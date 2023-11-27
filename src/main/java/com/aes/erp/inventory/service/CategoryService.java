@@ -1,0 +1,42 @@
+package com.aes.erp.inventory.service;
+
+import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.entity.ItemCategory;
+import org.springframework.data.domain.Page;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+public interface CategoryService {
+
+    void addCategory(CategoryRequestDto categoryRequestDto);
+
+    void updateCategory(Long id,CategoryRequestDto categoryRequestDto);
+    Optional<ItemCategory> existByCode(String Code);
+
+    Optional<ItemCategory> getItemCategory(Long id);
+
+
+    Page<?> getItemCategories(Optional<Integer> page, Optional<Integer> size,
+                              Optional<String> name, Optional<String> code,
+                              Optional<BigDecimal> currentYearBudget,
+                              Optional<Long> productCount
+    );
+    Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
+                               Optional<String> name, Optional<String> code,
+                               Optional<BigDecimal> currentYearBudget, Optional<Long> productCount,
+                               Optional<Long> categoryId
+    );
+
+    void deleteCategory(Long id);
+
+    List<?> getCategories(Optional<String> name, Optional<String> code);
+
+
+    List<?> getSubCategories(Optional<Long>categoryId, Optional<String> name, Optional<String> code);
+
+    String getNewCategoryCode();
+
+    void deleteAttribute(Long categoryId, Long attributeId);
+}

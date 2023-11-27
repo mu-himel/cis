@@ -1,0 +1,102 @@
+package com.aes.erp.inventory.repository;
+
+public interface CategoryQuery {
+    String getCategoriesWithSearch="SELECT cat.id, cat.code, cat.name, cat.currentYearBudget, cat.productCount FROM (" +
+            "SELECT ic.id, ic.code, ic.name, " +
+            "(sum(amount) + COALESCE((" +
+            "        SELECT sum(amount) FROM item_categories childCat " +
+            "        LEFT JOIN category_budgets cb2 ON childCat.id = cb2.category_id " +
+            "    WHERE childCat.parent_category_id = ic.id " +
+            "    AND cb2.current_year = :year " +
+            "    ),0) ) as currentYearBudget, " +
+            "    ( SELECT count(i.id) FROM items i " +
+            "    WHERE i.item_category_id in ( " +
+            "           SELECT id FROM item_categories ic3" +
+            "           WHERE ic3.parent_category_id = ic.id )" +
+            ") as productCount" +
+            "     FROM item_categories ic " +
+            "     LEFT JOIN category_budgets cb ON ic.id = cb.category_id " +
+            "     WHERE ic.active=1 AND ic.parent_category_id IS NULL AND cb.current_year = :year " +
+            "     GROUP BY ic.id) cat " +
+            "WHERE (:name IS NULL OR cat.name LIKE concat(:name,'%')) " +
+            " AND (:code IS NULL OR cat.code LIKE concat(:code,'%')) " +
+            " AND (:currentYearBudget IS NULL OR cat.currentYearBudget LIKE concat(:currentYearBudget,'%')) " +
+            " AND (:productCount IS NULL OR cat.productCount=:productCount)";
+
+    String countCategoriesWithSearch="SELECT count(cat.id) FROM (" +
+            "SELECT ic.id, ic.code, ic.name, " +
+            "(sum(amount) + COALESCE((" +
+            "        SELECT sum(amount) FROM item_categories childCat " +
+            "        LEFT JOIN category_budgets cb2 ON childCat.id = cb2.category_id " +
+            "    WHERE childCat.parent_category_id = ic.id " +
+            "    AND cb2.current_year = :year " +
+            "    ),0) ) as currentYearBudget, " +
+            "    ( SELECT count(i.id) FROM items i " +
+            "    WHERE i.item_category_id in ( " +
+            "           SELECT id FROM item_categories ic3" +
+            "           WHERE ic3.parent_category_id = ic.id )" +
+            ") as productCount" +
+            "     FROM item_categories ic " +
+            "     LEFT JOIN category_budgets cb ON ic.id = cb.category_id " +
+            "     WHERE ic.active=1 AND ic.parent_category_id IS NULL AND cb.current_year = :year " +
+            "     GROUP BY ic.id) cat " +
+            "WHERE (:name IS NULL OR cat.name LIKE concat(:name,'%')) " +
+            " AND (:code IS NULL OR cat.code LIKE concat(:code,'%')) " +
+            " AND (:currentYearBudget IS NULL OR cat.currentYearBudget LIKE concat(:currentYearBudget,'%')) " +
+            " AND (:productCount IS NULL OR cat.productCount=:productCount)";
+
+
+    String getSubCategoriesWithSearch="SELECT cat.id, cat.code, cat.name, cat.currentYearBudget, cat.productCount, " +
+            "cat.mainCategoryId, cat.mainCategoryName, cat.mainCategoryCode " +
+            "FROM (" +
+            "SELECT ic.id, ic.code, ic.name, ipc.id as mainCategoryId, " +
+            "ipc.name as mainCategoryName, ipc.code as mainCategoryCode," +
+            "(sum(amount) + COALESCE((" +
+            "        SELECT sum(amount) FROM item_categories childCat " +
+            "        LEFT JOIN category_budgets cb2 ON childCat.id = cb2.category_id " +
+            "    WHERE childCat.parent_category_id = ic.id " +
+            "    AND cb2.current_year = :year " +
+            "    ),0) ) as currentYearBudget, " +
+            "    ( SELECT count(i.id) FROM items i " +
+            "    WHERE i.item_category_id in ( " +
+            "           SELECT id FROM item_categories ic3" +
+            "           WHERE ic3.id = ic.id )" +
+            ") as productCount" +
+            "     FROM item_categories ic " +
+            "     LEFT JOIN item_categories ipc ON ipc.id = ic.parent_category_id " +
+            "     LEFT JOIN category_budgets cb ON ic.id = cb.category_id " +
+            "     WHERE ic.active=1 AND ic.parent_category_id IS NOT NULL AND cb.current_year = :year " +
+            "     GROUP BY ic.id) cat " +
+            "WHERE (:name IS NULL OR cat.name LIKE concat(:name,'%')) " +
+            " AND (:code IS NULL OR cat.code LIKE concat(:code,'%')) " +
+            " AND (:currentYearBudget IS NULL OR cat.currentYearBudget LIKE concat(:currentYearBudget,'%')) " +
+            " AND (:categoryId IS NULL OR cat.mainCategoryId =:categoryId) " +
+            " AND (:productCount IS NULL OR cat.productCount=:productCount)";
+
+    String countSubCategoriesWithSearch="SELECT count(cat.id) " +
+            "FROM (" +
+            "SELECT ic.id, ic.code, ic.name, ipc.id as mainCategoryId, " +
+            "ipc.name as mainCategoryName, ipc.code as mainCategoryCode," +
+            "(sum(amount) + COALESCE((" +
+            "        SELECT sum(amount) FROM item_categories childCat " +
+            "        LEFT JOIN category_budgets cb2 ON childCat.id = cb2.category_id " +
+            "    WHERE childCat.parent_category_id = ic.id " +
+            "    AND cb2.current_year = :year " +
+            "    ),0) ) as currentYearBudget, " +
+            "    ( SELECT count(i.id) FROM items i " +
+            "    WHERE i.item_category_id in ( " +
+            "           SELECT id FROM item_categories ic3" +
+            "           WHERE ic3.id = ic.id )" +
+            ") as productCount" +
+            "     FROM item_categories ic " +
+            "     LEFT JOIN item_categories ipc ON ipc.id = ic.parent_category_id " +
+            "     LEFT JOIN category_budgets cb ON ic.id = cb.category_id " +
+            "     WHERE ic.active=1 AND ic.parent_category_id IS NOT NULL AND cb.current_year = :year " +
+            "     GROUP BY ic.id) cat " +
+            "WHERE (:name IS NULL OR cat.name LIKE concat(:name,'%')) " +
+            " AND (:code IS NULL OR cat.code LIKE concat(:code,'%')) " +
+            " AND (:currentYearBudget IS NULL OR cat.currentYearBudget LIKE concat(:currentYearBudget,'%')) " +
+            " AND (:categoryId IS NULL OR cat.mainCategoryId =:categoryId) " +
+            " AND (:productCount IS NULL OR cat.productCount=:productCount)";
+
+}

@@ -1,0 +1,234 @@
+package com.aes.erp.inventory.service;
+
+import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.entity.CategoryBudget;
+import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.enums.BudgetType;
+import com.aes.erp.inventory.repository.CategoryAttributeRepository;
+import com.aes.erp.inventory.repository.CategoryBudgetRepository;
+import com.aes.erp.inventory.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class CategoryServiceImpl implements CategoryService {
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CategoryBudgetRepository categoryBudgetRepository;
+
+    @Autowired
+    private CategoryAttributeRepository categoryAttributeRepository;
+
+    @Override
+    @Transactional
+    public void addCategory(CategoryRequestDto categoryRequestDto) {
+        ItemCategory category = categoryRequestDto.getEntity();
+        if(categoryRequestDto.getCurrentYearBudget() != null){
+            category.setBudgets(Arrays.asList(new CategoryBudget(category,
+                    categoryRequestDto.getCurrentYearBudget(), LocalDate.now().getYear(), BudgetType.REGULAR)));
+        }
+        if(categoryRepository.existsByCode(category.getCode())){
+            throw new AesException("Category code already exist");
+        }
+
+        if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
+            category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
+                categoryAttribute.setCategory(category);
+                return categoryAttribute;
+            }).collect(Collectors.toList()));
+        }
+        categoryRepository.save(category);
+    }
+
+    @Override
+    @Transactional
+    public void updateCategory(Long id, CategoryRequestDto categoryRequestDto) {
+        Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
+        if(itemCategoryOptional.isEmpty()){
+            throw new AesException("Category Not Found");
+        }
+
+        ItemCategory itemCategory = itemCategoryOptional.get();
+        if(!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())){
+            throw new AesException("Category Code should be unique");
+        }
+
+        if(itemCategory.getParentCategory()!=null){
+            if(categoryRequestDto.getParentCategory()==null || categoryRequestDto.getParentCategory().getId()==null){
+                throw new AesException("Parent Category Id missing");
+            }
+        }
+
+        if(categoryRequestDto.getName()!=null) {
+            itemCategory.setName(categoryRequestDto.getName());
+        }
+
+        if(categoryRequestDto.getBudgetId().isPresent()){
+
+            Optional<CategoryBudget> categoryBudgetOp = categoryBudgetRepository
+                                                        .findById(categoryRequestDto.getBudgetId().get());
+            if(categoryBudgetOp.isPresent()) {
+                CategoryBudget categoryBudget = categoryBudgetOp.get();
+                if(categoryBudget.getAmount().compareTo(categoryRequestDto.getCurrentYearBudget())<0){
+                    CategoryBudget extendedBudget = new CategoryBudget(itemCategory,
+                            categoryRequestDto.getCurrentYearBudget(),
+                            LocalDate.now().getYear(), BudgetType.EXTENDED);
+
+                    extendedBudget.setAmount(categoryRequestDto.getCurrentYearBudget()
+                                    .subtract(categoryBudget.getAmount()));
+                    categoryBudgetRepository.save(extendedBudget);
+                } else {
+                    categoryBudget.setAmount(categoryRequestDto.getCurrentYearBudget());
+                    categoryBudgetRepository.save(categoryBudget);
+
+                }
+
+
+
+            }
+        }
+
+        if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
+            itemCategory.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
+                categoryAttribute.setCategory(itemCategory);
+                return categoryAttribute;
+            }).collect(Collectors.toList()));
+        }
+
+        if(categoryRequestDto.getEntity().getParentCategory()!=null) {
+            itemCategory.setParentCategory(categoryRequestDto.getEntity().getParentCategory());
+        }
+        if(categoryRequestDto.getVat()!=null) {
+            itemCategory.setVat(categoryRequestDto.getVat());
+        }
+        categoryRepository.save(itemCategory);
+    }
+
+    @Override
+    public Optional<ItemCategory> existByCode(String code) {
+        return categoryRepository.findByCode(code);
+    }
+
+    @Override
+    public Optional<ItemCategory> getItemCategory(Long id) {
+        return categoryRepository.findById(id,LocalDate.now().getYear());
+    }
+
+    @Override
+    public Page<?> getItemCategories(Optional<Integer> page, Optional<Integer> size,
+                                        Optional<String> name, Optional<String> code,
+                                     Optional<BigDecimal> currentYearBudget,
+                                     Optional<Long> productCount
+                                     ) {
+        Integer year  =LocalDate.now().getYear();
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10),sort);
+
+            return categoryRepository.findAllByYear(name.orElse(null),
+                    code.orElse(null), currentYearBudget.orElse(null),
+                    productCount.orElse(null),year,pageable);
+
+
+    }
+
+    @Override
+    public Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
+                                      Optional<String> name, Optional<String> code,
+                                      Optional<BigDecimal> currentYearBudget, Optional<Long> productCount,
+                                      Optional<Long> categoryId
+                                      ) {
+
+
+
+        Integer year  = LocalDate.now().getYear();
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        
+        Page<?> result = null;
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10),sort);
+
+
+        result = categoryRepository.findAllSubCategories(
+                            name.orElse(null),
+                            code.orElse(null),
+                            currentYearBudget.orElse(null),
+                            productCount.orElse(null),
+                            categoryId.orElse(null),
+                            year,pageable);
+
+        return result;
+    }
+
+
+    @Override
+    public List<?> getCategories(Optional<String> name, Optional<String> code) {
+
+        return categoryRepository.findAllMainCategories(name.orElse(null),code.orElse(null));
+    }
+
+    @Override
+    public List<?> getSubCategories(Optional<Long> id, Optional<String> name, Optional<String> code) {
+
+        return categoryRepository.findAllSubCategories(
+                id.orElse(null),
+                name.orElse(null),
+                code.orElse(null));
+    }
+
+    @Override
+    @Transactional
+    public void deleteCategory(Long id) {
+
+        Optional<ItemCategory> itemCategoryOptional = getItemCategory(id);
+        if(itemCategoryOptional.isPresent()){
+
+            Optional<Long> countOptional = categoryRepository.countAllByParentCategoryAndActive(
+                    itemCategoryOptional.get(),true);
+            if(countOptional.isPresent() && countOptional.get() > 0){
+                throw new AesException("Sorry! Unable to delete, Category already used in Child Category");
+            }
+
+            ItemCategory itemCategory = itemCategoryOptional.get();
+            itemCategory.setActive(false);
+            categoryRepository.save(itemCategory);
+        }
+    }
+
+    @Override
+    public String getNewCategoryCode() {
+        Optional<ItemCategory> icOp = categoryRepository.findMaxOrderById();
+        if(icOp.isPresent()){
+            ItemCategory ic = icOp.get();
+            Long newProductId = ic.getId() + 1;
+            return String.format("%05d",newProductId);
+        }
+        return String.format("%05d",1);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAttribute(Long categoryId, Long attributeId) {
+        Optional<ItemCategory> icOp = categoryRepository.findById(categoryId);
+        if(icOp.isPresent()){
+            categoryAttributeRepository.deleteByIdAndCategoryId(attributeId,categoryId);
+
+        }
+
+    }
+}
