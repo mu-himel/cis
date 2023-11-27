@@ -2,6 +2,7 @@ package com.aes.erp.vendor.controller;
 
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.dto.VendorDto;
+import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.service.VendorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +27,18 @@ public class VendorController {
     // get vendor info
     @GetMapping("/{id}")
     public ResponseEntity<?> getVendor(@PathVariable("id") Long id) {
-
         return new ResponseEntity<>(
                 vendorService.getVendorDetail(id),
-                HttpStatus.OK);
+                HttpStatus.OK
+        );
     }
 
     @GetMapping
     public ResponseEntity<?> getVendors(
             @RequestParam("page") Optional<Integer> page,
             @RequestParam("size") Optional<Integer> size
-
-    ){
+    )
+    {
         return new ResponseEntity<>(
                 vendorService.getVendors(page,size),
                 HttpStatus.OK
@@ -46,7 +47,7 @@ public class VendorController {
 
     // crate vendor
     @PostMapping
-    public ResponseEntity<?> createVendor(@RequestBody @Valid VendorDto vendorDto) {
+    public ResponseEntity<?> createVendor(@RequestBody VendorDto vendorDto) {
         vendorService.createVendor(vendorDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -97,9 +98,8 @@ public class VendorController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-    // email after vendor registration
-
-    // vendor api with and without password 2 apis
-
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<VendorProfileDto> getVendorProfile(@PathVariable("userId") Long userId) {
+        return  new ResponseEntity<VendorProfileDto>(vendorService.getVendorProfile(userId), HttpStatus.OK);
+    }
 }
