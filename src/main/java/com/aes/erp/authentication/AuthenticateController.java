@@ -56,8 +56,8 @@ public class AuthenticateController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        logger.info("username: "+ authenticationRequestDTO.getUsername());
-//        logger.info("password: "+ authenticationRequestDTO.getPassword());
+        logger.info("username: "+ authenticationRequestDTO.getUsername());
+        logger.info("password: "+ authenticationRequestDTO.getPassword());
 
         /** Step 2: If authenticated then generating JWT to return as response. */
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(authenticationRequestDTO.getUsername());
