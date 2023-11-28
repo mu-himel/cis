@@ -24,7 +24,7 @@ public class StoreTypeController {
 
     @PostMapping
     @ApiOperation(value = "Create a store type")
-    public ResponseEntity<StoreTypeGetDto> addItem(@RequestBody @Valid StoreTypeCreateDto createDto){
+    public ResponseEntity<StoreTypeGetDto> addStoreType(@RequestBody @Valid StoreTypeCreateDto createDto){
         return new ResponseEntity<StoreTypeGetDto>(storeTypeService.createStoreType(createDto), HttpStatus.CREATED);
     }
 }
