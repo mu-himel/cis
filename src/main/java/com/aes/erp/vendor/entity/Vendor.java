@@ -1,15 +1,18 @@
 package com.aes.erp.vendor.entity;
 
 import com.aes.erp.common.DtoConvertable;
+import com.aes.erp.common.DtoConvertable;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.vendor.dto.VendorDto;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.enums.VendorStatus;
-import com.aes.erp.vendor.enums.VendorVerifyStatus;
+import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -17,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Vendor implements DtoConvertable<VendorDto> {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,8 +32,14 @@ public class Vendor implements DtoConvertable<VendorDto> {
 
     private String phone;
 
+//    private String nid;
+//    private String tin;
+//    private String bankAccountNumber;
+//    private String businessIdNumber;
+//    private String tradeLicense;
+
     @Enumerated(EnumType.STRING)
-    private VendorVerifyStatus vendorVerifyStatus;
+    private VendorDocumentVerificationStatus verificationStatus;
 
 
     @Enumerated(EnumType.STRING)
@@ -54,7 +64,9 @@ public class Vendor implements DtoConvertable<VendorDto> {
 
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
     private List<VendorItem> vendorItems;
-
+    @OneToOne(fetch = FetchType.LAZY)
+    private DocumentHolder documentHolder;
+    private Date startedAt;
     @Override
     @JsonIgnore
     public VendorDto getDto() {

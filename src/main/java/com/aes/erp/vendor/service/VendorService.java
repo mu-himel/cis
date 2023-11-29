@@ -1,6 +1,7 @@
 package com.aes.erp.vendor.service;
 
 import com.aes.erp.vendor.dto.VendorDto;
+import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.enums.VendorStatus;
 import org.springframework.data.domain.Page;
@@ -28,4 +29,5 @@ public interface VendorService {
                            Optional<MultipartFile> quotationFormat);
 
     void updateVendorStatus(Long id, VendorStatus status);
+    VendorProfileDto getVendorProfile(Long userId);
 }

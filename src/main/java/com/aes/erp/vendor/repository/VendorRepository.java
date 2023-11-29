@@ -1,11 +1,10 @@
 package com.aes.erp.vendor.repository;
 
-import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
-import com.aes.erp.vendor.enums.VendorVerifyStatus;
+import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,6 +30,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
     @Query("SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt " +
             "WHERE v.id=:id")
     Optional<VendorDetail> findVendorById(@Param("id") Long id);
+    Vendor findVendorByUserId(@Param("userId")Long userId);
 
     interface VendorDetail{
         Long getId();
@@ -41,7 +41,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
         String getEmail();
 
-        VendorVerifyStatus getVendorVerifyStatus();
+        VendorDocumentVerificationStatus getVendorVerifyStatus();
 
         VendorStatus getStatus();
         UserInfo getUser();
@@ -93,7 +93,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
         VendorStatus getStatus();
 
-        VendorVerifyStatus getVendorVerifyStatus();
+        VendorDocumentVerificationStatus getVerificationStatus();
 
         VendorType getVendorType();
     }

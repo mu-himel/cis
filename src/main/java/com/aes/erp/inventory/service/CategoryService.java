@@ -18,11 +18,10 @@ public interface CategoryService {
     Optional<ItemCategory> getItemCategory(Long id);
 
 
-    Page<?> getItemCategories(Optional<Integer> page, Optional<Integer> size,
-                              Optional<String> name, Optional<String> code,
-                              Optional<BigDecimal> currentYearBudget,
-                              Optional<Long> productCount
-    );
+    Page<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Integer> page, Optional<Integer> size,
+                                                                 Optional<Long> storeTypeId, Optional<Long> parentCategoryId);
+    Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
+                              Optional<Long> id);
     Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
                                Optional<String> name, Optional<String> code,
                                Optional<BigDecimal> currentYearBudget, Optional<Long> productCount,

@@ -8,13 +8,13 @@ import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.VendorDto;
+import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorFile;
 import com.aes.erp.vendor.entity.VendorItem;
-import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
-import com.aes.erp.vendor.enums.VendorVerifyStatus;
+import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.repository.VendorFileRepository;
 import com.aes.erp.vendor.repository.VendorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +37,8 @@ public class VendorServiceImpl implements VendorService {
 
     @Autowired
     private VendorRepository vendorRepository;
+    @Autowired
+    private VendorProfileService vendorProfileService;
 
     @Autowired
     private FileUploadService fileUploadService;
@@ -69,16 +72,22 @@ public class VendorServiceImpl implements VendorService {
         User user = userService.createVendorUserAccount(vendorDto);
 
         Vendor vendor = vendorDto.getEntity();
-        vendor.setStatus(VendorStatus.DISABLED);
+        vendor.setStatus(VendorStatus.CREATED);
         vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
         vendor.setSubCategory(new ItemCategory(vendorDto.getSubCategory().getId()));
-        vendor.setVendorItems(vendorDto.getItems().stream().map((item)
-                -> new VendorItem(new Item(item.getId()),vendor)).collect(Collectors.toList()));
-        vendor.setVendorVerifyStatus(VendorVerifyStatus.UN_VERIFIED);
+//        vendor.setVendorItems(
+//                vendorDto.getItems()
+//                        .stream()
+//                        .map(
+//                                (item) -> new VendorItem(new Item(item.getId()), vendor)
+//                        )
+//                        .collect(Collectors.toList())
+//        );
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION);
         vendor.setVendorType(vendorDto.getVendorType());
         vendor.setUser(user);
+        vendor.setStartedAt(new Date());
         vendorRepository.save(vendor);
-
     }
 
     @Override
@@ -208,5 +217,16 @@ public class VendorServiceImpl implements VendorService {
         );
         vendor.setStatus(status);
 
+    }
+    @Override
+    public VendorProfileDto getVendorProfile(Long id){
+        Vendor vendor = vendorRepository.findVendorByUserId(id);
+        VendorProfileDto profileDto = new VendorProfileDto();
+        profileDto.setBasicInformation(vendorProfileService.getVendorBasicInformation(vendor));
+        profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
+        profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));
+        profileDto.setName(vendor.getName());
+        profileDto.setStartedAt(vendor.getStartedAt());
+        return profileDto;
     }
 }

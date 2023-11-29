@@ -2,6 +2,7 @@ package com.aes.erp.vendor.dto;
 
 import com.aes.erp.common.EntityConvertible;
 import com.aes.erp.common.ReferenceObjectDto;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorStatus;
@@ -11,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;

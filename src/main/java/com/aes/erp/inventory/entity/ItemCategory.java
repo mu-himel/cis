@@ -34,6 +34,9 @@ public class ItemCategory {
 
   @ManyToOne
   private ItemCategory parentCategory;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "store_type_id")
+  private StoreType storeType;
 
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
   @ApiModelProperty(hidden = true)

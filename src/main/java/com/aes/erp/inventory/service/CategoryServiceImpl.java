@@ -4,10 +4,12 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.entity.CategoryBudget;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.enums.BudgetType;
 import com.aes.erp.inventory.repository.CategoryAttributeRepository;
 import com.aes.erp.inventory.repository.CategoryBudgetRepository;
 import com.aes.erp.inventory.repository.CategoryRepository;
+import com.aes.erp.inventory.repository.StoreTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private StoreTypeRepository storeTypeRepository;
 
     @Autowired
     private CategoryBudgetRepository categoryBudgetRepository;
@@ -40,14 +44,17 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void addCategory(CategoryRequestDto categoryRequestDto) {
         ItemCategory category = categoryRequestDto.getEntity();
-        if(categoryRequestDto.getCurrentYearBudget() != null){
-            category.setBudgets(Arrays.asList(new CategoryBudget(category,
-                    categoryRequestDto.getCurrentYearBudget(), LocalDate.now().getYear(), BudgetType.REGULAR)));
-        }
         if(categoryRepository.existsByCode(category.getCode())){
             throw new AesException("Category code already exist");
         }
-
+        if(categoryRequestDto.getParentCategory() != null){
+            Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(categoryRequestDto.getParentCategory().getId());
+            if(itemCategoryOptional.isPresent()) category.setParentCategory(itemCategoryOptional.get());
+        }
+        if(categoryRequestDto.getStoreType().getId() != null){
+            Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
+            if(storeType.isPresent())category.setStoreType(storeType.get());
+        }
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
                 categoryAttribute.setCategory(category);
@@ -80,29 +87,9 @@ public class CategoryServiceImpl implements CategoryService {
             itemCategory.setName(categoryRequestDto.getName());
         }
 
-        if(categoryRequestDto.getBudgetId().isPresent()){
-
-            Optional<CategoryBudget> categoryBudgetOp = categoryBudgetRepository
-                                                        .findById(categoryRequestDto.getBudgetId().get());
-            if(categoryBudgetOp.isPresent()) {
-                CategoryBudget categoryBudget = categoryBudgetOp.get();
-                if(categoryBudget.getAmount().compareTo(categoryRequestDto.getCurrentYearBudget())<0){
-                    CategoryBudget extendedBudget = new CategoryBudget(itemCategory,
-                            categoryRequestDto.getCurrentYearBudget(),
-                            LocalDate.now().getYear(), BudgetType.EXTENDED);
-
-                    extendedBudget.setAmount(categoryRequestDto.getCurrentYearBudget()
-                                    .subtract(categoryBudget.getAmount()));
-                    categoryBudgetRepository.save(extendedBudget);
-                } else {
-                    categoryBudget.setAmount(categoryRequestDto.getCurrentYearBudget());
-                    categoryBudgetRepository.save(categoryBudget);
-
-                }
-
-
-
-            }
+        if(categoryRequestDto.getStoreType().getId() != null){
+            Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
+            if(storeType.isPresent())itemCategory.setStoreType(storeType.get());
         }
 
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
@@ -114,9 +101,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         if(categoryRequestDto.getEntity().getParentCategory()!=null) {
             itemCategory.setParentCategory(categoryRequestDto.getEntity().getParentCategory());
-        }
-        if(categoryRequestDto.getVat()!=null) {
-            itemCategory.setVat(categoryRequestDto.getVat());
         }
         categoryRepository.save(itemCategory);
     }
@@ -132,20 +116,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Page<?> getItemCategories(Optional<Integer> page, Optional<Integer> size,
-                                        Optional<String> name, Optional<String> code,
-                                     Optional<BigDecimal> currentYearBudget,
-                                     Optional<Long> productCount
-                                     ) {
-        Integer year  =LocalDate.now().getYear();
+    public Page<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Integer> page, Optional<Integer> size, Optional<Long> storeTypeId, Optional<Long> parentCategoryID) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10),sort);
+        return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(storeTypeId.orElse(null), parentCategoryID.orElse(null), pageable);
+    }
+
+    @Override
+    public Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
+                                        Optional<Long> store_type_id) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10),sort);
 
-            return categoryRepository.findAllByYear(name.orElse(null),
-                    code.orElse(null), currentYearBudget.orElse(null),
-                    productCount.orElse(null),year,pageable);
-
-
+            return categoryRepository.findAllByItemCategoryWithSubCategoryCount(store_type_id.orElse(null), pageable);
     }
 
     @Override
@@ -195,7 +178,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
 
-        Optional<ItemCategory> itemCategoryOptional = getItemCategory(id);
+        Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
         if(itemCategoryOptional.isPresent()){
 
             Optional<Long> countOptional = categoryRepository.countAllByParentCategoryAndActive(

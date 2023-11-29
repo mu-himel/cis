@@ -4,6 +4,7 @@ import com.aes.erp.common.EntityConvertible;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.CategoryBudget;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.StoreType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -30,16 +31,10 @@ public class CategoryRequestDto implements EntityConvertible<ItemCategory> {
     @ApiModelProperty(required = true)
     private String code;
 
-    private BigDecimal currentYearBudget;
-    private Optional<Long> budgetId;
-
     private ItemCategory parentCategory;
 
     private List<CategoryAttribute> attributes;
-
-    private BigDecimal vat;
-
-
+    private StoreType storeType;
 
     @Override
     @ApiModelProperty(hidden = true)
