@@ -4,12 +4,14 @@ import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.authentication.entity.CustomUserDetails;
 import com.aes.erp.config.Constants;
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.service.OrganizationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ import java.util.function.Function;
  * */
 @Service
 public class JwtUtil {
+    @Autowired
+    private OrganizationService organizationService;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -72,5 +76,9 @@ public class JwtUtil {
         Claims c = extractAllClaims(token);
         ObjectMapper mapper = new ObjectMapper();
         return mapper.convertValue(extractAllClaims(token),ClaimResponseDto.class);
+    }
+
+    public boolean validateOrganization(Long orgId){
+        return organizationService.isOrganizationExist(orgId);
     }
 }
