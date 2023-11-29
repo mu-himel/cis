@@ -1,25 +1,33 @@
 package com.aes.erp.vendor.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Configuration;
 
-@Service
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Configuration
 public class GenericMapper {
-    private final ObjectMapper objectMapper;
-    private final ModelMapper modelMapper;
-
-    public GenericMapper(ObjectMapper objectMapper, ModelMapper modelMapper) {
-        this.objectMapper = objectMapper;
-        this.modelMapper = modelMapper;
+    @Bean
+    public ModelMapper modelMapper() {
+        return modelMapper;
     }
+    private final ModelMapper modelMapper;
+    public GenericMapper() {
+        modelMapper = new ModelMapper();
+    }
+
 
     public <T, U> U map(T source, Class<U> destinationType) {
         return modelMapper.map(source, destinationType);
     }
 
-    public <T> T map(String responseToMap, Class<T> resultClass) throws Exception {
-        return objectMapper.readValue(responseToMap, resultClass);
+    public <D, E> List<E> mapDtoListToEntityList(List<D> dtoList, Class<E> entityClass) {
+        return dtoList.stream()
+                .map(dto -> map(dto, entityClass))
+                .collect(Collectors.toList());
     }
 }

@@ -16,14 +16,29 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, CategoryQuery {
 
 
-    @Query(value = getCategoriesWithSearch,countQuery = countCategoriesWithSearch,nativeQuery = true)
-    Page<ItemCategoryInfoExt> findAllByYear(
-            @Param("name") String name,
-            @Param("code") String code,
-            @Param("currentYearBudget") BigDecimal currentYearBudget,
-            @Param("productCount") Long productCurrent,
-            @Param("year") Integer year, Pageable pageable);
+    @Query(value = "SELECT c.id AS category_id, c.name AS category_name, COUNT(sub.id) AS subcategory_count, st.name AS store_type_name " +
+            "FROM item_categories c " +
+            "LEFT JOIN item_categories sub ON c.id = sub.parent_category_id " +
+            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
+            "WHERE st.id = :store_type_id " +
+            "GROUP BY c.id " +
+            "HAVING subcategory_count > 0",
+            nativeQuery = true)
+    Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
+            @Param("store_type_id") Long store_type_id, Pageable pageable);
 
+    @Query(value = "SELECT c.id AS sub_category_id, c.name AS sub_category_name, par.id AS parent_category, st.name AS store_type_name " +
+            "FROM item_categories c " +
+            "LEFT JOIN item_categories par ON par.id = c.parent_category_id " +
+            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
+            "WHERE st.id = :store_type_id " +
+            "AND par.id = :parent_category " +
+            "GROUP BY c.id",
+            nativeQuery = true)
+    Page<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
+            @Param("store_type_id") Long store_type_id,
+            @Param("parent_category") Long parent_category,
+            Pageable pageable);
 
     Optional<ItemCategory> findByCode(String code);
 
@@ -83,6 +98,18 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
         String getCode();
 
 
+    }
+    public interface SubCategoryWithParentCategoryAndStoreTypeExt{
+        String getSub_category_id();
+        String getSub_category_name();
+        String getParent_category();
+        String getStore_type_name();
+    }
+    public interface ItemCategoryWithSubCategoryCountExt {
+        Long getCategory_id();
+        String getCategory_name();
+        Long getSubcategory_count();
+        String getStore_type_name();
     }
 
     interface ItemCategoryInfoExt extends ItemCategoryInfo{

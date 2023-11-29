@@ -1,10 +1,12 @@
 package com.aes.erp.inventory.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,4 +19,7 @@ public class StoreType {
     @Column(updatable = false)
     private Long id;
     private String name;
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "storeType", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private List<ItemCategory> categories;
 }

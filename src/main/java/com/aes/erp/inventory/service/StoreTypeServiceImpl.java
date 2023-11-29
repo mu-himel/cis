@@ -1,11 +1,18 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.StoreTypeCreateDto;
 import com.aes.erp.inventory.dto.response.StoreTypeGetDto;
 import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.repository.StoreTypeRepository;
 import com.aes.erp.vendor.utils.GenericMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class StoreTypeServiceImpl implements StoreTypeService{
@@ -26,5 +33,32 @@ public class StoreTypeServiceImpl implements StoreTypeService{
         StoreTypeGetDto getDto = new StoreTypeGetDto();
         getDto = mapper.map(storeType, StoreTypeGetDto.class);
         return getDto;
+    }
+
+    @Override
+    public Page<?> getAllStoreTypes(Optional<String> optionalFilter, Optional<Integer> page, Optional<Integer> size) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
+        return storeTypeRepository.getAllStoreTypes(pageable, optionalFilter.orElse(""));
+    }
+
+    @Override
+    public void updateStoreType(Long id, StoreTypeCreateDto createDto) {
+        Optional<StoreType> storeTypeOptional = storeTypeRepository.findById(id);
+        if(storeTypeOptional.isPresent()){
+            StoreType storeType = storeTypeOptional.get();
+            storeType.setName(createDto.getName());
+            storeTypeRepository.save(storeType);
+        }
+        else throw new AesException("No store type found with given Id");
+    }
+
+    @Override
+    public void deleteStoreType(Long id) {
+        Optional<StoreType> storeTypeOptional = storeTypeRepository.findById(id);
+        if(storeTypeOptional.isPresent()){
+            storeTypeRepository.deleteById(id);
+        }
+        else throw new AesException("No store type found with given Id");
     }
 }
