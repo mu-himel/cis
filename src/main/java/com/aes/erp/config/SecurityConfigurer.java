@@ -2,6 +2,7 @@ package com.aes.erp.config;
 
 import com.aes.erp.authentication.CustomUserDetailsService;
 import com.aes.erp.authentication.filter.JwtRequestFilter;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -50,7 +51,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 // swagger specific routes
                 "/webjars/**","/swagger-ui.html",
                 "/v2/api-docs","/swagger-resources/**",
-                "/authenticate", "/users-credential", "/forgot-password", "/hello"};
+                "/authenticate", "/users-credential", "/forgot-password", "/hello", "/api/v1/organizations/register"};
 
                 http.cors().and().csrf().disable()
                 .authorizeRequests()

@@ -2,9 +2,12 @@ package com.aes.erp.authentication.filter;
 
 import com.aes.erp.authentication.CustomUserDetailsService;
 import com.aes.erp.authentication.JwtUtil;
+import com.aes.erp.authentication.OrganizationPrincipal;
+import com.aes.erp.exception.AesException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -16,6 +19,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +39,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
+        final String orgId = request.getHeader("orgId");
         String username = null;
         String jwt = null;
         try {
@@ -49,6 +55,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
+        }
+        else if(orgId != null && SecurityContextHolder.getContext().getAuthentication() == null){
+            if(!jwtUtil.validateOrganization(Long.parseLong(orgId))){
+                throw new AesException("Organization ID is not Registered in our system");
+            }
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    new OrganizationPrincipal(orgId), null, Collections.emptyList());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
             filterChain.doFilter(request, response);

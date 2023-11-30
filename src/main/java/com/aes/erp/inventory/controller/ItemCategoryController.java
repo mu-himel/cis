@@ -23,38 +23,47 @@ public class ItemCategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping
-    @ApiOperation(value = "Get Parent Categories With Pagination")
-    public ResponseEntity<?> getParentItemCategories(@RequestParam("page") Optional<Integer> page,
+    @GetMapping("/subcategories")
+    @ApiOperation(value = "Get Item SubCategories Filtered By Store Type Name and Parent Category Name, With Pagination")
+    public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("page") Optional<Integer> page,
                                                @RequestParam("size") Optional<Integer> size,
-                                               @RequestParam("name")  Optional<String> name,
-                                               @RequestParam("code") Optional<String> code,
-                                               @RequestParam("currentYearBudget") Optional<BigDecimal> currentYearBudget,
-                                               @RequestParam("productCount") Optional<Long> productCount
+                                               @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
+                                                           @RequestParam("parentCategoryId")  Optional<Long> parentCategoryId
     ){
         return new ResponseEntity<>(
-                categoryService.getItemCategories(page,size, name, code,currentYearBudget,productCount),
+                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(page,size, storeTypeId, parentCategoryId),
+                HttpStatus.OK
+        );
+    }
+    @GetMapping
+    @ApiOperation(value = "Get Item Categories Filtered By Store Type Name, With Pagination")
+    public ResponseEntity<?> getItemCategoriesForStoreType(@RequestParam("page") Optional<Integer> page,
+                                                           @RequestParam("size") Optional<Integer> size,
+                                                           @RequestParam("storeTypeId")  Optional<Long> storeTypeId
+    ){
+        return new ResponseEntity<>(
+                categoryService.getItemCategoriesForStoreType(page,size, storeTypeId),
                 HttpStatus.OK
         );
     }
 
-    @GetMapping("/sub-categories")
-    @ApiOperation(value = "Get Sub Categories With Pagination")
-    public ResponseEntity<?> getSubItemCategories(
-                     @RequestParam("page") Optional<Integer> page,
-                     @RequestParam("size") Optional<Integer> size,
-                     @RequestParam("name")  Optional<String> name,
-                     @RequestParam("code") Optional<String> code,
-                     @RequestParam("currentYearBudget") Optional<BigDecimal> currentYearBudget,
-                     @RequestParam("productCount") Optional<Long> productCount,
-                     @RequestParam("categoryId") Optional<Long> categoryId
-
-    ){
-        return new ResponseEntity<>(
-                categoryService.getItemCategories(page,size, name, code,currentYearBudget,productCount,categoryId),
-                HttpStatus.OK
-        );
-    }
+//    @GetMapping("/sub-categories")
+//    @ApiOperation(value = "Get Sub Categories With Pagination")
+//    public ResponseEntity<?> getSubItemCategories(
+//                     @RequestParam("page") Optional<Integer> page,
+//                     @RequestParam("size") Optional<Integer> size,
+//                     @RequestParam("name")  Optional<String> name,
+//                     @RequestParam("code") Optional<String> code,
+//                     @RequestParam("currentYearBudget") Optional<BigDecimal> currentYearBudget,
+//                     @RequestParam("productCount") Optional<Long> productCount,
+//                     @RequestParam("categoryId") Optional<Long> categoryId
+//
+//    ){
+//        return new ResponseEntity<>(
+//                categoryService.getItemCategories(page,size, name, code,currentYearBudget,productCount,categoryId),
+//                HttpStatus.OK
+//        );
+//    }
 
     @GetMapping("/main-categories")
     public ResponseEntity<?> getMainCategoryList(@RequestParam("name")  Optional<String> name,

@@ -1,7 +1,7 @@
 package com.aes.erp.inventory.repository;
 
 public interface CategoryQuery {
-    String getCategoriesWithSearch="SELECT cat.id, cat.code, cat.name, cat.currentYearBudget, cat.productCount FROM (" +
+    String getCategoriesWithSearch="SELECT cat.id, cat.code, cat.name FROM (" +
             "SELECT ic.id, ic.code, ic.name, " +
             "(sum(amount) + COALESCE((" +
             "        SELECT sum(amount) FROM item_categories childCat " +
