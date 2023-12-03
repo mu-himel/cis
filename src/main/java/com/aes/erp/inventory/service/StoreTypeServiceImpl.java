@@ -5,7 +5,7 @@ import com.aes.erp.inventory.dto.request.StoreTypeCreateDto;
 import com.aes.erp.inventory.dto.response.StoreTypeGetDto;
 import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.repository.StoreTypeRepository;
-import com.aes.erp.vendor.utils.GenericMapper;
+import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +18,9 @@ import java.util.Optional;
 public class StoreTypeServiceImpl implements StoreTypeService{
 
     private final StoreTypeRepository storeTypeRepository;
-    private final GenericMapper mapper;
+    private final GenericModelMapper mapper;
 
-    public StoreTypeServiceImpl(StoreTypeRepository storeTypeRepository, GenericMapper mapper) {
+    public StoreTypeServiceImpl(StoreTypeRepository storeTypeRepository, GenericModelMapper mapper) {
         this.storeTypeRepository = storeTypeRepository;
         this.mapper = mapper;
     }

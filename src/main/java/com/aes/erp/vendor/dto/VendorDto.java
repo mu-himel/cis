@@ -41,19 +41,11 @@ public class VendorDto implements Serializable, EntityConvertible<Vendor> {
     private VendorType vendorType;
 
     private String password;
-
     private ReferenceObjectDto category;
 
     private ReferenceObjectDto subCategory;
 
     private List<ReferenceObjectDto> items;
-
-    // nid validation
-//    private String nid;
-//    private String tin;
-//    private String bankAccountNumber;
-//    private String businessIdNumber;
-//    private String tradeLicense;
 
 
 

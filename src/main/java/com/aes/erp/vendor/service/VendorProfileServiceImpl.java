@@ -36,7 +36,7 @@ public class VendorProfileServiceImpl implements VendorProfileService{
     public VendorAddressDto getVendorAddress(Vendor vendor) {
         VendorAddressDto dto = new VendorAddressDto();
         if(vendor.getDocumentHolder() != null){
-            DocumentHolder documentHolder = new DocumentHolder();
+            DocumentHolder documentHolder = vendor.getDocumentHolder();
             if(documentHolder.getTinDocument() != null){
                 dto.setPermanentAddress(documentHolder.getTinDocument().getPermanentAddress());
                 dto.setPresentAddress(documentHolder.getTinDocument().getCurrentAddress());

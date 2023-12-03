@@ -1,8 +1,7 @@
 package com.aes.erp.vendor.utils;
 
-import org.modelmapper.Converter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,13 +9,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Configuration
-public class GenericMapper {
+public class GenericModelMapper {
     @Bean
     public ModelMapper modelMapper() {
         return modelMapper;
     }
     private final ModelMapper modelMapper;
-    public GenericMapper() {
+    public GenericModelMapper() {
         modelMapper = new ModelMapper();
     }
 

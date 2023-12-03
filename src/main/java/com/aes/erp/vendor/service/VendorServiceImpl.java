@@ -59,9 +59,9 @@ public class VendorServiceImpl implements VendorService {
     @Transactional
     public void createVendor(VendorDto vendorDto) {
 
-        if(vendorDto.getVendorType()==null || vendorDto.getVendorType().getId()== null){
-            throw new AesException("Vendor Type Required");
-        }
+//        if(vendorDto.getVendorType()==null || vendorDto.getVendorType().getId()== null){
+//            throw new AesException("Vendor Type Required");
+//        }
 
         if(!vendorDto.getPhone().isEmpty()){
             if(vendorDto.getPhone().matches("[a-zA-Z]")){
@@ -83,7 +83,7 @@ public class VendorServiceImpl implements VendorService {
 //                        )
 //                        .collect(Collectors.toList())
 //        );
-        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION);
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
         vendor.setVendorType(vendorDto.getVendorType());
         vendor.setUser(user);
         vendor.setStartedAt(new Date());
@@ -228,5 +228,15 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
         return profileDto;
+    }
+
+    @Override
+    public void approveVendor(Long vendorId) {
+        Optional<Vendor> vendorOptional = vendorRepository.findById(vendorId);
+        if(!vendorOptional.isPresent())throw new AesException("Vendor not found");
+        Vendor vendor = vendorOptional.get();
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.VERIFIED);
+        vendor.setStatus(VendorStatus.ENABLED);
+        vendorRepository.save(vendor);
     }
 }

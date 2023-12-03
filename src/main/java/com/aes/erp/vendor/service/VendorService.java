@@ -30,4 +30,5 @@ public interface VendorService {
 
     void updateVendorStatus(Long id, VendorStatus status);
     VendorProfileDto getVendorProfile(Long userId);
+    void approveVendor(Long vendorId);
 }
