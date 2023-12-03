@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
                 return categoryAttribute;
             }).collect(Collectors.toList()));
         }
+        category.setCreatedAt(Instant.now().toEpochMilli());
         categoryRepository.save(category);
     }
 

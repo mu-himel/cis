@@ -49,4 +49,13 @@ public class OrganizationServiceImpl implements OrganizationService{
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
         return organizationRepository.findAllOrganizations(pageable);
     }
+
+    @Override
+    public Organization getOrganizationById(Long orgId) {
+        Optional<Organization> organization = organizationRepository.findById(orgId);
+        if(!organization.isPresent()){
+            throw new AesException("Organization couldn't found by given Id");
+        }
+        return organizationRepository.findById(orgId).get();
+    }
 }

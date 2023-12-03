@@ -29,4 +29,9 @@ public class GenericModelMapper {
                 .map(dto -> map(dto, entityClass))
                 .collect(Collectors.toList());
     }
+    public <E, D> List<D> mapEntityListToDtoList(List<E> entityList, Class<D> dtoClass) {
+        return entityList.stream()
+                .map(dto -> map(dto, dtoClass))
+                .collect(Collectors.toList());
+    }
 }
