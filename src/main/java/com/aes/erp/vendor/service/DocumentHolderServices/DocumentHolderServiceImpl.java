@@ -144,7 +144,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         documentHolder.setBusinessDetails(businessDetails);
         documentHolder.setGeneralDetails(generalDetails);
         documentHolder = documentHolderRepository.save(documentHolder);
-        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION);
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.DOCUMENTS_SUBMITTED);
         vendor.setDocumentHolder(documentHolder);
         vendorRepository.save(vendor);
     }
@@ -167,9 +167,9 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         if(documentHolder.getNidDocument()!= null && !documentHolder.getNidDocument().getNid().isEmpty()){
             responseDto.setNidNumber(documentHolder.getNidDocument().getNid());
         }
-//        if(documentHolder.getTradeDocument()!= null && !documentHolder.getTradeDocument().getTradeLicenseNumber().isEmpty()){
-//            responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
-//        }
+        if(documentHolder.getTradeDocument()!= null && !documentHolder.getTradeDocument().getTradeLicenseNumber().isEmpty()){
+            responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
+        }
         return responseDto;
     }
 }

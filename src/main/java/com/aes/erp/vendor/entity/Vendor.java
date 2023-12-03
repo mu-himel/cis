@@ -32,12 +32,6 @@ public class Vendor implements DtoConvertable<VendorDto> {
 
     private String phone;
 
-//    private String nid;
-//    private String tin;
-//    private String bankAccountNumber;
-//    private String businessIdNumber;
-//    private String tradeLicense;
-
     @Enumerated(EnumType.STRING)
     private VendorDocumentVerificationStatus verificationStatus;
 
