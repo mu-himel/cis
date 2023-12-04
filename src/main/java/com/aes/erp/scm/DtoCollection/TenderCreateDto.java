@@ -10,6 +10,5 @@ import java.util.List;
 public class TenderCreateDto {
     private Long itemCategoryId;
     private Long orgId;
-    private Long itemQuantity;
     private List<TenderItem> tenderItems;
 }

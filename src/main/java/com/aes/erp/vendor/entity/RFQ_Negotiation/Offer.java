@@ -1,12 +1,12 @@
 package com.aes.erp.vendor.entity.RFQ_Negotiation;
 
-import com.aes.erp.scm.Entities.PriceQuotation;
 import com.aes.erp.scm.Entities.Tender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -18,9 +18,6 @@ public class Offer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
-    @OneToOne
-    private PriceQuotation priceQuotation;
-    private Long estimatedDeliveryDays;
     private boolean deliveryChargeIncluded;
     private Long deliveryChargeAmount;
     @Enumerated(value = EnumType.STRING)
@@ -30,7 +27,12 @@ public class Offer {
     private String note;
     private Long finalOfferPrice;
     private Long creditPaymentDays;
+    @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)
+    private List<OfferItem> offerItems;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tender_id")
     private Tender tender;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "negotiation_history_id")
+    private NegotiationHistory negotiationHistory;
 }

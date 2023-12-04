@@ -26,6 +26,11 @@ public class StoreTypeController {
         storeTypeService.createStoreType(createDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+    @GetMapping("/{id}")
+    @ApiOperation(value = "Get A Store Type By Id")
+    public ResponseEntity<?> getAllStoreTypes(@PathVariable("id") Long id){
+        return new ResponseEntity<>(storeTypeService.getById(id), HttpStatus.OK);
+    }
     @GetMapping
     @ApiOperation(value = "Get All Store Types")
     public ResponseEntity<?> getAllStoreTypes(@RequestParam("searchFilter") Optional<String> searchFilter,
