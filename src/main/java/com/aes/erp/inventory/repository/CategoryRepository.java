@@ -103,12 +103,14 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
         String getSubCategoryName();
         Long getParentCategoryId();
         String getParentCategoryName();
+        String getParentCategoryCode();
         String getStoreTypeName();
         Long getStoreTypeId();
     }
     public interface ItemCategoryWithSubCategoryCountExt {
         Long getCategoryId();
         String getCategoryName();
+        String getCategoryCode();
         Long getSubcategoryCount();
         String getStoreTypeName();
     }
