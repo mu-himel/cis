@@ -105,7 +105,7 @@ public interface CategoryQuery {
             "FROM item_categories c " +
             "LEFT JOIN item_categories sub ON c.id = sub.parent_category_id " +
             "LEFT JOIN store_types st ON c.store_type_id = st.id " +
-            "WHERE st.id = :store_type_id " +
+            "WHERE st.id = :store_type_id AND c.parent_category_id IS NULL " +
             "GROUP BY c.id ";
 
 
@@ -115,7 +115,7 @@ public interface CategoryQuery {
             "FROM item_categories c " +
             "LEFT JOIN item_categories par ON par.id = c.parent_category_id " +
             "LEFT JOIN store_types st ON c.store_type_id = st.id " +
-            "WHERE (:store_type_id IS NULL OR st.id = :store_type_id)" +
+            "WHERE c.parent_category_id IS NOT NULL AND (:store_type_id IS NULL OR st.id = :store_type_id)" +
             "AND (:parent_category IS NULL OR par.id = :parent_category)" +
             "GROUP BY c.id";
 
