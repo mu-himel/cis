@@ -26,18 +26,18 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     List<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
             @Param("store_type_id") Long store_type_id);
 
-    @Query(value = "SELECT c.id AS sub_category_id, c.name AS sub_category_name, par.id AS parent_category, st.name AS store_type_name " +
-            "FROM item_categories c " +
-            "LEFT JOIN item_categories par ON par.id = c.parent_category_id " +
-            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
-            "WHERE st.id = :store_type_id " +
-            "AND par.id = :parent_category " +
-            "GROUP BY c.id",
+    @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
             nativeQuery = true)
     Page<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
             @Param("store_type_id") Long store_type_id,
             @Param("parent_category") Long parent_category,
             Pageable pageable);
+
+    @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
+            nativeQuery = true)
+    List<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
+            @Param("store_type_id") Long store_type_id,
+            @Param("parent_category") Long parent_category);
 
     Optional<ItemCategory> findByCode(String code);
 
@@ -99,10 +99,10 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
     }
     public interface SubCategoryWithParentCategoryAndStoreTypeExt{
-        String getSub_category_id();
-        String getSub_category_name();
-        String getParent_category();
-        String getStore_type_name();
+        String getSubCategoryId();
+        String getSubCategoryName();
+        String getParentCategory();
+        String getStoreTypeName();
     }
     public interface ItemCategoryWithSubCategoryCountExt {
         Long getCategoryId();

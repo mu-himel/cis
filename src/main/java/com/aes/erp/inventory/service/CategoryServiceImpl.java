@@ -125,6 +125,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId, Optional<Long> parentCategoryId) {
+        return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(storeTypeId.orElse(null),
+                parentCategoryId.orElse(null));
+    }
+
+    @Override
     public Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
                                         Optional<Long> store_type_id) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
