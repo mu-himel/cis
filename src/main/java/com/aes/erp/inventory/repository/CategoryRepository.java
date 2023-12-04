@@ -16,15 +16,15 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, CategoryQuery {
 
 
-    @Query(value = "SELECT c.id AS category_id, c.name AS category_name, COUNT(sub.id) AS subcategory_count, st.name AS store_type_name " +
-            "FROM item_categories c " +
-            "LEFT JOIN item_categories sub ON c.id = sub.parent_category_id " +
-            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
-            "WHERE st.id = :store_type_id " +
-            "GROUP BY c.id ",
+    @Query(value = findAllByItemCategoryWithSubCategoryCount,
             nativeQuery = true)
     Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
             @Param("store_type_id") Long store_type_id, Pageable pageable);
+
+    @Query(value = findAllByItemCategoryWithSubCategoryCount,
+            nativeQuery = true)
+    List<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
+            @Param("store_type_id") Long store_type_id);
 
     @Query(value = "SELECT c.id AS sub_category_id, c.name AS sub_category_name, par.id AS parent_category, st.name AS store_type_name " +
             "FROM item_categories c " +
@@ -105,10 +105,10 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
         String getStore_type_name();
     }
     public interface ItemCategoryWithSubCategoryCountExt {
-        Long getCategory_id();
-        String getCategory_name();
-        Long getSubcategory_count();
-        String getStore_type_name();
+        Long getCategoryId();
+        String getCategoryName();
+        Long getSubcategoryCount();
+        String getStoreTypeName();
     }
 
     interface ItemCategoryInfoExt extends ItemCategoryInfo{

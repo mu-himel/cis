@@ -160,6 +160,13 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
+    @Override
+    public List<?> getItemCategoriesForStoreType(Optional<Long> id) {
+        if(id.isEmpty()){
+            throw new AesException("store type missing");
+        }
+        return categoryRepository.findAllByItemCategoryWithSubCategoryCount(id.get());
+    }
 
     @Override
     public List<?> getCategories(Optional<String> name, Optional<String> code) {
