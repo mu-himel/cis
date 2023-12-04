@@ -110,12 +110,13 @@ public interface CategoryQuery {
 
 
     String findAllBySubCategoryFilteredByStoreTypeAndParentCategory="SELECT c.id AS subCategoryId, " +
-            "c.name AS subCategoryName, par.id AS parentCategory, st.name AS storeTypeName " +
+            "c.name AS subCategoryName, par.id AS parentCategoryId, par.name AS parentCategoryName , " +
+            "st.id as storeTypeId, st.name AS storeTypeName " +
             "FROM item_categories c " +
             "LEFT JOIN item_categories par ON par.id = c.parent_category_id " +
             "LEFT JOIN store_types st ON c.store_type_id = st.id " +
-            "WHERE st.id = :store_type_id " +
-            "AND par.id = :parent_category " +
+            "WHERE (:store_type_id IS NULL OR st.id = :store_type_id)" +
+            "AND (:parent_category IS NULL OR par.id = :parent_category)" +
             "GROUP BY c.id";
 
 }
