@@ -2,6 +2,7 @@ package com.aes.erp.scm.Entities;
 
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,4 +35,6 @@ public class Tender {
     private TenderStatus tenderStatus;
     @Enumerated(EnumType.STRING)
     private TenderType tenderType;
+    @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
+    private List<Offer> offerList;
 }

@@ -20,6 +20,8 @@ public class TenderItem {
     private String productDescription;
     private String specification;
     private String location;
+    private Long itemQuantity;
+    private PriceQuotation priceQuotation;
     @ManyToOne
     @JsonIgnore
     private Tender tender;
