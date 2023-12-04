@@ -21,6 +21,7 @@ public class TenderItem {
     private String specification;
     private String location;
     private Long itemQuantity;
+    @OneToOne
     private PriceQuotation priceQuotation;
     @ManyToOne
     @JsonIgnore
