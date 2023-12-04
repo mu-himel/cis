@@ -21,7 +21,6 @@ public class Offer {
     @OneToOne
     private PriceQuotation priceQuotation;
     private Long estimatedDeliveryDays;
-    @Enumerated(value = EnumType.STRING)
     private boolean deliveryChargeIncluded;
     private Long deliveryChargeAmount;
     @Enumerated(value = EnumType.STRING)
