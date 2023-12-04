@@ -17,7 +17,7 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     Page<OrganizationExt> findAllOrganizations(Pageable pageable);
     @Query(value = "Select * from organizations o WHERE o.name=:name", nativeQuery = true)
     Optional<Organization> findByName(@Param("name") String name);
-    public interface OrganizationExt{
+    interface OrganizationExt{
         String getName();
         String getId();
         OrganizationStatus getStatus();

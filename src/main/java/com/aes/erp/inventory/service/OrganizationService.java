@@ -10,4 +10,5 @@ public interface OrganizationService {
     Organization registerOrganization(OrganizationCreateDto dto);
     boolean isOrganizationExist(Long Id);
     Page<?> getAllOrganization(Optional<Integer> page, Optional<Integer> size);
+    Organization getOrganizationById(Long orgId);
 }

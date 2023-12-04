@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.entity;
 
 import com.aes.erp.inventory.enums.ItemUnit;
+import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.user_management.entity.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
