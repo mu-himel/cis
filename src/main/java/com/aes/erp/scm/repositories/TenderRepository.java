@@ -26,7 +26,6 @@ public interface TenderRepository extends JpaRepository<Tender, Long> {
     @Query("SELECT t.id AS id, " +
             "t.tenderStatus AS tenderStatus, " +
             "t.tenderType AS tenderType, " +
-            "t.itemQuantity AS itemQuantity, " +
             "t.tenderCreator AS tenderCreator, " +
             "t.itemCategory AS itemCategory, " +
             "t.creationDate AS creationDate " +
@@ -48,7 +47,6 @@ public interface TenderRepository extends JpaRepository<Tender, Long> {
         TenderStatus getTenderStatus();
         TenderType getTenderType();
         ItemCategory getItemCategory();
-        Long getItemQuantity();
         Organization getTenderCreator();
         Long getCreationDate();
     }

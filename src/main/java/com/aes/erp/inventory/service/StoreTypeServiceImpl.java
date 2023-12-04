@@ -61,4 +61,11 @@ public class StoreTypeServiceImpl implements StoreTypeService{
         }
         else throw new AesException("No store type found with given Id");
     }
+
+    @Override
+    public StoreType getById(Long id) {
+        Optional<StoreType> storeTypeOptional = storeTypeRepository.findById(id);
+        if(storeTypeOptional.isEmpty()) throw new AesException("No store type found with given Id");
+        return storeTypeOptional.get();
+    }
 }

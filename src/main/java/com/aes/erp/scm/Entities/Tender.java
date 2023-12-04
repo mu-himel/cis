@@ -30,7 +30,6 @@ public class Tender {
     private ItemCategory itemCategory ;
     @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
     private List<TenderItem> tenderItems;
-    private Long itemQuantity;
     @Enumerated(EnumType.STRING)
     private TenderStatus tenderStatus;
     @Enumerated(EnumType.STRING)
