@@ -110,7 +110,7 @@ public interface CategoryQuery {
 
 
     String findAllBySubCategoryFilteredByStoreTypeAndParentCategory="SELECT c.id AS subCategoryId, " +
-            "c.name AS subCategoryName, par.id AS parentCategoryId, par.code AS parentCategoryCode," +
+            "c.name AS subCategoryName, c.code as subCategoryCode, par.id AS parentCategoryId, par.code AS parentCategoryCode," +
             " par.name AS parentCategoryName , " +
             "st.id as storeTypeId, st.name AS storeTypeName " +
             "FROM item_categories c " +
