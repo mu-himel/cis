@@ -239,4 +239,9 @@ public class VendorServiceImpl implements VendorService {
         vendor.setStatus(VendorStatus.ENABLED);
         vendorRepository.save(vendor);
     }
+
+    @Override
+    public Vendor getVendorByUserId(Long userId) {
+        return vendorRepository.findVendorByUserId(userId);
+    }
 }

@@ -1,6 +1,7 @@
 package com.aes.erp.scm.Entities;
 
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,4 @@ public class PriceQuotation {
     private Long id;
     private String pricePerUnit;
     private String totalPrice;
-    @OneToOne
-    private Offer offer;
 }

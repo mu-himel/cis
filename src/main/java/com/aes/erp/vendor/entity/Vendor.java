@@ -40,7 +40,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     private VendorStatus status;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private VendorType vendorType;
 
 

@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.entity.RFQ_Negotiation;
 
+import com.aes.erp.scm.Entities.Tender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,7 @@ public class NegotiationHistory {
     private Long id;
     @OneToMany(mappedBy = "negotiationHistory", cascade = CascadeType.ALL)
     private List<Offer> offers;
+    @OneToOne
+    private Tender tender;
 }
+

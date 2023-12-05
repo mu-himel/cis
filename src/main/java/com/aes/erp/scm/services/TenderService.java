@@ -2,6 +2,7 @@ package com.aes.erp.scm.services;
 
 import com.aes.erp.scm.DtoCollection.TenderCreateDto;
 import com.aes.erp.scm.DtoCollection.TenderResponseDto;
+import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderType;
 import org.springframework.data.domain.Page;
 
@@ -14,5 +15,6 @@ public interface TenderService {
     Page<?> getAllTenders(Optional<String> searchFilter, Optional<Integer> page,
                           Optional<Integer> size, Optional<TenderType> tenderType,
                           Optional<Long> startDate, Optional<Long> endDate);
-    TenderResponseDto getTenderById(Long id);
+    TenderResponseDto getTenderResponseById(Long id);
+    Tender getTenderById(Long id);
 }
