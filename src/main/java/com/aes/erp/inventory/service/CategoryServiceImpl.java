@@ -169,7 +169,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<?> getItemCategoriesForStoreType(Optional<Long> id) {
 
-        return categoryRepository.findAllByItemCategoryWithSubCategoryCount(id.get());
+        return categoryRepository.findAllByItemCategoryWithSubCategoryCount(id.orElse(null));
     }
 
     @Override
