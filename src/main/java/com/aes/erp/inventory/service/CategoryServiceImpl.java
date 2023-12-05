@@ -168,9 +168,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<?> getItemCategoriesForStoreType(Optional<Long> id) {
-        if(id.isEmpty()){
-            throw new AesException("store type missing");
-        }
+
         return categoryRepository.findAllByItemCategoryWithSubCategoryCount(id.get());
     }
 
