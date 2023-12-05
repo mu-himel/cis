@@ -79,6 +79,6 @@ public class JwtUtil {
     }
 
     public boolean validateOrganization(Long orgId){
-        return organizationService.isOrganizationExist(orgId);
+        return organizationService.isOrganizationExistAndEnabled(orgId);
     }
 }

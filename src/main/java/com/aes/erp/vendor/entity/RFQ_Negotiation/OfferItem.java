@@ -1,6 +1,7 @@
 package com.aes.erp.vendor.entity.RFQ_Negotiation;
 
 import com.aes.erp.scm.Entities.PriceQuotation;
+import com.aes.erp.vendor.entity.Vendor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,8 +24,7 @@ public class OfferItem {
     private Long itemQuantity;
     @OneToOne
     private PriceQuotation priceQuotation;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "offer_id")
     private Offer offer;
-
 }

@@ -35,4 +35,9 @@ public class OrganizationController {
                                                  @RequestParam("size") Optional<Integer> size){
         return new ResponseEntity<>(organizationService.getAllOrganization( page, size), HttpStatus.OK);
     }
+    @PostMapping("/{id}")
+    public ResponseEntity<?> enableOrganization(@PathVariable("id") Long id, @RequestParam("status") Boolean status){
+        organizationService.enableOrganization(status, id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

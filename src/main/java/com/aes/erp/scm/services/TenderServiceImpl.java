@@ -44,7 +44,7 @@ public class TenderServiceImpl implements TenderService{
         Tender tender = genericModelMapper.map(dto, Tender.class);
         tender.setTenderStatus(TenderStatus.PENDING);
         tender.setTenderType(TenderType.PENDING);
-        if(organizationService.isOrganizationExist(dto.getOrgId())){
+        if(organizationService.isOrganizationExistAndEnabled(dto.getOrgId())){
             tender.setTenderCreator(organizationService.getOrganizationById(dto.getOrgId()));
         }
         if(categoryService.getItemCategory(dto.getItemCategoryId()).isPresent()){
@@ -66,10 +66,16 @@ public class TenderServiceImpl implements TenderService{
     }
 
     @Override
-    public TenderResponseDto getTenderById(Long id) {
+    public TenderResponseDto getTenderResponseById(Long id) {
         Optional<Tender> tender = tenderRepository.findById(id);
         if(tender.isEmpty()) throw new AesException("Tender couldn't be found");
         TenderResponseDto dto = genericModelMapper.map(tender.get(), TenderResponseDto.class);
         return dto;
+    }
+    @Override
+    public Tender getTenderById(Long id) {
+        Optional<Tender> tender = tenderRepository.findById(id);
+        if(tender.isEmpty()) throw new AesException("Tender couldn't be found");
+        return tender.get();
     }
 }

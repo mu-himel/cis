@@ -8,7 +8,8 @@ import java.util.Optional;
 
 public interface OrganizationService {
     Organization registerOrganization(OrganizationCreateDto dto);
-    boolean isOrganizationExist(Long Id);
+    boolean isOrganizationExistAndEnabled(Long Id);
     Page<?> getAllOrganization(Optional<Integer> page, Optional<Integer> size);
     Organization getOrganizationById(Long orgId);
+    void enableOrganization(Boolean enable, Long id);
 }

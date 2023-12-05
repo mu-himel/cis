@@ -16,8 +16,9 @@ public class OfferController {
     }
 
     @PostMapping("/accept-tender/{tenderId}")
-    public ResponseEntity<?> acceptTender(@PathVariable("tenderId") String tenderId, @RequestBody OfferCreateDTO offerCreateDTO){
+    public ResponseEntity<?> acceptTender(@PathVariable("tenderId") Long tenderId, @RequestBody OfferCreateDTO offerCreateDTO){
         offerService.createInitialOffer(offerCreateDTO, tenderId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+//    @PostMapping("")
 }
