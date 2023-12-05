@@ -114,7 +114,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Optional<ItemCategory> getItemCategory(Long id) {
-        return categoryRepository.findById(id,LocalDate.now().getYear());
+        Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
+        return itemCategoryOptional;
     }
 
     @Override

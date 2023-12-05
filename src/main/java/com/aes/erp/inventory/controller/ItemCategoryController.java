@@ -86,9 +86,11 @@ public class ItemCategoryController {
 
     @GetMapping("/{id}")
     @ApiOperation(value = "Get Category Detail By ID")
-    public ResponseEntity<?> getItemCategory(@ApiParam(value = "Category Id",example = "1", required = true) @PathVariable("id") Long id){
+    public ResponseEntity<?> getItemCategory(
+            @ApiParam(value = "Category Id",example = "1", required = true)
+            @PathVariable("id") Long id){
         return new ResponseEntity<>(
-                categoryService.getItemCategory(id),
+                categoryService.getItemCategory(id).get(),
                 HttpStatus.OK
         );
     }
