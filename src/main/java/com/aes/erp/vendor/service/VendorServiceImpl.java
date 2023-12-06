@@ -3,15 +3,14 @@ package com.aes.erp.vendor.service;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
-import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
+import com.aes.erp.vendor.dto.VendorRegistrationMailSender;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorFile;
-import com.aes.erp.vendor.entity.VendorItem;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
@@ -22,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
@@ -31,10 +32,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class VendorServiceImpl implements VendorService {
+    private final RestTemplate restTemplate;
+
 
     @Autowired
     private VendorRepository vendorRepository;
@@ -50,6 +52,10 @@ public class VendorServiceImpl implements VendorService {
     @Autowired
     private VendorFileRepository vendorFileRepository;
 
+    public VendorServiceImpl(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     @Override
     public Optional<?> getVendorDetail(Long vendorId) {
         Optional<?> vendorOptional = vendorRepository.findVendorById(vendorId);
@@ -59,10 +65,6 @@ public class VendorServiceImpl implements VendorService {
     @Override
     @Transactional
     public void createVendor(VendorDto vendorDto) {
-
-//        if(vendorDto.getVendorType()==null || vendorDto.getVendorType().getId()== null){
-//            throw new AesException("Vendor Type Required");
-//        }
 
         if(!vendorDto.getPhone().isEmpty()){
             if(vendorDto.getPhone().matches("[a-zA-Z]")){
@@ -76,19 +78,14 @@ public class VendorServiceImpl implements VendorService {
         vendor.setStatus(VendorStatus.CREATED);
         vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
         vendor.setSubCategory(new ItemCategory(vendorDto.getSubCategory().getId()));
-//        vendor.setVendorItems(
-//                vendorDto.getItems()
-//                        .stream()
-//                        .map(
-//                                (item) -> new VendorItem(new Item(item.getId()), vendor)
-//                        )
-//                        .collect(Collectors.toList())
-//        );
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
         vendor.setVendorType(vendorDto.getVendorType());
         vendor.setUser(user);
         vendor.setStartedAt(new Date());
-        vendorRepository.save(vendor);
+        vendor = vendorRepository.save(vendor);
+//        //Notify user Through a mail
+//        VendorRegistrationMailSender senderBody = new VendorRegistrationMailSender(vendor.getEmail());
+//        ResponseEntity<String> response = restTemplate.postForEntity("http://172.17.18.36:9090/api/mail/send-email", senderBody, String.class);
     }
 
     @Override
@@ -238,6 +235,8 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));
         profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
+        profileDto.setBusinessDetails(vendor.getDocumentHolder().getBusinessDetails());
+        profileDto.setGeneralDetails(vendor.getDocumentHolder().getGeneralDetails());
         return profileDto;
     }
 
