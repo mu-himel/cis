@@ -61,6 +61,8 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @OneToOne(fetch = FetchType.LAZY)
     private DocumentHolder documentHolder;
     private Date startedAt;
+    @OneToOne
+    private VendorScore vendorScore;
     @Override
     @JsonIgnore
     public VendorDto getDto() {

@@ -15,6 +15,7 @@ public interface CategoryService {
     void updateCategory(Long id,CategoryRequestDto categoryRequestDto);
     Optional<ItemCategory> existByCode(String Code);
 
+
     Optional<ItemCategory> getItemCategory(Long id);
 
 
@@ -35,6 +36,7 @@ public interface CategoryService {
     void deleteCategory(Long id);
 
     List<?> getCategories(Optional<String> name, Optional<String> code);
+    List<?> getSubCategoriesByParentId(Optional<Long> categoryId);
 
 
     List<?> getSubCategories(Optional<Long>categoryId, Optional<String> name, Optional<String> code);

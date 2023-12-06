@@ -85,6 +85,10 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     List<ItemCategoryInfo> findAllSubCategories(Long parentCategoryId,
                                                 String name, String code);
 
+    @Query(value = "SELECT ic.id as id, ic.name as name, ic.code as code FROM ItemCategory ic " +
+            "WHERE ic.active = 1 " +
+            " AND (:parentCategoryId IS NULL OR ic.parentCategory.id = :parentCategoryId)")
+    List<ItemCategoryInfo> findAllSubCategories(Long parentCategoryId);
 
     @Query("select max(ic.id) from ItemCategory ic")
     Optional<ItemCategory> findMaxOrderById();

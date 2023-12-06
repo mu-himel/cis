@@ -180,6 +180,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<?> getSubCategoriesByParentId(Optional<Long> categoryId) {
+        return categoryRepository.findAllSubCategories(categoryId.orElse(null));
+    }
+
+    @Override
     public List<?> getSubCategories(Optional<Long> id, Optional<String> name, Optional<String> code) {
 
         return categoryRepository.findAllSubCategories(

@@ -36,11 +36,12 @@ public class VendorController {
     @GetMapping
     public ResponseEntity<?> getVendors(
             @RequestParam("page") Optional<Integer> page,
-            @RequestParam("size") Optional<Integer> size
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("searchFilter") Optional<String> searchFilter
     )
     {
         return new ResponseEntity<>(
-                vendorService.getVendors(page,size),
+                vendorService.getVendors(page,size,searchFilter),
                 HttpStatus.OK
         );
     }
@@ -100,7 +101,7 @@ public class VendorController {
     }
     @GetMapping("/profile/{userId}")
     public ResponseEntity<VendorProfileDto> getVendorProfile(@PathVariable("userId") Long userId) {
-        return  new ResponseEntity<VendorProfileDto>(vendorService.getVendorProfile(userId), HttpStatus.OK);
+        return  new ResponseEntity<>(vendorService.getVendorProfile(userId), HttpStatus.OK);
     }
     @PostMapping("/{id}/approve")
     public void approveVendorProfile(@PathVariable("id") Long id){
