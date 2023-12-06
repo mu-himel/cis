@@ -12,6 +12,7 @@ import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorFile;
 import com.aes.erp.vendor.entity.VendorItem;
+import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
@@ -109,7 +110,18 @@ public class VendorServiceImpl implements VendorService {
         if(vendorDto.getPhone()!=null && !vendorDto.getPhone().isEmpty()) {
             vendor.setPhone(vendorDto.getPhone());
         }
-
+        if(vendorDto.getCategory() != null){
+            vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
+        }
+        if(vendorDto.getSubCategory() != null){
+            vendor.setSubCategory(new ItemCategory(vendorDto.getSubCategory().getId()));
+        }
+        if(vendorDto.getVendorType() != null){
+            VendorType vendorType = new VendorType();
+            vendorType.setId(vendorDto.getVendorType().getId());
+            vendor.setVendorType(vendorType);
+        }
+        vendorRepository.save(vendor);
     }
 
     @Override
@@ -117,10 +129,9 @@ public class VendorServiceImpl implements VendorService {
         vendorRepository.deleteById(id);
     }
 
-    @Override
-    public Page<?> getVendors(Optional<Integer> page, Optional<Integer> size) {
+    @Override public Page<?> getVendors(Optional<Integer> page, Optional<Integer> size, Optional<String> searchFilter) {
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10));
-        return vendorRepository.findAllVendors(pageable);
+        return vendorRepository.findAllVendors(pageable, searchFilter.orElse(null));
     }
 
     @Override

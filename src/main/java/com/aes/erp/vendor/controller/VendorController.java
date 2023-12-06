@@ -36,11 +36,12 @@ public class VendorController {
     @GetMapping
     public ResponseEntity<?> getVendors(
             @RequestParam("page") Optional<Integer> page,
-            @RequestParam("size") Optional<Integer> size
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("searchFilter") Optional<String> searchFilter
     )
     {
         return new ResponseEntity<>(
-                vendorService.getVendors(page,size),
+                vendorService.getVendors(page,size,searchFilter),
                 HttpStatus.OK
         );
     }

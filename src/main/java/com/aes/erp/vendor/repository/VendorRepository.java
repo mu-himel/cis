@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.repository;
 
+import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
@@ -23,9 +24,18 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             "WHERE v.id=:id")
     Optional<Vendor> findById(Long id);
 
-    @Query(value = "SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt",
-    countQuery = "SELECT COUNT(v) FROM Vendor v LEFT JOIN v.vendorType vt")
-    Page<VendorInfo> findAllVendors(Pageable pageable);
+    @Query(value = "SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt LEFT JOIN FETCH v.category c LEFT JOIN FETCH v.subCategory sc " +
+            "WHERE :searchFilter IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
+            "   OR :searchFilter IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
+            "   OR :searchFilter IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
+            "   OR :searchFilter IS NULL OR LOWER(vt.name) LIKE LOWER(CONCAT('%', :searchFilter, '%')) ",
+            countQuery = "SELECT COUNT(v) FROM Vendor v LEFT JOIN v.vendorType vt LEFT JOIN v.category c LEFT JOIN v.subCategory sc " +
+                    "WHERE :searchFilter IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
+                    "   OR :searchFilter IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
+                    "   OR :searchFilter IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
+                    "   OR :searchFilter IS NULL OR LOWER(vt.name) LIKE LOWER(CONCAT('%', :searchFilter, '%')) ")
+    Page<VendorInfo> findAllVendors(Pageable pageable, @Param("searchFilter") String searchFilter);
+
 
     @Query("SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt " +
             "WHERE v.id=:id")
@@ -96,5 +106,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         VendorDocumentVerificationStatus getVerificationStatus();
 
         VendorType getVendorType();
+        ItemCategory getCategory();
+        ItemCategory getSubCategory();
     }
 }

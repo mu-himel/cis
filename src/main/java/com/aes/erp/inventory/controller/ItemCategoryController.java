@@ -82,6 +82,13 @@ public class ItemCategoryController {
                 HttpStatus.OK
         );
     }
+    @GetMapping("/subcategory-list")
+    public ResponseEntity<?> getCategoryList(@RequestParam("categoryId")  Optional<Long> categoryId){
+        return new ResponseEntity<>(
+                categoryService.getSubCategoriesByParentId(categoryId),
+                HttpStatus.OK
+        );
+    }
 
     @GetMapping("/{id}")
     @ApiOperation(value = "Get Category Detail By ID")
