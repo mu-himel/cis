@@ -15,6 +15,7 @@ public class AuthenticationResponseDTO {
     private final List<OrganizationInfo> organizationInfos;
 
     private EmployeeInfoDto employee;
+    private final Long vendorId;
 
 //    private final List<OrganizationFileResponseDTO> organizationFileInfos;
 
@@ -22,18 +23,24 @@ public class AuthenticationResponseDTO {
 
     public AuthenticationResponseDTO(String jwt, long id, List<String> roles, List<OrganizationInfo> organizationInfos,
 //                                     List<OrganizationFileResponseDTO> organizationFileInfos,
-                                     String status) {
+                                     Long vendorId, String status) {
         this.jwt = jwt;
         this.id = id;
         this.roles = roles;
+        this.vendorId = vendorId;
         this.status = status;
         this.organizationInfos = organizationInfos;
 //        this.organizationFileInfos = organizationFileInfos;
     }
 
+    public Long getVendorId() {
+        return vendorId;
+    }
+
     public void setEmployee(EmployeeInfoDto employee) {
         this.employee = employee;
     }
+
 
     public EmployeeInfoDto getEmployee() {
         return employee;

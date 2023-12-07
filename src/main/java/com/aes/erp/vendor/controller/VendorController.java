@@ -5,6 +5,7 @@ import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.service.VendorService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class VendorController {
 
     // crate vendor
     @PostMapping
-    public ResponseEntity<?> createVendor(@RequestBody VendorDto vendorDto) {
+    public ResponseEntity<?> createVendor(@RequestBody VendorDto vendorDto) throws JsonProcessingException {
         vendorService.createVendor(vendorDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -99,9 +100,9 @@ public class VendorController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    @GetMapping("/profile/{userId}")
-    public ResponseEntity<VendorProfileDto> getVendorProfile(@PathVariable("userId") Long userId) {
-        return  new ResponseEntity<>(vendorService.getVendorProfile(userId), HttpStatus.OK);
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<VendorProfileDto> getVendorProfile(@PathVariable() Long id) {
+        return  new ResponseEntity<>(vendorService.getVendorProfile(id), HttpStatus.OK);
     }
     @PostMapping("/{id}/approve")
     public void approveVendorProfile(@PathVariable("id") Long id){

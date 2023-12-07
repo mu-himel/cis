@@ -65,9 +65,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                }
             }
             if(roleName.equals("VENDOR")){
-                Vendor vendor = vendorService.getVendorByUserId(user.getId());
-                if(vendor != null){
-                    customUserDetails.setVendor(vendor);
+                Optional<Vendor> vendor = vendorService.getVendorByUserId(user.getId());
+                if(vendor.isPresent()){
+                    customUserDetails.setVendor(vendor.get());
                 }
             }
 
