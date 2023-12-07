@@ -104,7 +104,7 @@ public class VendorController {
     public ResponseEntity<VendorProfileDto> getVendorProfile(@PathVariable() Long id) {
         return  new ResponseEntity<>(vendorService.getVendorProfile(id), HttpStatus.OK);
     }
-    @PostMapping("/{id}/approve")
+    @PutMapping("/{id}/approve")
     public void approveVendorProfile(@PathVariable("id") Long id){
         vendorService.approveVendor(id);
     }

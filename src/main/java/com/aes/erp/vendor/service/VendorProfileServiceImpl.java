@@ -23,11 +23,11 @@ public class VendorProfileServiceImpl implements VendorProfileService{
         VendorIdentificationDto identificationDto = new VendorIdentificationDto();
         if(vendor.getDocumentHolder() != null){
             DocumentHolder documentHolder = vendor.getDocumentHolder();
-            identificationDto.setBin(documentHolder.getBinDocument().getBin());
-            identificationDto.setNid(documentHolder.getNidDocument().getNid());
-            identificationDto.setTin(documentHolder.getTinDocument().getTin());
-            identificationDto.setSolvency(documentHolder.getBankSolvencyDocument().getAccount());
-            identificationDto.setTrade(documentHolder.getTradeDocument().getTradeLicenseNumber());
+            if(documentHolder.getBinDocument() != null)identificationDto.setBin(documentHolder.getBinDocument().getBin());
+            if(documentHolder.getNidDocument() != null)identificationDto.setNid(documentHolder.getNidDocument().getNid());
+            if(documentHolder.getTinDocument() != null)identificationDto.setTin(documentHolder.getTinDocument().getTin());
+            if(documentHolder.getBankSolvencyDocument() != null)identificationDto.setSolvency(documentHolder.getBankSolvencyDocument().getAccount());
+            if(documentHolder.getTradeDocument() != null)identificationDto.setTrade(documentHolder.getTradeDocument().getTradeLicenseNumber());
         }
         return identificationDto;
     }

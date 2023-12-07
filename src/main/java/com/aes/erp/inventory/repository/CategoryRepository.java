@@ -22,6 +22,9 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             "LEFT JOIN store_types st ON c.store_type_id = st.id " +
             "WHERE st.id = :store_type_id " +
             "GROUP BY c.id ",
+            countQuery = "SELECT COUNT(c.id) FROM item_categories c " +
+                    "LEFT JOIN store_types st ON c.store_type_id = st.id " +
+                    "WHERE st.id = :store_type_id",
             nativeQuery = true)
     Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
             @Param("store_type_id") Long store_type_id, Pageable pageable);
