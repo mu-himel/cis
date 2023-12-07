@@ -9,4 +9,10 @@ public class VendorIdentificationDto {
     private String bin;
     private String trade;
     private String solvency;
+    private byte[] nidFile;
+    private byte[] tinFile;
+    private byte[] binFile;
+    private byte[] tradeFile;
+    private byte[] solvencyFile;
+
 }

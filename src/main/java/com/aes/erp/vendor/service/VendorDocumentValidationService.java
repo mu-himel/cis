@@ -8,6 +8,8 @@ import com.aes.erp.vendor.service.DocumentServices.DocumentService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import com.aes.erp.vendor.utils.GenericObjectMapper;
 import com.aes.erp.vendor.utils.RestTemplateService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,13 +75,17 @@ public class VendorDocumentValidationService {
         }
         try{
             result = restClient.postPdfFile(documentHolderId, fileName, file, orgName, url);
-           if(result != null){
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(result);
+           if(result == null || jsonNode.has("Error")){
+               throw new AesException("Wrong document uploaded");
+           }
+           else{
                document.setResultFromMachineLearning(result);
                documentService.create(document);
                //Finishing The asynchronous task
                return mapToDto(result, fileName);
            }
-           else return null;
         }catch(Error | IOException e){
             System.out.println(e.getMessage());
             throw new AesException("Document information extraction process failed. Error -->" + e.getMessage());

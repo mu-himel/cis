@@ -2,6 +2,7 @@ package com.aes.erp.vendor.dto;
 
 import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
+import com.aes.erp.vendor.entity.VendorScore;
 import lombok.Data;
 
 import java.util.Date;
@@ -17,4 +18,5 @@ public class VendorProfileDto {
 //    private List<String> permittedProducts;
     private GeneralDetails generalDetails;
     private BusinessDetails businessDetails;
+    private VendorScore vendorScore;
 }

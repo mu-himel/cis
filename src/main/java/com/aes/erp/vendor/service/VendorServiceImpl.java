@@ -239,6 +239,7 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setStartedAt(vendor.getStartedAt());
         profileDto.setBusinessDetails(vendor.getDocumentHolder().getBusinessDetails());
         profileDto.setGeneralDetails(vendor.getDocumentHolder().getGeneralDetails());
+        profileDto.setVendorScore(vendor.getVendorScore());
         return profileDto;
     }
 

@@ -5,15 +5,15 @@ import com.aes.erp.vendor.document_response_dto.*;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.entity.VendorScore;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
-import com.aes.erp.vendor.repository.BusinessDetailsRepository;
-import com.aes.erp.vendor.repository.DocumentHolderRepository;
-import com.aes.erp.vendor.repository.GeneralDetailsRepository;
-import com.aes.erp.vendor.repository.VendorRepository;
+import com.aes.erp.vendor.repository.*;
 import com.aes.erp.vendor.service.DocumentServices.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,12 +27,13 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     private final TradeLicenseService tradeLicenseService;
     private final NIDService nidService;
     private final BankSolvencyService bankSolvencyService;
+    private final VendorScoreRepository vendorScoreRepository;
 
     private final BusinessDetailsRepository businessDetailsRepository;
     private final GeneralDetailsRepository generalDetailsRepository;
     ModelMapper modelMapper = new ModelMapper();
 
-    public DocumentHolderServiceImpl(DocumentHolderRepository documentHolderRepository, TINService tinService, BinService binService, VendorRepository vendorRepository, TradeLicenseService tradeLicenseService, NIDService nidService, BankSolvencyService bankSolvencyService, BusinessDetailsRepository businessDetailsRepository, GeneralDetailsRepository generalDetailsRepository) {
+    public DocumentHolderServiceImpl(DocumentHolderRepository documentHolderRepository, TINService tinService, BinService binService, VendorRepository vendorRepository, TradeLicenseService tradeLicenseService, NIDService nidService, BankSolvencyService bankSolvencyService, VendorScoreRepository vendorScoreRepository, BusinessDetailsRepository businessDetailsRepository, GeneralDetailsRepository generalDetailsRepository) {
         this.documentHolderRepository = documentHolderRepository;
         this.tinService = tinService;
         this.binService = binService;
@@ -40,6 +41,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         this.tradeLicenseService = tradeLicenseService;
         this.nidService = nidService;
         this.bankSolvencyService = bankSolvencyService;
+        this.vendorScoreRepository = vendorScoreRepository;
         this.businessDetailsRepository = businessDetailsRepository;
         this.generalDetailsRepository = generalDetailsRepository;
     }
@@ -151,7 +153,23 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         documentHolder = documentHolderRepository.save(documentHolder);
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.DOCUMENTS_SUBMITTED);
         vendor.setDocumentHolder(documentHolder);
+        //Setting up Score For Vendor
+        VendorScore vendorScore = new VendorScore();
+        setVendorScore(vendor, vendorScore);
         vendorRepository.save(vendor);
+    }
+    public Long calculateYearsOfBusiness(DocumentHolder documentHolder){
+        Date effectiveDateBin = documentHolder.getBinDocument().getEffectiveDate();
+        return (long) (LocalDate.now().getYear() - effectiveDateBin.getYear());
+    }
+    public void setVendorScore(Vendor vendor, VendorScore vendorScore){
+        Long totalBusinessYears = calculateYearsOfBusiness(vendor.getDocumentHolder());
+        vendorScore.setYearOfEstablishmentWeight((float) ((5 * totalBusinessYears) / 10));
+        vendorScore.setYearOfEstablishmentWeight((float) (totalBusinessYears / 10));
+        vendorScore.setLegalDocumentationWeight(5F);
+        vendorScore.setLegalDocumentationGrade(1F);
+        vendorScore = vendorScoreRepository.save(vendorScore);
+        vendor.setVendorScore(vendorScore);
     }
 
     private DocumentHolderResponseDto mapEntityToDTO(DocumentHolder documentHolder) {
