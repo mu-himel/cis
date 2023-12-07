@@ -2,6 +2,7 @@ package com.aes.erp.vendor.utils;
 
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.dto.EmailLoginDto;
+import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorRegistrationMailSender;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

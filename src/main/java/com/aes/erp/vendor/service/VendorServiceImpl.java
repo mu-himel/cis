@@ -85,6 +85,7 @@ public class VendorServiceImpl implements VendorService {
         vendor = vendorRepository.save(vendor);
         //Notify user Through a mail
         VendorRegistrationMailSender senderBody = new VendorRegistrationMailSender(vendor.getEmail());
+        senderBody.setContent(senderBody.getContent() +  "Email: " + vendorDto.getEmail() + "\n" + "Password: " + vendorDto.getPassword());
         emailSenderUtil.sendMail(senderBody);
     }
 
