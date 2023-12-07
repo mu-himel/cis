@@ -100,13 +100,15 @@ public interface CategoryQuery {
             " AND (:productCount IS NULL OR cat.productCount=:productCount)";
 
 
-    String findAllByItemCategoryWithSubCategoryCount="SELECT c.id AS categoryId, c.name AS categoryName, " +
+    String findAllByItemCategoryWithSubCategory="SELECT c.id AS categoryId, c.name AS categoryName, " +
             "c.code AS categoryCode, COUNT(sub.id) AS subcategoryCount, st.name AS storeTypeName " +
             "FROM item_categories c " +
             "LEFT JOIN item_categories sub ON c.id = sub.parent_category_id " +
             "LEFT JOIN store_types st ON c.store_type_id = st.id " +
             "WHERE c.parent_category_id IS NULL AND (:store_type_id IS NULL OR st.id = :store_type_id) " +
             "GROUP BY c.id ";
+
+    String findAllByItemCategoryWithSubCategoryCount="SELECT COUNT(*) FROM ("+findAllByItemCategoryWithSubCategory+") p";
 
 
     String findAllBySubCategoryFilteredByStoreTypeAndParentCategory="SELECT c.id AS subCategoryId, " +
