@@ -66,19 +66,20 @@ public class ItemCategoryController {
 //    }
 
     @GetMapping("/main-categories")
-    public ResponseEntity<?> getMainCategoryList(@RequestParam("name")  Optional<String> name,
-                                             @RequestParam("code") Optional<String> code){
+    public ResponseEntity<?> getMainCategoryList(@RequestParam("storeTypeId") Optional<Long> storeTypeId){
         return new ResponseEntity<>(
-                categoryService.getCategories(name,code),
+                categoryService.getItemCategoriesForStoreType(storeTypeId),
                 HttpStatus.OK
         );
     }
     @GetMapping("/list")
-    public ResponseEntity<?> getCategoryList(@RequestParam("categoryId")  Optional<Long> categoryId,
+    public ResponseEntity<?> getCategoryList(
+            @RequestParam("categoryId")  Optional<Long> categoryId,
+            @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
                                              @RequestParam("name")  Optional<String> name,
                                                 @RequestParam("code") Optional<String> code){
         return new ResponseEntity<>(
-                categoryService.getSubCategories(categoryId, name,code),
+                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(storeTypeId,categoryId),
                 HttpStatus.OK
         );
     }
@@ -92,9 +93,11 @@ public class ItemCategoryController {
 
     @GetMapping("/{id}")
     @ApiOperation(value = "Get Category Detail By ID")
-    public ResponseEntity<?> getItemCategory(@ApiParam(value = "Category Id",example = "1", required = true) @PathVariable("id") Long id){
+    public ResponseEntity<?> getItemCategory(
+            @ApiParam(value = "Category Id",example = "1", required = true)
+            @PathVariable("id") Long id){
         return new ResponseEntity<>(
-                categoryService.getItemCategory(id),
+                categoryService.getItemCategory(id).get(),
                 HttpStatus.OK
         );
     }

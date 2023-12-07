@@ -114,7 +114,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Optional<ItemCategory> getItemCategory(Long id) {
-        return categoryRepository.findById(id,LocalDate.now().getYear());
+        Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
+        return itemCategoryOptional;
     }
 
     @Override
@@ -122,6 +123,12 @@ public class CategoryServiceImpl implements CategoryService {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10),sort);
         return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(storeTypeId.orElse(null), parentCategoryID.orElse(null), pageable);
+    }
+
+    @Override
+    public List<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId, Optional<Long> parentCategoryId) {
+        return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(storeTypeId.orElse(null),
+                parentCategoryId.orElse(null));
     }
 
     @Override
@@ -160,6 +167,11 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
+    @Override
+    public List<?> getItemCategoriesForStoreType(Optional<Long> id) {
+
+        return categoryRepository.findAllByItemCategoryWithSubCategoryCount(id.orElse(null));
+    }
 
     @Override
     public List<?> getCategories(Optional<String> name, Optional<String> code) {
