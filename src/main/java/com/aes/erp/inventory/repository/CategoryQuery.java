@@ -99,4 +99,25 @@ public interface CategoryQuery {
             " AND (:categoryId IS NULL OR cat.mainCategoryId =:categoryId) " +
             " AND (:productCount IS NULL OR cat.productCount=:productCount)";
 
+
+    String findAllByItemCategoryWithSubCategoryCount="SELECT c.id AS categoryId, c.name AS categoryName, " +
+            "c.code AS categoryCode, COUNT(sub.id) AS subcategoryCount, st.name AS storeTypeName " +
+            "FROM item_categories c " +
+            "LEFT JOIN item_categories sub ON c.id = sub.parent_category_id " +
+            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
+            "WHERE c.parent_category_id IS NULL AND (:store_type_id IS NULL OR st.id = :store_type_id) " +
+            "GROUP BY c.id ";
+
+
+    String findAllBySubCategoryFilteredByStoreTypeAndParentCategory="SELECT c.id AS subCategoryId, " +
+            "c.name AS subCategoryName, c.code as subCategoryCode, par.id AS parentCategoryId, par.code AS parentCategoryCode," +
+            " par.name AS parentCategoryName , " +
+            "st.id as storeTypeId, st.name AS storeTypeName " +
+            "FROM item_categories c " +
+            "LEFT JOIN item_categories par ON par.id = c.parent_category_id " +
+            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
+            "WHERE c.parent_category_id IS NOT NULL AND (:store_type_id IS NULL OR st.id = :store_type_id)" +
+            "AND (:parent_category IS NULL OR par.id = :parent_category)" +
+            "GROUP BY c.id";
+
 }

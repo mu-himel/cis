@@ -18,6 +18,7 @@ import com.aes.erp.module_access.enums.ModuleType;
 import com.aes.erp.module_access.generic.MergeFilterPermission;
 import com.aes.erp.module_access.generic.MergeModulePermission;
 import com.aes.erp.module_access.repository.ModuleAccessPermissionRepository.*;
+import com.aes.erp.module_access.repository.ModuleAccessRepository;
 import com.aes.erp.organogram_system.entity.Department;
 import com.aes.erp.organogram_system.entity.RoleNode;
 import com.aes.erp.user_management.entity.User;
@@ -82,7 +83,17 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
 
         if(roles.contains("ROLE_SYS_ADMIN")){
             return moduleAccessService.getAllModules();
-        }else{
+        }else if(roles.contains("ROLE_VENDOR")){
+            List<ModuleAccessRepository.ModuleAccessInfo> allModules = (List<ModuleAccessRepository.ModuleAccessInfo>) moduleAccessService.getAllModules();
+            List<ModuleAccessRepository.ModuleAccessInfo> vendorModules = new ArrayList<>();
+            for (ModuleAccessRepository.ModuleAccessInfo module : allModules) {
+                if(module.getUri().startsWith("vendor-panel")){
+                    vendorModules.add(module);
+                }
+            }
+            return vendorModules;
+        }
+        else{
 
             List<PermittedModule> permittedModules = _getPermittedModules(claimResponseDto);
 

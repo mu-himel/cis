@@ -32,12 +32,6 @@ public class Vendor implements DtoConvertable<VendorDto> {
 
     private String phone;
 
-//    private String nid;
-//    private String tin;
-//    private String bankAccountNumber;
-//    private String businessIdNumber;
-//    private String tradeLicense;
-
     @Enumerated(EnumType.STRING)
     private VendorDocumentVerificationStatus verificationStatus;
 
@@ -46,7 +40,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     private VendorStatus status;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private VendorType vendorType;
 
 
@@ -67,6 +61,8 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @OneToOne(fetch = FetchType.LAZY)
     private DocumentHolder documentHolder;
     private Date startedAt;
+    @OneToOne
+    private VendorScore vendorScore;
     @Override
     @JsonIgnore
     public VendorDto getDto() {

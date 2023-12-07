@@ -12,11 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -73,24 +73,24 @@ public class AuthenticateController {
 //            System.out.println("===>" + user.getUserCredential().getPassword());
             // System.out.println("===>" + user.getUserToOrganizations());
             // System.out.println("===>" + user.getUserToOrganizationFiles());
+            Long vendorId = null;
+            if(userDetails.getVendor() != null) vendorId = userDetails.getVendor().getId();
             AuthenticationResponseDTO authenticationResponseDTO =new AuthenticationResponseDTO(jwt, user.getId(),
                     getRoles(user.getUserCredential().getUserCredentialToRoles()),
                     //getOrganizations(user.getUserToOrganizations()),
                     Collections.emptyList(),
                     // getOrganizationFiles(user.getUserToOrganizationFiles()) /*Collections.emptyList()*/,
-                    user.getUserCredential().isActive()?"active":"deactive");
+                    vendorId, user.getUserCredential().isActive()?"active":"deactive");
 
             authenticationResponseDTO.setEmployee(userDetails.getEmployee());
-            return ResponseEntity.ok(
-                    authenticationResponseDTO
-            );
+            return new ResponseEntity<>(authenticationResponseDTO, HttpStatus.OK);
         }
         else {
             return ResponseEntity.ok(
                     new AuthenticationResponseDTO("", 0,
                             Collections.emptyList(),
                             Collections.emptyList(),
-                            "deactive")
+                            null, "deactive")
             );
             // apiResponse.setResponse("this account is deactivated", TRUE, NULL, SUCCESS);
             // return ResponseEntity.ok().body(apiResponse);

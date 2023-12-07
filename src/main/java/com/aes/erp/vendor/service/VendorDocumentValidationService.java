@@ -5,7 +5,8 @@ import com.aes.erp.vendor.document_response_dto.*;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
 import com.aes.erp.vendor.repository.DocumentHolderRepository;
 import com.aes.erp.vendor.service.DocumentServices.DocumentService;
-import com.aes.erp.vendor.utils.GenericMapper;
+import com.aes.erp.vendor.utils.GenericModelMapper;
+import com.aes.erp.vendor.utils.GenericObjectMapper;
 import com.aes.erp.vendor.utils.RestTemplateService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,15 @@ public class VendorDocumentValidationService {
     public final String BANK_SOLVENCY_URL =  "http://172.17.18.41:5050/bank";
     public final String TRADE_LICENSE_URL =  "http://172.17.18.41:5053/trade";
     private final RestTemplateService restClient;
-    private final GenericMapper genericMapper;
+    private final GenericObjectMapper genericMapper;
     private final DocumentHolderRepository documentHolderRepository;
     private final DocumentService documentService;
 
-    public VendorDocumentValidationService(RestTemplateService restClient, GenericMapper genericMapper, DocumentHolderRepository documentHolderRepository, DocumentService documentService) {
+    public VendorDocumentValidationService(RestTemplateService restClient, GenericObjectMapper genericMapper, DocumentHolderRepository documentHolderRepository, DocumentService documentService) {
         this.restClient = restClient;
-        this.genericMapper = genericMapper;
         this.documentHolderRepository = documentHolderRepository;
         this.documentService = documentService;
+        this.genericMapper = genericMapper;
     }
     public void multipartFileToBytes(MultipartFile file, Document document){
         try{
@@ -88,7 +89,7 @@ public class VendorDocumentValidationService {
         try {
             Class<T> dtoClass = getDtoClassForFileName(fileName);
             System.out.println(result);
-            return genericMapper.map(result, dtoClass);
+            return genericMapper.convertStringToDto(result, dtoClass);
         } catch (Exception e) {
             System.out.println("Object Mapping failed: " + e.getMessage());
             throw new AesException(e.getMessage());

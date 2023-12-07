@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.service.DocumentHolderServices;
 
+import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.document_response_dto.*;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
@@ -48,7 +49,9 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     @Override
     public DocumentHolderResponseDto create(Long userId, DocumentHolderRequestDto dto) {
         DocumentHolder documentHolder = new DocumentHolder();
-        Vendor vendor = vendorRepository.findVendorByUserId(userId);
+        Optional<Vendor> vendorOptional = vendorRepository.findByUserId(userId);
+        if(vendorOptional.isEmpty()) throw new AesException("No Vendor Found for this user Id");
+        Vendor vendor = vendorOptional.get();
         documentHolder = documentHolderRepository.save(documentHolder);
         enableAllDocumentTypes(documentHolder, dto);
         documentHolder.setName(vendor.getName());
@@ -135,7 +138,9 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
 
     @Override
     public void addHolderDetails(DetailsDTO dto, Long userId,  Long documentHolderId) {
-        Vendor vendor = vendorRepository.findVendorByUserId(userId);
+        Optional<Vendor> vendorOptional = vendorRepository.findByUserId(userId);
+        if(vendorOptional.isEmpty()) throw new AesException("No Vendor Found for this user Id");
+        Vendor vendor = vendorOptional.get();
         DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
         BusinessDetails businessDetails = modelMapper.map(dto.getBusinessDetails(), BusinessDetails.class);
         GeneralDetails generalDetails = modelMapper.map(dto.getGeneralDetails(), GeneralDetails.class);
@@ -144,7 +149,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         documentHolder.setBusinessDetails(businessDetails);
         documentHolder.setGeneralDetails(generalDetails);
         documentHolder = documentHolderRepository.save(documentHolder);
-        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION);
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.DOCUMENTS_SUBMITTED);
         vendor.setDocumentHolder(documentHolder);
         vendorRepository.save(vendor);
     }
@@ -167,9 +172,9 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         if(documentHolder.getNidDocument()!= null && !documentHolder.getNidDocument().getNid().isEmpty()){
             responseDto.setNidNumber(documentHolder.getNidDocument().getNid());
         }
-//        if(documentHolder.getTradeDocument()!= null && !documentHolder.getTradeDocument().getTradeLicenseNumber().isEmpty()){
-//            responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
-//        }
+        if(documentHolder.getTradeDocument()!= null && !documentHolder.getTradeDocument().getTradeLicenseNumber().isEmpty()){
+            responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
+        }
         return responseDto;
     }
 }

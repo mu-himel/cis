@@ -37,7 +37,7 @@ public class OrganizationServiceImpl implements OrganizationService{
     }
 
     @Override
-    public boolean isOrganizationExist(Long Id) {
+    public boolean isOrganizationExistAndEnabled(Long Id) {
         Optional<Organization> organization = organizationRepository.findById(Id);
         if(organization.isPresent() && organization.get().getStatus().equals(OrganizationStatus.ENABLED))return true;
         else return false;
@@ -48,5 +48,22 @@ public class OrganizationServiceImpl implements OrganizationService{
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
         return organizationRepository.findAllOrganizations(pageable);
+    }
+
+    @Override
+    public Organization getOrganizationById(Long orgId) {
+        Optional<Organization> organization = organizationRepository.findById(orgId);
+        if(!organization.isPresent()){
+            throw new AesException("Organization couldn't found by given Id");
+        }
+        return organizationRepository.findById(orgId).get();
+    }
+
+    @Override
+    public void enableOrganization(Boolean status, Long id) {
+        Organization org = getOrganizationById(id);
+        if(status)org.setStatus(OrganizationStatus.ENABLED);
+        else org.setStatus(OrganizationStatus.DISABLED);
+        organizationRepository.save(org);
     }
 }

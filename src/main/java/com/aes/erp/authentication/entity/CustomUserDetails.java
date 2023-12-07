@@ -4,6 +4,7 @@ import com.aes.erp.authentication.dto.EmployeeInfoDto;
 import com.aes.erp.employee.entity.Employee;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.user_credential.entity.UserCredential;
+import com.aes.erp.vendor.entity.Vendor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,6 +16,7 @@ import java.util.Collection;
 public class CustomUserDetails implements UserDetails {
     private User user;
     private EmployeeInfoDto employee;
+    private Vendor vendor;
     private UserCredential userCredential;
 
     private String username;
@@ -56,6 +58,12 @@ public class CustomUserDetails implements UserDetails {
             this.employee.setReportingManagerId(employee.getReportingManager().getId());
             this.employee.setReportingManagerName(employee.getReportingManager().getName());
         }
+    }
+    public void setVendor(Vendor vendor){
+        this.vendor = vendor;
+    }
+    public Vendor getVendor(){
+        return this.vendor;
     }
 
     public void setUser(User user) {

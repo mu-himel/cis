@@ -10,12 +10,16 @@ import com.aes.erp.user_management.entity.UserCredentialToRole;
 import com.aes.erp.user_management.service.UserRepository;
 import com.aes.erp.user_management.user_credential.entity.UserCredential;
 import com.aes.erp.user_management.user_credential.service.UserCredentialRepository;
+import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.service.VendorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,6 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private final EmployeeService employeeService;
+    private final VendorService vendorService;
 
     @Transactional
     @Override
@@ -52,13 +57,18 @@ public class CustomUserDetailsService implements UserDetailsService {
         /** logger.info("user: "+user); */
         Set<GrantedAuthority> authorities = new HashSet<>();
         for(UserCredentialToRole userCredentialToRole:user.getUserCredential().getUserCredentialToRoles()) {
-
             String roleName = userCredentialToRole.getRole().getRoleName();
             if(roleName.equals("EMPLOYEE")){
                Optional<Employee> employeeOptional = employeeService.getEmployeeByUserId(user.getId());
                if(employeeOptional.isPresent()){
                     customUserDetails.setEmployee(employeeOptional.get());
                }
+            }
+            if(roleName.equals("VENDOR")){
+                Optional<Vendor> vendor = vendorService.getVendorByUserId(user.getId());
+                if(vendor.isPresent()){
+                    customUserDetails.setVendor(vendor.get());
+                }
             }
 
             authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
@@ -72,5 +82,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         customUserDetails.setAuthorities(authorities);
 
         return customUserDetails;
+    }
+    public Vendor getLoggedInVendor(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return userDetails.getVendor();
+        } else {
+            throw new RuntimeException("Error occurred in getting the logged in vendor");
+        }
     }
 }

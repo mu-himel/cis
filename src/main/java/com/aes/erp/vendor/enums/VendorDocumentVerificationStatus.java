@@ -4,8 +4,7 @@ import io.swagger.annotations.ApiModel;
 
 @ApiModel(value = "Vendor Verify Status")
 public enum VendorDocumentVerificationStatus {
-    PENDING_VERIFICATION,
+    PENDING_DOCUMENT_VERIFICATION,
     DOCUMENTS_SUBMITTED,
     VERIFIED
-
 }

@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class ItemCategory {
 
   @ManyToOne
   private ItemCategory parentCategory;
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "store_type_id")
   private StoreType storeType;
 
@@ -49,12 +50,10 @@ public class ItemCategory {
 
   private BigDecimal vat;
 
-  @CreationTimestamp
   @Column(updatable = false)
-  private LocalDateTime createdAt;
+  private Long createdAt;
 
-  @UpdateTimestamp
-  private LocalDateTime updatedAt;
+  private Long updatedAt;
 
 
   public ItemCategory(Long id) {

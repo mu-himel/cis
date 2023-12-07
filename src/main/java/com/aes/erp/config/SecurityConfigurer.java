@@ -2,6 +2,7 @@ package com.aes.erp.config;
 
 import com.aes.erp.authentication.CustomUserDetailsService;
 import com.aes.erp.authentication.filter.JwtRequestFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -85,6 +86,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public ObjectMapper objectMapper() {return new ObjectMapper();}
     @Bean
     public FilterRegistrationBean processCorsFilter() {
         final UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();

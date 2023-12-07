@@ -11,6 +11,9 @@
         <module name="cps_vms" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="release-v1" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
