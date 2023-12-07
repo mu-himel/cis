@@ -11,7 +11,8 @@ public class VendorRegistrationMailSender {
 //    private List<String> cc;
 //    private List<String> bcc;
     private String subject = "Vendor Registration Process Initiated";
-    private String content = "Welcome to Vendor Portal! Please Upload your documents to get verified.";
+    private String content = "Welcome to Vendor Portal! Please upload your documents to get verified.\n";
+
     private boolean isHtml = true;
 
     public VendorRegistrationMailSender(String to) {
