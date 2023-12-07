@@ -17,11 +17,12 @@ import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.repository.VendorFileRepository;
 import com.aes.erp.vendor.repository.VendorRepository;
+import com.aes.erp.vendor.utils.EmailSenderUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -35,7 +36,7 @@ import java.util.Optional;
 
 @Service
 public class VendorServiceImpl implements VendorService {
-    private final RestTemplate restTemplate;
+    private final EmailSenderUtil emailSenderUtil;
 
 
     @Autowired
@@ -52,8 +53,8 @@ public class VendorServiceImpl implements VendorService {
     @Autowired
     private VendorFileRepository vendorFileRepository;
 
-    public VendorServiceImpl(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public VendorServiceImpl(EmailSenderUtil emailSenderUtil) {
+        this.emailSenderUtil = emailSenderUtil;
     }
 
     @Override
@@ -64,8 +65,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public void createVendor(VendorDto vendorDto) {
-
+    public void createVendor(VendorDto vendorDto) throws JsonProcessingException {
         if(!vendorDto.getPhone().isEmpty()){
             if(vendorDto.getPhone().matches("[a-zA-Z]")){
                 throw new AesException("phone number should not contain alphabets");
@@ -83,9 +83,9 @@ public class VendorServiceImpl implements VendorService {
         vendor.setUser(user);
         vendor.setStartedAt(new Date());
         vendor = vendorRepository.save(vendor);
-//        //Notify user Through a mail
-//        VendorRegistrationMailSender senderBody = new VendorRegistrationMailSender(vendor.getEmail());
-//        ResponseEntity<String> response = restTemplate.postForEntity("http://172.17.18.36:9090/api/mail/send-email", senderBody, String.class);
+        //Notify user Through a mail
+        VendorRegistrationMailSender senderBody = new VendorRegistrationMailSender(vendor.getEmail());
+        emailSenderUtil.sendMail(senderBody);
     }
 
     @Override
@@ -228,7 +228,9 @@ public class VendorServiceImpl implements VendorService {
     }
     @Override
     public VendorProfileDto getVendorProfile(Long id){
-        Vendor vendor = vendorRepository.findVendorByUserId(id);
+        Optional<Vendor> vendorOptional = vendorRepository.findById(id);
+        if(vendorOptional.isEmpty())throw new AesException("Vendor couldn't be found with this user Id");
+        Vendor vendor = vendorOptional.get();
         VendorProfileDto profileDto = new VendorProfileDto();
         profileDto.setBasicInformation(vendorProfileService.getVendorBasicInformation(vendor));
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
@@ -251,7 +253,7 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public Vendor getVendorByUserId(Long userId) {
-        return vendorRepository.findVendorByUserId(userId);
+    public Optional<Vendor> getVendorByUserId(Long userId) {
+        return vendorRepository.findByUserId(userId);
     }
 }

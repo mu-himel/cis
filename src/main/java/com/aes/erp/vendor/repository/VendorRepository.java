@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.repository;
 
+import com.aes.erp.employee.entity.Employee;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorType;
@@ -40,7 +41,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
     @Query("SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt " +
             "WHERE v.id=:id")
     Optional<VendorDetail> findVendorById(@Param("id") Long id);
-    Vendor findVendorByUserId(@Param("userId")Long userId);
+    Optional<Vendor> findByUserId(Long id);
 
     interface VendorDetail{
         Long getId();
