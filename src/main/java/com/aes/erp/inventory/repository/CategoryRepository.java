@@ -16,6 +16,7 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, CategoryQuery {
 
 
+
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
             nativeQuery = true)
     Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
