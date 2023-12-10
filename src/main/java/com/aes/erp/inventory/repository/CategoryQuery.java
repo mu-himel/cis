@@ -122,4 +122,7 @@ public interface CategoryQuery {
             "AND (:parent_category IS NULL OR par.id = :parent_category)" +
             "GROUP BY c.id";
 
+    String findAllBySubCategoryFilteredByStoreTypeAndParentCategoryCount="SELECT COUNT(*) FROM ("+
+            findAllBySubCategoryFilteredByStoreTypeAndParentCategory+") c";
+
 }
