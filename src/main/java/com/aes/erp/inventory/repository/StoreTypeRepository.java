@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface StoreTypeRepository extends JpaRepository<StoreType, Long> {
-    @Query(value = "SELECT * FROM store_types WHERE (:name IS NULL OR name LIKE %:name%)", nativeQuery = true)
+    @Query(value = "SELECT * FROM store_types st WHERE st.active=1 AND (:name IS NULL OR name LIKE %:name%)", nativeQuery = true)
     Page<StoreTypeExt> getAllStoreTypes(Pageable pageable, @Param("name") String name);
     StoreType getStoreTypeByName(String name);
     public interface StoreTypeExt{

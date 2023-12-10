@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -54,10 +55,12 @@ public class StoreTypeServiceImpl implements StoreTypeService{
     }
 
     @Override
+    @Transactional
     public void deleteStoreType(Long id) {
         Optional<StoreType> storeTypeOptional = storeTypeRepository.findById(id);
         if(storeTypeOptional.isPresent()){
-            storeTypeRepository.deleteById(id);
+            StoreType storeType = storeTypeOptional.get();
+            storeType.setActive(false);
         }
         else throw new AesException("No store type found with given Id");
     }
