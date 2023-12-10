@@ -36,7 +36,10 @@ public class EmailSenderUtil {
         EmailLoginDto dto = new EmailLoginDto();
         dto.setPassword(emailConfig.getUsername());
         dto.setUsername(emailConfig.getPassword());
-        log.info("Email server logging-in at "+emailConfig.getAddress());
+        log.info("Email server logging-in at "+emailConfig.getAddress().concat(loginUrl));
+        log.info("username "+emailConfig.getUsername());
+        log.info("username "+emailConfig.getPassword());
+        log.info("Email server logging-in at "+emailConfig.getAddress().concat(emailUrl));
         ResponseEntity<String> response = restTemplate.postForEntity(
                 emailConfig.getAddress().concat(loginUrl), dto, String.class);
         try{
