@@ -34,17 +34,19 @@ public class EmailSenderUtil {
         this.restTemplate = restTemplate;
     }
     public void sendMail(VendorRegistrationMailSender mailBody){
+        ObjectMapper objectMapper = new ObjectMapper();
         EmailLoginDto dto = new EmailLoginDto();
-        dto.setPassword(emailConfig.getUsername());
-        dto.setUsername(emailConfig.getPassword());
+        dto.setUsername(emailConfig.getUsername());
+        dto.setPassword(emailConfig.getPassword());
         log.info("Email server logging-in at "+emailConfig.getAddress().concat(loginUrl));
         log.info("username "+emailConfig.getUsername());
         log.info("username "+emailConfig.getPassword());
         log.info("Email server logging-in at "+emailConfig.getAddress().concat(emailUrl));
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                emailConfig.getAddress().concat(loginUrl), dto, String.class);
+
         try{
-            ObjectMapper objectMapper = new ObjectMapper();
+            String payload = objectMapper.writeValueAsString(dto);
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    emailConfig.getAddress().concat(loginUrl), dto, String.class);
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
             String token = jsonNode.path("content").path("token").asText();
             HttpHeaders headers = new HttpHeaders();
