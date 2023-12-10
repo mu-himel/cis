@@ -49,6 +49,7 @@ public class EmailSenderUtil {
             ResponseEntity<String> responseMail = restTemplate.postForEntity(
                     emailConfig.getAddress().concat(emailUrl), requestEntity, String.class);
         }catch (Exception e){
+            e.printStackTrace();
             throw new AesException("Error occurred while sending the confirmation mail to created vendor");
         }
 
