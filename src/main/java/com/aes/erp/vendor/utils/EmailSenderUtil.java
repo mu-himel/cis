@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,6 +49,8 @@ public class EmailSenderUtil {
             String token = jsonNode.path("content").path("token").asText();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(token);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            log.info(mailBody.getContent());
             HttpEntity<VendorRegistrationMailSender> requestEntity = new HttpEntity<>(mailBody, headers);
             ResponseEntity<String> responseMail = restTemplate.postForEntity(
                     emailConfig.getAddress().concat(emailUrl), requestEntity, String.class);
