@@ -1,0 +1,38 @@
+package com.aes.erp.inventory.controller;
+
+import com.aes.erp.inventory.service.SubcategoryBrandService;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/v1/item-categories/brands")
+public class SubcategoryBrandController {
+    private final SubcategoryBrandService brandService;
+
+    public SubcategoryBrandController(SubcategoryBrandService brandService) {
+        this.brandService = brandService;
+    }
+
+    @GetMapping("/list")
+    @ApiOperation(value = "Get all available brands for a subcategory")
+    public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("page") Optional<Integer> page,
+                                                                                  @RequestParam("size") Optional<Integer> size
+    ){
+        return new ResponseEntity<>(
+                brandService.getAllBrands(page,size),
+                HttpStatus.OK
+        );
+    }
+//    @PostMapping()
+//    @ApiOperation(value = "Create New Brand")
+//    public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("brand") String name){
+//        return new ResponseEntity<>(
+//                brandService.createNewBrand(String name),
+//                HttpStatus.CREATED
+//        );
+//    }
+}

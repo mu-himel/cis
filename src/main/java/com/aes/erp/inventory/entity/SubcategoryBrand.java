@@ -1,6 +1,6 @@
 package com.aes.erp.inventory.entity;
 
-import com.aes.erp.user_management.entity.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,15 +11,15 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "organizations")
-public class Organization {
+@Table(name = "subcategory_brands")
+public class SubcategoryBrand {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
-
     private String name;
-    private OrganizationStatus status;
-    @OneToOne(fetch = FetchType.EAGER)
-    private Role role;
+
+    @ManyToOne
+    @JsonIgnore
+    private ItemCategory category;
 }

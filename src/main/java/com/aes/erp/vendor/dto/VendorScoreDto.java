@@ -1,19 +1,9 @@
-package com.aes.erp.vendor.entity;
+package com.aes.erp.vendor.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Data
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
-public class VendorScore {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+public class VendorScoreDto {
     private Long id;
     private Float yearOfEstablishmentWeight;
     private Float yearOfEstablishmentGrade;
@@ -31,5 +21,5 @@ public class VendorScore {
     private Float capacityGrade;
     private Float physicalVerificationWeight;
     private Float physicalVerificationGrade;
-    private Float totalScore = 0F;
+    private Float totalScore;
 }

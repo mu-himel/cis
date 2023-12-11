@@ -18,7 +18,7 @@ public class NidResponseDto {
     private Date dateOfBirth;
     @JsonProperty("Full Name")
     private String eName;
-    @JsonProperty("NID")
+    @JsonProperty("NID Number")
     private String nid;
 
     public NIDDocument dtoToEntityMapping(NidResponseDto dto, NIDDocument nidDocument){

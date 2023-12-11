@@ -9,15 +9,20 @@ import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorRegistrationMailSender;
+import com.aes.erp.vendor.dto.VendorScoreDto;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorFile;
+import com.aes.erp.vendor.entity.VendorScore;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.repository.VendorFileRepository;
 import com.aes.erp.vendor.repository.VendorRepository;
+import com.aes.erp.vendor.repository.VendorScoreRepository;
 import com.aes.erp.vendor.utils.EmailSenderUtil;
+import com.aes.erp.vendor.utils.GenericModelMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +30,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
@@ -43,18 +47,22 @@ public class VendorServiceImpl implements VendorService {
     private VendorRepository vendorRepository;
     @Autowired
     private VendorProfileService vendorProfileService;
+    private final GenericModelMapper modelMapper;
 
     @Autowired
     private FileUploadService fileUploadService;
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private VendorScoreRepository vendorScoreRepository;
 
     @Autowired
     private VendorFileRepository vendorFileRepository;
 
-    public VendorServiceImpl(EmailSenderUtil emailSenderUtil) {
+    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, GenericModelMapper modelMapper) {
         this.emailSenderUtil = emailSenderUtil;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -236,11 +244,14 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setBasicInformation(vendorProfileService.getVendorBasicInformation(vendor));
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));
-        profileDto.setName(vendor.getName());
+        if(!vendor.getName().isEmpty())profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
-        profileDto.setBusinessDetails(vendor.getDocumentHolder().getBusinessDetails());
-        profileDto.setGeneralDetails(vendor.getDocumentHolder().getGeneralDetails());
-        profileDto.setVendorScore(vendor.getVendorScore());
+        if(vendor.getDocumentHolder() != null){
+            DocumentHolder documentHolder = vendor.getDocumentHolder();
+            if(documentHolder.getBusinessDetails() != null)profileDto.setBusinessDetails(vendor.getDocumentHolder().getBusinessDetails());
+            if(documentHolder.getGeneralDetails() != null)profileDto.setGeneralDetails(vendor.getDocumentHolder().getGeneralDetails());
+        }
+        if(vendor.getVendorScore() != null)profileDto.setVendorScore(vendor.getVendorScore());
         return profileDto;
     }
 
@@ -257,5 +268,22 @@ public class VendorServiceImpl implements VendorService {
     @Override
     public Optional<Vendor> getVendorByUserId(Long userId) {
         return vendorRepository.findByUserId(userId);
+    }
+
+    @Override
+    public void updateVendorScore(VendorScoreDto dto) {
+        Optional<VendorScore> vendorScoreOptional = vendorScoreRepository.findById(dto.getId());
+        if(vendorScoreOptional.isEmpty()) throw  new AesException("Vendor Score couldn't be found");
+        VendorScore vendorScore;
+        vendorScore = modelMapper.map(dto, VendorScore.class);
+        vendorScore = vendorScoreRepository.save(vendorScore);
+        vendorScoreRepository.save(vendorScore);
+    }
+
+    @Override
+    public Vendor getById(Long id) {
+        Optional<Vendor> vendorOptional = vendorRepository.findById(id);
+        if(vendorOptional.isEmpty()) throw  new AesException("Vendor Score couldn't be found");
+        return vendorOptional.get();
     }
 }

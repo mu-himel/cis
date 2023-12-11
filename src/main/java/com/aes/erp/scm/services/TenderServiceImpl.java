@@ -1,6 +1,8 @@
 package com.aes.erp.scm.services;
 
+import com.aes.erp.authentication.OrganizationPrincipal;
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.service.CategoryServiceImpl;
 import com.aes.erp.inventory.service.OrganizationService;
 import com.aes.erp.scm.DtoCollection.TenderCreateDto;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -44,12 +47,15 @@ public class TenderServiceImpl implements TenderService{
         Tender tender = genericModelMapper.map(dto, Tender.class);
         tender.setTenderStatus(TenderStatus.PENDING);
         tender.setTenderType(TenderType.PENDING);
-        if(organizationService.isOrganizationExistAndEnabled(dto.getOrgId())){
-            tender.setTenderCreator(organizationService.getOrganizationById(dto.getOrgId()));
+        OrganizationPrincipal organizationPrincipal = (OrganizationPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(organizationService.isOrganizationExistAndEnabled(organizationPrincipal.getOrgId())){
+            tender.setTenderCreator(organizationService.getOrganizationById(organizationPrincipal.getOrgId()));
         }
+        else throw new AesException("Organization doesn't exist or doesn't have permission to create the tender");
         if(categoryService.getItemCategory(dto.getItemCategoryId()).isPresent()){
             tender.setItemCategory(categoryService.getItemCategory(dto.getItemCategoryId()).get());
         }
+        else throw new AesException("No Item Category couldn't be found with given Id");
         tender = tenderRepository.save(tender);
         for(TenderItem item : tender.getTenderItems()){
             item.setTender(tender);

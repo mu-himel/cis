@@ -2,6 +2,7 @@ package com.aes.erp.vendor.service;
 
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
+import com.aes.erp.vendor.dto.VendorScoreDto;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,4 +34,6 @@ public interface VendorService {
     VendorProfileDto getVendorProfile(Long userId);
     void approveVendor(Long vendorId);
     Optional<Vendor> getVendorByUserId(Long userId);
+    void updateVendorScore(VendorScoreDto dto);
+    Vendor getById(Long id);
 }

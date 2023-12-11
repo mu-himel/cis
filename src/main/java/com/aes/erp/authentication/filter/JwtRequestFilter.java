@@ -4,10 +4,13 @@ import com.aes.erp.authentication.CustomUserDetailsService;
 import com.aes.erp.authentication.JwtUtil;
 import com.aes.erp.authentication.OrganizationPrincipal;
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.entity.Organization;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -19,10 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class documentation Comments to be added
@@ -40,6 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
         final String orgId = request.getHeader("orgId");
+        final String orgName = request.getHeader("orgName");
         String username = null;
         String jwt = null;
         try {
@@ -56,12 +57,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
-        else if(orgId != null && SecurityContextHolder.getContext().getAuthentication() == null){
+        else if(orgId != null && !orgName.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null){
             if(!jwtUtil.validateOrganization(Long.parseLong(orgId))){
                 throw new AesException("Organization ID is not Registered in our system");
             }
+            Organization organization = jwtUtil.getOrganization(Long.parseLong(orgId));
+            if(organization.getRole() == null || !organization.getRole().getRoleName().equals("ORGANIZATION")){
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                throw new AesException("Organization doesn't have necessary role permission");
+            }
+            Set<GrantedAuthority> authorities = new HashSet<>();
+            authorities.add(new SimpleGrantedAuthority(organization.getRole().getRoleName()));
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    new OrganizationPrincipal(orgId), null, Collections.emptyList());
+                    new OrganizationPrincipal(orgId, orgName), null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
