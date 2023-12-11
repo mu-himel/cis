@@ -45,6 +45,8 @@ public class ItemCategory {
 
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
   private List<CategoryAttribute> attributes;
+  @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+  private List<SubcategoryBrand> brands;
 
   private Boolean active=true;
 

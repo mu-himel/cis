@@ -4,6 +4,8 @@ import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.authentication.entity.CustomUserDetails;
 import com.aes.erp.config.Constants;
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.inventory.entity.OrganizationStatus;
 import com.aes.erp.inventory.service.OrganizationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,5 +82,10 @@ public class JwtUtil {
 
     public boolean validateOrganization(Long orgId){
         return organizationService.isOrganizationExistAndEnabled(orgId);
+    }
+    public Organization getOrganization(Long id){
+        Organization organization = organizationService.getOrganizationById(id);
+        if(organization.getStatus().equals(OrganizationStatus.DISABLED))throw new AesException("Organization Status is Disabled");
+        return organization;
     }
 }

@@ -9,6 +9,5 @@ import java.util.List;
 @Data
 public class TenderCreateDto {
     private Long itemCategoryId;
-    private Long orgId;
     private List<TenderItem> tenderItems;
 }

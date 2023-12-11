@@ -3,6 +3,8 @@ package com.aes.erp.vendor.controller;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
+import com.aes.erp.vendor.dto.VendorScoreDto;
+import com.aes.erp.vendor.entity.VendorScore;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.service.VendorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -105,7 +107,9 @@ public class VendorController {
         return  new ResponseEntity<>(vendorService.getVendorProfile(id), HttpStatus.OK);
     }
     @PutMapping("/{id}/approve")
-    public void approveVendorProfile(@PathVariable("id") Long id){
+    public ResponseEntity<?> approveVendorProfile(@PathVariable("id") Long id, @RequestBody VendorScoreDto dto){
+        vendorService.updateVendorScore(dto);
         vendorService.approveVendor(id);
+        return  new ResponseEntity<>(HttpStatus.OK);
     }
 }

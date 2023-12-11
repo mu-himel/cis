@@ -5,6 +5,8 @@ import com.aes.erp.inventory.dto.request.OrganizationCreateDto;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.OrganizationStatus;
 import com.aes.erp.inventory.repository.OrganizationRepository;
+import com.aes.erp.user_management.entity.Role;
+import com.aes.erp.user_management.service.RoleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +18,11 @@ import java.util.Optional;
 @Service
 public class OrganizationServiceImpl implements OrganizationService{
     private final OrganizationRepository organizationRepository;
+    private final RoleService roleService;
 
-    public OrganizationServiceImpl(OrganizationRepository organizationRepository) {
+    public OrganizationServiceImpl(OrganizationRepository organizationRepository, RoleService roleService) {
         this.organizationRepository = organizationRepository;
+        this.roleService = roleService;
     }
 
     @Override
@@ -33,6 +37,8 @@ public class OrganizationServiceImpl implements OrganizationService{
         Organization organization = new Organization();
         organization.setName(dto.getName());
         organization.setStatus(OrganizationStatus.ENABLED);
+        Role role = roleService.read("ORGANIZATION");
+        organization.setRole(role);
         return organizationRepository.save(organization);
     }
 
