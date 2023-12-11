@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface SubcategoryBrandService {
     Page<?> getAllBrands(Optional<Integer> page, Optional<Integer> size);
+    void create(String name);
 }

@@ -2,14 +2,11 @@ package com.aes.erp.inventory.service;
 
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
-import com.aes.erp.inventory.entity.CategoryBudget;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.StoreType;
-import com.aes.erp.inventory.enums.BudgetType;
-import com.aes.erp.inventory.repository.CategoryAttributeRepository;
-import com.aes.erp.inventory.repository.CategoryBudgetRepository;
-import com.aes.erp.inventory.repository.CategoryRepository;
-import com.aes.erp.inventory.repository.StoreTypeRepository;
+import com.aes.erp.inventory.entity.SubcategoryBrand;
+import com.aes.erp.inventory.repository.*;
+import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,8 +33,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryBudgetRepository categoryBudgetRepository;
 
+    private final GenericModelMapper genericModelMapper;
+    private final SubcategoryBrandRepository subcategoryBrandRepository;
     @Autowired
     private CategoryAttributeRepository categoryAttributeRepository;
+
+    public CategoryServiceImpl(GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository) {
+        this.genericModelMapper = genericModelMapper;
+        this.subcategoryBrandRepository = subcategoryBrandRepository;
+    }
 
     @Override
     @Transactional
@@ -60,6 +62,14 @@ public class CategoryServiceImpl implements CategoryService {
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
                 categoryAttribute.setCategory(category);
                 return categoryAttribute;
+            }).collect(Collectors.toList()));
+        }
+        List<SubcategoryBrand> brands = genericModelMapper.mapDtoListToEntityList(categoryRequestDto.getBrands(), SubcategoryBrand.class);
+        if(brands!=null && !brands.isEmpty()){
+            category.setBrands(brands.stream().map(brand -> {
+                brand.setCategory(category);
+                brand = subcategoryBrandRepository.save(brand);
+                return brand;
             }).collect(Collectors.toList()));
         }
         category.setCreatedAt(Instant.now().toEpochMilli());
