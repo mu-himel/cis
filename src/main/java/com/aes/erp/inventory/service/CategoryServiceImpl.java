@@ -68,7 +68,6 @@ public class CategoryServiceImpl implements CategoryService {
         if(brands!=null && !brands.isEmpty()){
             category.setBrands(brands.stream().map(brand -> {
                 brand.setCategory(category);
-                brand = subcategoryBrandRepository.save(brand);
                 return brand;
             }).collect(Collectors.toList()));
         }
