@@ -113,15 +113,24 @@ public interface CategoryQuery {
             "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
             "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId)";
 
-    String findAllBySubCategoryFilteredByStoreTypeAndParentCategory="SELECT c.id AS subCategoryId, " +
-            "c.name AS subCategoryName, c.code as subCategoryCode, par.id AS parentCategoryId, par.code AS parentCategoryCode," +
-            " par.name AS parentCategoryName , " +
+    String findAllBySubCategoryFilteredByStoreTypeAndParentCategory = "SELECT c.id AS subCategoryId, " +
+            "c.name AS subCategoryName, c.code as subCategoryCode, " +
+            "par.id AS parentCategoryId, par.code AS parentCategoryCode, par.name AS parentCategoryName, " +
             "st.id as storeTypeId, st.name AS storeTypeName " +
-            "FROM item_categories c " +
-            "LEFT JOIN item_categories par ON par.id = c.parent_category_id " +
-            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
-            "WHERE c.parent_category_id IS NOT NULL AND (:store_type_id IS NULL OR st.id = :store_type_id)" +
-            "AND (:parent_category IS NULL OR par.id = :parent_category)" +
+            "FROM ItemCategory c " +
+            "LEFT JOIN ItemCategory par ON par.id = c.parentCategory.id " +
+            "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
+            "WHERE c.parentCategory IS NOT NULL AND " +
+            "(:store_type_id IS NULL OR st.id = :store_type_id) " +
+            "AND (:parent_category IS NULL OR par.id = :parent_category) " +
             "GROUP BY c.id";
+    String countQueryForSubCategoryFilteredByStoreTypeAndParentCategory = "SELECT COUNT(DISTINCT c.id) " +
+            "FROM ItemCategory c " +
+            "LEFT JOIN ItemCategory par ON par.id = c.parentCategory.id " +
+            "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
+            "WHERE c.parentCategory IS NOT NULL AND " +
+            "(:store_type_id IS NULL OR st.id = :store_type_id) " +
+            "AND (:parent_category IS NULL OR par.id = :parent_category)";
+
 
 }
