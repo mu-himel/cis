@@ -4,6 +4,7 @@ import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.w3c.dom.Text;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,6 +20,7 @@ public class BINDocument {
     private Long id;
     private String address;
     private String bin;
+    @Column(columnDefinition = "TEXT")
     private String effectiveDate;
     private Date issueDate;
     private String companyName;

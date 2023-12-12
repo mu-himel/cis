@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,13 +51,13 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @OneToOne(cascade = CascadeType.ALL)
     private User user;
 
-    @ManyToOne
+    @OneToOne
     private ItemCategory category;
 
-    @ManyToOne
-    private ItemCategory subCategory;
-
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
+    private List<ItemCategory> subCategoryList = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<VendorItem> vendorItems;
     @OneToOne(fetch = FetchType.LAZY)
     private DocumentHolder documentHolder;

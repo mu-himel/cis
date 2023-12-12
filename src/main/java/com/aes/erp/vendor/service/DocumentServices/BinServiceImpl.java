@@ -30,10 +30,8 @@ public class BinServiceImpl implements BinService{
     public void update(Long documentHolderId, BinResponseDto dto) {
         BINDocument binDocument = binRepository.getBinDocumentByDocumentHolderId(documentHolderId);
         binDocument = dto.dtoToEntityMapping(dto, binDocument);
-//        DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
         Document document = documentService.getDocumentByDocumentHolderIdAndType(documentHolderId, DocumentType.BIN);
         binDocument.setDocument(document);
-//        binDocument.setDocumentHolder(documentHolder);
         binRepository.save(binDocument);
     }
 }

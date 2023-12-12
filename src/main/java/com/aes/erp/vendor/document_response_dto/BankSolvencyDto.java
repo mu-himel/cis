@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BankSolvencyDto {
     @JsonProperty("ID")
+    @JsonIgnore
     private String ID;
     @JsonIgnore()
     private String secret_key;

@@ -100,27 +100,40 @@ public interface CategoryQuery {
             " AND (:productCount IS NULL OR cat.productCount=:productCount)";
 
 
-    String findAllByItemCategoryWithSubCategory="SELECT c.id AS categoryId, c.name AS categoryName, " +
-            "c.code AS categoryCode, COUNT(sub.id) AS subcategoryCount, st.id as storeTypeId, st.name AS storeTypeName " +
-            "FROM item_categories c " +
-            "LEFT JOIN item_categories sub ON c.id = sub.parent_category_id " +
-            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
-            "WHERE c.active=1 AND c.parent_category_id IS NULL AND (:store_type_id IS NULL OR st.id = :store_type_id) " +
-            "GROUP BY c.id ";
 
-    String findAllByItemCategoryWithSubCategoryCount="SELECT COUNT(*) FROM ("+findAllByItemCategoryWithSubCategory+") p";
-
-
-    String findAllBySubCategoryFilteredByStoreTypeAndParentCategory="SELECT c.id AS subCategoryId, " +
-            "c.name AS subCategoryName, c.code as subCategoryCode, par.id AS parentCategoryId, par.code AS parentCategoryCode," +
-            " par.name AS parentCategoryName , " +
-            "st.id as storeTypeId, st.name AS storeTypeName " +
-            "FROM item_categories c " +
-            "LEFT JOIN item_categories par ON par.id = c.parent_category_id " +
-            "LEFT JOIN store_types st ON c.store_type_id = st.id " +
-            "WHERE c.active=1 AND c.parent_category_id IS NOT NULL AND (:store_type_id IS NULL OR st.id = :store_type_id)" +
-            "AND (:parent_category IS NULL OR par.id = :parent_category)" +
+    String findAllByItemCategoryWithSubCategoryCount = "SELECT c.id AS categoryId, c.name AS categoryName, " +
+            "c.code AS categoryCode, COUNT(sub.id) AS subcategoryCount, st.name AS storeTypeName " +
+            "FROM ItemCategory c " +
+            "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id " +
+            "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
+            "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
             "GROUP BY c.id";
+
+    String countQueryForFindAllByItemCategoryWithSubCategoryCount = "SELECT COUNT(DISTINCT c.id) AS categoryCount " +
+            "FROM ItemCategory c " +
+            "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
+            "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId)";
+
+
+    String findAllBySubCategoryFilteredByStoreTypeAndParentCategory = "SELECT c.id AS subCategoryId, " +
+            "c.name AS subCategoryName, c.code as subCategoryCode, " +
+            "par.id AS parentCategoryId, par.code AS parentCategoryCode, par.name AS parentCategoryName, " +
+            "st.id as storeTypeId, st.name AS storeTypeName " +
+            "FROM ItemCategory c " +
+            "LEFT JOIN ItemCategory par ON par.id = c.parentCategory.id " +
+            "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
+            "WHERE c.parentCategory IS NOT NULL AND " +
+            "(:store_type_id IS NULL OR st.id = :store_type_id) " +
+            "AND (:parent_category IS NULL OR par.id = :parent_category) " +
+            "GROUP BY c.id";
+    String countQueryForSubCategoryFilteredByStoreTypeAndParentCategory = "SELECT COUNT(DISTINCT c.id) " +
+            "FROM ItemCategory c " +
+            "LEFT JOIN ItemCategory par ON par.id = c.parentCategory.id " +
+            "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
+            "WHERE c.parentCategory IS NOT NULL AND " +
+            "(:store_type_id IS NULL OR st.id = :store_type_id) " +
+            "AND (:parent_category IS NULL OR par.id = :parent_category)";
+
 
     String findAllBySubCategoryFilteredByStoreTypeAndParentCategoryCount="SELECT COUNT(*) FROM ("+
             findAllBySubCategoryFilteredByStoreTypeAndParentCategory+") c";

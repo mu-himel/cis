@@ -15,8 +15,9 @@ import java.util.Date;
 @AllArgsConstructor
 public class TradeLicenseDto {
     @JsonProperty("ID")
+    @JsonIgnore
     private String ID;
-    @JsonIgnore()
+    @JsonIgnore
     private String secret_key;
     @JsonProperty("Issue Date")
     @JsonFormat(pattern = "dd/MM/yyyy")
@@ -27,6 +28,7 @@ public class TradeLicenseDto {
     private String nid;
     private String license;
     @JsonProperty("None")
+    @JsonIgnore
     private String ignore;
 
     public TradeDocument dtoToEntityMapping(TradeLicenseDto dto, TradeDocument tradeDocument){

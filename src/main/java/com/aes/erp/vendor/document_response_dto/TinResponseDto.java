@@ -12,8 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TinResponseDto {
     @JsonProperty("ID")
+    @JsonIgnore
     private String ID;
-    @JsonIgnore()
+    @JsonIgnore
     private String secret_key;
     @JsonProperty("Full Name")
     private String name;

@@ -14,6 +14,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.List;
@@ -38,12 +39,13 @@ public class VendorDto implements Serializable, EntityConvertible<Vendor> {
     private String phone;
 
 
+    @NotBlank(message = "Vendor Type is required")
     private VendorType vendorType;
 
     private String password;
     private ReferenceObjectDto category;
 
-    private ReferenceObjectDto subCategory;
+    private List<Long> subCategory;
 
     private List<ReferenceObjectDto> items;
 

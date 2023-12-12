@@ -17,27 +17,27 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
 
 
-    @Query(value = findAllByItemCategoryWithSubCategory,
-            countQuery = findAllByItemCategoryWithSubCategoryCount,
-            nativeQuery = true)
-    Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("store_type_id") Long store_type_id, Pageable pageable);
 
-    @Query(value = findAllByItemCategoryWithSubCategory,
-            nativeQuery = true)
+    @Query(value = findAllByItemCategoryWithSubCategoryCount,
+            countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
+    Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
+            @Param("storeTypeId") Long storeTypeId, Pageable pageable);
+
+
+    @Query(value = findAllByItemCategoryWithSubCategoryCount,
+            countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     List<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("store_type_id") Long store_type_id);
+            @Param("storeTypeId") Long storeTypeId);
 
     @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
-            countQuery = findAllBySubCategoryFilteredByStoreTypeAndParentCategoryCount,
-            nativeQuery = true)
+            countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory)
     Page<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
             @Param("store_type_id") Long store_type_id,
             @Param("parent_category") Long parent_category,
             Pageable pageable);
 
     @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
-            nativeQuery = true)
+            countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory)
     List<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
             @Param("store_type_id") Long store_type_id,
             @Param("parent_category") Long parent_category);
