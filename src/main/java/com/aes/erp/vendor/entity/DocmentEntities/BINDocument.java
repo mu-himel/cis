@@ -19,7 +19,7 @@ public class BINDocument {
     private Long id;
     private String address;
     private String bin;
-    private Date effectiveDate;
+    private String effectiveDate;
     private Date issueDate;
     private String companyName;
     private String oldBin;

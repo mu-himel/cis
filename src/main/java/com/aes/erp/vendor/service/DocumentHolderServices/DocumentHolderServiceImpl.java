@@ -159,8 +159,8 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         vendorRepository.save(vendor);
     }
     public Long calculateYearsOfBusiness(DocumentHolder documentHolder){
-        Date effectiveDateBin = documentHolder.getBinDocument().getEffectiveDate();
-        return (long) (LocalDate.now().getYear() - effectiveDateBin.getYear());
+        Date issueDateBin = documentHolder.getBinDocument().getIssueDate();
+        return (long) (LocalDate.now().getYear() - issueDateBin.getYear());
     }
     public void setVendorScore(Vendor vendor, VendorScore vendorScore){
         Long totalBusinessYears = calculateYearsOfBusiness(vendor.getDocumentHolder());

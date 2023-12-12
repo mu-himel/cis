@@ -1,10 +1,8 @@
 package com.aes.erp.inventory.dto.request;
 
 import com.aes.erp.common.EntityConvertible;
-import com.aes.erp.inventory.entity.CategoryAttribute;
-import com.aes.erp.inventory.entity.CategoryBudget;
-import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.StoreType;
+import com.aes.erp.inventory.entity.*;
+import com.aes.erp.inventory.service.SubcategoryBrandService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -34,6 +32,7 @@ public class CategoryRequestDto implements EntityConvertible<ItemCategory> {
     private ItemCategory parentCategory;
 
     private List<CategoryAttribute> attributes;
+    private List<String> brands;
     private StoreType storeType;
 
     @Override

@@ -26,8 +26,7 @@ public class BinResponseDto {
     private String bin;
 
     @JsonProperty("Effective Date")
-    @JsonFormat(pattern = "dd/MM/yyyy")
-    private Date effectiveDate;
+    private String effectiveDate;
 
     @JsonProperty("Issue Date")
     @JsonFormat(pattern = "dd/MM/yyyy")

@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.inventory.entity.SubcategoryBrand;
 import com.aes.erp.inventory.repository.SubcategoryBrandRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,13 @@ public class SubcategoryBrandServiceImpl implements SubcategoryBrandService{
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
         return subcategoryBrandRepository.findAll(pageable);
+    }
+
+    @Override
+    public void create(String name) {
+        SubcategoryBrand brand = new SubcategoryBrand();
+        brand.setName(name);
+        subcategoryBrandRepository.save(brand);
     }
 
 }

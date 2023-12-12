@@ -27,12 +27,10 @@ public class SubcategoryBrandController {
                 HttpStatus.OK
         );
     }
-//    @PostMapping()
-//    @ApiOperation(value = "Create New Brand")
-//    public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("brand") String name){
-//        return new ResponseEntity<>(
-//                brandService.createNewBrand(String name),
-//                HttpStatus.CREATED
-//        );
-//    }
+    @PostMapping()
+    @ApiOperation(value = "Create New Brand")
+    public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("brand") String name){
+        brandService.create(name);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }
