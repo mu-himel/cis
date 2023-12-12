@@ -18,14 +18,14 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
 
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
-            nativeQuery = true)
+            countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("store_type_id") Long store_type_id, Pageable pageable);
+            @Param("storeTypeId") Long storeTypeId, Pageable pageable);
 
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
             nativeQuery = true)
     List<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("store_type_id") Long store_type_id);
+            @Param("storeTypeId") Long storeTypeId);
 
     @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
             nativeQuery = true)

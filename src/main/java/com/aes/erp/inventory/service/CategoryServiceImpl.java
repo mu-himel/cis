@@ -64,8 +64,8 @@ public class CategoryServiceImpl implements CategoryService {
                 return categoryAttribute;
             }).collect(Collectors.toList()));
         }
-        List<SubcategoryBrand> brands = genericModelMapper.mapDtoListToEntityList(categoryRequestDto.getBrands(), SubcategoryBrand.class);
-        if(brands!=null && !brands.isEmpty()){
+        if(categoryRequestDto.getBrands() != null && !categoryRequestDto.getBrands().isEmpty()){
+            List<SubcategoryBrand> brands = genericModelMapper.mapDtoListToEntityList(categoryRequestDto.getBrands(), SubcategoryBrand.class);
             category.setBrands(brands.stream().map(brand -> {
                 brand.setCategory(category);
                 return brand;
