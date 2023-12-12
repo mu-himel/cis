@@ -48,10 +48,8 @@ public class VendorController {
                 HttpStatus.OK
         );
     }
-
-    // crate vendor
     @PostMapping
-    public ResponseEntity<?> createVendor(@RequestBody VendorDto vendorDto) throws JsonProcessingException {
+    public ResponseEntity<?> createVendor(@RequestBody VendorDto vendorDto){
         vendorService.createVendor(vendorDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

@@ -1,6 +1,8 @@
 package com.aes.erp.inventory.entity;
 
 
+import com.aes.erp.vendor.entity.Vendor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
 import lombok.*;
@@ -56,6 +58,9 @@ public class ItemCategory {
   private Long createdAt;
 
   private Long updatedAt;
+  @JsonIgnore
+  @ManyToOne
+  private Vendor vendor;
 
 
   public ItemCategory(Long id) {

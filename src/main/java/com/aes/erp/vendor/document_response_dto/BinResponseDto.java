@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BinResponseDto {
     @JsonProperty("ID")
+    @JsonIgnore
     private String ID;
     @JsonIgnore()
     private String secret_key;
@@ -40,8 +41,6 @@ public class BinResponseDto {
     private String tin;
     @JsonProperty("Ownership Type")
     private String ownershipType;
-//    @JsonProperty("all_info")
-//    private List<String> allInformation;
 
     public BINDocument dtoToEntityMapping(BinResponseDto dto, BINDocument document){
         if(!dto.getAddress().isEmpty())document.setAddress(dto.getAddress());

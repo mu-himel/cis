@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface VendorService {
     Optional<?> getVendorDetail(Long vendorId);
-    void createVendor(VendorDto vendorDto) throws JsonProcessingException;
+    void createVendor(VendorDto vendorDto);
 
     void updateVendor(Long id, VendorDto vendorDto);
 

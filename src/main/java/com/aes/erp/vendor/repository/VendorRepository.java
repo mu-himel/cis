@@ -25,12 +25,12 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             "WHERE v.id=:id")
     Optional<Vendor> findById(Long id);
 
-    @Query(value = "SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt LEFT JOIN FETCH v.category c LEFT JOIN FETCH v.subCategory sc " +
+    @Query(value = "SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt LEFT JOIN FETCH v.category c LEFT JOIN FETCH v.subCategoryList sc " +
             "WHERE :searchFilter IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
             "   OR :searchFilter IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
             "   OR :searchFilter IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
             "   OR :searchFilter IS NULL OR LOWER(vt.name) LIKE LOWER(CONCAT('%', :searchFilter, '%')) ",
-            countQuery = "SELECT COUNT(v) FROM Vendor v LEFT JOIN v.vendorType vt LEFT JOIN v.category c LEFT JOIN v.subCategory sc " +
+            countQuery = "SELECT COUNT(v) FROM Vendor v LEFT JOIN v.vendorType vt LEFT JOIN v.category c LEFT JOIN v.subCategoryList sc " +
                     "WHERE :searchFilter IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
                     "   OR :searchFilter IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
                     "   OR :searchFilter IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :searchFilter, '%')) " +
@@ -108,6 +108,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
         VendorType getVendorType();
         ItemCategory getCategory();
-        ItemCategory getSubCategory();
+        List<ItemCategory> getSubCategoryList();
     }
 }

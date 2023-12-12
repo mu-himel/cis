@@ -4,6 +4,8 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.service.CategoryService;
+import com.aes.erp.inventory.service.ItemService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.VendorDto;
@@ -23,7 +25,6 @@ import com.aes.erp.vendor.repository.VendorRepository;
 import com.aes.erp.vendor.repository.VendorScoreRepository;
 import com.aes.erp.vendor.utils.EmailSenderUtil;
 import com.aes.erp.vendor.utils.GenericModelMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,10 +60,12 @@ public class VendorServiceImpl implements VendorService {
 
     @Autowired
     private VendorFileRepository vendorFileRepository;
+    private final CategoryService categoryService;
 
-    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, GenericModelMapper modelMapper) {
+    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, GenericModelMapper modelMapper, CategoryService categoryService) {
         this.emailSenderUtil = emailSenderUtil;
         this.modelMapper = modelMapper;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -73,7 +76,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public void createVendor(VendorDto vendorDto) throws JsonProcessingException {
+    public void createVendor(VendorDto vendorDto) {
         if(!vendorDto.getPhone().isEmpty()){
             if(vendorDto.getPhone().matches("[a-zA-Z]")){
                 throw new AesException("phone number should not contain alphabets");
@@ -85,7 +88,16 @@ public class VendorServiceImpl implements VendorService {
         Vendor vendor = vendorDto.getEntity();
         vendor.setStatus(VendorStatus.CREATED);
         vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
-        vendor.setSubCategory(new ItemCategory(vendorDto.getSubCategory().getId()));
+        //Set SubCategory List For Vendor
+        if(vendorDto.getSubCategory() != null && !vendorDto.getSubCategory().isEmpty()){
+           List<ItemCategory> subCategoryList = new ArrayList<>();
+           for(Long id: vendorDto.getSubCategory()){
+               Optional<ItemCategory> existingItemCategory = categoryService.getItemCategory(id);
+               if(existingItemCategory.isEmpty()) throw new AesException("No item category found with given Id" + id);
+               ItemCategory itemCategory = new ItemCategory(id);
+               subCategoryList.add(itemCategory);
+           }
+        }
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
         vendor.setVendorType(vendorDto.getVendorType());
         vendor.setUser(user);
@@ -119,8 +131,11 @@ public class VendorServiceImpl implements VendorService {
         if(vendorDto.getCategory() != null){
             vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
         }
-        if(vendorDto.getSubCategory() != null){
-            vendor.setSubCategory(new ItemCategory(vendorDto.getSubCategory().getId()));
+        //Set SubCategory List For Vendor
+        if(vendorDto.getSubCategory() != null && !vendorDto.getSubCategory().isEmpty()){
+            List<ItemCategory> subCategoryList = new ArrayList<>();
+            subCategoryList = modelMapper.mapDtoListToEntityList(vendorDto.getSubCategory(), ItemCategory.class);
+            vendor.setSubCategoryList(subCategoryList);
         }
         if(vendorDto.getVendorType() != null){
             VendorType vendorType = new VendorType();
