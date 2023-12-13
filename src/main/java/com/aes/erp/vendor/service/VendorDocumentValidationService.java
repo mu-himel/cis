@@ -7,6 +7,7 @@ import com.aes.erp.vendor.repository.DocumentHolderRepository;
 import com.aes.erp.vendor.service.DocumentServices.DocumentService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import com.aes.erp.vendor.utils.GenericObjectMapper;
+import com.aes.erp.vendor.utils.MLApiConfig;
 import com.aes.erp.vendor.utils.RestTemplateService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,21 +19,18 @@ import java.io.IOException;
 
 @Service
 public class VendorDocumentValidationService {
-    public final String TIN_URL =  "http://172.17.18.41:5052/tin";
-    public final String BIN_URL =  "http://172.17.18.41:5051/bin";
-    public final String NID_URL =  "http://172.17.18.41:5054/nid";
-    public final String BANK_SOLVENCY_URL =  "http://172.17.18.41:5050/bank";
-    public final String TRADE_LICENSE_URL =  "http://172.17.18.37:5053/trade";
     private final RestTemplateService restClient;
     private final GenericObjectMapper genericMapper;
     private final DocumentHolderRepository documentHolderRepository;
     private final DocumentService documentService;
+    private final MLApiConfig mlApiConfig;
 
-    public VendorDocumentValidationService(RestTemplateService restClient, GenericObjectMapper genericMapper, DocumentHolderRepository documentHolderRepository, DocumentService documentService) {
+    public VendorDocumentValidationService(RestTemplateService restClient, GenericObjectMapper genericMapper, DocumentHolderRepository documentHolderRepository, DocumentService documentService, MLApiConfig mlApiConfig) {
         this.restClient = restClient;
         this.documentHolderRepository = documentHolderRepository;
         this.documentService = documentService;
         this.genericMapper = genericMapper;
+        this.mlApiConfig = mlApiConfig;
     }
     public void multipartFileToBytes(MultipartFile file, Document document){
         try{
@@ -54,23 +52,23 @@ public class VendorDocumentValidationService {
         String url = "";
         String result = "";
         if(fileName.equals("TIN")){
-            url = TIN_URL;
+            url = mlApiConfig.getTin();
             document.setDocumentType(DocumentType.TIN);
         }
         else if(fileName.equals("BIN")){
-            url = BIN_URL;
+            url = mlApiConfig.getBin();
             document.setDocumentType(DocumentType.BIN);
         }
         else if(fileName.equals("NID")){
-            url = NID_URL;
+            url = mlApiConfig.getNid();
             document.setDocumentType(DocumentType.NID);
         }
         else if(fileName.equals("BANK")){
-            url = BANK_SOLVENCY_URL;
+            url = mlApiConfig.getSolvency();
             document.setDocumentType(DocumentType.BANK_SOLVENCY);
         }
         else if(fileName.equals("TRADE")){
-            url = TRADE_LICENSE_URL;
+            url = mlApiConfig.getTrade();
             document.setDocumentType(DocumentType.TRADE);
         }
         try{
