@@ -133,8 +133,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Integer> page, Optional<Integer> size, Optional<Long> storeTypeId, Optional<Long> parentCategoryID) {
-        Sort sort = Sort.by(Sort.Direction.DESC,"id");
-        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10),sort);
+//        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10));
         return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(storeTypeId.orElse(null), parentCategoryID.orElse(null), pageable);
     }
 

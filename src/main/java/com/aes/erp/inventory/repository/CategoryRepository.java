@@ -17,10 +17,12 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
 
 
+
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
             countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
             @Param("storeTypeId") Long storeTypeId, Pageable pageable);
+
 
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
             countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
@@ -119,6 +121,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
         String getCategoryCode();
         Long getSubcategoryCount();
         String getStoreTypeName();
+        Long getStoreTypeId();
     }
 
     interface ItemCategoryInfoExt extends ItemCategoryInfo{

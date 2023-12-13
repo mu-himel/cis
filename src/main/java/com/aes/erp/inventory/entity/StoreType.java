@@ -19,6 +19,7 @@ public class StoreType {
     @Column(updatable = false)
     private Long id;
     private String name;
+    private Boolean active=true;
 //    @JsonIgnore
 //    @OneToMany(mappedBy = "storeType", cascade = CascadeType.REMOVE, orphanRemoval = true)
 //    private List<ItemCategory> categories;
