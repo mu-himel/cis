@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,11 +66,14 @@ public class CategoryServiceImpl implements CategoryService {
             }).collect(Collectors.toList()));
         }
         if(categoryRequestDto.getBrands() != null && !categoryRequestDto.getBrands().isEmpty()){
-            List<SubcategoryBrand> brands = genericModelMapper.mapDtoListToEntityList(categoryRequestDto.getBrands(), SubcategoryBrand.class);
-            category.setBrands(brands.stream().map(brand -> {
-                brand.setCategory(category);
-                return brand;
-            }).collect(Collectors.toList()));
+            List<SubcategoryBrand> brands = new ArrayList<>();
+            for(String brandName: categoryRequestDto.getBrands()){
+                SubcategoryBrand newBrand = new SubcategoryBrand();
+                newBrand.setCategory(category);
+                newBrand.setName(brandName);
+                brands.add(newBrand);
+            }
+            category.setBrands(brands);
         }
         category.setCreatedAt(Instant.now().toEpochMilli());
         categoryRepository.save(category);
