@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface SubcategoryBrandRepository extends JpaRepository<SubcategoryBrand, Long> {
     @Query(value = "SELECT * FROM subcategory_brands ", nativeQuery = true)
@@ -17,4 +19,7 @@ public interface SubcategoryBrandRepository extends JpaRepository<SubcategoryBra
         Long getId();
         String getName();
     }
+    @Query("SELECT sb FROM SubcategoryBrand sb " +
+            "WHERE sb.name = :name AND sb.category.id = :subcategoryId")
+    Optional<SubcategoryBrand> getBrandByIdAndSubCategory(@Param("name") String name, @Param("subcategoryId") Long subcategoryId);
 }

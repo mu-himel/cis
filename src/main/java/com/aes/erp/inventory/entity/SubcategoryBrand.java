@@ -20,6 +20,7 @@ public class SubcategoryBrand {
     private String name;
 
     @ManyToOne
+    @JoinColumn(name = "subcategories_id")
     @JsonIgnore
     private ItemCategory category;
 }
