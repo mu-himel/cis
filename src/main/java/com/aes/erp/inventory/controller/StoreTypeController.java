@@ -28,7 +28,7 @@ public class StoreTypeController {
     }
     @GetMapping("/{id}")
     @ApiOperation(value = "Get A Store Type By Id")
-    public ResponseEntity<?> getAllStoreTypes(@PathVariable("id") Long id){
+    public ResponseEntity<?> getStoreType(@PathVariable("id") Long id){
         return new ResponseEntity<>(storeTypeService.getById(id), HttpStatus.OK);
     }
     @GetMapping

@@ -22,7 +22,7 @@ public class VendorDocumentValidationService {
     public final String BIN_URL =  "http://172.17.18.41:5051/bin";
     public final String NID_URL =  "http://172.17.18.41:5054/nid";
     public final String BANK_SOLVENCY_URL =  "http://172.17.18.41:5050/bank";
-    public final String TRADE_LICENSE_URL =  "http://172.17.18.41:5053/trade";
+    public final String TRADE_LICENSE_URL =  "http://172.17.18.37:5053/trade";
     private final RestTemplateService restClient;
     private final GenericObjectMapper genericMapper;
     private final DocumentHolderRepository documentHolderRepository;
