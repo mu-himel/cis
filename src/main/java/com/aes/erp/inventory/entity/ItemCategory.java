@@ -15,6 +15,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -48,7 +49,7 @@ public class ItemCategory {
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
   private List<CategoryAttribute> attributes;
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-  private List<SubcategoryBrand> brands;
+  private List<SubcategoryBrand> brands = new ArrayList<>();
 
   private Boolean active=true;
 

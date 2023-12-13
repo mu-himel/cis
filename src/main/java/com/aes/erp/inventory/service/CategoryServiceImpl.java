@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.entity.ItemCategory;
@@ -44,6 +45,19 @@ public class CategoryServiceImpl implements CategoryService {
         this.subcategoryBrandRepository = subcategoryBrandRepository;
     }
 
+    public void setBrandToSubCategory(CategoryRequestDto dto, ItemCategory category){
+        for(String brandName: dto.getBrands()){
+            Optional<SubcategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByIdAndSubCategory(brandName, category.getId());
+            if(!existingBrandOptional.isPresent()){
+                SubcategoryBrand subcategoryBrand = new SubcategoryBrand();
+                subcategoryBrand.setName(brandName);
+                subcategoryBrand.setCategory(category);
+                category.getBrands().add(subcategoryBrand);
+//                category = categoryRepository.save(category);
+//                subcategoryBrandRepository.save(subcategoryBrand);
+            }
+        }
+    }
     @Override
     @Transactional
     public void addCategory(CategoryRequestDto categoryRequestDto) {
@@ -59,21 +73,13 @@ public class CategoryServiceImpl implements CategoryService {
             Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
             if(storeType.isPresent())category.setStoreType(storeType.get());
         }
+        setBrandToSubCategory(categoryRequestDto, category);
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
+            ItemCategory finalCategory = category;
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
-                categoryAttribute.setCategory(category);
+                categoryAttribute.setCategory(finalCategory);
                 return categoryAttribute;
             }).collect(Collectors.toList()));
-        }
-        if(categoryRequestDto.getBrands() != null && !categoryRequestDto.getBrands().isEmpty()){
-            List<SubcategoryBrand> brands = new ArrayList<>();
-            for(String brandName: categoryRequestDto.getBrands()){
-                SubcategoryBrand newBrand = new SubcategoryBrand();
-                newBrand.setCategory(category);
-                newBrand.setName(brandName);
-                brands.add(newBrand);
-            }
-            category.setBrands(brands);
         }
         category.setCreatedAt(Instant.now().toEpochMilli());
         categoryRepository.save(category);
@@ -88,9 +94,9 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         ItemCategory itemCategory = itemCategoryOptional.get();
-        if(!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())){
-            throw new AesException("Category Code should be unique");
-        }
+//        if(!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())){
+//            throw new AesException("Category Code should be unique");
+//        }
 
         if(itemCategory.getParentCategory()!=null){
             if(categoryRequestDto.getParentCategory()==null || categoryRequestDto.getParentCategory().getId()==null){
@@ -106,14 +112,14 @@ public class CategoryServiceImpl implements CategoryService {
             Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
             if(storeType.isPresent())itemCategory.setStoreType(storeType.get());
         }
-
+        setBrandToSubCategory(categoryRequestDto, itemCategory);
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
+            ItemCategory finalItemCategory = itemCategory;
             itemCategory.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
-                categoryAttribute.setCategory(itemCategory);
+                categoryAttribute.setCategory(finalItemCategory);
                 return categoryAttribute;
             }).collect(Collectors.toList()));
         }
-
         if(categoryRequestDto.getEntity().getParentCategory()!=null) {
             itemCategory.setParentCategory(categoryRequestDto.getEntity().getParentCategory());
         }
