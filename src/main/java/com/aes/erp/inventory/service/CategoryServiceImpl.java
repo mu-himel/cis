@@ -46,17 +46,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public void setBrandToSubCategory(CategoryRequestDto dto, ItemCategory category){
-        for(String brandName: dto.getBrands()){
-            Optional<SubcategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByIdAndSubCategory(brandName, category.getId());
-            if(!existingBrandOptional.isPresent()){
-                SubcategoryBrand subcategoryBrand = new SubcategoryBrand();
-                subcategoryBrand.setName(brandName);
-                subcategoryBrand.setCategory(category);
-                category.getBrands().add(subcategoryBrand);
-//                category = categoryRepository.save(category);
-//                subcategoryBrandRepository.save(subcategoryBrand);
+        if(dto.getBrands() != null){
+            for(String brandName: dto.getBrands()){
+                Optional<SubcategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByIdAndSubCategory(brandName, category.getId());
+                if(!existingBrandOptional.isPresent()){
+                    SubcategoryBrand subcategoryBrand = new SubcategoryBrand();
+                    subcategoryBrand.setName(brandName);
+                    subcategoryBrand.setCategory(category);
+                    category.getBrands().add(subcategoryBrand);
+                }
             }
         }
+        //If Its a subcategory Brands Must be included check
+        if(category.getParentCategory() != null && dto.getBrands() == null) throw new AesException("Brands must included to create a subcategory");
     }
     @Override
     @Transactional
