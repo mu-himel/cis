@@ -5,6 +5,7 @@ import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.VendorScore;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class VendorProfileDto {
     private VendorIdentificationDto identification;
     private VendorBasicInformationDto basicInformation;
     private VendorAddressDto address;
-//    private List<String> permittedProducts;
+    private List<String> permittedProducts = new ArrayList<>();
     private GeneralDetails generalDetails;
     private BusinessDetails businessDetails;
     private VendorScore vendorScore;

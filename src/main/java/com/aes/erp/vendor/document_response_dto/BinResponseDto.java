@@ -49,7 +49,7 @@ public class BinResponseDto {
         if(!dto.getTin().isEmpty())document.setTin(dto.getTin());
         if(!dto.getCompanyName().isEmpty())document.setCompanyName(dto.getCompanyName());
         if(dto.getEffectiveDate() != null)document.setEffectiveDate(dto.getEffectiveDate());
-        if(dto.getIssueDate() != null)document.setIssueDate(dto.getIssueDate());
+        if(dto.getIssueDate() != null)document.setIssueDate(new Timestamp(dto.getIssueDate().getTime()));
         if(!dto.getOwnershipType().isEmpty())document.setOwnershipType(dto.getOwnershipType());
         return document;
     }

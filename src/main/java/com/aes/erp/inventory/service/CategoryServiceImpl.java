@@ -47,7 +47,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     public void setBrandToSubCategory(CategoryRequestDto dto, ItemCategory category){
         if(dto.getBrands() != null){
-            for(String brandName: dto.getBrands()){
+            List<SubcategoryBrand> brandsToBeDeleted = new ArrayList<>();
+            for (SubcategoryBrand existingBrand : category.getBrands()) {
+                if (!dto.getBrands().contains(existingBrand.getName())) {
+                    brandsToBeDeleted.add(existingBrand);
+                }
+            }
+            for(SubcategoryBrand brand: brandsToBeDeleted){
+                subcategoryBrandRepository.deleteById(brand.getId());
+                category.getBrands().remove(brand);
+            }
+            for(String brandName: dto.getBrands()) {
                 Optional<SubcategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByIdAndSubCategory(brandName, category.getId());
                 if(!existingBrandOptional.isPresent()){
                     SubcategoryBrand subcategoryBrand = new SubcategoryBrand();
@@ -57,7 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
                 }
             }
         }
-        //If Its a subcategory Brands Must be included check
+        //If Its a subcategory Brands Must be included.
         if(category.getParentCategory() != null && dto.getBrands() == null) throw new AesException("Brands must included to create a subcategory");
     }
     @Override

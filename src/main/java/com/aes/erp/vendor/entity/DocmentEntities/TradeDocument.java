@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -16,7 +17,7 @@ public class TradeDocument {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    private Date issueDate;
+    private Timestamp issueDate;
     private String mobileNo;
     private String nid;
     private String tradeLicenseNumber;

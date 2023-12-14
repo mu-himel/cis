@@ -104,7 +104,7 @@ public interface CategoryQuery {
     String findAllByItemCategoryWithSubCategoryCount = "SELECT c.id AS categoryId, c.name AS categoryName, " +
             "c.code AS categoryCode, COUNT(sub.id) AS subcategoryCount,st.id as storeTypeId, st.name AS storeTypeName " +
             "FROM ItemCategory c " +
-            "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id " +
+            "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id  AND sub.active = true " +
             "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
             "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
             "AND c.active = true " +

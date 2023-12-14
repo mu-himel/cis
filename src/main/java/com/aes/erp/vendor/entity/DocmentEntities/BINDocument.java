@@ -7,6 +7,7 @@ import lombok.Data;
 import org.w3c.dom.Text;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class BINDocument {
     private String bin;
     @Column(columnDefinition = "TEXT")
     private String effectiveDate;
-    private Date issueDate;
+    private Timestamp issueDate;
     private String companyName;
     private String oldBin;
     private String tin;

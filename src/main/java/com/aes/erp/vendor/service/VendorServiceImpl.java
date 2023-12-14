@@ -250,12 +250,18 @@ public class VendorServiceImpl implements VendorService {
         vendor.setStatus(status);
 
     }
+    public void setPermittedProductsForVendor(VendorProfileDto dto, List<ItemCategory> categoryList){
+        for(ItemCategory subCategory: categoryList){
+            dto.getPermittedProducts().add(subCategory.getName() + subCategory.getCode());
+        }
+    }
     @Override
     public VendorProfileDto getVendorProfile(Long id){
         Optional<Vendor> vendorOptional = vendorRepository.findById(id);
         if(vendorOptional.isEmpty())throw new AesException("Vendor couldn't be found with this user Id");
         Vendor vendor = vendorOptional.get();
         VendorProfileDto profileDto = new VendorProfileDto();
+        setPermittedProductsForVendor(profileDto, vendor.getSubCategoryList());
         profileDto.setBasicInformation(vendorProfileService.getVendorBasicInformation(vendor));
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));
