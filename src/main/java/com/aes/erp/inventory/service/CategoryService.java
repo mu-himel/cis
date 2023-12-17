@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface CategoryService {
 
     void addCategory(CategoryRequestDto categoryRequestDto);
+    ItemCategory addCategoryFromCategoryEntity(ItemCategory itemCategory);
 
     void updateCategory(Long id,CategoryRequestDto categoryRequestDto);
     Optional<ItemCategory> existByCode(String Code);
@@ -44,4 +45,6 @@ public interface CategoryService {
     String getNewCategoryCode();
 
     void deleteAttribute(Long categoryId, Long attributeId);
+    Optional<ItemCategory> getCategoryForAVendor(Long vendorId, Long Id);
+    Optional<ItemCategory> findRootReferenceItem(Long Id);
 }

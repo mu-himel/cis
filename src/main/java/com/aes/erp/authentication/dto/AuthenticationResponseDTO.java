@@ -1,5 +1,7 @@
 package com.aes.erp.authentication.dto;
 
+import com.aes.erp.vendor.enums.VendorStatus;
+
 import java.util.List;
 
 /**
@@ -16,6 +18,7 @@ public class AuthenticationResponseDTO {
 
     private EmployeeInfoDto employee;
     private final Long vendorId;
+    private final VendorStatus vendorStatus;
 
 //    private final List<OrganizationFileResponseDTO> organizationFileInfos;
 
@@ -23,11 +26,12 @@ public class AuthenticationResponseDTO {
 
     public AuthenticationResponseDTO(String jwt, long id, List<String> roles, List<OrganizationInfo> organizationInfos,
 //                                     List<OrganizationFileResponseDTO> organizationFileInfos,
-                                     Long vendorId, String status) {
+                                     Long vendorId, VendorStatus vendorStatus, String status) {
         this.jwt = jwt;
         this.id = id;
         this.roles = roles;
         this.vendorId = vendorId;
+        this.vendorStatus = vendorStatus;
         this.status = status;
         this.organizationInfos = organizationInfos;
 //        this.organizationFileInfos = organizationFileInfos;
@@ -35,6 +39,9 @@ public class AuthenticationResponseDTO {
 
     public Long getVendorId() {
         return vendorId;
+    }
+    public VendorStatus getVendorStatus() {
+        return vendorStatus;
     }
 
     public void setEmployee(EmployeeInfoDto employee) {

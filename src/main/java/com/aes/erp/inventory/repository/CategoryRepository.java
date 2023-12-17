@@ -96,6 +96,14 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     @Query("select max(ic.id) from ItemCategory ic")
     Optional<ItemCategory> findMaxOrderById();
 
+    @Query(value = "SELECT * FROM item_categories ic " +
+            "WHERE (:id IS NOT NULL AND ic.id = :id) " +
+            "AND ic.copied_from IS NULL", nativeQuery = true)
+    Optional<ItemCategory> findRootReferenceEntity(@Param("id") Long id);
+    @Query(value = "SELECT * FROM item_categories ic " +
+            "WHERE (:id IS NOT NULL AND ic.id = :id) " +
+            "AND (:vendorId IS NOT NULL AND ic.vendor_id = :vendorId)", nativeQuery = true)
+    Optional<ItemCategory> findSavedCategoryForVendor(@Param("vendorId") Long vendorId, @Param("id") Long id);
     interface ItemCategoryInfo {
 
 

@@ -98,6 +98,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public ItemCategory addCategoryFromCategoryEntity(ItemCategory itemCategory) {
+        return categoryRepository.save(itemCategory);
+    }
+
+    @Override
     @Transactional
     public void updateCategory(Long id, CategoryRequestDto categoryRequestDto) {
         Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
@@ -106,9 +111,9 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         ItemCategory itemCategory = itemCategoryOptional.get();
-//        if(!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())){
-//            throw new AesException("Category Code should be unique");
-//        }
+        if(!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())){
+            throw new AesException("Category Code should be unique");
+        }
 
         if(itemCategory.getParentCategory()!=null){
             if(categoryRequestDto.getParentCategory()==null || categoryRequestDto.getParentCategory().getId()==null){
@@ -263,5 +268,15 @@ public class CategoryServiceImpl implements CategoryService {
 
         }
 
+    }
+
+    @Override
+    public Optional<ItemCategory> getCategoryForAVendor(Long vendorId, Long Id) {
+       return categoryRepository.findSavedCategoryForVendor(vendorId, Id);
+    }
+
+    @Override
+    public Optional<ItemCategory> findRootReferenceItem(Long Id) {
+        return categoryRepository.findById(Id);
     }
 }
