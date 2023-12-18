@@ -4,6 +4,7 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.SubcategoryBrand;
 import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.inventory.service.ItemService;
 import com.aes.erp.user_management.entity.User;
@@ -93,9 +94,14 @@ public class VendorServiceImpl implements VendorService {
            List<ItemCategory> subCategoryList = new ArrayList<>();
            for(Long id: vendorDto.getSubCategory()){
                Optional<ItemCategory> existingItemCategory = categoryService.getItemCategory(id);
-               if(existingItemCategory.isEmpty()) throw new AesException("No item category found with given Id" + id);
-               ItemCategory itemCategory = new ItemCategory(id);
-               subCategoryList.add(itemCategory);
+               if(existingItemCategory.isPresent()){
+                   ItemCategory previousReference = existingItemCategory.get();
+                   ItemCategory itemCategory = new ItemCategory();
+                   setNewItemCategory(previousReference, itemCategory);
+                   itemCategory.setVendor(vendor);
+                   itemCategory = categoryService.addCategoryFromCategoryEntity(itemCategory);
+                   subCategoryList.add(itemCategory);
+               }
            }
         }
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
@@ -107,6 +113,18 @@ public class VendorServiceImpl implements VendorService {
         VendorRegistrationMailSender senderBody = new VendorRegistrationMailSender(vendor.getEmail());
         senderBody.setContent(senderBody.getContent() +  "Email: " + vendorDto.getEmail() + "\n" + "Password: " + vendorDto.getPassword());
         emailSenderUtil.sendMail(senderBody);
+    }
+    public void setNewItemCategory(ItemCategory refCat, ItemCategory destination){
+        destination.setName(refCat.getName());
+        destination.setCopiedFrom(refCat.getId());
+        if(refCat.getParentCategory() != null){
+            destination.setParentCategory(refCat.getParentCategory());
+        }
+        if(refCat.getStoreType() != null)destination.setStoreType(refCat.getStoreType());
+        if(refCat.getActive() != null)destination.setActive(refCat.getActive());
+        if(!refCat.getBrands().isEmpty())destination.setBrands(refCat.getBrands());
+        if(!refCat.getAttributes().isEmpty())destination.setAttributes(refCat.getAttributes());
+        if(!refCat.getBudgets().isEmpty())destination.setBudgets(refCat.getBudgets());
     }
 
     @Override
@@ -134,7 +152,7 @@ public class VendorServiceImpl implements VendorService {
         //Set SubCategory List For Vendor
         if(vendorDto.getSubCategory() != null && !vendorDto.getSubCategory().isEmpty()){
             List<ItemCategory> subCategoryList = new ArrayList<>();
-            subCategoryList = modelMapper.mapDtoListToEntityList(vendorDto.getSubCategory(), ItemCategory.class);
+            subCategoryList = updateSubCategoryListForVendor(vendor, id, vendor.getSubCategoryList(), vendorDto.getSubCategory());
             vendor.setSubCategoryList(subCategoryList);
         }
         if(vendorDto.getVendorType() != null){
@@ -144,7 +162,33 @@ public class VendorServiceImpl implements VendorService {
         }
         vendorRepository.save(vendor);
     }
-
+    public List<ItemCategory> updateSubCategoryListForVendor(Vendor vendor, Long vendorId, List<ItemCategory> subCategoryList, List<Long> subCategoryIdList){
+        if(subCategoryIdList != null){
+            List<ItemCategory> subCategoriesToBeDeleted = new ArrayList<>();
+            for (ItemCategory category : subCategoryList) {
+                if(!subCategoryIdList.contains(category.getId())){
+                    subCategoriesToBeDeleted.add(category);
+                }
+            }
+            for(ItemCategory ic: subCategoriesToBeDeleted){
+                categoryService.deleteCategory(ic.getId());
+                subCategoryList.remove(ic);
+            }
+            for(Long id: subCategoryIdList) {
+                Optional<ItemCategory> existingCategoryOptional = categoryService.getCategoryForAVendor(vendorId, id);
+                if(!existingCategoryOptional.isPresent()){
+                    Optional<ItemCategory> refCat = categoryService.findRootReferenceItem(id);
+                    ItemCategory refCategory = refCat.get();
+                    ItemCategory newItem = new ItemCategory();
+                    setNewItemCategory(refCategory, newItem);
+                    newItem.setVendor(vendor);
+                    newItem = categoryService.addCategoryFromCategoryEntity(newItem);
+                    subCategoryList.add(newItem);
+                }
+            }
+        }
+        return subCategoryList;
+    }
     @Override
     public void deleteVendor(Long id) {
         vendorRepository.deleteById(id);
@@ -250,12 +294,19 @@ public class VendorServiceImpl implements VendorService {
         vendor.setStatus(status);
 
     }
+    public void setPermittedProductsForVendor(VendorProfileDto dto, List<ItemCategory> categoryList){
+        for(ItemCategory subCategory: categoryList){
+            Optional<ItemCategory> refCategory = categoryService.getItemCategory(subCategory.getCopiedFrom());
+            refCategory.ifPresent(category -> dto.getPermittedProducts().add(subCategory.getName() + category.getCode()));
+        }
+    }
     @Override
     public VendorProfileDto getVendorProfile(Long id){
         Optional<Vendor> vendorOptional = vendorRepository.findById(id);
         if(vendorOptional.isEmpty())throw new AesException("Vendor couldn't be found with this user Id");
         Vendor vendor = vendorOptional.get();
         VendorProfileDto profileDto = new VendorProfileDto();
+        setPermittedProductsForVendor(profileDto, vendor.getSubCategoryList());
         profileDto.setBasicInformation(vendorProfileService.getVendorBasicInformation(vendor));
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));

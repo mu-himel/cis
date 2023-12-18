@@ -46,17 +46,29 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public void setBrandToSubCategory(CategoryRequestDto dto, ItemCategory category){
-        for(String brandName: dto.getBrands()){
-            Optional<SubcategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByIdAndSubCategory(brandName, category.getId());
-            if(!existingBrandOptional.isPresent()){
-                SubcategoryBrand subcategoryBrand = new SubcategoryBrand();
-                subcategoryBrand.setName(brandName);
-                subcategoryBrand.setCategory(category);
-                category.getBrands().add(subcategoryBrand);
-//                category = categoryRepository.save(category);
-//                subcategoryBrandRepository.save(subcategoryBrand);
+        if(dto.getBrands() != null){
+            List<SubcategoryBrand> brandsToBeDeleted = new ArrayList<>();
+            for (SubcategoryBrand existingBrand : category.getBrands()) {
+                if (!dto.getBrands().contains(existingBrand.getName())) {
+                    brandsToBeDeleted.add(existingBrand);
+                }
+            }
+            for(SubcategoryBrand brand: brandsToBeDeleted){
+                subcategoryBrandRepository.deleteById(brand.getId());
+                category.getBrands().remove(brand);
+            }
+            for(String brandName: dto.getBrands()) {
+                Optional<SubcategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByIdAndSubCategory(brandName, category.getId());
+                if(!existingBrandOptional.isPresent()){
+                    SubcategoryBrand subcategoryBrand = new SubcategoryBrand();
+                    subcategoryBrand.setName(brandName);
+                    subcategoryBrand.setCategory(category);
+                    category.getBrands().add(subcategoryBrand);
+                }
             }
         }
+        //If Its a subcategory Brands Must be included.
+        if(category.getParentCategory() != null && dto.getBrands() == null) throw new AesException("Brands must included to create a subcategory");
     }
     @Override
     @Transactional
@@ -86,6 +98,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public ItemCategory addCategoryFromCategoryEntity(ItemCategory itemCategory) {
+        return categoryRepository.save(itemCategory);
+    }
+
+    @Override
     @Transactional
     public void updateCategory(Long id, CategoryRequestDto categoryRequestDto) {
         Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
@@ -94,9 +111,9 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         ItemCategory itemCategory = itemCategoryOptional.get();
-//        if(!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())){
-//            throw new AesException("Category Code should be unique");
-//        }
+        if(!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())){
+            throw new AesException("Category Code should be unique");
+        }
 
         if(itemCategory.getParentCategory()!=null){
             if(categoryRequestDto.getParentCategory()==null || categoryRequestDto.getParentCategory().getId()==null){
@@ -251,5 +268,15 @@ public class CategoryServiceImpl implements CategoryService {
 
         }
 
+    }
+
+    @Override
+    public Optional<ItemCategory> getCategoryForAVendor(Long vendorId, Long Id) {
+       return categoryRepository.findSavedCategoryForVendor(vendorId, Id);
+    }
+
+    @Override
+    public Optional<ItemCategory> findRootReferenceItem(Long Id) {
+        return categoryRepository.findById(Id);
     }
 }

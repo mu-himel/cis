@@ -8,6 +8,7 @@ import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.entity.UserCredentialToRole;
 import com.aes.erp.user_management.service.UserRepository;
 //import com.aes.erp.user_management.service.UserToOrganizationFileRepository;
+import com.aes.erp.vendor.enums.VendorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -74,13 +75,17 @@ public class AuthenticateController {
             // System.out.println("===>" + user.getUserToOrganizations());
             // System.out.println("===>" + user.getUserToOrganizationFiles());
             Long vendorId = null;
-            if(userDetails.getVendor() != null) vendorId = userDetails.getVendor().getId();
+            VendorStatus vendorStatus = null;
+            if(userDetails.getVendor() != null){
+                vendorId = userDetails.getVendor().getId();
+                vendorStatus = userDetails.getVendor().getStatus();
+            }
             AuthenticationResponseDTO authenticationResponseDTO =new AuthenticationResponseDTO(jwt, user.getId(),
                     getRoles(user.getUserCredential().getUserCredentialToRoles()),
                     //getOrganizations(user.getUserToOrganizations()),
                     Collections.emptyList(),
                     // getOrganizationFiles(user.getUserToOrganizationFiles()) /*Collections.emptyList()*/,
-                    vendorId, user.getUserCredential().isActive()?"active":"deactive");
+                    vendorId, vendorStatus, user.getUserCredential().isActive()?"active":"deactive");
 
             authenticationResponseDTO.setEmployee(userDetails.getEmployee());
             return new ResponseEntity<>(authenticationResponseDTO, HttpStatus.OK);
@@ -90,7 +95,7 @@ public class AuthenticateController {
                     new AuthenticationResponseDTO("", 0,
                             Collections.emptyList(),
                             Collections.emptyList(),
-                            null, "deactive")
+                            null, null, "deactive")
             );
             // apiResponse.setResponse("this account is deactivated", TRUE, NULL, SUCCESS);
             // return ResponseEntity.ok().body(apiResponse);

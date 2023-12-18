@@ -23,6 +23,7 @@ import java.util.List;
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Table(name = "item_categories")
 public class ItemCategory {
 
@@ -62,6 +63,7 @@ public class ItemCategory {
   @JsonIgnore
   @ManyToOne
   private Vendor vendor;
+  private Long copiedFrom;
 
 
   public ItemCategory(Long id) {

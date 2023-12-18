@@ -12,6 +12,7 @@ import com.aes.erp.vendor.service.DocumentServices.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
@@ -158,12 +159,12 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         setVendorScore(vendor, vendorScore);
         vendorRepository.save(vendor);
     }
-    public Long calculateYearsOfBusiness(DocumentHolder documentHolder){
-        Date issueDateBin = documentHolder.getBinDocument().getIssueDate();
-        return (long) (LocalDate.now().getYear() - issueDateBin.getYear());
+    public int calculateYearsOfBusiness(DocumentHolder documentHolder){
+        Timestamp issueDateBin = documentHolder.getBinDocument().getIssueDate();
+        return LocalDate.now().getYear() - issueDateBin.toLocalDateTime().getYear();
     }
     public void setVendorScore(Vendor vendor, VendorScore vendorScore){
-        Long totalBusinessYears = calculateYearsOfBusiness(vendor.getDocumentHolder());
+        int totalBusinessYears = calculateYearsOfBusiness(vendor.getDocumentHolder());
         vendorScore.setYearOfEstablishmentWeight((float) ((5 * totalBusinessYears) / 10));
         vendorScore.setYearOfEstablishmentWeight((float) (totalBusinessYears / 10));
         vendorScore.setLegalDocumentationWeight(5F);

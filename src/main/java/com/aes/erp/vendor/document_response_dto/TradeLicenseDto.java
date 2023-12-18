@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -32,7 +33,7 @@ public class TradeLicenseDto {
     private String ignore;
 
     public TradeDocument dtoToEntityMapping(TradeLicenseDto dto, TradeDocument tradeDocument){
-        if(dto.getIssueDate() != null)tradeDocument.setIssueDate(dto.getIssueDate());
+        if(dto.getIssueDate() != null)tradeDocument.setIssueDate(new Timestamp(dto.getIssueDate().getTime()));
         if(!dto.getNid().isEmpty())tradeDocument.setNid(dto.getNid());
         if(!dto.getMobileNo().isEmpty())tradeDocument.setMobileNo(dto.getMobileNo());
         if(!dto.getLicense().isEmpty())tradeDocument.setTradeLicenseNumber(dto.getLicense());

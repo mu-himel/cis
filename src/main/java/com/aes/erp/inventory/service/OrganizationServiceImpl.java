@@ -51,7 +51,7 @@ public class OrganizationServiceImpl implements OrganizationService{
 
     @Override
     public Page<?> getAllOrganization(Optional<Integer> page, Optional<Integer> size) {
-        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Sort sort = Sort.by(Sort.Direction.ASC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
         return organizationRepository.findAllOrganizations(pageable);
     }

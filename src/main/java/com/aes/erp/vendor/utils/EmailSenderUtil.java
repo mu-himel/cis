@@ -53,7 +53,7 @@ public class EmailSenderUtil {
             headers.setBearerAuth(token);
             headers.setContentType(MediaType.APPLICATION_JSON);
             log.info(objectMapper.writeValueAsString(mailBody));
-            HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(mailBody), headers);
+            HttpEntity<VendorRegistrationMailSender> requestEntity = new HttpEntity<>(mailBody, headers);
             ResponseEntity<String> responseMail = restTemplate.postForEntity(
                     emailConfig.getAddress().concat(emailUrl), requestEntity, String.class);
         }catch (Exception e){
