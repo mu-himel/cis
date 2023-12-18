@@ -23,7 +23,10 @@ public interface CategoryService {
     Page<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Integer> page, Optional<Integer> size,
                                                                  Optional<Long> storeTypeId, Optional<Long> parentCategoryId);
 
-    List<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId, Optional<Long> parentCategoryId);
+    List<?> getSubCategoryListFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId,
+                                                                   Optional<Long> parentCategoryId,
+                                                                   Optional<String> name,
+                                                                   Optional<String> code);
     Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
                               Optional<Long> id);
     List<?> getItemCategoryListForStoreType(Optional<Long> id, Optional<String> name, Optional<String> code);

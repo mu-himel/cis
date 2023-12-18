@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -82,7 +81,7 @@ public class ItemCategoryController {
                                              @RequestParam("name")  Optional<String> name,
                                                 @RequestParam("code") Optional<String> code){
         return new ResponseEntity<>(
-                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(storeTypeId,categoryId),
+                categoryService.getSubCategoryListFilteredByStoreTypeAndParentCategory(storeTypeId,categoryId,name,code),
                 HttpStatus.OK
         );
     }

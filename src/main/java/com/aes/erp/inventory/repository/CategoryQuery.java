@@ -129,6 +129,8 @@ public interface CategoryQuery {
             "WHERE c.parentCategory IS NOT NULL AND " +
             "(:store_type_id IS NULL OR st.id = :store_type_id) " +
             "AND (:parent_category IS NULL OR par.id = :parent_category) " +
+            " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name)||'%') " +
+            " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code)||'%') " +
             "AND c.active = true "+
             "GROUP BY c.id";
     String countQueryForSubCategoryFilteredByStoreTypeAndParentCategory = "SELECT COUNT(DISTINCT c.id) " +
