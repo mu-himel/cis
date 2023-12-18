@@ -27,7 +27,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
             countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     List<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("storeTypeId") Long storeTypeId);
+            @Param("storeTypeId") Long storeTypeId, @Param("name") String name, @Param("code") String code);
 
     @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
             countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory)

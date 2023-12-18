@@ -66,9 +66,12 @@ public class ItemCategoryController {
 //    }
 
     @GetMapping("/main-categories")
-    public ResponseEntity<?> getMainCategoryList(@RequestParam("storeTypeId") Optional<Long> storeTypeId){
+    public ResponseEntity<?> getMainCategoryList(@RequestParam("storeTypeId") Optional<Long> storeTypeId,
+                                                 @RequestParam("name") Optional<String> name,
+                                                 @RequestParam("code") Optional<String> code
+                                                 ){
         return new ResponseEntity<>(
-                categoryService.getItemCategoriesForStoreType(storeTypeId),
+                categoryService.getItemCategoryListForStoreType(storeTypeId,name,code),
                 HttpStatus.OK
         );
     }
