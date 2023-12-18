@@ -54,6 +54,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @OneToOne
     private ItemCategory category;
 
+    ///Need switching to ManyToMany
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
     private List<ItemCategory> subCategoryList = new ArrayList<>();
 
