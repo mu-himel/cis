@@ -38,6 +38,12 @@ public class StoreTypeController {
                                               @RequestParam("size") Optional<Integer> size){
         return new ResponseEntity<>(storeTypeService.getAllStoreTypes(searchFilter, page, size), HttpStatus.OK);
     }
+    @GetMapping("/list")
+    @ApiOperation(value = "Get All Store Types")
+    public ResponseEntity<?> getAllStoreTypes(@RequestParam("searchFilter") Optional<String> searchFilter){
+        return new ResponseEntity<>(storeTypeService.getAllStoreTypes(searchFilter), HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     @ApiOperation(value = "Update a Store Type")
     public ResponseEntity<?> updateStoreType(@PathVariable("id") Long id, @RequestBody @Valid StoreTypeCreateDto dto){
