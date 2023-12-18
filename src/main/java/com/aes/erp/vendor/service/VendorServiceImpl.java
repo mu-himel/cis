@@ -3,6 +3,7 @@ package com.aes.erp.vendor.service;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
+import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.SubcategoryBrand;
 import com.aes.erp.inventory.service.CategoryService;
@@ -122,9 +123,18 @@ public class VendorServiceImpl implements VendorService {
         }
         if(refCat.getStoreType() != null)destination.setStoreType(refCat.getStoreType());
         if(refCat.getActive() != null)destination.setActive(refCat.getActive());
-        if(!refCat.getBrands().isEmpty())destination.setBrands(refCat.getBrands());
-        if(!refCat.getAttributes().isEmpty())destination.setAttributes(refCat.getAttributes());
-        if(!refCat.getBudgets().isEmpty())destination.setBudgets(refCat.getBudgets());
+//        if(!refCat.getBrands().isEmpty())destination.setBrands(refCat.getBrands());
+//        if(!refCat.getAttributes().isEmpty()){
+//            List<CategoryAttribute> attributeList = new ArrayList<>();
+//            for(CategoryAttribute attribute : refCat.getAttributes()){
+//                CategoryAttribute newAttribute = new CategoryAttribute();
+//                newAttribute = attribute;
+//                newAttribute.setCategory(null);
+//                attributeList.add(newAttribute);
+//            }
+//            destination.setAttributes(attributeList);
+//        }
+//        if(!refCat.getBudgets().isEmpty())destination.setBudgets(refCat.getBudgets());
     }
 
     @Override
