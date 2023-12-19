@@ -27,10 +27,14 @@ public class ItemCategoryController {
     public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("page") Optional<Integer> page,
                                                @RequestParam("size") Optional<Integer> size,
                                                @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
-                                                           @RequestParam("parentCategoryId")  Optional<Long> parentCategoryId
+                                               @RequestParam("parentCategoryId")  Optional<Long> parentCategoryId,
+                                               @RequestParam("name") Optional<String> name,
+                                               @RequestParam("code") Optional<String> code
     ){
         return new ResponseEntity<>(
-                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(page,size, storeTypeId, parentCategoryId),
+                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(page,size,
+                        storeTypeId, parentCategoryId,
+                        name,code),
                 HttpStatus.OK
         );
     }
