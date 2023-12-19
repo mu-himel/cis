@@ -32,7 +32,7 @@ public class ModuleAccess {
     @ManyToOne(fetch =FetchType.LAZY)
     private ModuleAccess parentModuleAccess;
 
-    @OneToMany(mappedBy = "parentModuleAccess")
+    @OneToMany(mappedBy = "parentModuleAccess",cascade = CascadeType.ALL)
     private List<ModuleAccess> children=new ArrayList<>();
 
     private Integer displayOrder;
