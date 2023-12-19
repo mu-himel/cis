@@ -84,9 +84,10 @@ public class ItemCategoryController {
         );
     }
     @GetMapping("/subcategory-list")
-    public ResponseEntity<?> getCategoryList(@RequestParam("categoryId")  Optional<Long> categoryId){
+    public ResponseEntity<?> getCategoryList(@RequestParam("categoryId")  Optional<Long> categoryId,
+                                            @RequestParam("categoryName") Optional<String> categoryName){
         return new ResponseEntity<>(
-                categoryService.getSubCategoriesByParentId(categoryId),
+                categoryService.getSubCategoriesByParentIdAndSearchFilter(categoryId, categoryName),
                 HttpStatus.OK
         );
     }

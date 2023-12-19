@@ -108,6 +108,6 @@ public class VendorController {
     public ResponseEntity<?> approveVendorProfile(@PathVariable("id") Long id, @RequestBody VendorScoreDto dto){
         vendorService.updateVendorScore(dto);
         vendorService.approveVendor(id);
-        return  new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Approved", HttpStatus.OK);
     }
 }

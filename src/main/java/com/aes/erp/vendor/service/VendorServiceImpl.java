@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -84,9 +85,7 @@ public class VendorServiceImpl implements VendorService {
                 throw new AesException("phone number should not contain alphabets");
             }
         }
-
         User user = userService.createVendorUserAccount(vendorDto);
-
         Vendor vendor = vendorDto.getEntity();
         vendor.setStatus(VendorStatus.CREATED);
         vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
@@ -205,7 +204,8 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override public Page<?> getVendors(Optional<Integer> page, Optional<Integer> size, Optional<String> searchFilter) {
-        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10));
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
         return vendorRepository.findAllVendors(pageable, searchFilter.orElse(null));
     }
 
