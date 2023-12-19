@@ -36,4 +36,12 @@ public class DesignationServiceImpl implements DesignationService{
     public Optional<RoleNode> getDesignationById(Long id) {
         return roleNodeRepository.findById(id);
     }
+
+    @Override
+    public void createRoleNode() {
+        RoleNode roleNode = new RoleNode();
+        roleNode.setId(1L);
+        roleNode.setName("RootRoleNode");
+        roleNodeRepository.save(roleNode);
+    }
 }

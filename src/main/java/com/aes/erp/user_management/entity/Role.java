@@ -25,4 +25,8 @@ public class Role {
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<RoleToPrivilege> roleToPrivileges;
+
+    public Role(String roleName) {
+        this.roleName = roleName;
+    }
 }

@@ -246,4 +246,34 @@ public class UserService {
         if (userDetails == null) return null;
         return userRepository.findByEmailAddress(userDetails.getUsername()).orElse(null);
     }
+
+    public void createSuperAdmin() {
+        User user = new User();
+        user.setEmailAddress("superadmin@mail.com");
+        user.setFirstName("Super");
+        user.setLastName("Admin");
+
+        UserCredential userCredential = new UserCredential();
+        userCredential.setEmailAddress(user.getEmailAddress());
+        userCredential.setPassword(passwordEncoder.encode("12345678"));
+        userCredential.setActive(true);
+        user.setUserCredential(userCredential);
+
+        UserCredentialToRole userCredentialToRole = new UserCredentialToRole();
+        userCredentialToRole.setUserCredential(userCredential);
+        userCredentialToRole.setRole((Role) roleService.read("SYS_ADMIN"));
+        userCredentialToRoleRepository.save(userCredentialToRole);
+        user = userRepository.save(user);
+        Employee employee = new Employee(
+                employeeService.getNextEmployeeId(),
+                user.getFirstName()+ " "+user.getLastName(),
+                null,
+                user
+        );
+//        employee.setWarehouse(null);
+        employee.setDepartment(null);
+        employee.setRoleNode(null);
+        employee.setReportingManager(null);
+        employeeService.createEmployee(employee);
+    }
 }

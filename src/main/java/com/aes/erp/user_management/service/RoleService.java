@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,4 +45,12 @@ public class RoleService {
 
     public Role getRoleByRoleName(String roleName) {return roleRepository.findRoleByRoleName(roleName);}
 
+    public List<Role> getRoleByRoleNames(List<String> roleNames) {
+        return roleRepository.findAllByRoleNames(roleNames);
+    }
+
+    public void createRoles(List<String> roleNames) {
+        List<Role> roles = roleNames.stream().map(name-> new Role(name)).collect(Collectors.toList());
+        roleRepository.saveAll(roles);
+    }
 }
