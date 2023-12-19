@@ -41,14 +41,14 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             " LEFT JOIN FETCH v.vendorType vt " +
             " LEFT JOIN FETCH v.category c " +
             " LEFT JOIN FETCH v.subCategoryList sc " +
-            " WHERE v.status IN (:status)",
+            " WHERE v.verificationStatus IN (:status)",
             countQuery =  "SELECT count(v) FROM Vendor v " +
                     " LEFT JOIN v.vendorType vt " +
                     " LEFT JOIN v.category c " +
                     " LEFT JOIN v.subCategoryList sc " +
-                    " WHERE v.status IN (:status)"
+                    " WHERE v.verificationStatus IN (:status)"
     )
-    Page<VendorInfo> findAllVendorForStatus(@Param("status") VendorStatus status, Pageable pageable);
+    Page<VendorInfo> findAllVendorForStatus(@Param("status") VendorDocumentVerificationStatus status, Pageable pageable);
 
 
     @Query("SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt " +

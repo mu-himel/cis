@@ -6,5 +6,8 @@ import io.swagger.annotations.ApiModel;
 public enum VendorDocumentVerificationStatus {
     PENDING_DOCUMENT_VERIFICATION,
     DOCUMENTS_SUBMITTED,
-    VERIFIED
+
+
+    VERIFIED,
+    PENDING_VERIFICATION, PENDING_APPROVAL,  APPROVED,
 }

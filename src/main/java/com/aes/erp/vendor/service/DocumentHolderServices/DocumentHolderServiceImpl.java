@@ -153,12 +153,12 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         documentHolder.setBusinessDetails(businessDetails);
         documentHolder.setGeneralDetails(generalDetails);
         documentHolder = documentHolderRepository.save(documentHolder);
-        vendor.setVerificationStatus(VendorDocumentVerificationStatus.DOCUMENTS_SUBMITTED);
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION);
         vendor.setDocumentHolder(documentHolder);
         //Setting up Score For Vendor
         VendorScore vendorScore = new VendorScore();
         setVendorScore(vendor, vendorScore);
-        vendor.setStatus(VendorStatus.PENDING_VERIFICATION);
+//        vendor.setVerificationStatus(VendorD);
         vendorRepository.save(vendor);
     }
     public int calculateYearsOfBusiness(DocumentHolder documentHolder){

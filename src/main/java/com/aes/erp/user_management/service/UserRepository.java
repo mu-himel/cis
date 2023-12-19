@@ -34,7 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByRoleName(String roleName);
 
     @Query(value =
-            "select e.employee_id employeeId , e.name name , e.phone phone, users.id,users.first_name firstName, \n" +
+            "select e.id as empId, e.employee_id employeeId , e.name name , e.phone phone, users.id,users.first_name firstName, \n" +
                     "            users.last_name lastName, \n" +
                     "            users.email_address emailAddress, \n" +
                     "            uc.active active  ,r.role_name roleName\n" +
@@ -43,14 +43,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
                     "            LEFT JOIN user_credential_to_role uctr on uctr.user_credential_id  = uc.id \n" +
                     "            LEFT JOIN role r on r.id  = uctr.role_id  \n" +
                     "            LEFT JOIN employees e on e.user_id = users.id\n" +
-                    "            where r.role_name !=\"SYS_ADMIN\"",
+                    "            where r.role_name !=\"SYS_ADMIN\" AND r.role_name IN (:name)",
     countQuery = "select count(*) " +
             "            from users\n" +
             "            LEFT JOIN  user_credential uc on uc.id = users.user_credential_id\n" +
             "            LEFT JOIN user_credential_to_role uctr on uctr.user_credential_id  = uc.id \n" +
             "            LEFT JOIN role r on r.id  = uctr.role_id  \n" +
             "            LEFT JOIN employees e on e.user_id = users.id\n" +
-            "            where r.role_name !=\"SYS_ADMIN\"",
+            "            where r.role_name !=\"SYS_ADMIN\" AND r.role_name IN (:name)",
     nativeQuery = true)
     Page<UserInfo> findAllByRoleName(@Param("name") String roleName, Pageable pageable);
 

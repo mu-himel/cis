@@ -109,7 +109,20 @@ public class UserController {
 //        return apiResponse.isSuccess() ? ok(apiResponse) : badRequest().body(apiResponse);
 
         return new ResponseEntity<>(
-                userService.read("USER", page.orElse(PAGE),size.orElse(SIZE)),
+                userService.read("VENDOR", page.orElse(PAGE),size.orElse(SIZE)),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/employees")
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE','ROLE_SYS_ADMIN')")
+    public ResponseEntity<?> getAllEmployees(@RequestParam("page") Optional<Integer> page,
+                                         @RequestParam("size")Optional<Integer> size) {
+
+//        APIResponse apiResponse = ;
+//        return apiResponse.isSuccess() ? ok(apiResponse) : badRequest().body(apiResponse);
+
+        return new ResponseEntity<>(
+                userService.read("EMPLOYEE", page.orElse(PAGE),size.orElse(SIZE)),
                 HttpStatus.OK);
     }
 
