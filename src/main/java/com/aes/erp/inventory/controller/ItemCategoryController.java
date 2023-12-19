@@ -38,10 +38,12 @@ public class ItemCategoryController {
     @ApiOperation(value = "Get Item Categories Filtered By Store Type ID, With Pagination")
     public ResponseEntity<?> getItemCategoriesForStoreType(@RequestParam("page") Optional<Integer> page,
                                                            @RequestParam("size") Optional<Integer> size,
-                                                           @RequestParam("storeTypeId")  Optional<Long> storeTypeId
+                                                           @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
+                                                           @RequestParam("name") Optional<String> name,
+                                                           @RequestParam("code") Optional<String> code
     ){
         return new ResponseEntity<>(
-                categoryService.getItemCategoriesForStoreType(page,size, storeTypeId),
+                categoryService.getItemCategoriesForStoreType(page,size, storeTypeId,name,code),
                 HttpStatus.OK
         );
     }

@@ -173,11 +173,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
-                                        Optional<Long> store_type_id) {
+                                        Optional<Long> store_type_id, Optional<String> name,
+                                                 Optional<String> code) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10),sort);
 
-            return categoryRepository.findAllByItemCategoryWithSubCategoryCount(store_type_id.orElse(null), pageable);
+            return categoryRepository.findAllByItemCategoryWithSubCategoryCount(
+                    store_type_id.orElse(null),
+                    name.orElse(null), code.orElse(null),
+                    pageable);
     }
 
     @Override
