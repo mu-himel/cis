@@ -166,7 +166,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     public void setVendorScore(Vendor vendor, VendorScore vendorScore){
         int totalBusinessYears = calculateYearsOfBusiness(vendor.getDocumentHolder());
         vendorScore.setYearOfEstablishmentWeight((float) ((5 * totalBusinessYears) / 10));
-        vendorScore.setYearOfEstablishmentWeight((float) (totalBusinessYears / 10));
+        vendorScore.setYearOfEstablishmentGrade((float) (totalBusinessYears / 10));
         vendorScore.setLegalDocumentationWeight(5F);
         vendorScore.setLegalDocumentationGrade(1F);
         vendorScore = vendorScoreRepository.save(vendorScore);

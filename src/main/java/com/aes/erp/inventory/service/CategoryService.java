@@ -44,7 +44,7 @@ public interface CategoryService {
     void deleteCategory(Long id);
 
     List<?> getCategories(Optional<String> name, Optional<String> code);
-    List<?> getSubCategoriesByParentId(Optional<Long> categoryId);
+    List<?> getSubCategoriesByParentIdAndSearchFilter(Optional<Long> categoryId, Optional<String> categoryName);
 
 
     List<?> getSubCategories(Optional<Long>categoryId, Optional<String> name, Optional<String> code);
