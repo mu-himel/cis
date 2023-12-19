@@ -164,7 +164,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         return LocalDate.now().getYear() - issueDateBin.toLocalDateTime().getYear();
     }
     public void setVendorScore(Vendor vendor, VendorScore vendorScore){
-        float totalBusinessYears = calculateYearsOfBusiness(vendor.getDocumentHolder());
+        int totalBusinessYears = calculateYearsOfBusiness(vendor.getDocumentHolder());
         vendorScore.setYearOfEstablishmentWeight((float) ((5 * totalBusinessYears) / 10));
         vendorScore.setYearOfEstablishmentGrade((float) (totalBusinessYears / 10));
         vendorScore.setLegalDocumentationWeight(5F);
