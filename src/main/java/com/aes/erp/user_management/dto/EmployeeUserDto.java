@@ -1,6 +1,7 @@
 package com.aes.erp.user_management.dto;
 
 import com.aes.erp.common.ReferenceObjectDto;
+import com.aes.erp.employee.enums.EmployeeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,8 @@ public class EmployeeUserDto {
 
     @Length(min = 8,  message = "Password length should be 8 characters long")
     private String password;
+
+    private EmployeeType employeeType;
 
     private ReferenceObjectDto department;
     private ReferenceObjectDto designation;

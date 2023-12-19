@@ -1,12 +1,11 @@
 package com.aes.erp.employee.controller;
 
 import com.aes.erp.employee.service.EmployeeService;
+import com.aes.erp.user_management.dto.EmployeeUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,5 +25,23 @@ public class EmployeeController {
                 response,
               HttpStatus.OK
         );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getEmployee(@PathVariable("id") Long id){
+
+        return new ResponseEntity<>(
+                employeeService.getEmployeeByUserId(id).orElse(null),
+                HttpStatus.OK
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateEmployee(
+            @PathVariable("id") Long id,
+            @RequestBody EmployeeUserDto employeeUserDto
+    ){
+        employeeService.updateEmployee(id,employeeUserDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

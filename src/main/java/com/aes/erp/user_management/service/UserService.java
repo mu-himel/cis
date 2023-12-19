@@ -1,6 +1,7 @@
 package com.aes.erp.user_management.service;
 
 import com.aes.erp.employee.entity.Employee;
+import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.employee.service.EmployeeService;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.organogram_system.dto.APIResponse;
@@ -103,6 +104,7 @@ public class UserService {
                 userDto.getPhone(),
                 user
         );
+        employee.setEmployeeType(userDto.getEmployeeType());
         employee.setDepartment(null);
         employee.setRoleNode(null);
         employee.setReportingManager(null);
@@ -220,6 +222,24 @@ public class UserService {
 
         Pageable pageable = PageRequest.of(page,size);
         Page<?> existingUsers = userRepository.findAllByRoleName(roleName,pageable);
+        return existingUsers;
+    }
+
+    public Page<?> read(String roleName, Integer page,
+                        Integer size,
+                        Optional<String> employeeId,
+                        Optional<String> name,
+                        Optional<String> email,
+                        Optional<String> phone,
+                        Optional<String> employeeType
+    ) {
+
+        Pageable pageable = PageRequest.of(page,size);
+        Page<?> existingUsers = userRepository.findAllByRoleName(roleName,
+                employeeId.orElse(null),
+                name.orElse(null),
+                email.orElse(null),phone.orElse(null),employeeType.orElse(null),pageable
+        );
         return existingUsers;
     }
 

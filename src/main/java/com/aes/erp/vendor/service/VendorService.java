@@ -19,7 +19,13 @@ public interface VendorService {
 
     void deleteVendor(Long id);
 
-    Page<?> getVendors(Optional<Integer> page, Optional<Integer> size, Optional<String> searchFilter);
+    Page<?> getVendors(Optional<Integer> page, Optional<Integer> size,
+                       Optional<String> name,
+                       Optional<String> email,
+                       Optional<String> phone,
+                       Optional<String> vendorType,
+                       Optional<String> vendorStatus
+    );
     Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size);
     Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size);
 

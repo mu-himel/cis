@@ -203,10 +203,24 @@ public class VendorServiceImpl implements VendorService {
         vendorRepository.deleteById(id);
     }
 
-    @Override public Page<?> getVendors(Optional<Integer> page, Optional<Integer> size, Optional<String> searchFilter) {
+    @Override
+    public Page<?> getVendors(Optional<Integer> page, Optional<Integer> size,
+                                        Optional<String> name,
+                                        Optional<String> email,
+                                        Optional<String> phone,
+                                        Optional<String> vendorType,
+                                        Optional<String> vendorStatus
+    ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendors(pageable, searchFilter.orElse(null));
+        return vendorRepository.findAllVendors(
+                name.orElse(null),
+                email.orElse(null),
+                phone.orElse(null),
+                vendorType.orElse(null),
+                vendorStatus.orElse(null),
+                pageable
+        );
     }
 
     @Override

@@ -40,11 +40,15 @@ public class VendorController {
     public ResponseEntity<?> getVendors(
             @RequestParam("page") Optional<Integer> page,
             @RequestParam("size") Optional<Integer> size,
-            @RequestParam("searchFilter") Optional<String> searchFilter
+            @RequestParam("name") Optional<String> name,
+            @RequestParam("email") Optional<String> email,
+            @RequestParam("phone") Optional<String> phone,
+            @RequestParam("vendorType") Optional<String> vendorType,
+            @RequestParam("vendorStatus") Optional<String> vendorStatus
     )
     {
         return new ResponseEntity<>(
-                vendorService.getVendors(page,size,searchFilter),
+                vendorService.getVendors(page,size,name,email,phone,vendorType,vendorStatus),
                 HttpStatus.OK
         );
     }

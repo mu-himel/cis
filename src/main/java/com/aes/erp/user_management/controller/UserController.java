@@ -1,5 +1,6 @@
 package com.aes.erp.user_management.controller;
 
+import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.user_management.dto.EmployeeUserDto;
 import com.aes.erp.user_management.dto.UserDTO;
 import com.aes.erp.user_management.service.UserService;
@@ -116,13 +117,20 @@ public class UserController {
     @GetMapping("/employees")
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE','ROLE_SYS_ADMIN')")
     public ResponseEntity<?> getAllEmployees(@RequestParam("page") Optional<Integer> page,
-                                         @RequestParam("size")Optional<Integer> size) {
+                                         @RequestParam("size")Optional<Integer> size,
+                                         @RequestParam("employeeId") Optional<String> employeeId,
+                                         @RequestParam("name") Optional<String> name,
+                                         @RequestParam("email") Optional<String> email,
+                                         @RequestParam("phone") Optional<String> phone,
+                                         @RequestParam("employeeType") Optional<String> employeeType
+    ) {
 
 //        APIResponse apiResponse = ;
 //        return apiResponse.isSuccess() ? ok(apiResponse) : badRequest().body(apiResponse);
 
         return new ResponseEntity<>(
-                userService.read("EMPLOYEE", page.orElse(PAGE),size.orElse(SIZE)),
+                userService.read("EMPLOYEE", page.orElse(PAGE),size.orElse(SIZE),
+                        employeeId,name,email,phone,employeeType),
                 HttpStatus.OK);
     }
 
