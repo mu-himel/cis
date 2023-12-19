@@ -19,6 +19,7 @@ public class Document {
     private DocumentType documentType;
     @Lob
     private byte[] file;
+    private String contentType;
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "document_holder_id")
     private DocumentHolder documentHolder;

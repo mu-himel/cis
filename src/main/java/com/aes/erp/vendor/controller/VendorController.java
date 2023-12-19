@@ -1,6 +1,7 @@
 package com.aes.erp.vendor.controller;
 
 import com.aes.erp.exception.AesException;
+import com.aes.erp.vendor.dto.VendorApprovalResponseDto;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
@@ -105,9 +106,11 @@ public class VendorController {
         return  new ResponseEntity<>(vendorService.getVendorProfile(id), HttpStatus.OK);
     }
     @PutMapping("/{id}/approve")
-    public ResponseEntity<?> approveVendorProfile(@PathVariable("id") Long id, @RequestBody VendorScoreDto dto){
+    public ResponseEntity<VendorApprovalResponseDto> approveVendorProfile(@PathVariable("id") Long id, @RequestBody VendorScoreDto dto){
         vendorService.updateVendorScore(dto);
         vendorService.approveVendor(id);
-        return new ResponseEntity<>("Approved", HttpStatus.OK);
+        VendorApprovalResponseDto approvalDto = new VendorApprovalResponseDto();
+        approvalDto.setMessage("Approved");
+        return new ResponseEntity<>(approvalDto, HttpStatus.OK);
     }
 }

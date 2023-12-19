@@ -14,5 +14,9 @@ public class VendorIdentificationDto {
     private byte[] binFile;
     private byte[] tradeFile;
     private byte[] solvencyFile;
-
+    private String nidContentType;
+    private String binContentType;
+    private String tinContentType;
+    private String tradeContentType;
+    private String solvencyContentType;
 }

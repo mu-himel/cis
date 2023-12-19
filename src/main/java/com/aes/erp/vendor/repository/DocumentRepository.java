@@ -14,5 +14,5 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "WHERE d.document_holder_id = :document_holder_id" +
             " AND d.document_type = :documentType", nativeQuery = true)
     Document getDocumentByDocumentHolderId(@Param("document_holder_id") Long documentHolder,
-                                            @Param("documentType")DocumentType documentType);
+                                            @Param("documentType")int documentType);
 }
