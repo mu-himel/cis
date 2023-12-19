@@ -20,6 +20,8 @@ public interface VendorService {
     void deleteVendor(Long id);
 
     Page<?> getVendors(Optional<Integer> page, Optional<Integer> size, Optional<String> searchFilter);
+    Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size);
+    Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size);
 
     void uploadVendorFiles(Long id,
                            String address,
@@ -36,4 +38,6 @@ public interface VendorService {
     Optional<Vendor> getVendorByUserId(Long userId);
     void updateVendorScore(VendorScoreDto dto);
     Vendor getById(Long id);
+
+    Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size);
 }

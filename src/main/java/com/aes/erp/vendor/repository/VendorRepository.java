@@ -37,6 +37,19 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                     "   OR :searchFilter IS NULL OR LOWER(vt.name) LIKE LOWER(CONCAT('%', :searchFilter, '%')) ")
     Page<VendorInfo> findAllVendors(Pageable pageable, @Param("searchFilter") String searchFilter);
 
+    @Query(value = "SELECT v FROM Vendor v " +
+            " LEFT JOIN FETCH v.vendorType vt " +
+            " LEFT JOIN FETCH v.category c " +
+            " LEFT JOIN FETCH v.subCategoryList sc " +
+            " WHERE v.status IN (:status)",
+            countQuery =  "SELECT count(v) FROM Vendor v " +
+                    " LEFT JOIN v.vendorType vt " +
+                    " LEFT JOIN v.category c " +
+                    " LEFT JOIN v.subCategoryList sc " +
+                    " WHERE v.status IN (:status)"
+    )
+    Page<VendorInfo> findAllVendorForStatus(@Param("status") VendorStatus status, Pageable pageable);
+
 
     @Query("SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt " +
             "WHERE v.id=:id")

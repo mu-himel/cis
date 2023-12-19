@@ -210,6 +210,27 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
+    public Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
+        return vendorRepository.findAllVendorForStatus(VendorStatus.PENDING_VERIFICATION,pageable);
+    }
+
+    @Override
+    public Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
+        return vendorRepository.findAllVendorForStatus(VendorStatus.PENDING_APPROVAL,pageable);
+    }
+
+    @Override
+    public Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
+        return vendorRepository.findAllVendorForStatus(VendorStatus.APPROVED,pageable);
+    }
+
+    @Override
     public void uploadVendorFiles(Long id,
                                   String address,
                                   String password,

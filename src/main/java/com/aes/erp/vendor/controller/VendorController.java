@@ -48,6 +48,44 @@ public class VendorController {
                 HttpStatus.OK
         );
     }
+
+    @GetMapping("/pending-verification")
+    public ResponseEntity<?> getPendingVerificationVendors(
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size
+    )
+    {
+        return new ResponseEntity<>(
+                vendorService.getPendingVerificationVendors(page,size),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/pending-approval")
+    public ResponseEntity<?> getPendingApprovalVendors(
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size
+    )
+    {
+        return new ResponseEntity<>(
+                vendorService.getPendingApprovalVendors(page,size),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/complete")
+    public ResponseEntity<?> getApprovedVendors(
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size
+    ){
+        return new ResponseEntity<>(
+                vendorService.getApprovedVendors(page,size),
+                HttpStatus.OK
+        );
+    }
+
+
+
     @PostMapping
     public ResponseEntity<?> createVendor(@RequestBody VendorDto vendorDto){
         vendorService.createVendor(vendorDto);
