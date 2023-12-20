@@ -14,7 +14,7 @@ public interface ModuleAccessRepository extends JpaRepository<ModuleAccess,Long>
 
     @Query("SELECT DISTINCT ma from ModuleAccess ma " +
             "LEFT JOIN FETCH ma.children c " +
-            "WHERE ma.parentModuleAccess IS NULL ORDER BY ma.displayOrder ASC")
+            "WHERE ma.parentModuleAccess IS NULL ORDER BY ma.displayOrder ASC, c.displayOrder ASC")
     List<ModuleAccessInfo> findAllOrderByDisplayOrderAsc();
 
     List<ModuleAccess> findByParentModuleAccess(ModuleAccess moduleAccess);

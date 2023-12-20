@@ -1,6 +1,7 @@
 package com.aes.erp.organogram_system.service;
 
 import com.aes.erp.organogram_system.entity.Department;
+import com.aes.erp.organogram_system.entity.RoleNode;
 import com.aes.erp.organogram_system.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,5 +27,16 @@ public class DepartmentServiceImpl implements DepartmentService{
     @Override
     public Optional<Department> getDepartment(Long id) {
         return departmentRepository.findById(id);
+    }
+
+    @Override
+    public void createDepartment() {
+        Department department = new Department();
+        department.setId(1L);
+        department.setName("root");
+        department.setHasUser(false);
+        department.setRootRoleNode(new RoleNode(1L));
+        department.setLevel(0);
+        departmentRepository.save(department);
     }
 }

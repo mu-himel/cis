@@ -10,4 +10,6 @@ public interface DesignationService {
     List<?> getAllDesignationsByDepartment(Long id, Optional<String> name);
 
     Optional<RoleNode> getDesignationById(Long id);
+
+    void createRoleNode();
 }

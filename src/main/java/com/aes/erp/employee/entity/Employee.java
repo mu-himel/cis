@@ -1,5 +1,6 @@
 package com.aes.erp.employee.entity;
 
+import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.organogram_system.entity.Department;
 import com.aes.erp.organogram_system.entity.RoleNode;
 import com.aes.erp.user_management.entity.User;
@@ -34,6 +35,9 @@ public class Employee {
 
     @OneToOne
     private Employee reportingManager;
+
+    @Enumerated(EnumType.STRING)
+    private EmployeeType employeeType;
 
     @OneToOne
     private User user;

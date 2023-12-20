@@ -211,44 +211,46 @@ public class DemandServiceImpl implements DemandService{
 
     @Override
     public Page<?> getAllPendingVerificationDemands(String token, Optional<Integer> page, Optional<Integer> size) {
-        String moduleUri = "demand/pending-verification";
-        ClaimResponseDto claimResponseDto = jwtUtil.extractId(token);
-        Sort sort = Sort.by(Sort.Direction.ASC,"id");
-        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
-        Optional<Map<String,List<Long>>> modulePermission = moduleAccessPermissionService
-                .getModulePermissionFilterByUri(token,moduleUri);
-
-        List<Long> categoryIds = new ArrayList<>();
-        if(modulePermission.isPresent()){
-            categoryIds = modulePermission.get().get("category_id");
-            return demandRepository.findAllDemandsByCategoryAndDemandStatusAndNextVerifierId(categoryIds,
-                    claimResponseDto.getEmployee().getId(),
-                    DemandStatus.PENDING_VERIFICATION,pageable);
-        }
-        return demandRepository.findAllDemandsByDemandStatusAndNextVerifierId(DemandStatus.PENDING_VERIFICATION,
-                claimResponseDto.getEmployee().getId(),
-                pageable);
+//        String moduleUri = "demand/pending-verification";
+//        ClaimResponseDto claimResponseDto = jwtUtil.extractId(token);
+//        Sort sort = Sort.by(Sort.Direction.ASC,"id");
+//        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
+//        Optional<Map<String,List<Long>>> modulePermission = moduleAccessPermissionService
+//                .getModulePermissionFilterByUri(token,moduleUri);
+//
+//        List<Long> categoryIds = new ArrayList<>();
+//        if(modulePermission.isPresent()){
+//            categoryIds = modulePermission.get().get("category_id");
+//            return demandRepository.findAllDemandsByCategoryAndDemandStatusAndNextVerifierId(categoryIds,
+//                    claimResponseDto.getEmployee().getId(),
+//                    DemandStatus.PENDING_VERIFICATION,pageable);
+//        }
+//        return demandRepository.findAllDemandsByDemandStatusAndNextVerifierId(DemandStatus.PENDING_VERIFICATION,
+//                claimResponseDto.getEmployee().getId(),
+//                pageable);
+        return null;
     }
 
     @Override
     public Page<?> getAllPendingApprovalDemands(String token, Optional<Integer> page, Optional<Integer> size) {
-        String moduleUri = "demand/pending-approval";
-        ClaimResponseDto claimResponseDto = jwtUtil.extractId(token);
-        Sort sort = Sort.by(Sort.Direction.ASC,"id");
-        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
-        Optional<Map<String,List<Long>>> modulePermission = moduleAccessPermissionService
-                .getModulePermissionFilterByUri(token,moduleUri);
-
-        List<Long> categoryIds = new ArrayList<>();
-        if(modulePermission.isPresent()){
-            categoryIds = modulePermission.get().get("category_id");
-            return demandRepository.findAllDemandsByCategoryAndDemandStatusAndNextApproverId(categoryIds,
-                    claimResponseDto.getEmployee().getId(),
-                    DemandStatus.PENDING_APPROVAL,pageable);
-        }
-        return demandRepository.findAllDemandsByDemandStatusAndNextApproverId(DemandStatus.PENDING_APPROVAL,
-                claimResponseDto.getEmployee().getId(),
-                pageable);
+//        String moduleUri = "demand/pending-approval";
+//        ClaimResponseDto claimResponseDto = jwtUtil.extractId(token);
+//        Sort sort = Sort.by(Sort.Direction.ASC,"id");
+//        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
+//        Optional<Map<String,List<Long>>> modulePermission = moduleAccessPermissionService
+//                .getModulePermissionFilterByUri(token,moduleUri);
+//
+//        List<Long> categoryIds = new ArrayList<>();
+//        if(modulePermission.isPresent()){
+//            categoryIds = modulePermission.get().get("category_id");
+//            return demandRepository.findAllDemandsByCategoryAndDemandStatusAndNextApproverId(categoryIds,
+//                    claimResponseDto.getEmployee().getId(),
+//                    DemandStatus.PENDING_APPROVAL,pageable);
+//        }
+//        return demandRepository.findAllDemandsByDemandStatusAndNextApproverId(DemandStatus.PENDING_APPROVAL,
+//                claimResponseDto.getEmployee().getId(),
+//                pageable);
+        return null;
     }
 
     @Override

@@ -21,26 +21,30 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
             countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("storeTypeId") Long storeTypeId, Pageable pageable);
+            @Param("storeTypeId") Long storeTypeId,@Param("name") String name,@Param("code") String code, Pageable pageable);
 
 
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
             countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     List<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("storeTypeId") Long storeTypeId);
+            @Param("storeTypeId") Long storeTypeId, @Param("name") String name, @Param("code") String code);
 
     @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
             countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory)
     Page<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
             @Param("store_type_id") Long store_type_id,
             @Param("parent_category") Long parent_category,
+            @Param("name") String name, @Param("code") String code,
             Pageable pageable);
 
     @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
             countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory)
     List<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
             @Param("store_type_id") Long store_type_id,
-            @Param("parent_category") Long parent_category);
+            @Param("parent_category") Long parent_category,
+            @Param("name") String name,
+            @Param("code") String code
+            );
 
     Optional<ItemCategory> findByCode(String code);
 

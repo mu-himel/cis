@@ -1,6 +1,7 @@
 package com.aes.erp.user_management.service;
 
 import com.aes.erp.employee.entity.Employee;
+import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.employee.service.EmployeeService;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.organogram_system.dto.APIResponse;
@@ -103,6 +104,7 @@ public class UserService {
                 userDto.getPhone(),
                 user
         );
+        employee.setEmployeeType(userDto.getEmployeeType());
         employee.setDepartment(null);
         employee.setRoleNode(null);
         employee.setReportingManager(null);
@@ -223,6 +225,24 @@ public class UserService {
         return existingUsers;
     }
 
+    public Page<?> read(String roleName, Integer page,
+                        Integer size,
+                        Optional<String> employeeId,
+                        Optional<String> name,
+                        Optional<String> email,
+                        Optional<String> phone,
+                        Optional<String> employeeType
+    ) {
+
+        Pageable pageable = PageRequest.of(page,size);
+        Page<?> existingUsers = userRepository.findAllByRoleName(roleName,
+                employeeId.orElse(null),
+                name.orElse(null),
+                email.orElse(null),phone.orElse(null),employeeType.orElse(null),pageable
+        );
+        return existingUsers;
+    }
+
     public User getUserByUserId(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         return user;
@@ -245,5 +265,35 @@ public class UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (userDetails == null) return null;
         return userRepository.findByEmailAddress(userDetails.getUsername()).orElse(null);
+    }
+
+    public void createSuperAdmin() {
+        User user = new User();
+        user.setEmailAddress("superadmin@mail.com");
+        user.setFirstName("Super");
+        user.setLastName("Admin");
+
+        UserCredential userCredential = new UserCredential();
+        userCredential.setEmailAddress(user.getEmailAddress());
+        userCredential.setPassword(passwordEncoder.encode("12345678"));
+        userCredential.setActive(true);
+        user.setUserCredential(userCredential);
+
+        UserCredentialToRole userCredentialToRole = new UserCredentialToRole();
+        userCredentialToRole.setUserCredential(userCredential);
+        userCredentialToRole.setRole((Role) roleService.read("SYS_ADMIN"));
+        userCredentialToRoleRepository.save(userCredentialToRole);
+        user = userRepository.save(user);
+        Employee employee = new Employee(
+                employeeService.getNextEmployeeId(),
+                user.getFirstName()+ " "+user.getLastName(),
+                null,
+                user
+        );
+//        employee.setWarehouse(null);
+        employee.setDepartment(null);
+        employee.setRoleNode(null);
+        employee.setReportingManager(null);
+        employeeService.createEmployee(employee);
     }
 }

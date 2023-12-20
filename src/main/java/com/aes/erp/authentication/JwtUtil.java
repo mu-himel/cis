@@ -60,7 +60,7 @@ public class JwtUtil {
     private String createToken(Map<String, Object> claims, CustomUserDetails userDetails) {
         return Jwts.builder().setClaims(claims)
                 .claim("id",userDetails.getId())
-                .claim("employee",userDetails.getEmployee())
+                .claim("userInfoDto",userDetails.getUserInfoDto())
                 .claim("authorities",userDetails.getAuthorities())
                 .setSubject(userDetails.getUsername()).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + Constants.TOKEN_EXPIRATION_TIME))

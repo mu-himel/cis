@@ -8,14 +8,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface StoreTypeRepository extends JpaRepository<StoreType, Long> {
-    @Query(value = "SELECT * FROM store_types st WHERE st.active=1 AND (:name IS NULL OR st.name LIKE %:name%)",
-            countQuery = "SELECT count(*) FROM store_types st WHERE st.active=1 AND (:name IS NULL OR st.name LIKE %:name%)",
+    @Query(value = "SELECT * FROM store_types st WHERE st.active=1 AND st.is_default=0 AND (:name IS NULL OR st.name LIKE %:name%)",
+            countQuery = "SELECT count(*) FROM store_types st WHERE st.active=1 AND st.is_default=0 AND (:name IS NULL OR st.name LIKE %:name%)",
             nativeQuery = true)
     Page<StoreTypeExt> getAllStoreTypes(Pageable pageable, @Param("name") String name);
+
+    @Query(value = "SELECT * FROM store_types st WHERE st.active=1 AND (:name IS NULL OR st.name LIKE %:name%)",
+            nativeQuery = true)
+    List<StoreTypeExt> getAllStoreTypes(@Param("name") String name);
     StoreType getStoreTypeByName(String name);
     public interface StoreTypeExt{
         Long getId();

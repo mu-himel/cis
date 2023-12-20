@@ -49,7 +49,7 @@ public class CommentServiceImpl implements CommentService{
                                   Long domainId,
                                   String msg) {
         Comment comment = new Comment();
-        comment.setCommentedBy(new Employee(claimResponseDto.getEmployee().getId()));
+//        comment.setCommentedBy(new Employee(claimResponseDto.getEmployee().getId()));
         comment.setMessage(msg);
         comment.setDomainType(domainType);
         comment.setDomainId(domainId);

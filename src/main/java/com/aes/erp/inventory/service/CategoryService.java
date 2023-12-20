@@ -21,12 +21,19 @@ public interface CategoryService {
 
 
     Page<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Integer> page, Optional<Integer> size,
-                                                                 Optional<Long> storeTypeId, Optional<Long> parentCategoryId);
+                                                                 Optional<Long> storeTypeId,
+                                                                 Optional<Long> parentCategoryId,
+                                                                 Optional<String> name,
+                                                                 Optional<String> code
+                                                                 );
 
-    List<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId, Optional<Long> parentCategoryId);
+    List<?> getSubCategoryListFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId,
+                                                                   Optional<Long> parentCategoryId,
+                                                                   Optional<String> name,
+                                                                   Optional<String> code);
     Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
-                              Optional<Long> id);
-    List<?> getItemCategoriesForStoreType(Optional<Long> id);
+                              Optional<Long> id, Optional<String> name, Optional<String> code);
+    List<?> getItemCategoryListForStoreType(Optional<Long> id, Optional<String> name, Optional<String> code);
 
     Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
                                Optional<String> name, Optional<String> code,

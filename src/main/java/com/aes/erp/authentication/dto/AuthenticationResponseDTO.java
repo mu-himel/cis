@@ -14,43 +14,44 @@ public class AuthenticationResponseDTO {
 
     private final List<String> roles;
 
-    private final List<OrganizationInfo> organizationInfos;
+//    private final List<OrganizationInfo> organizationInfos;
 
-    private EmployeeInfoDto employee;
-    private final Long vendorId;
-    private final VendorStatus vendorStatus;
+    private UserInfoDto userInfo;
+//    private final Long vendorId;
+//    private final VendorStatus vendorStatus;
 
 //    private final List<OrganizationFileResponseDTO> organizationFileInfos;
 
     private final String status;
 
-    public AuthenticationResponseDTO(String jwt, long id, List<String> roles, List<OrganizationInfo> organizationInfos,
+    public AuthenticationResponseDTO(String jwt, long id, List<String> roles,
 //                                     List<OrganizationFileResponseDTO> organizationFileInfos,
-                                     Long vendorId, VendorStatus vendorStatus, String status) {
+//                                     Long vendorId, VendorStatus vendorStatus,
+                                     String status) {
         this.jwt = jwt;
         this.id = id;
         this.roles = roles;
-        this.vendorId = vendorId;
-        this.vendorStatus = vendorStatus;
+//        this.vendorId = vendorId;
+//        this.vendorStatus = vendorStatus;
         this.status = status;
-        this.organizationInfos = organizationInfos;
+//        this.organizationInfos = organizationInfos;
 //        this.organizationFileInfos = organizationFileInfos;
     }
 
-    public Long getVendorId() {
-        return vendorId;
-    }
-    public VendorStatus getVendorStatus() {
-        return vendorStatus;
+//    public Long getVendorId() {
+//        return vendorId;
+//    }
+//    public VendorStatus getVendorStatus() {
+//        return vendorStatus;
+//    }
+
+    public void setUserinfo(UserInfoDto userInfo) {
+        this.userInfo = userInfo;
     }
 
-    public void setEmployee(EmployeeInfoDto employee) {
-        this.employee = employee;
-    }
 
-
-    public EmployeeInfoDto getEmployee() {
-        return employee;
+    public UserInfoDto getUserInfo() {
+        return userInfo;
     }
 
     public String getJwt() {
@@ -63,7 +64,7 @@ public class AuthenticationResponseDTO {
 
     public List<String> getRoles() {return roles;}
 
-    public List<OrganizationInfo> getOrganizations() {return organizationInfos;}
+//    public List<OrganizationInfo> getOrganizations() {return organizationInfos;}
 
 //    public List<OrganizationFileResponseDTO> getOrganizationFiles(){return organizationFileInfos;}
 

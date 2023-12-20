@@ -7,6 +7,7 @@ import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorScore;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
+import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.repository.*;
 import com.aes.erp.vendor.service.DocumentServices.*;
 import org.modelmapper.ModelMapper;
@@ -152,11 +153,12 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         documentHolder.setBusinessDetails(businessDetails);
         documentHolder.setGeneralDetails(generalDetails);
         documentHolder = documentHolderRepository.save(documentHolder);
-        vendor.setVerificationStatus(VendorDocumentVerificationStatus.DOCUMENTS_SUBMITTED);
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION);
         vendor.setDocumentHolder(documentHolder);
         //Setting up Score For Vendor
         VendorScore vendorScore = new VendorScore();
         setVendorScore(vendor, vendorScore);
+//        vendor.setVerificationStatus(VendorD);
         vendorRepository.save(vendor);
     }
     public int calculateYearsOfBusiness(DocumentHolder documentHolder){

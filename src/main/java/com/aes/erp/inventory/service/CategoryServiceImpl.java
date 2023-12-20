@@ -155,25 +155,47 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Page<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Integer> page, Optional<Integer> size, Optional<Long> storeTypeId, Optional<Long> parentCategoryID) {
+    public Page<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Integer> page, Optional<Integer> size,
+                                                                    Optional<Long> storeTypeId,
+                                                                    Optional<Long> parentCategoryId,
+                                                                    Optional<String> name,
+                                                                    Optional<String> code) {
 //        Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10));
-        return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(storeTypeId.orElse(null), parentCategoryID.orElse(null), pageable);
+        return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
+                storeTypeId.orElse(null),
+                parentCategoryId.orElse(null),
+                name.orElse(null),code.orElse(null),
+                pageable);
     }
 
     @Override
-    public List<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId, Optional<Long> parentCategoryId) {
+    public List<?> getSubCategoryListFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId,
+                                                                          Optional<Long> parentCategoryId,
+                                                                          Optional<String> name,
+                                                                          Optional<String> code) {
         return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(storeTypeId.orElse(null),
-                parentCategoryId.orElse(null));
+                parentCategoryId.orElse(null),
+                name.orElse(null), code.orElse(null));
     }
 
     @Override
     public Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
-                                        Optional<Long> store_type_id) {
+                                        Optional<Long> store_type_id, Optional<String> name,
+                                                 Optional<String> code) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10),sort);
 
-            return categoryRepository.findAllByItemCategoryWithSubCategoryCount(store_type_id.orElse(null), pageable);
+            return categoryRepository.findAllByItemCategoryWithSubCategoryCount(
+                    store_type_id.orElse(null),
+                    name.orElse(null), code.orElse(null),
+                    pageable);
+    }
+
+    @Override
+    public List<?> getItemCategoryListForStoreType(Optional<Long> id, Optional<String> name, Optional<String> code) {
+        return categoryRepository.findAllByItemCategoryWithSubCategoryCount(id.orElse(null),
+                name.orElse(null),code.orElse(null));
     }
 
     @Override
@@ -201,12 +223,6 @@ public class CategoryServiceImpl implements CategoryService {
                             year,pageable);
 
         return result;
-    }
-
-    @Override
-    public List<?> getItemCategoriesForStoreType(Optional<Long> id) {
-
-        return categoryRepository.findAllByItemCategoryWithSubCategoryCount(id.orElse(null));
     }
 
     @Override

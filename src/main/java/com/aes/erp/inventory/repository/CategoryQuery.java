@@ -107,13 +107,18 @@ public interface CategoryQuery {
             "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id  AND sub.active = true " +
             "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
             "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
+            " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name) || '%' ) " +
+            " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code) || '%' )" +
             "AND c.active = true " +
             "GROUP BY c.id";
 
     String countQueryForFindAllByItemCategoryWithSubCategoryCount = "SELECT COUNT(DISTINCT c.id) AS categoryCount " +
             "FROM ItemCategory c " +
+            "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id  AND sub.active = true " +
             "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
             "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
+            " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name) || '%' ) " +
+            " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code) || '%' )" +
             "AND c.active = true";
 
 
@@ -127,6 +132,8 @@ public interface CategoryQuery {
             "WHERE c.parentCategory IS NOT NULL AND " +
             "(:store_type_id IS NULL OR st.id = :store_type_id) " +
             "AND (:parent_category IS NULL OR par.id = :parent_category) " +
+            " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name)||'%') " +
+            " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code)||'%') " +
             "AND c.active = true "+
             "GROUP BY c.id";
     String countQueryForSubCategoryFilteredByStoreTypeAndParentCategory = "SELECT COUNT(DISTINCT c.id) " +
@@ -136,6 +143,8 @@ public interface CategoryQuery {
             "WHERE c.parentCategory IS NOT NULL AND " +
             "(:store_type_id IS NULL OR st.id = :store_type_id) " +
             "AND (:parent_category IS NULL OR par.id = :parent_category) " +
+            " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name)||'%') " +
+            " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code)||'%') " +
             " AND c.active = true ";
 
 

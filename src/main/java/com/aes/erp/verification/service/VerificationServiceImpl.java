@@ -84,10 +84,10 @@ public class VerificationServiceImpl implements VerificationService {
                     }
             ).findFirst();
 
-            if (claimResponseDto.getEmployee() != null) {
+            if (claimResponseDto.getUserInfoDto() != null) {
                 if(verifierConfigOp.isPresent()) {
                     ModuleAccessVerifierConfig verifierConfig = verifierConfigOp.get();
-                    EmployeeInfoDto employee = claimResponseDto.getEmployee();
+                    EmployeeInfoDto employee = (EmployeeInfoDto) claimResponseDto.getUserInfoDto();
                     if (employee.getReportingManagerId() == null && employee
                             .getLevel().equals(verifierConfig.getLevel())) {
                         // manager self

@@ -1,7 +1,8 @@
 package com.aes.erp.vendor.enums;
 
 public enum VendorDocType {
-    
+
+    NONE,
     BANK_ACCOUNT,
     NID,
     TRADE_LICENSE,

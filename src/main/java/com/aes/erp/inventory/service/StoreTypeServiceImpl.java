@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,6 +42,11 @@ public class StoreTypeServiceImpl implements StoreTypeService{
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
         return storeTypeRepository.getAllStoreTypes(pageable, optionalFilter.orElse(""));
+    }
+
+    @Override
+    public List<?> getAllStoreTypes(Optional<String> filter) {
+        return storeTypeRepository.getAllStoreTypes(filter.orElse(""));
     }
 
     @Override

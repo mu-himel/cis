@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,10 +27,14 @@ public class ItemCategoryController {
     public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("page") Optional<Integer> page,
                                                @RequestParam("size") Optional<Integer> size,
                                                @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
-                                                           @RequestParam("parentCategoryId")  Optional<Long> parentCategoryId
+                                               @RequestParam("parentCategoryId")  Optional<Long> parentCategoryId,
+                                               @RequestParam("name") Optional<String> name,
+                                               @RequestParam("code") Optional<String> code
     ){
         return new ResponseEntity<>(
-                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(page,size, storeTypeId, parentCategoryId),
+                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(page,size,
+                        storeTypeId, parentCategoryId,
+                        name,code),
                 HttpStatus.OK
         );
     }
@@ -39,10 +42,12 @@ public class ItemCategoryController {
     @ApiOperation(value = "Get Item Categories Filtered By Store Type ID, With Pagination")
     public ResponseEntity<?> getItemCategoriesForStoreType(@RequestParam("page") Optional<Integer> page,
                                                            @RequestParam("size") Optional<Integer> size,
-                                                           @RequestParam("storeTypeId")  Optional<Long> storeTypeId
+                                                           @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
+                                                           @RequestParam("name") Optional<String> name,
+                                                           @RequestParam("code") Optional<String> code
     ){
         return new ResponseEntity<>(
-                categoryService.getItemCategoriesForStoreType(page,size, storeTypeId),
+                categoryService.getItemCategoriesForStoreType(page,size, storeTypeId,name,code),
                 HttpStatus.OK
         );
     }
@@ -66,9 +71,12 @@ public class ItemCategoryController {
 //    }
 
     @GetMapping("/main-categories")
-    public ResponseEntity<?> getMainCategoryList(@RequestParam("storeTypeId") Optional<Long> storeTypeId){
+    public ResponseEntity<?> getMainCategoryList(@RequestParam("storeTypeId") Optional<Long> storeTypeId,
+                                                 @RequestParam("name") Optional<String> name,
+                                                 @RequestParam("code") Optional<String> code
+                                                 ){
         return new ResponseEntity<>(
-                categoryService.getItemCategoriesForStoreType(storeTypeId),
+                categoryService.getItemCategoryListForStoreType(storeTypeId,name,code),
                 HttpStatus.OK
         );
     }
@@ -79,7 +87,7 @@ public class ItemCategoryController {
                                              @RequestParam("name")  Optional<String> name,
                                                 @RequestParam("code") Optional<String> code){
         return new ResponseEntity<>(
-                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(storeTypeId,categoryId),
+                categoryService.getSubCategoryListFilteredByStoreTypeAndParentCategory(storeTypeId,categoryId,name,code),
                 HttpStatus.OK
         );
     }

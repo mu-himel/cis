@@ -10,4 +10,6 @@ public interface DepartmentService {
     List<?> getAllDepartments(Optional<String> name);
 
     Optional<Department> getDepartment(Long id);
+
+    void createDepartment();
 }

@@ -12,4 +12,6 @@ public interface ModuleAccessService {
     List<ModuleAccess> getByParentModuleAccess(ModuleAccess moduleAccess);
 
     Optional<ModuleAccess> getModuleAccessByUri(String uri);
+
+    void initModuleAccess();
 }
