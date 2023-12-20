@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,24 +49,25 @@ public class AbstractModuleAccessFilterService {
                 .collect(Collectors.toList());
         List<ModuleAccessPermissionRepository.PermittedModule> permittedModules = new ArrayList<>();
         if(roles.contains("ROLE_EMPLOYEE")) {
-            EmployeeInfoDto employeeInfoDto = (EmployeeInfoDto) claimResponseDto.getUserInfoDto();
+            Map<String,Object> employeeInfoDto = claimResponseDto.getUserInfoDto();
             List<ModuleAccessPermissionRepository.PermittedModule> userPermittedModules =
                     moduleAccessPermissionRepository.findAllByDepartmentIdAndDesignationIdAndUserId(
-                            employeeInfoDto.getDepartmentId(),
-                            employeeInfoDto.getDesignationId(),
+//                            (Long)employeeInfoDto.get("departmentId"),
+//                            (Long)employeeInfoDto.get("designationId"),
+                            null,null,
                             claimResponseDto.getId()
                     );
 
             List<ModuleAccessPermissionRepository.PermittedModule> rolePermittedRoleModules =
                     moduleAccessPermissionRepository
                             .findAllByDepartmentIdAndDesignationId(
-                                    employeeInfoDto.getDepartmentId(),
-                                    employeeInfoDto.getDesignationId()
+                                    (Long)employeeInfoDto.get("departmentId"),
+                                    (Long)employeeInfoDto.get("designationId")
                             );
 
             List<ModuleAccessPermissionRepository.PermittedModule> departmentPermittedModules =
                     moduleAccessPermissionRepository
-                            .findAllByDepartmentId(employeeInfoDto.getDepartmentId());
+                            .findAllByDepartmentId((Long)employeeInfoDto.get("departmentId"));
 
 
             for (ModuleAccessPermissionRepository.PermittedModule p : userPermittedModules) {

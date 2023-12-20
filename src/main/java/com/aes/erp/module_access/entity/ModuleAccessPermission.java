@@ -45,8 +45,8 @@ public class ModuleAccessPermission {
     private Boolean updatePermission;
     private Boolean deletePermission;
 
-    private Boolean rolePermissionDelete;
-    private Boolean userPermissionDelete;
+//    private Boolean rolePermissionDelete;
+//    private Boolean userPermissionDelete;
 
     @CreationTimestamp
     @Column(updatable = false)

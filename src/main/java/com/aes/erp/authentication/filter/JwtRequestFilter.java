@@ -75,7 +75,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         }catch (Exception ex){
-//            ex.printStackTrace();
+            ex.printStackTrace();
             Map<String,String> map = new HashMap<>();
             map.put("message", ex.getMessage());
             ObjectMapper objectMapper = new ObjectMapper();
