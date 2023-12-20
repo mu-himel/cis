@@ -109,6 +109,7 @@ public class VendorServiceImpl implements VendorService {
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
         vendor.setVendorType(vendorDto.getVendorType());
         vendor.setUser(user);
+
         vendor.setStartedAt(new Date());
         vendor = vendorRepository.save(vendor);
         //Notify user Through a mail

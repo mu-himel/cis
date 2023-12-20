@@ -7,6 +7,8 @@ import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +16,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -141,6 +145,12 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         String getPhone();
 
         VendorStatus getStatus();
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        Date getStartedAt();
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate getCompletedAt();
 
         VendorDocumentVerificationStatus getVerificationStatus();
 

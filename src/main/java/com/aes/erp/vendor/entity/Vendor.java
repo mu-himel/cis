@@ -10,8 +10,10 @@ import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,9 +62,15 @@ public class Vendor implements DtoConvertable<VendorDto> {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<VendorItem> vendorItems;
+
     @OneToOne(fetch = FetchType.LAZY)
     private DocumentHolder documentHolder;
+
     private Date startedAt;
+
+    @UpdateTimestamp
+    private LocalDate completedAt;
+
     @OneToOne
     private VendorScore vendorScore;
     @Override
