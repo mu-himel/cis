@@ -12,5 +12,5 @@ public class ClaimResponseDto {
     private Long exp;
     private Long iat;
     private List<AuthorityDto> authorities;
-    private EmployeeInfoDto employee;
+    private UserInfoDto userInfoDto;
 }

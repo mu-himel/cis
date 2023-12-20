@@ -2,6 +2,7 @@ package com.aes.erp.module_access.service;
 
 import com.aes.erp.authentication.JwtUtil;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.authentication.dto.EmployeeInfoDto;
 import com.aes.erp.module_access.comparator.PermittedModuleSortByDisplayOrder;
 import com.aes.erp.module_access.dto.request.ModulePermissionRequest;
 import com.aes.erp.module_access.entity.ModuleAccessFilter;
@@ -42,55 +43,62 @@ public class AbstractModuleAccessFilterService {
 
 
     protected List<ModuleAccessPermissionRepository.PermittedModule> _getPermittedModules(ClaimResponseDto claimResponseDto){
-        List<ModuleAccessPermissionRepository.PermittedModule> userPermittedModules =
-                moduleAccessPermissionRepository .findAllByDepartmentIdAndDesignationIdAndUserId(
-                        claimResponseDto.getEmployee().getDepartmentId(),
-                        claimResponseDto.getEmployee().getDesignationId(),
-                        claimResponseDto.getId()
-                );
-
-        List<ModuleAccessPermissionRepository.PermittedModule>   rolePermittedRoleModules =
-                moduleAccessPermissionRepository
-                        .findAllByDepartmentIdAndDesignationId(
-                                claimResponseDto.getEmployee().getDepartmentId(),
-                                claimResponseDto.getEmployee().getDesignationId()
-                        );
-
-        List<ModuleAccessPermissionRepository.PermittedModule> departmentPermittedModules=
-                moduleAccessPermissionRepository
-                        .findAllByDepartmentId(claimResponseDto.getEmployee().getDepartmentId());
-
+        List<String> roles = claimResponseDto.getAuthorities().stream()
+                .map(dto->dto.getAuthority())
+                .collect(Collectors.toList());
         List<ModuleAccessPermissionRepository.PermittedModule> permittedModules = new ArrayList<>();
+        if(roles.contains("ROLE_EMPLOYEE")) {
+            EmployeeInfoDto employeeInfoDto = (EmployeeInfoDto) claimResponseDto.getUserInfoDto();
+            List<ModuleAccessPermissionRepository.PermittedModule> userPermittedModules =
+                    moduleAccessPermissionRepository.findAllByDepartmentIdAndDesignationIdAndUserId(
+                            employeeInfoDto.getDepartmentId(),
+                            employeeInfoDto.getDesignationId(),
+                            claimResponseDto.getId()
+                    );
 
-        for(ModuleAccessPermissionRepository.PermittedModule p: userPermittedModules){
-            Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->
-                    permittedModule.getModuleAccess().getName().equals(
-                            p.getModuleAccess().getName()
-                    )).findFirst();
-            if(permittedModuleExist.isEmpty()){
-                permittedModules.add(p);
+            List<ModuleAccessPermissionRepository.PermittedModule> rolePermittedRoleModules =
+                    moduleAccessPermissionRepository
+                            .findAllByDepartmentIdAndDesignationId(
+                                    employeeInfoDto.getDepartmentId(),
+                                    employeeInfoDto.getDesignationId()
+                            );
+
+            List<ModuleAccessPermissionRepository.PermittedModule> departmentPermittedModules =
+                    moduleAccessPermissionRepository
+                            .findAllByDepartmentId(employeeInfoDto.getDepartmentId());
+
+
+            for (ModuleAccessPermissionRepository.PermittedModule p : userPermittedModules) {
+                Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->
+                        permittedModule.getModuleAccess().getName().equals(
+                                p.getModuleAccess().getName()
+                        )).findFirst();
+                if (permittedModuleExist.isEmpty()) {
+                    permittedModules.add(p);
+                }
+            }
+
+            for (ModuleAccessPermissionRepository.PermittedModule p : rolePermittedRoleModules) {
+                Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->
+                        permittedModule.getModuleAccess().getName().equals(
+                                p.getModuleAccess().getName()
+                        )).findFirst();
+                if (permittedModuleExist.isEmpty()) {
+                    permittedModules.add(p);
+                }
+            }
+
+            for (ModuleAccessPermissionRepository.PermittedModule p : departmentPermittedModules) {
+                Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->
+                        permittedModule.getModuleAccess().getName().equals(
+                                p.getModuleAccess().getName()
+                        )).findFirst();
+                if (permittedModuleExist.isEmpty()) {
+                    permittedModules.add(p);
+                }
             }
         }
 
-        for(ModuleAccessPermissionRepository.PermittedModule p: rolePermittedRoleModules){
-            Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->
-                    permittedModule.getModuleAccess().getName().equals(
-                            p.getModuleAccess().getName()
-                    )).findFirst();
-            if(permittedModuleExist.isEmpty()){
-                permittedModules.add(p);
-            }
-        }
-
-        for(ModuleAccessPermissionRepository.PermittedModule p: departmentPermittedModules){
-            Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->
-                    permittedModule.getModuleAccess().getName().equals(
-                            p.getModuleAccess().getName()
-                    )).findFirst();
-            if(permittedModuleExist.isEmpty()){
-                permittedModules.add(p);
-            }
-        }
 
         permittedModules.sort(new PermittedModuleSortByDisplayOrder());
         return permittedModules;

@@ -1,6 +1,7 @@
 package com.aes.erp.module_access.service;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.authentication.dto.EmployeeInfoDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.module_access.comparator.PermittedModuleSortByDisplayOrder;
 import com.aes.erp.module_access.dto.request.DeletePermissionRequest;
@@ -164,21 +165,22 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
         List<ModuleAccessFilter> filterByModuleNameAndDepartmentAndDesignationAndUser=new ArrayList<>();
         List<ModuleAccessFilter> filterByModuleNameAndDepartmentAndDesignation=new ArrayList<>();
         List<ModuleAccessFilter> filterByModuleNameAndDepartment = new ArrayList<>();
-        if(claimResponseDto.getEmployee()!=null) {
+        if(claimResponseDto.getUserInfoDto()!=null) {
             // some code pending
+            EmployeeInfoDto employeeInfoDto = (EmployeeInfoDto)claimResponseDto.getUserInfoDto();
             filterByModuleNameAndDepartmentAndDesignationAndUser = moduleAccessFilterRepository
                     .getFilterByModuleNameAndDepartmentAndDesignationAndUser(
                             uri,
-                            claimResponseDto.getEmployee().getDepartmentId(),
-                            claimResponseDto.getEmployee().getDesignationId(),
-                            claimResponseDto.getId()
+                            employeeInfoDto.getDepartmentId(),
+                            employeeInfoDto.getDesignationId(),
+                            employeeInfoDto.getId()
                     );
             filterByModuleNameAndDepartmentAndDesignation = moduleAccessFilterRepository
-                    .getFilterByModuleNameAndDepartmentAndDesignation(uri, claimResponseDto.getEmployee().getDepartmentId(),
-                            claimResponseDto.getEmployee().getDesignationId());
+                    .getFilterByModuleNameAndDepartmentAndDesignation(uri, employeeInfoDto.getDepartmentId(),
+                            employeeInfoDto.getDesignationId());
 
             filterByModuleNameAndDepartment = moduleAccessFilterRepository
-                    .getFilterByModuleNameAndDepartment(uri, claimResponseDto.getEmployee().getDepartmentId());
+                    .getFilterByModuleNameAndDepartment(uri, employeeInfoDto.getDepartmentId());
 
         }
             List<ModuleAccessFilter> permittedFilters = new ArrayList<>();
@@ -410,21 +412,22 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
         List<String> roles = claimResponseDto.getAuthorities().stream()
                 .map(dto->dto.getAuthority())
                 .collect(Collectors.toList());
-        if(!roles.contains("ROLE_SYS_ADMIN")) {
+        if(roles.contains("ROLE_EMPLOYEE")) {
+            EmployeeInfoDto employeeInfoDto = (EmployeeInfoDto) claimResponseDto.getUserInfoDto();
             List<PermittedModuleWithVerifier> userWise =
                     moduleAccessPermissionRepository.findAllByModuleUriAndDepartmentAndDesignationAndUser(
-                            uri, claimResponseDto.getEmployee().getDepartmentId(),
-                            claimResponseDto.getEmployee().getDesignationId(),
+                            uri, employeeInfoDto.getDepartmentId(),
+                            employeeInfoDto.getDesignationId(),
                             claimResponseDto.getId()
                     );
             List<PermittedModuleWithVerifier> designationWise =
                     moduleAccessPermissionRepository.findAllByModuleUriAndDepartmentAndDesignation(
-                            uri, claimResponseDto.getEmployee().getDepartmentId(),
-                            claimResponseDto.getEmployee().getDesignationId()
+                            uri, employeeInfoDto.getDepartmentId(),
+                            employeeInfoDto.getDesignationId()
                     );
             List<PermittedModuleWithVerifier> departmentWise =
                     moduleAccessPermissionRepository.findAllByModuleUriAndDepartment(
-                            uri, claimResponseDto.getEmployee().getDepartmentId()
+                            uri, employeeInfoDto.getDepartmentId()
                     );
 
             MergeModulePermission<PermittedModuleWithVerifier,
