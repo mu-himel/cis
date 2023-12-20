@@ -38,6 +38,8 @@ public interface VendorService {
                            Optional<MultipartFile> tradeLicense,
                            Optional<MultipartFile> quotationFormat);
 
+    void uploadVendorFile(Long id, Optional<MultipartFile> file);
+
     void updateVendorStatus(Long id, VendorStatus status);
     VendorProfileDto getVendorProfile(Long userId);
     void approveVendor(Long vendorId);

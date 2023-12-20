@@ -119,7 +119,7 @@ public class VendorController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/upload/{id}")
+    @PostMapping("/uploads/{id}")
     public ResponseEntity<?> uploadFiles(
             @PathVariable("id") Long id,
             @RequestParam("address") String address,
@@ -138,10 +138,21 @@ public class VendorController {
         vendorService.uploadVendorFiles(id,address,password,confirmPassword,tinCert,
                 vatCert,tradeLicense,quotationFormat);
 
-        System.out.println(address);
+//        System.out.println(address);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PostMapping("/upload/{id}")
+    public ResponseEntity<?> uploadFile(
+            @PathVariable("id") Long id,
+            @RequestParam("tinCert") Optional<MultipartFile> file
+    ){
+        vendorService.uploadVendorFile(id,file);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
     @GetMapping("/profile/{id}")
     public ResponseEntity<VendorProfileDto> getVendorProfile(@PathVariable() Long id) {
         return  new ResponseEntity<>(vendorService.getVendorProfile(id), HttpStatus.OK);
