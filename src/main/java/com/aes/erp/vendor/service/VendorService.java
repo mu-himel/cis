@@ -27,8 +27,20 @@ public interface VendorService {
                        Optional<String> vendorType,
                        Optional<String> vendorStatus
     );
-    Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size);
-    Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size);
+    Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size,
+                                          Optional<String> name,
+                                          Optional<String> email,
+                                          Optional<String> phone,
+                                          Optional<String> vendorType,
+                                          Optional<String> vendorStatus
+                                          );
+    Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size,
+                                      Optional<String> name,
+                                      Optional<String> email,
+                                      Optional<String> phone,
+                                      Optional<String> vendorType,
+                                      Optional<String> vendorStatus
+                                      );
 
     void uploadVendorFiles(Long id,
                            String address,
@@ -48,5 +60,11 @@ public interface VendorService {
     void updateVendorScore(VendorScoreDto dto);
     Vendor getById(Long id);
 
-    Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size);
+    Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size,
+                               Optional<String> name,
+                               Optional<String> email,
+                               Optional<String> phone,
+                               Optional<String> vendorType,
+                               Optional<String> vendorStatus
+                               );
 }

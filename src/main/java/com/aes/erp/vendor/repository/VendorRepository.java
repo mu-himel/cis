@@ -50,14 +50,30 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             " LEFT JOIN FETCH v.vendorType vt " +
             " LEFT JOIN FETCH v.category c " +
             " LEFT JOIN FETCH v.subCategoryList sc " +
-            " WHERE v.verificationStatus IN (:status)",
+            " WHERE v.verificationStatus IN (:status)" +
+            "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+            "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
+            "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
+            "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
+            "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)",
             countQuery =  "SELECT count(v) FROM Vendor v " +
                     " LEFT JOIN v.vendorType vt " +
                     " LEFT JOIN v.category c " +
                     " LEFT JOIN v.subCategoryList sc " +
-                    " WHERE v.verificationStatus IN (:status)"
+                    " WHERE v.verificationStatus IN (:status)" +
+                    "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+                    "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
+                    "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
+                    "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
+                    "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)"
     )
-    Page<VendorInfo> findAllVendorForStatus(@Param("status") VendorDocumentVerificationStatus status, Pageable pageable);
+    Page<VendorInfo> findAllVendorForStatus(@Param("status") VendorDocumentVerificationStatus status,
+                                            @Param("name") String name,
+                                            @Param("email") String email,
+                                            @Param("phone") String phone,
+                                            @Param("vendorType") String vendorType,
+                                            @Param("vendorStatus") String vendorStatus,
+                    Pageable pageable);
 
 
     @Query("SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt " +

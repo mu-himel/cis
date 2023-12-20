@@ -57,23 +57,36 @@ public class VendorController {
     @GetMapping("/pending-verification")
     public ResponseEntity<?> getPendingVerificationVendors(
             @RequestParam("page") Optional<Integer> page,
-            @RequestParam("size") Optional<Integer> size
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("name") Optional<String> name,
+            @RequestParam("email") Optional<String> email,
+            @RequestParam("phone") Optional<String> phone,
+            @RequestParam("vendorType") Optional<String> vendorType,
+            @RequestParam("vendorStatus") Optional<String> vendorStatus
     )
     {
         return new ResponseEntity<>(
-                vendorService.getPendingVerificationVendors(page,size),
-                HttpStatus.OK
+            vendorService.getPendingVerificationVendors(page,size,
+            name,email,phone,vendorType,vendorStatus),
+            HttpStatus.OK
         );
     }
 
     @GetMapping("/pending-approval")
     public ResponseEntity<?> getPendingApprovalVendors(
             @RequestParam("page") Optional<Integer> page,
-            @RequestParam("size") Optional<Integer> size
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("name") Optional<String> name,
+            @RequestParam("email") Optional<String> email,
+            @RequestParam("phone") Optional<String> phone,
+            @RequestParam("vendorType") Optional<String> vendorType,
+            @RequestParam("vendorStatus") Optional<String> vendorStatus
     )
     {
         return new ResponseEntity<>(
-                vendorService.getPendingApprovalVendors(page,size),
+                vendorService.getPendingApprovalVendors(page,size,
+                        name,email,phone,vendorType,vendorStatus
+                ),
                 HttpStatus.OK
         );
     }
@@ -81,10 +94,15 @@ public class VendorController {
     @GetMapping("/complete")
     public ResponseEntity<?> getApprovedVendors(
             @RequestParam("page") Optional<Integer> page,
-            @RequestParam("size") Optional<Integer> size
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("name") Optional<String> name,
+            @RequestParam("email") Optional<String> email,
+            @RequestParam("phone") Optional<String> phone,
+            @RequestParam("vendorType") Optional<String> vendorType,
+            @RequestParam("vendorStatus") Optional<String> vendorStatus
     ){
         return new ResponseEntity<>(
-                vendorService.getApprovedVendors(page,size),
+                vendorService.getApprovedVendors(page,size,name,email,phone,vendorType,vendorStatus),
                 HttpStatus.OK
         );
     }

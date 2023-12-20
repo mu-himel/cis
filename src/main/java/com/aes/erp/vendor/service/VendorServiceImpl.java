@@ -33,6 +33,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -225,24 +226,60 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size) {
+    public Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size,
+                                                 Optional<String> name,
+                                                 Optional<String> email,
+                                                 Optional<String> phone,
+                                                 Optional<String> vendorType,
+                                                 Optional<String> vendorStatus
+                                                 ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION,pageable);
+        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION,
+                name.orElse(null),
+                email.orElse(null),
+                phone.orElse(null),
+                vendorType.orElse(null),
+                vendorStatus.orElse(null),
+                pageable);
     }
 
     @Override
-    public Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size) {
+    public Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size,
+                                             Optional<String> name,
+                                             Optional<String> email,
+                                             Optional<String> phone,
+                                             Optional<String> vendorType,
+                                             Optional<String> vendorStatus) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL,pageable);
+        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL,
+                name.orElse(null),
+                email.orElse(null),
+                phone.orElse(null),
+                vendorType.orElse(null),
+                vendorStatus.orElse(null),
+                pageable);
     }
 
     @Override
-    public Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size) {
+    public Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size,
+                                      Optional<String> name,
+                                      Optional<String> email,
+                                      Optional<String> phone,
+                                      Optional<String> vendorType,
+                                      Optional<String> vendorStatus
+                                      ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.APPROVED,pageable);
+        return vendorRepository.findAllVendorForStatus(
+                VendorDocumentVerificationStatus.APPROVED,
+                name.orElse(null),
+                email.orElse(null),
+                phone.orElse(null),
+                vendorType.orElse(null),
+                vendorStatus.orElse(null),
+                pageable);
     }
 
     @Override
