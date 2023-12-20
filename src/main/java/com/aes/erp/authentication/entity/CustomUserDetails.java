@@ -55,6 +55,7 @@ public class CustomUserDetails implements UserDetails {
         employeeInfoDto.setId(employee.getId());
         employeeInfoDto.setEmployeeId(employee.getEmployeeId());
         employeeInfoDto.setName(employee.getName());
+        employeeInfoDto.setEmployeeType(employee.getEmployeeType());
         this.userInfoDto = employeeInfoDto;
 //        this.employee.setDepartmentId(employee.getDepartment().getId());
 //        this.employee.setLevel(employee.getDepartment().getLevel());
