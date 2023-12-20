@@ -16,7 +16,7 @@ public class AuthenticationResponseDTO {
 
 //    private final List<OrganizationInfo> organizationInfos;
 
-    private UserInfoDto userinfo;
+    private UserInfoDto userInfo;
 //    private final Long vendorId;
 //    private final VendorStatus vendorStatus;
 
@@ -45,13 +45,13 @@ public class AuthenticationResponseDTO {
 //        return vendorStatus;
 //    }
 
-    public void setUserinfo(UserInfoDto userinfo) {
-        this.userinfo = userinfo;
+    public void setUserinfo(UserInfoDto userInfo) {
+        this.userInfo = userInfo;
     }
 
 
-    public UserInfoDto getUserinfo() {
-        return userinfo;
+    public UserInfoDto getUserInfo() {
+        return userInfo;
     }
 
     public String getJwt() {
