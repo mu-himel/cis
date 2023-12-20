@@ -71,6 +71,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 }
             }
 
+
             authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
             for(RoleToPrivilege roleToPrivilege :userCredentialToRole.getRole().getRoleToPrivileges()) {
                 authorities.add(new SimpleGrantedAuthority(roleToPrivilege.getPrivilege().getPrivilegeName()));
