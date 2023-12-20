@@ -34,7 +34,7 @@ public class User {
     private String lastName;
 
     @Column(name = "emailAddress", unique = true)
-    @Pattern(regexp = EMAIL_PATTERN, message = "email id is invalid")
+    @Pattern(regexp = EMAIL_PATTERN, message = "Email id is invalid")
     @NotBlank(message = "email is mandatory")
     private String emailAddress;
 
