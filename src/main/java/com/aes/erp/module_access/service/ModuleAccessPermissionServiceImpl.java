@@ -84,16 +84,17 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
 
         if(roles.contains("ROLE_SYS_ADMIN")){
             return moduleAccessService.getAllModules();
-        }else if(roles.contains("ROLE_VENDOR")){
-            List<ModuleAccessRepository.ModuleAccessInfo> allModules = (List<ModuleAccessRepository.ModuleAccessInfo>) moduleAccessService.getAllModules();
-            List<ModuleAccessRepository.ModuleAccessInfo> vendorModules = new ArrayList<>();
-            for (ModuleAccessRepository.ModuleAccessInfo module : allModules) {
-                if(module.getUri().startsWith("vendor-panel")){
-                    vendorModules.add(module);
-                }
-            }
-            return vendorModules;
         }
+//        else if(roles.contains("ROLE_VENDOR")){
+//            List<ModuleAccessRepository.ModuleAccessInfo> allModules = (List<ModuleAccessRepository.ModuleAccessInfo>) moduleAccessService.getAllModules();
+//            List<ModuleAccessRepository.ModuleAccessInfo> vendorModules = new ArrayList<>();
+//            for (ModuleAccessRepository.ModuleAccessInfo module : allModules) {
+//                if(module.getUri().startsWith("vendor-panel")){
+//                    vendorModules.add(module);
+//                }
+//            }
+//            return vendorModules;
+//        }
         else{
 
             List<PermittedModule> permittedModules = _getPermittedModules(claimResponseDto);

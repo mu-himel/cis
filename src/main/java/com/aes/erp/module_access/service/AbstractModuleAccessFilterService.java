@@ -48,7 +48,7 @@ public class AbstractModuleAccessFilterService {
                 .map(dto->dto.getAuthority())
                 .collect(Collectors.toList());
         List<ModuleAccessPermissionRepository.PermittedModule> permittedModules = new ArrayList<>();
-        if(roles.contains("ROLE_EMPLOYEE")) {
+//        if(roles.contains("ROLE_EMPLOYEE")) {
             Map<String,Object> employeeInfoDto = claimResponseDto.getUserInfoDto();
             List<ModuleAccessPermissionRepository.PermittedModule> userPermittedModules =
                     moduleAccessPermissionRepository.findAllByDepartmentIdAndDesignationIdAndUserId(
@@ -99,7 +99,7 @@ public class AbstractModuleAccessFilterService {
                     permittedModules.add(p);
                 }
             }
-        }
+//        }
 
 
         permittedModules.sort(new PermittedModuleSortByDisplayOrder());
