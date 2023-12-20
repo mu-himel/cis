@@ -45,6 +45,10 @@ public class CustomUserDetails implements UserDetails {
         return userInfoDto;
     }
 
+    public void setUserInfoDto(UserInfoDto userInfoDto) {
+        this.userInfoDto = userInfoDto;
+    }
+
     public void setEmployee(Employee employee) {
         EmployeeInfoDto employeeInfoDto = new EmployeeInfoDto();
 
@@ -79,10 +83,10 @@ public class CustomUserDetails implements UserDetails {
 
     public void setUser(User user) {
         this.user = user;
-        UserInfoDto admin = new UserInfoDto();
-        admin.setId(user.getId());
-        admin.setName(user.getFirstName()+ " " + user.getLastName());
-        this.userInfoDto = admin;
+//        UserInfoDto admin = new UserInfoDto();
+//        admin.setId(user.getId());
+//        admin.setName(user.getFirstName()+ " " + user.getLastName());
+//        this.userInfoDto = admin;
         this.username = user.getEmailAddress();
         this.password = user.getUserCredential().getPassword();
         this.active = user.getUserCredential().isActive();

@@ -1,5 +1,6 @@
 package com.aes.erp.authentication;
 
+import com.aes.erp.authentication.dto.UserInfoDto;
 import com.aes.erp.authentication.entity.CustomUserDetails;
 import com.aes.erp.employee.entity.Employee;
 import com.aes.erp.employee.service.EmployeeService;
@@ -69,6 +70,12 @@ public class CustomUserDetailsService implements UserDetailsService {
                 if(vendor.isPresent()){
                     customUserDetails.setVendor(vendor.get());
                 }
+            }
+            if(roleName.equals("SYS_ADMIN")){
+                UserInfoDto userInfoDto = new UserInfoDto();
+                userInfoDto.setId(user.getId());
+                userInfoDto.setName(user.getFirstName()+ " " + user.getLastName());
+                customUserDetails.setUserInfoDto(userInfoDto);
             }
 
 
