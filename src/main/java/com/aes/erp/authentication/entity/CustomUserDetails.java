@@ -1,6 +1,8 @@
 package com.aes.erp.authentication.entity;
 
 import com.aes.erp.authentication.dto.EmployeeInfoDto;
+import com.aes.erp.authentication.dto.UserInfoDto;
+import com.aes.erp.authentication.dto.VendorInfoDto;
 import com.aes.erp.employee.entity.Employee;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.user_credential.entity.UserCredential;
@@ -15,7 +17,7 @@ import java.util.Collection;
  * */
 public class CustomUserDetails implements UserDetails {
     private User user;
-    private EmployeeInfoDto employee;
+    private UserInfoDto userInfoDto;
     private Vendor vendor;
     private UserCredential userCredential;
 
@@ -39,28 +41,37 @@ public class CustomUserDetails implements UserDetails {
     }
 
 
-    public EmployeeInfoDto getEmployee() {
-        return employee;
+    public UserInfoDto getUserInfoDto() {
+        return userInfoDto;
     }
 
     public void setEmployee(Employee employee) {
-        this.employee = new EmployeeInfoDto();
-        this.employee.setId(employee.getId());
-        this.employee.setEmployeeId(employee.getEmployeeId());
-        this.employee.setName(employee.getName());
-        this.employee.setDepartmentId(employee.getDepartment().getId());
-        this.employee.setLevel(employee.getDepartment().getLevel());
-        this.employee.setParentDepartmentId(employee.getDepartment().getParentDepartment().getId());
-        this.employee.setDepartmentName(employee.getDepartment().getName());
-        this.employee.setDesignationId(employee.getRoleNode().getId());
-        this.employee.setDesignationName(employee.getRoleNode().getName());
-        if(employee.getReportingManager() != null) {
-            this.employee.setReportingManagerId(employee.getReportingManager().getId());
-            this.employee.setReportingManagerName(employee.getReportingManager().getName());
-        }
+        EmployeeInfoDto employeeInfoDto = new EmployeeInfoDto();
+
+        employeeInfoDto.setId(employee.getId());
+        employeeInfoDto.setEmployeeId(employee.getEmployeeId());
+        employeeInfoDto.setName(employee.getName());
+        this.userInfoDto = employeeInfoDto;
+//        this.employee.setDepartmentId(employee.getDepartment().getId());
+//        this.employee.setLevel(employee.getDepartment().getLevel());
+//        this.employee.setParentDepartmentId(employee.getDepartment().getParentDepartment().getId());
+//        this.employee.setDepartmentName(employee.getDepartment().getName());
+//        this.employee.setDesignationId(employee.getRoleNode().getId());
+//        this.employee.setDesignationName(employee.getRoleNode().getName());
+//        if(employee.getReportingManager() != null) {
+//            this.employee.setReportingManagerId(employee.getReportingManager().getId());
+//            this.employee.setReportingManagerName(employee.getReportingManager().getName());
+//        }
     }
     public void setVendor(Vendor vendor){
         this.vendor = vendor;
+        VendorInfoDto vendorInfoDto = new VendorInfoDto();
+        vendorInfoDto.setId(vendor.getUser().getId());
+        vendorInfoDto.setName(vendor.getName());
+        vendorInfoDto.setVendorId(vendor.getId());
+        vendorInfoDto.setVendorStatus(vendor.getStatus());
+        vendorInfoDto.setVendorDocumentVerificationStatus(vendor.getVerificationStatus());
+        this.userInfoDto = vendorInfoDto;
     }
     public Vendor getVendor(){
         return this.vendor;

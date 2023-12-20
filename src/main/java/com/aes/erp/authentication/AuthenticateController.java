@@ -83,19 +83,21 @@ public class AuthenticateController {
             AuthenticationResponseDTO authenticationResponseDTO =new AuthenticationResponseDTO(jwt, user.getId(),
                     getRoles(user.getUserCredential().getUserCredentialToRoles()),
                     //getOrganizations(user.getUserToOrganizations()),
-                    Collections.emptyList(),
+//                    Collections.emptyList(),
                     // getOrganizationFiles(user.getUserToOrganizationFiles()) /*Collections.emptyList()*/,
-                    vendorId, vendorStatus, user.getUserCredential().isActive()?"active":"deactive");
+//                    vendorId, vendorStatus,
+                    user.getUserCredential().isActive()?"active":"deactive");
 
-            authenticationResponseDTO.setEmployee(userDetails.getEmployee());
+            authenticationResponseDTO.setUserinfo(userDetails.getUserInfoDto());
             return new ResponseEntity<>(authenticationResponseDTO, HttpStatus.OK);
         }
         else {
             return ResponseEntity.ok(
                     new AuthenticationResponseDTO("", 0,
                             Collections.emptyList(),
-                            Collections.emptyList(),
-                            null, null, "deactive")
+//                            Collections.emptyList(),
+//                            null, null,
+                            "deactive")
             );
             // apiResponse.setResponse("this account is deactivated", TRUE, NULL, SUCCESS);
             // return ResponseEntity.ok().body(apiResponse);
