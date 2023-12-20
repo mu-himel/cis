@@ -14,6 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -69,7 +70,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     private Date startedAt;
 
     @UpdateTimestamp
-    private LocalDate completedAt;
+    private Date completedAt;
 
     @OneToOne
     private VendorScore vendorScore;

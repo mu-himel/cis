@@ -17,6 +17,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -150,7 +151,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         Date getStartedAt();
 
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate getCompletedAt();
+        Date getCompletedAt();
 
         VendorDocumentVerificationStatus getVerificationStatus();
 
