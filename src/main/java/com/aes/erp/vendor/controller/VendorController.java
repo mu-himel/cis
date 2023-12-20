@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.controller;
 
+import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
@@ -146,9 +147,10 @@ public class VendorController {
     @PostMapping("/upload/{id}")
     public ResponseEntity<?> uploadFile(
             @PathVariable("id") Long id,
-            @RequestParam("tinCert") Optional<MultipartFile> file
+            @RequestParam("employeeType") EmployeeType employeeType,
+            @RequestParam("file") Optional<MultipartFile> file
     ){
-        vendorService.uploadVendorFile(id,file);
+        vendorService.uploadVendorFile(id,employeeType,file);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

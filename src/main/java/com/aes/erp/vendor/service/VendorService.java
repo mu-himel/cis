@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.service;
 
+import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
@@ -38,7 +39,7 @@ public interface VendorService {
                            Optional<MultipartFile> tradeLicense,
                            Optional<MultipartFile> quotationFormat);
 
-    void uploadVendorFile(Long id, Optional<MultipartFile> file);
+    void uploadVendorFile(Long id, EmployeeType employeeType, Optional<MultipartFile> file);
 
     void updateVendorStatus(Long id, VendorStatus status);
     VendorProfileDto getVendorProfile(Long userId);

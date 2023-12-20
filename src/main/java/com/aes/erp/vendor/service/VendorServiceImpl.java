@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.service;
 
+import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
@@ -327,7 +328,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public void uploadVendorFile(Long id, Optional<MultipartFile> file) {
+    public void uploadVendorFile(Long id, EmployeeType employeeType, Optional<MultipartFile> file) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(id);
         if (vendorOptional.isEmpty()) {
             throw new AesException("Vendor not found");
@@ -349,10 +350,10 @@ public class VendorServiceImpl implements VendorService {
         }
         vendorFileRepository.saveAll(vendorFiles);
 
-        if (vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION){
+        if (employeeType == EmployeeType.ENLISTER && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
         }
-        if(vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
+        if(employeeType == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
         }
     }
