@@ -326,17 +326,18 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
+    @Transactional
     public void uploadVendorFile(Long id, Optional<MultipartFile> file) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(id);
-        if(vendorOptional.isEmpty()){
+        if (vendorOptional.isEmpty()) {
             throw new AesException("Vendor not found");
         }
         List<VendorFile> vendorFiles = new ArrayList<>();
         Vendor vendor = vendorOptional.get();
-        Path shopPhotoPath = Path.of("./uploads/vendor/"+vendor.getId()+"/shop");
-        if(file.isPresent()) {
+        Path shopPhotoPath = Path.of("./uploads/vendor/" + vendor.getId() + "/shop");
+        if (file.isPresent()) {
             FileUploadResponse fileUploadResponse = fileUploadService.uploadFile(shopPhotoPath, file.get());
-            if(fileUploadResponse!=null) {
+            if (fileUploadResponse != null) {
                 VendorFile vendorFile = new VendorFile(vendor,
                         fileUploadResponse.getFilename(),
                         fileUploadResponse.getPath(),
@@ -347,6 +348,13 @@ public class VendorServiceImpl implements VendorService {
             }
         }
         vendorFileRepository.saveAll(vendorFiles);
+
+        if (vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION){
+            vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
+        }
+        if(vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
+            vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
+        }
     }
 
     @Override
