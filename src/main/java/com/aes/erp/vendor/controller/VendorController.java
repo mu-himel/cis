@@ -208,7 +208,7 @@ public class VendorController {
             }
     }
 
-    @GetMapping(value = "/images/{id}/{filename:.+}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/images/{id}/{businessDetailId}/{filename:.+}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<?> getImage(
             @PathVariable("id") Long id,
             @PathVariable("businessDetailId") Long businessDetailId,

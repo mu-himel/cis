@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface VendorFileRepository extends JpaRepository<VendorFile,Long> {
-    Optional<VendorFile> findByVendorIdAndBusinessDetailIdAndFileName(Long id, Long businessDetailId, String filename);
+    Optional<VendorFile> findByVendorIdAndBusinessDetailsIdAndFileName(Long id, Long businessDetailId, String filename);
 }
