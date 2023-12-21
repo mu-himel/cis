@@ -1,6 +1,7 @@
 package com.aes.erp.vendor.entity.DocmentEntities;
 
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class GeneralDetails {
     private String urgentDeliverySupport;
     private String annualBusinessVolume;
     private String deliveryLeadTime;
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private DocumentHolder documentHolder;
 }

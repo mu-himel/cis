@@ -29,11 +29,10 @@ public class DocumentHolder {
     private BINDocument binDocument;
     @OneToOne
     private TradeDocument tradeDocument;
-    @OneToOne
-    private BusinessDetails businessDetails;
+    @OneToMany(mappedBy = "documentHolder")
+    private List<BusinessDetails> businessDetailsRecords;
     @OneToOne
     private GeneralDetails generalDetails;
-//    private String resumeNumber;
 
 
 }

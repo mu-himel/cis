@@ -2,6 +2,7 @@ package com.aes.erp.vendor.service.DocumentHolderServices;
 
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.document_response_dto.*;
+import com.aes.erp.vendor.dto.BusinessDetailsDto;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
@@ -14,11 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class DocumentHolderServiceImpl implements DocumentHolderService{
@@ -49,6 +48,11 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     }
 
 
+    public void addVendorScore(Vendor vendor){
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION);
+        VendorScore vendorScore = new VendorScore();
+        setVendorScore(vendor, vendorScore);
+    }
 
     @Override
     public DocumentHolderResponseDto create(Long userId, DocumentHolderRequestDto dto) {
@@ -137,6 +141,8 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
                 map.put("bin", documentHolder.getBinDocument().getAddress());
             misMatchResponseDto.setAddress(map);
         }
+        Optional<Vendor> optionalVendor = vendorRepository.findByDocumentHolderId(documentHolderId);
+        optionalVendor.ifPresent(this::addVendorScore);
         return misMatchResponseDto;
     }
 
@@ -146,23 +152,31 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         if(vendorOptional.isEmpty()) throw new AesException("No Vendor Found for this user Id");
         Vendor vendor = vendorOptional.get();
         DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
-        BusinessDetails businessDetails = modelMapper.map(dto.getBusinessDetails(), BusinessDetails.class);
+        List<BusinessDetails> businessDetailsList = new ArrayList<>();
+        for(BusinessDetailsDto details: dto.getBusinessDetails()){
+            BusinessDetails newBusinessDetails = new BusinessDetails();
+            newBusinessDetails.setBusinessType(details.getBusinessType());
+            newBusinessDetails.setAnnualVolume(details.getAnnualVolume());
+            newBusinessDetails.setNumberOfYear(details.getNumberOfYear());
+            newBusinessDetails.setWorkOrderFile(details.getWorkOrderFile());
+            newBusinessDetails.setOrgName(details.getOrgName());
+            newBusinessDetails.setDocumentHolder(documentHolder);
+            newBusinessDetails = businessDetailsRepository.save(newBusinessDetails);
+            businessDetailsList.add(newBusinessDetails);
+        }
+        documentHolder.setBusinessDetailsRecords(businessDetailsList);
         GeneralDetails generalDetails = modelMapper.map(dto.getGeneralDetails(), GeneralDetails.class);
-        generalDetails = generalDetailsRepository.save(generalDetails);
-        businessDetails = businessDetailsRepository.save(businessDetails);
-        documentHolder.setBusinessDetails(businessDetails);
-        documentHolder.setGeneralDetails(generalDetails);
-        documentHolder = documentHolderRepository.save(documentHolder);
-        vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION);
-        vendor.setDocumentHolder(documentHolder);
-        //Setting up Score For Vendor
-        VendorScore vendorScore = new VendorScore();
-        setVendorScore(vendor, vendorScore);
-//        vendor.setVerificationStatus(VendorD);
-        vendorRepository.save(vendor);
+        generalDetails.setDocumentHolder(documentHolder);
+        generalDetailsRepository.save(generalDetails);
+//        generalDetails = generalDetailsRepository.save(generalDetails);
+//        documentHolder.setGeneralDetails(generalDetails);
+//        documentHolder = documentHolderRepository.save(documentHolder);
+//        vendor.setDocumentHolder(documentHolder);
+//        vendorRepository.save(vendor);
     }
     public int calculateYearsOfBusiness(DocumentHolder documentHolder){
         Timestamp issueDateBin = documentHolder.getBinDocument().getIssueDate();
+        if(issueDateBin == null)issueDateBin = Timestamp.from(Instant.now());
         return LocalDate.now().getYear() - issueDateBin.toLocalDateTime().getYear();
     }
     public void setVendorScore(Vendor vendor, VendorScore vendorScore){
@@ -171,8 +185,16 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         vendorScore.setYearOfEstablishmentGrade((float) (totalBusinessYears / 10));
         vendorScore.setLegalDocumentationWeight(5F);
         vendorScore.setLegalDocumentationGrade(1F);
+        vendorScore.setClientListAndCustomerReferenceWeight(10F);
+        vendorScore.setOrganizationWeight(5F);
+        vendorScore.setTypeOfBusinessWeight(10F);
+        vendorScore.setNoOfEmployeeWeight(5F);
+        vendorScore.setRelevantExperienceWeight(15F);
+        vendorScore.setCapacityWeight(15F);
+        vendorScore.setPhysicalVerificationWeight(30F);
         vendorScore = vendorScoreRepository.save(vendorScore);
         vendor.setVendorScore(vendorScore);
+        vendorRepository.save(vendor);
     }
 
     private DocumentHolderResponseDto mapEntityToDTO(DocumentHolder documentHolder) {

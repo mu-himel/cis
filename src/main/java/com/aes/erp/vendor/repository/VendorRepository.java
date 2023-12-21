@@ -64,6 +64,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             "WHERE v.id=:id")
     Optional<VendorDetail> findVendorById(@Param("id") Long id);
     Optional<Vendor> findByUserId(Long id);
+    Optional<Vendor> findByDocumentHolderId(Long id);
 
     interface VendorDetail{
         Long getId();
