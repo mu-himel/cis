@@ -8,6 +8,7 @@ import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
 import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.entity.VendorFile;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
@@ -54,7 +55,7 @@ public interface VendorService {
                            Optional<MultipartFile> tradeLicense,
                            Optional<MultipartFile> quotationFormat);
 
-    FileUploadResponse uploadVendorFile(Long id, Optional<MultipartFile> file);
+    FileUploadResponse uploadVendorFile(Long id, Long businessDetailId,Optional<MultipartFile> file);
 
     void updateVendorStatus(Long id, VendorStatus status);
     VendorProfileDto getVendorProfile(Long userId);
@@ -74,4 +75,5 @@ public interface VendorService {
 
     VendorDetailsDto getAllDetailsOfVendor(Long vendorId);
 
+    Optional<VendorFile> getShopFile(Long id, String filename);
 }

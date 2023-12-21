@@ -12,6 +12,7 @@ import com.aes.erp.inventory.service.ItemService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.*;
+import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
@@ -399,7 +400,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public FileUploadResponse uploadVendorFile(Long id, Optional<MultipartFile> file) {
+    public FileUploadResponse uploadVendorFile(Long id, Long businessDetailId, Optional<MultipartFile> file) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(id);
         if (vendorOptional.isEmpty()) {
             throw new AesException("Vendor not found");
@@ -417,12 +418,18 @@ public class VendorServiceImpl implements VendorService {
                         fileUploadResponse.getSize(),
                         fileUploadResponse.getMimeType(),
                         VendorDocType.NONE);
+                vendorFile.setBusinessDetails(new BusinessDetails(businessDetailId));
                 vendorFiles.add(vendorFile);
             }
         }
         vendorFileRepository.saveAll(vendorFiles);
 
         return fileUploadResponse;
+    }
+
+    @Override
+    public Optional<VendorFile> getShopFile(Long id, String filename) {
+        return vendorFileRepository.findByVendorIdAndFileName(id,filename);
     }
 
     @Override

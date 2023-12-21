@@ -6,6 +6,7 @@ import com.aes.erp.vendor.dto.VendorApprovalResponseDto;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
+import com.aes.erp.vendor.entity.VendorFile;
 import com.aes.erp.vendor.entity.VendorScore;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.enums.VendorStatus;
@@ -13,12 +14,21 @@ import com.aes.erp.vendor.service.VendorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 
@@ -168,12 +178,47 @@ public class VendorController {
     @PostMapping("/upload/{id}")
     public ResponseEntity<?> uploadFile(
             @PathVariable("id") Long id,
+            @RequestParam("businessDetailId") Long businessDetailId,
             @RequestPart("file") Optional<MultipartFile> file
     ){
         return new ResponseEntity<>(
-                vendorService.uploadVendorFile(id,file),
+                vendorService.uploadVendorFile(id,businessDetailId, file),
                 HttpStatus.OK
         );
+    }
+
+
+    private ByteArrayResource load(Long id, String filename) {
+            Optional<VendorFile> vendorFileOp = vendorService.getShopFile(id,filename);
+            if(vendorFileOp.isEmpty()){
+                return null;
+            }
+            try {
+                VendorFile vendorFile = vendorFileOp.get();
+                Path path = Path.of(vendorFile.getPath(),vendorFile.getFileName());
+                ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+
+                if (resource.exists() || resource.isReadable()) {
+                    return resource;
+                } else {
+                    throw new RuntimeException("Could not read the file!");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error: " + e.getMessage());
+            }
+    }
+
+    @GetMapping(value = "/images/{id}/{filename:.+}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<?> getImage(
+            @PathVariable("id") Long id,
+            @PathVariable String filename) {
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(
+                    load(id,filename)
+                );
+
     }
 
 

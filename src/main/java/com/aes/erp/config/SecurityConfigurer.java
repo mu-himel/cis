@@ -50,6 +50,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
         String[] permittedRoutes = new String[]{
                 // swagger specific routes
+                "/api/v1/vendors/images/**",
                 "/webjars/**","/swagger-ui.html",
                 "/v2/api-docs","/swagger-resources/**",
                 "/authenticate", "/users-credential", "/forgot-password", "/hello", "/api/v1/organizations/register"};
