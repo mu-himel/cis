@@ -7,6 +7,7 @@ import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.enums.CategoryHeader;
+import com.aes.erp.inventory.service.BulkUploadService;
 import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.inventory.service.StoreTypeService;
 import org.apache.commons.csv.CSVFormat;
@@ -31,16 +32,13 @@ import java.util.Optional;
 @RequestMapping("/api/v1/item-categories/bulk-upload")
 public class UploadController {
 
-    @Autowired
-    private FileUploadService fileUploadService;
 
-    @Autowired
-    private CategoryService categoryService;
 
     @Autowired
     private StoreTypeService storeTypeService;
 
-
+    @Autowired
+    private BulkUploadService bulkUploadService;
 
     @PostMapping("/category")
     public ResponseEntity<?> uploadCategory(
@@ -52,31 +50,21 @@ public class UploadController {
         if(storeTypeOp.isEmpty()){
             throw new AesException("Store Type not found");
         }
+        bulkUploadService.categoryBulkUpload(storeTypeOp,file);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
-
-        Path path = Path.of("./uploads/inventory-control");
-        FileUploadResponse fileUploadResponse = null;
-        if(file.isPresent()) {
-            fileUploadResponse = fileUploadService.uploadFile(path, file.get());
-
-            FileReader in = new FileReader(fileUploadResponse.getPath()+"/"+fileUploadResponse.getFilename());
-            Iterable<CSVRecord> records  = CSVFormat.RFC4180.withHeader(CategoryHeader.class).parse(in);
-            records.iterator().next();
-
-            for(CSVRecord r:records){
-                System.out.println(r.get("CATEGORY_NAME"));
-                String catName = r.get("CATEGORY_NAME");
-                List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName);
-                if(catOp.size()==0){
-                    String code = categoryService.getNewCategoryCode();
-                    CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
-                    categoryRequestDto.setName(catName);
-                    categoryRequestDto.setCode(code);
-                    categoryRequestDto.setStoreType(storeTypeOp.get());
-                    categoryService.addCategory(categoryRequestDto);
-                }
-            }
+    @PostMapping("/sub-category")
+    public ResponseEntity<?> uploadSubCategory(
+            @RequestParam("storeTypeId") Long storeTypeId,
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("file") Optional<MultipartFile> file
+    ) throws IOException {
+        Optional<StoreType> storeTypeOp = Optional.ofNullable(storeTypeService.getById(storeTypeId));
+        if(storeTypeOp.isEmpty()){
+            throw new AesException("Store Type not found");
         }
-        return new ResponseEntity<>(fileUploadResponse,HttpStatus.OK);
+
+        bulkUploadService.subCategoryBulkUpload(categoryId,storeTypeOp,file);
     }
 }
