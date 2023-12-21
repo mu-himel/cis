@@ -18,6 +18,6 @@ public class VendorProfileDto {
     private VendorAddressDto address;
     private List<String> permittedProducts = new ArrayList<>();
     private GeneralDetails generalDetails;
-    private BusinessDetails businessDetails;
+    private List<BusinessDetails> businessDetails;
     private VendorScore vendorScore;
 }

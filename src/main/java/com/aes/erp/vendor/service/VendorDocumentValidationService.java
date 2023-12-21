@@ -46,6 +46,7 @@ public class VendorDocumentValidationService {
         //Creating a document Entity first
         Document document = new Document();
         document.setDocumentHolder(documentHolderRepository.getReferenceById(documentHolderId));
+        document.setContentType(file.getContentType());
         multipartFileToBytes(file, document);
         document.setName(fileName);
 

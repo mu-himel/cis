@@ -30,8 +30,6 @@ public class TradeLicenseServiceImpl implements TradeLicenseService{
     public void update(Long documentHolderId, TradeLicenseDto dto) {
         TradeDocument tradeDocument = tradeRepository.getTradeLicenseDocumentByDocumentHolderId(documentHolderId);
         tradeDocument = dto.dtoToEntityMapping(dto, tradeDocument);
-//        DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
-//        tradeDocument.setDocumentHolder(documentHolder);
         Document document = documentService.getDocumentByDocumentHolderIdAndType(documentHolderId, DocumentType.TRADE);
         tradeDocument.setDocument(document);
         tradeRepository.save(tradeDocument);

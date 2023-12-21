@@ -1,6 +1,7 @@
 package com.aes.erp.vendor.entity.DocmentEntities;
 
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -17,6 +18,10 @@ public class BusinessDetails {
     private String businessType;
     private String numberOfYear;
     private String annualVolume;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Lob
+    private String workOrderFile;
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_holder_id")
     private DocumentHolder documentHolder;
 }

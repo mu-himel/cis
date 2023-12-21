@@ -30,10 +30,8 @@ public class BankSolvencyServiceImpl implements BankSolvencyService{
     public void update(Long documentHolderId, BankSolvencyDto dto) {
        BankSolvencyDocument bankSolvencyDocument = bankSolvencyRepository.getBankSolvencyDocumentByDocumentHolderId(documentHolderId);
        bankSolvencyDocument = dto.dtoToEntityMapping(dto, bankSolvencyDocument);
-//       DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
        Document document = documentService.getDocumentByDocumentHolderIdAndType(documentHolderId, DocumentType.BANK_SOLVENCY);
        bankSolvencyDocument.setDocument(document);
-//       bankSolvencyDocument.setDocumentHolder(documentHolder);
        bankSolvencyRepository.save(bankSolvencyDocument);
     }
 

@@ -20,6 +20,6 @@ public class DocumentServiceImpl implements DocumentService{
 
     @Override
     public Document getDocumentByDocumentHolderIdAndType(Long documentHolderId, DocumentType docType) {
-       return documentRepository.getDocumentByDocumentHolderId(documentHolderId, docType);
+       return documentRepository.getDocumentByDocumentHolderId(documentHolderId, docType.ordinal());
     }
 }

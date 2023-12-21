@@ -15,6 +15,7 @@ import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorRegistrationMailSender;
 import com.aes.erp.vendor.dto.VendorScoreDto;
+import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorFile;
@@ -23,6 +24,7 @@ import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
+import com.aes.erp.vendor.repository.GeneralDetailsRepository;
 import com.aes.erp.vendor.repository.VendorFileRepository;
 import com.aes.erp.vendor.repository.VendorRepository;
 import com.aes.erp.vendor.repository.VendorScoreRepository;
@@ -66,11 +68,15 @@ public class VendorServiceImpl implements VendorService {
     @Autowired
     private VendorFileRepository vendorFileRepository;
     private final CategoryService categoryService;
+    private final GeneralDetailsRepository generalDetailsRepository;
 
-    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, GenericModelMapper modelMapper, CategoryService categoryService) {
+
+
+    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, GenericModelMapper modelMapper, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
         this.emailSenderUtil = emailSenderUtil;
         this.modelMapper = modelMapper;
         this.categoryService = categoryService;
+        this.generalDetailsRepository = generalDetailsRepository;
     }
 
     @Override
@@ -430,8 +436,9 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setStartedAt(vendor.getStartedAt());
         if(vendor.getDocumentHolder() != null){
             DocumentHolder documentHolder = vendor.getDocumentHolder();
-            if(documentHolder.getBusinessDetails() != null)profileDto.setBusinessDetails(vendor.getDocumentHolder().getBusinessDetails());
-            if(documentHolder.getGeneralDetails() != null)profileDto.setGeneralDetails(vendor.getDocumentHolder().getGeneralDetails());
+            if(documentHolder.getBusinessDetailsRecords() != null)profileDto.setBusinessDetails(vendor.getDocumentHolder().getBusinessDetailsRecords());
+            Optional<GeneralDetails> vendorGeneralDetails = generalDetailsRepository.findByDocumentHolderId(documentHolder.getId());
+            vendorGeneralDetails.ifPresent(profileDto::setGeneralDetails);
         }
         if(vendor.getVendorScore() != null)profileDto.setVendorScore(vendor.getVendorScore());
         return profileDto;
