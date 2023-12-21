@@ -66,5 +66,7 @@ public class UploadController {
         }
 
         bulkUploadService.subCategoryBulkUpload(categoryId,storeTypeOp,file);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
