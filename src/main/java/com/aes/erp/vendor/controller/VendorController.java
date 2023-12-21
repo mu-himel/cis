@@ -170,8 +170,8 @@ public class VendorController {
             @PathVariable("id") Long id,
             @RequestParam("file") Optional<MultipartFile> file
     ){
-        vendorService.uploadVendorFile(id,file);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        
+        return new ResponseEntity<>(vendorService.uploadVendorFile(id,file),HttpStatus.OK);
     }
 
 
