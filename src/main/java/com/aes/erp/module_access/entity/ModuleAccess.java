@@ -18,7 +18,6 @@ import java.util.List;
 public class ModuleAccess {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 
@@ -42,5 +41,9 @@ public class ModuleAccess {
 
     public ModuleAccess(Long id) {
         this.id = id;
+    }
+
+    public void addChildModule(ModuleAccess moduleAccess){
+        this.children.add(moduleAccess);
     }
 }

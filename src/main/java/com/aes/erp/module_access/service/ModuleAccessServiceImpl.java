@@ -6,6 +6,7 @@ import com.aes.erp.module_access.repository.ModuleAccessRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
 
 
     @Override
-    public void initModuleAccess() {
+    @Transactional
+    public Long initModuleAccess() {
         List<ModuleAccess> moduleAccesses = new ArrayList<>();
 
         Long count = moduleAccessRepository.count();
@@ -60,7 +62,6 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             controlPanel.setUri("control-panel");
             controlPanel.setModuleType(ModuleType.PARENT);
             controlPanel.setShowInMenu(true);
-            moduleAccessRepository.save(controlPanel);
 
             ModuleAccess organization = new ModuleAccess();
             organization.setId(4L);
@@ -71,7 +72,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             organization.setModuleType(ModuleType.CHILD);
             organization.setShowInMenu(true);
             organization.setParentModuleAccess(controlPanel);
-            moduleAccessRepository.save(organization);
+            controlPanel.addChildModule(organization);
 
             ModuleAccess inventoryControl = new ModuleAccess();
             inventoryControl.setId(5L);
@@ -82,7 +83,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             inventoryControl.setModuleType(ModuleType.CHILD);
             inventoryControl.setShowInMenu(true);
             inventoryControl.setParentModuleAccess(controlPanel);
-            moduleAccessRepository.save(inventoryControl);
+            controlPanel.addChildModule(inventoryControl);
 
             ModuleAccess category = new ModuleAccess();
             category.setId(6L);
@@ -93,7 +94,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             category.setModuleType(ModuleType.CHILD);
             category.setShowInMenu(false);
             category.setParentModuleAccess(controlPanel);
-            moduleAccessRepository.save(category);
+            controlPanel.addChildModule(category);
 
             ModuleAccess subCategory = new ModuleAccess();
             subCategory.setId(7L);
@@ -104,7 +105,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             subCategory.setModuleType(ModuleType.CHILD);
             subCategory.setShowInMenu(false);
             subCategory.setParentModuleAccess(controlPanel);
-            moduleAccessRepository.save(subCategory);
+            controlPanel.addChildModule(subCategory);
 
             ModuleAccess allPartner = new ModuleAccess();
             allPartner.setId(8L);
@@ -115,7 +116,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             allPartner.setModuleType(ModuleType.CHILD);
             allPartner.setShowInMenu(true);
             allPartner.setParentModuleAccess(controlPanel);
-            moduleAccessRepository.save(allPartner);
+            controlPanel.addChildModule(allPartner);
 
             ModuleAccess registration = new ModuleAccess();
             registration.setId(9L);
@@ -126,7 +127,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             registration.setModuleType(ModuleType.CHILD);
             registration.setShowInMenu(true);
             registration.setParentModuleAccess(controlPanel);
-            moduleAccessRepository.save(registration);
+            controlPanel.addChildModule(registration);
 
             ModuleAccess employee = new ModuleAccess();
             employee.setId(10L);
@@ -137,7 +138,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             employee.setModuleType(ModuleType.CHILD);
             employee.setShowInMenu(true);
             employee.setParentModuleAccess(controlPanel);
-            moduleAccessRepository.save(employee);
+            controlPanel.addChildModule(employee);
+            moduleAccessRepository.save(controlPanel);
 
             ModuleAccess vendorManagement = new ModuleAccess();
             vendorManagement.setId(11L);
@@ -148,7 +150,6 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             vendorManagement.setUri("vendor-management");
             vendorManagement.setModuleType(ModuleType.PARENT);
             vendorManagement.setShowInMenu(true);
-            moduleAccessRepository.save(vendorManagement);
 
             ModuleAccess pendingVendors = new ModuleAccess();
             pendingVendors.setId(12L);
@@ -159,7 +160,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             pendingVendors.setModuleType(ModuleType.CHILD);
             pendingVendors.setShowInMenu(true);
             pendingVendors.setParentModuleAccess(vendorManagement);
-            moduleAccessRepository.save(pendingVendors);
+            vendorManagement.addChildModule(pendingVendors);
 
             ModuleAccess pendingVerification = new ModuleAccess();
             pendingVerification.setId(13L);
@@ -168,9 +169,9 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             pendingVerification.setRoute("vendor-panel/pending-vendors/pending-verification");
             pendingVerification.setUri("vendor-panel/pending-vendors/pending-verification");
             pendingVerification.setModuleType(ModuleType.CHILD);
-            pendingVerification.setShowInMenu(true);
+            pendingVerification.setShowInMenu(false);
             pendingVerification.setParentModuleAccess(vendorManagement);
-            moduleAccessRepository.save(pendingVerification);
+            vendorManagement.addChildModule(pendingVerification);
 
             ModuleAccess pendingApproval = new ModuleAccess();
             pendingApproval.setId(14L);
@@ -179,9 +180,9 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             pendingApproval.setRoute("vendor-panel/pending-vendors/pending-approval");
             pendingApproval.setUri("vendor-panel/pending-vendors/pending-approval");
             pendingApproval.setModuleType(ModuleType.CHILD);
-            pendingApproval.setShowInMenu(true);
+            pendingApproval.setShowInMenu(false);
             pendingApproval.setParentModuleAccess(vendorManagement);
-            moduleAccessRepository.save(pendingApproval);
+            vendorManagement.addChildModule(pendingApproval);
 
             ModuleAccess approvedVendor = new ModuleAccess();
             approvedVendor.setId(15L);
@@ -190,10 +191,12 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             approvedVendor.setRoute("vendor-panel/pending-vendors/completed");
             approvedVendor.setUri("vendor-panel/pending-vendors/completed");
             approvedVendor.setModuleType(ModuleType.CHILD);
-            approvedVendor.setShowInMenu(true);
+            approvedVendor.setShowInMenu(false);
             approvedVendor.setParentModuleAccess(vendorManagement);
-            moduleAccessRepository.save(approvedVendor);
+            vendorManagement.addChildModule(approvedVendor);
+            moduleAccessRepository.save(vendorManagement);
 
         }
+        return count;
     }
 }

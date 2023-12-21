@@ -32,4 +32,6 @@ public interface ModuleAccessPermissionService {
     void deletePermissionById(Long id, DeletePermissionRequest deletePermissionRequest);
 
     Optional<?> getModulePermissionByUri(String token, String uri);
+
+    void initModulePermissions();
 }

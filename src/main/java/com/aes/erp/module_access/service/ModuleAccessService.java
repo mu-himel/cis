@@ -13,5 +13,5 @@ public interface ModuleAccessService {
 
     Optional<ModuleAccess> getModuleAccessByUri(String uri);
 
-    void initModuleAccess();
+    Long initModuleAccess();
 }

@@ -1,5 +1,6 @@
 package com.aes.erp.config.seed;
 
+import com.aes.erp.module_access.service.ModuleAccessPermissionService;
 import com.aes.erp.module_access.service.ModuleAccessService;
 import com.aes.erp.organogram_system.entity.Department;
 import com.aes.erp.organogram_system.entity.RoleNode;
@@ -41,6 +42,9 @@ public class DataSeed implements CommandLineRunner {
 
     @Autowired
     private ModuleAccessService moduleAccessService;
+
+    @Autowired
+    private ModuleAccessPermissionService moduleAccessPermissionService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -127,6 +131,9 @@ public class DataSeed implements CommandLineRunner {
     }
 
     private void initModules(){
-        moduleAccessService.initModuleAccess();
+        Long count = moduleAccessService.initModuleAccess();
+        if(count==0) {
+            moduleAccessPermissionService.initModulePermissions();
+        }
     }
 }
