@@ -38,7 +38,8 @@ public interface ModuleAccessPermissionRepository extends JpaRepository<ModuleAc
             "LEFT JOIN FETCH mp.moduleAccess ma " +
             "LEFT JOIN FETCH mp.department d " +
             "WHERE (:departmentId IS NULL OR d.id = :departmentId) " +
-            "   AND (:designationId IS NULL OR mp.designation.id = :designationId) AND mp.user.id = :userId")
+            "   AND (:designationId IS NULL OR mp.designation.id = :designationId) " +
+            "   AND (:user IS NULL OR mp.user.id = :userId)")
     List<PermittedModule> findAllByDepartmentIdAndDesignationIdAndUserId(@Param("departmentId") Long departmentId,
                                                                          @Param("designationId") Long designationId,
                                                                          @Param("userId") Long userId);
