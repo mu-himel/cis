@@ -44,4 +44,36 @@ public class DesignationServiceImpl implements DesignationService{
         roleNode.setName("RootRoleNode");
         roleNodeRepository.save(roleNode);
     }
+
+    @Override
+    public void createEnlisterRoleNode() {
+        RoleNode roleNode = new RoleNode();
+        roleNode.setId(2L);
+        roleNode.setName("ENLISTER");
+        roleNode.setParentDepartment(new Department(1L));
+        roleNodeRepository.save(roleNode);
+    }
+
+    @Override
+    public void createAuditorRoleNode() {
+        RoleNode roleNode = new RoleNode();
+        roleNode.setId(3L);
+        roleNode.setName("AUDITOR");
+        roleNode.setParentDepartment(new Department(1L));
+        roleNodeRepository.save(roleNode);
+    }
+
+    @Override
+    public void createVendorRoleNode() {
+        RoleNode roleNode = new RoleNode();
+        roleNode.setId(4L);
+        roleNode.setName("VENDOR");
+        roleNode.setParentDepartment(new Department(1L));
+        roleNodeRepository.save(roleNode);
+    }
+
+    @Override
+    public Optional<RoleNode> findByName(String enlister) {
+        return roleNodeRepository.findByName(enlister);
+    }
 }

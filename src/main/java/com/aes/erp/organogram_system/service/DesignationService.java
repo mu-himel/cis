@@ -11,5 +11,13 @@ public interface DesignationService {
 
     Optional<RoleNode> getDesignationById(Long id);
 
+    Optional<RoleNode> findByName(String enlister);
+
     void createRoleNode();
+
+    void createEnlisterRoleNode();
+
+    void createAuditorRoleNode();
+
+    void createVendorRoleNode();
 }
