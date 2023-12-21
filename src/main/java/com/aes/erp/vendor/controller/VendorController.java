@@ -10,6 +10,7 @@ import com.aes.erp.vendor.entity.VendorScore;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.service.VendorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -185,5 +186,9 @@ public class VendorController {
         VendorApprovalResponseDto approvalDto = new VendorApprovalResponseDto();
         approvalDto.setMessage("Approved");
         return new ResponseEntity<>(approvalDto, HttpStatus.OK);
+    }
+    @GetMapping("/details/{id}")
+    public ResponseEntity<?> getAllDetailsOfVendor(@PathVariable("id") Long id){
+        return new ResponseEntity<>(vendorService.getAllDetailsOfVendor(id), HttpStatus.OK);
     }
 }

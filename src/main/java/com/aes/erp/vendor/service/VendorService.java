@@ -1,6 +1,8 @@
 package com.aes.erp.vendor.service;
 
+
 import com.aes.erp.employee.enums.EmployeeType;
+import com.aes.erp.vendor.dto.VendorDetailsDto;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
@@ -60,6 +62,7 @@ public interface VendorService {
     void updateVendorScore(VendorScoreDto dto);
     Vendor getById(Long id);
 
+
     Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size,
                                Optional<String> name,
                                Optional<String> email,
@@ -67,4 +70,7 @@ public interface VendorService {
                                Optional<String> vendorType,
                                Optional<String> vendorStatus
                                );
+
+    VendorDetailsDto getAllDetailsOfVendor(Long vendorId);
+
 }

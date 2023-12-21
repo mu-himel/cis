@@ -56,9 +56,10 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
 
     @Override
     public DocumentHolderResponseDto create(Long userId, DocumentHolderRequestDto dto) {
-        DocumentHolder documentHolder = new DocumentHolder();
         Optional<Vendor> vendorOptional = vendorRepository.findByUserId(userId);
         if(vendorOptional.isEmpty()) throw new AesException("No Vendor Found for this user Id");
+        if(vendorOptional.get().getDocumentHolder() != null) throw new AesException("Document Holder entity already been created for this vendor");
+        DocumentHolder documentHolder = new DocumentHolder();
         Vendor vendor = vendorOptional.get();
         documentHolder = documentHolderRepository.save(documentHolder);
         enableAllDocumentTypes(documentHolder, dto);

@@ -81,7 +81,7 @@ public class CategoryServiceImpl implements CategoryService {
             Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(categoryRequestDto.getParentCategory().getId());
             if(itemCategoryOptional.isPresent()) category.setParentCategory(itemCategoryOptional.get());
         }
-        if(categoryRequestDto.getStoreType().getId() != null){
+        if(categoryRequestDto.getStoreType()!=null && categoryRequestDto.getStoreType().getId() != null){
             Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
             if(storeType.isPresent())category.setStoreType(storeType.get());
         }
@@ -125,7 +125,7 @@ public class CategoryServiceImpl implements CategoryService {
             itemCategory.setName(categoryRequestDto.getName());
         }
 
-        if(categoryRequestDto.getStoreType().getId() != null){
+        if(categoryRequestDto.getStoreType()!=null && categoryRequestDto.getStoreType().getId() != null){
             Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
             if(storeType.isPresent())itemCategory.setStoreType(storeType.get());
         }
@@ -294,5 +294,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Optional<ItemCategory> findRootReferenceItem(Long Id) {
         return categoryRepository.findById(Id);
+    }
+
+    @Override
+    public List<ItemCategory> existCategoryByNameIgnoreCase(String category_name) {
+        return categoryRepository.findCategoryByNameIgnoreCase(category_name.toLowerCase());
     }
 }
