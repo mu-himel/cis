@@ -1,5 +1,6 @@
 package com.aes.erp.config.seed;
 
+import com.aes.erp.module_access.service.ModuleAccessService;
 import com.aes.erp.organogram_system.entity.Department;
 import com.aes.erp.organogram_system.entity.RoleNode;
 import com.aes.erp.organogram_system.service.DepartmentService;
@@ -38,6 +39,9 @@ public class DataSeed implements CommandLineRunner {
     @Autowired
     private UserAssignRepository userAssignRepository;
 
+    @Autowired
+    private ModuleAccessService moduleAccessService;
+
     @Override
     public void run(String... args) throws Exception {
         this.init();
@@ -47,6 +51,9 @@ public class DataSeed implements CommandLineRunner {
         this.initRoles();
         this.createRoleNode();
         this.createDepartment();
+        this.createEnlisterRoleNode();
+        this.createAuditorRoleNode();
+        this.createVendorRoleNode();
         this.initUserAccounts();
         this.assignUserToRole();
         this.initModules();
@@ -78,6 +85,27 @@ public class DataSeed implements CommandLineRunner {
         }
     }
 
+    private void createEnlisterRoleNode(){
+        Optional<RoleNode> roleNodeOptional = designationService.findByName("ENLISTER");
+        if(roleNodeOptional.isEmpty()){
+            designationService.createEnlisterRoleNode();
+        }
+    }
+
+    private void createAuditorRoleNode(){
+        Optional<RoleNode> roleNodeOptional = designationService.findByName("AUDITOR");
+        if(roleNodeOptional.isEmpty()){
+            designationService.createAuditorRoleNode();
+        }
+    }
+
+    private void createVendorRoleNode() {
+        Optional<RoleNode> roleNodeOptional = designationService.findByName("VENDOR");
+        if(roleNodeOptional.isEmpty()){
+            designationService.createVendorRoleNode();
+        }
+    }
+
     private void initUserAccounts(){
         User user = userService.getUserByUserId(1L);
         if(user==null){
@@ -99,6 +127,6 @@ public class DataSeed implements CommandLineRunner {
     }
 
     private void initModules(){
-
+        moduleAccessService.initModuleAccess();
     }
 }
