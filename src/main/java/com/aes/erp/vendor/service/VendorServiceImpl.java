@@ -399,7 +399,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public void uploadVendorFile(Long id, EmployeeType employeeType, Optional<MultipartFile> file) {
+    public FileUploadResponse uploadVendorFile(Long id, Optional<MultipartFile> file) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(id);
         if (vendorOptional.isEmpty()) {
             throw new AesException("Vendor not found");
@@ -407,8 +407,9 @@ public class VendorServiceImpl implements VendorService {
         List<VendorFile> vendorFiles = new ArrayList<>();
         Vendor vendor = vendorOptional.get();
         Path shopPhotoPath = Path.of("./uploads/vendor/" + vendor.getId() + "/shop");
+        FileUploadResponse fileUploadResponse = null;
         if (file.isPresent()) {
-            FileUploadResponse fileUploadResponse = fileUploadService.uploadFile(shopPhotoPath, file.get());
+            fileUploadResponse = fileUploadService.uploadFile(shopPhotoPath, file.get());
             if (fileUploadResponse != null) {
                 VendorFile vendorFile = new VendorFile(vendor,
                         fileUploadResponse.getFilename(),
@@ -421,12 +422,7 @@ public class VendorServiceImpl implements VendorService {
         }
         vendorFileRepository.saveAll(vendorFiles);
 
-        if (employeeType == EmployeeType.ENLISTER && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION){
-            vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
-        }
-        if(employeeType == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
-            vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
-        }
+        return fileUploadResponse;
     }
 
     @Override
@@ -472,12 +468,19 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public void approveVendor(Long vendorId) {
+    public void approveVendor(Long vendorId, VendorScoreDto dto) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(vendorId);
         if(!vendorOptional.isPresent())throw new AesException("Vendor not found");
         Vendor vendor = vendorOptional.get();
-        vendor.setVerificationStatus(VendorDocumentVerificationStatus.VERIFIED);
-        vendor.setStatus(VendorStatus.ENABLED);
+
+        if (dto.getEmployeeType() == EmployeeType.ENLISTER && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION){
+            vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
+        }
+        if(dto.getEmployeeType()  == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
+            vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
+            vendor.setStatus(VendorStatus.ENABLED);
+        }
+
         vendorRepository.save(vendor);
     }
 

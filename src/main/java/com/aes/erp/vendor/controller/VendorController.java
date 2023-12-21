@@ -7,6 +7,7 @@ import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
 import com.aes.erp.vendor.entity.VendorScore;
+import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.service.VendorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -167,10 +168,9 @@ public class VendorController {
     @PostMapping("/upload/{id}")
     public ResponseEntity<?> uploadFile(
             @PathVariable("id") Long id,
-            @RequestParam("employeeType") EmployeeType employeeType,
             @RequestParam("file") Optional<MultipartFile> file
     ){
-        vendorService.uploadVendorFile(id,employeeType,file);
+        vendorService.uploadVendorFile(id,file);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -182,8 +182,10 @@ public class VendorController {
     @PutMapping("/{id}/approve")
     public ResponseEntity<VendorApprovalResponseDto> approveVendorProfile(@PathVariable("id") Long id, @RequestBody VendorScoreDto dto){
         vendorService.updateVendorScore(dto);
-        vendorService.approveVendor(id);
+        vendorService.approveVendor(id,dto);
         VendorApprovalResponseDto approvalDto = new VendorApprovalResponseDto();
+
+
         approvalDto.setMessage("Approved");
         return new ResponseEntity<>(approvalDto, HttpStatus.OK);
     }
