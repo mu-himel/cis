@@ -11,4 +11,5 @@ public class DocumentHolderResponseDto {
     private String binNumber;
     private String tradeLicenseNumber;
     private String bankAccountNumber;
+    private String msg;
 }

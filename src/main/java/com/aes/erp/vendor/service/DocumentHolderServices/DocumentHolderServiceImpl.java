@@ -57,19 +57,25 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     @Override
     public DocumentHolderResponseDto create(Long userId, DocumentHolderRequestDto dto) {
         Optional<Vendor> vendorOptional = vendorRepository.findByUserId(userId);
-        if(vendorOptional.isEmpty()) throw new AesException("No Vendor Found for this user Id");
-        if(vendorOptional.get().getDocumentHolder() != null) throw new AesException("Document Holder entity already been created for this vendor");
-        DocumentHolder documentHolder = new DocumentHolder();
-        Vendor vendor = vendorOptional.get();
-        documentHolder = documentHolderRepository.save(documentHolder);
-        enableAllDocumentTypes(documentHolder, dto);
-        documentHolder.setName(vendor.getName());
-        documentHolder = documentHolderRepository.save(documentHolder);
-        vendor.setDocumentHolder(documentHolder);
-        vendorRepository.save(vendor);
         DocumentHolderResponseDto responseDto = new DocumentHolderResponseDto();
-        responseDto.setId(documentHolder.getId());
-        return responseDto;
+        if(vendorOptional.isEmpty()) throw new AesException("No Vendor Found for this user Id");
+        if(vendorOptional.get().getDocumentHolder() == null) {
+            DocumentHolder documentHolder = new DocumentHolder();
+            Vendor vendor = vendorOptional.get();
+            documentHolder = documentHolderRepository.save(documentHolder);
+            enableAllDocumentTypes(documentHolder, dto);
+            documentHolder.setName(vendor.getName());
+            documentHolder = documentHolderRepository.save(documentHolder);
+            vendor.setDocumentHolder(documentHolder);
+            vendorRepository.save(vendor);
+            responseDto.setId(documentHolder.getId());
+            responseDto.setMsg("Document Holder Created");
+            return responseDto;
+        }
+        else{
+            responseDto.setMsg("Document Holder Already Exists");
+            return responseDto;
+        }
     }
 
     private void enableAllDocumentTypes(DocumentHolder documentHolder, DocumentHolderRequestDto dto) {
