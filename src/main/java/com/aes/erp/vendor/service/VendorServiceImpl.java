@@ -10,10 +10,7 @@ import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.inventory.service.ItemService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
-import com.aes.erp.vendor.dto.VendorDto;
-import com.aes.erp.vendor.dto.VendorProfileDto;
-import com.aes.erp.vendor.dto.VendorRegistrationMailSender;
-import com.aes.erp.vendor.dto.VendorScoreDto;
+import com.aes.erp.vendor.dto.*;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
@@ -248,6 +245,36 @@ public class VendorServiceImpl implements VendorService {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
         return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.APPROVED,pageable);
+    }
+
+    @Override
+    public VendorDetailsDto getAllDetailsOfVendor(Long vendorId) {
+       Optional<Vendor> vendor = vendorRepository.findById(vendorId);
+       if(vendor.isEmpty()) throw new AesException("No vendor Found with this vendor id");
+       Long documentHolderId = vendor.get().getDocumentHolder().getId();
+       DocumentHolder documentHolder = vendor.get().getDocumentHolder();
+       VendorDetailsDto dto = new VendorDetailsDto();
+       Optional<GeneralDetails> generalDetails = generalDetailsRepository.findByDocumentHolderId(documentHolderId);
+       generalDetails.ifPresent(dto::setGeneralDetails);
+       if(!documentHolder.getBusinessDetailsRecords().isEmpty())dto.setBusinessDetails(documentHolder.getBusinessDetailsRecords());
+       Vendor vendorEntity = vendor.get();
+       if(vendorEntity.getVendorType() != null) dto.setVendorType(vendorEntity.getVendorType().toString());
+       if(vendorEntity.getName() != null)dto.setVendorName(vendorEntity.getName());
+       if(vendorEntity.getCategory() != null)dto.setVendorCategory(vendorEntity.getCategory().getName());
+       if(!vendorEntity.getSubCategoryList().isEmpty()){
+           List<String> subCategories = new ArrayList<>();
+           for(ItemCategory item: vendorEntity.getSubCategoryList()){
+               String subCategoryName = item.getName();
+               subCategories.add(subCategoryName);
+           }
+           dto.setSubCategories(subCategories);
+       }
+       if(documentHolder.getBinDocument() != null)dto.setBinNumber(documentHolder.getBinDocument().getBin());
+       if(documentHolder.getTinDocument() != null)dto.setTinNumber(documentHolder.getTinDocument().getTin());
+       if(documentHolder.getTradeDocument() != null)dto.setTradeNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
+       if(documentHolder.getBankSolvencyDocument() != null)dto.setSolvencyNumber(documentHolder.getBankSolvencyDocument().getAccount());
+       if(documentHolder.getNidDocument() != null)dto.setNidNumber(documentHolder.getNidDocument().getNid());
+       return dto;
     }
 
     @Override

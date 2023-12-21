@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.service;
 
+import com.aes.erp.vendor.dto.VendorDetailsDto;
 import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
@@ -46,4 +47,5 @@ public interface VendorService {
     Vendor getById(Long id);
 
     Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size);
+    VendorDetailsDto getAllDetailsOfVendor(Long vendorId);
 }
