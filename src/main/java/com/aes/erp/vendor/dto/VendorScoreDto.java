@@ -21,5 +21,7 @@ public class VendorScoreDto {
     private Float capacityGrade;
     private Float physicalVerificationWeight;
     private Float physicalVerificationGrade;
+    private Float relevantExperienceWeight;
+    private Float relevantExperienceGrade;
     private Float totalScore;
 }
