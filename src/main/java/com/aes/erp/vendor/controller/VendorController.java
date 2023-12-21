@@ -168,7 +168,7 @@ public class VendorController {
     @PostMapping("/upload/{id}")
     public ResponseEntity<?> uploadFile(
             @PathVariable("id") Long id,
-            @RequestParam("file") Optional<MultipartFile> file
+            @RequestPart("file") Optional<MultipartFile> file
     ){
         return new ResponseEntity<>(
                 vendorService.uploadVendorFile(id,file),
