@@ -188,8 +188,8 @@ public class VendorController {
     }
 
 
-    private ByteArrayResource load(Long id, String filename) {
-            Optional<VendorFile> vendorFileOp = vendorService.getShopFile(id,filename);
+    private ByteArrayResource load(Long id,Long businessDetailId, String filename) {
+            Optional<VendorFile> vendorFileOp = vendorService.getShopFile(id,businessDetailId,filename);
             if(vendorFileOp.isEmpty()){
                 return null;
             }
@@ -211,12 +211,13 @@ public class VendorController {
     @GetMapping(value = "/images/{id}/{filename:.+}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<?> getImage(
             @PathVariable("id") Long id,
+            @PathVariable("businessDetailId") Long businessDetailId,
             @PathVariable String filename) {
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(
-                    load(id,filename)
+                    load(id,businessDetailId,filename)
                 );
 
     }

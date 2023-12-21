@@ -75,5 +75,5 @@ public interface VendorService {
 
     VendorDetailsDto getAllDetailsOfVendor(Long vendorId);
 
-    Optional<VendorFile> getShopFile(Long id, String filename);
+    Optional<VendorFile> getShopFile(Long id, Long bid, String filename);
 }

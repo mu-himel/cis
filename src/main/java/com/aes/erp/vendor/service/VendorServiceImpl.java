@@ -428,8 +428,8 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public Optional<VendorFile> getShopFile(Long id, String filename) {
-        return vendorFileRepository.findByVendorIdAndFileName(id,filename);
+    public Optional<VendorFile> getShopFile(Long id, Long bid, String filename) {
+        return vendorFileRepository.findByVendorIdAndBusinessDetailIdAndFileName(id,bid, filename);
     }
 
     @Override
