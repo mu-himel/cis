@@ -86,8 +86,8 @@ public class CategoryServiceImpl implements CategoryService {
             Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
             if(storeType.isPresent())category.setStoreType(storeType.get());
         }
-        category = categoryRepository.save(category);
-        addBrandToSubCategory(categoryRequestDto, category);
+
+
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalCategory = category;
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
@@ -97,6 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         category.setCreatedAt(Instant.now().toEpochMilli());
         categoryRepository.save(category);
+        addBrandToSubCategory(categoryRequestDto, category);
     }
 
     @Override
