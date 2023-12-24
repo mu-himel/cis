@@ -1,12 +1,13 @@
 package com.aes.erp.inventory.service;
 
-import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.StoreType;
-import com.aes.erp.inventory.entity.SubcategoryBrand;
+import com.aes.erp.inventory.entity.Brand;
+import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.repository.*;
+import com.aes.erp.vendor.entity.VendorSubCategory;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,9 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
     @Autowired
     private StoreTypeRepository storeTypeRepository;
 
@@ -40,32 +40,33 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryAttributeRepository categoryAttributeRepository;
 
-    public CategoryServiceImpl(GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository) {
+    public CategoryServiceImpl(BrandRepository brandRepository, GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository) {
+        this.brandRepository = brandRepository;
         this.genericModelMapper = genericModelMapper;
         this.subcategoryBrandRepository = subcategoryBrandRepository;
     }
 
-    public void setBrandToSubCategory(CategoryRequestDto dto, ItemCategory category){
+    public void addBrandToSubCategory(CategoryRequestDto dto, ItemCategory category){
         if(dto.getBrands() != null){
-            List<SubcategoryBrand> brandsToBeDeleted = new ArrayList<>();
-            for (SubcategoryBrand existingBrand : category.getBrands()) {
-                if (!dto.getBrands().contains(existingBrand.getName())) {
-                    brandsToBeDeleted.add(existingBrand);
-                }
-            }
-            for(SubcategoryBrand brand: brandsToBeDeleted){
-                subcategoryBrandRepository.deleteById(brand.getId());
-                category.getBrands().remove(brand);
-            }
+            Set<SubCategoryBrand> subCategoryBrands = new HashSet<>();
             for(String brandName: dto.getBrands()) {
-                Optional<SubcategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByIdAndSubCategory(brandName, category.getId());
-                if(!existingBrandOptional.isPresent()){
-                    SubcategoryBrand subcategoryBrand = new SubcategoryBrand();
-                    subcategoryBrand.setName(brandName);
-                    subcategoryBrand.setCategory(category);
-                    category.getBrands().add(subcategoryBrand);
+                Optional<SubCategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByNameAndSubCategoryId(brandName, category.getId());
+                if(existingBrandOptional.isEmpty()){
+                    SubCategoryBrand subcategoryBrand = new SubCategoryBrand();
+                    Optional<Brand> brandOptional = brandRepository.findByName(brandName);
+                    Brand brandToBeAdded = new Brand();
+                    if(brandOptional.isEmpty()){
+                        brandToBeAdded.setName(brandName);
+                        brandToBeAdded = brandRepository.save(brandToBeAdded);
+                    }
+                    else brandToBeAdded = brandOptional.get();
+                    subcategoryBrand.setBrand(brandToBeAdded);
+                    subcategoryBrand.setSubcategory(category);
+                    subcategoryBrand = subcategoryBrandRepository.save(subcategoryBrand);
+                    subCategoryBrands.add(subcategoryBrand);
                 }
             }
+            category.setSubcategoryBrands(subCategoryBrands);
         }
         //If Its a subcategory Brands Must be included.
         if(category.getParentCategory() != null && dto.getBrands() == null) throw new AesException("Brands must included to create a subcategory");
@@ -85,7 +86,8 @@ public class CategoryServiceImpl implements CategoryService {
             Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
             if(storeType.isPresent())category.setStoreType(storeType.get());
         }
-        setBrandToSubCategory(categoryRequestDto, category);
+        category = categoryRepository.save(category);
+        addBrandToSubCategory(categoryRequestDto, category);
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalCategory = category;
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
@@ -129,7 +131,8 @@ public class CategoryServiceImpl implements CategoryService {
             Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
             if(storeType.isPresent())itemCategory.setStoreType(storeType.get());
         }
-        setBrandToSubCategory(categoryRequestDto, itemCategory);
+        removeBrandsForSubCategory(itemCategory, categoryRequestDto.getBrands());
+        addBrandToSubCategory(categoryRequestDto, itemCategory);
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalItemCategory = itemCategory;
             itemCategory.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
@@ -141,6 +144,20 @@ public class CategoryServiceImpl implements CategoryService {
             itemCategory.setParentCategory(categoryRequestDto.getEntity().getParentCategory());
         }
         categoryRepository.save(itemCategory);
+    }
+    public void removeBrandsForSubCategory(ItemCategory itemCategory, List<String> brandNames){
+        if(brandNames != null){
+            List<SubCategoryBrand> subCategoryBrandsToBeDeleted = new ArrayList<>();
+            for (SubCategoryBrand subCategoryBrand : itemCategory.getSubcategoryBrands()) {
+                if(!brandNames.contains(subCategoryBrand.getBrand().getName())){
+                    subCategoryBrandsToBeDeleted.add(subCategoryBrand);
+                }
+            }
+            for(SubCategoryBrand subCategoryBrand: subCategoryBrandsToBeDeleted){
+                subcategoryBrandRepository.delete(subCategoryBrand);
+                itemCategory.getSubcategoryBrands().remove(subCategoryBrand);
+            }
+        }
     }
 
     @Override

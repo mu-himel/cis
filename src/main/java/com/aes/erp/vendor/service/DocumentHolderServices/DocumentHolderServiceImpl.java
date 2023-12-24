@@ -74,6 +74,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         }
         else{
             responseDto.setMsg("Document Holder Already Exists");
+            responseDto.setId(vendorOptional.get().getDocumentHolder().getId());
             return responseDto;
         }
     }

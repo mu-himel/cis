@@ -3,8 +3,6 @@ package com.aes.erp.inventory.dto.request;
 import com.aes.erp.common.EntityConvertible;
 import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.*;
-import com.aes.erp.inventory.service.SubcategoryBrandService;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
