@@ -400,7 +400,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public FileUploadResponse uploadVendorFile(Long id, Long businessDetailId, Optional<MultipartFile> file) {
+    public FileUploadResponse uploadVendorFile(Long id,  Optional<MultipartFile> file) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(id);
         if (vendorOptional.isEmpty()) {
             throw new AesException("Vendor not found");
@@ -418,7 +418,7 @@ public class VendorServiceImpl implements VendorService {
                         fileUploadResponse.getSize(),
                         fileUploadResponse.getMimeType(),
                         VendorDocType.NONE);
-                vendorFile.setBusinessDetails(new BusinessDetails(businessDetailId));
+//                vendorFile.setBusinessDetails(new BusinessDetails(businessDetailId));
                 vendorFiles.add(vendorFile);
             }
         }
@@ -428,8 +428,8 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public Optional<VendorFile> getShopFile(Long id, Long bid, String filename) {
-        return vendorFileRepository.findByVendorIdAndBusinessDetailsIdAndFileName(id,bid, filename);
+    public Optional<VendorFile> getShopFile(Long id,  String filename) {
+        return vendorFileRepository.findByVendorIdAndFileName(id, filename);
     }
 
     @Override
@@ -462,6 +462,7 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setBasicInformation(vendorProfileService.getVendorBasicInformation(vendor));
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));
+        profileDto.setVendorFileList(vendor.getFiles());
         if(!vendor.getName().isEmpty())profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
         if(vendor.getDocumentHolder() != null){
@@ -475,13 +476,16 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
+    @Transactional
     public void approveVendor(Long vendorId, VendorScoreDto dto) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(vendorId);
-        if(!vendorOptional.isPresent())throw new AesException("Vendor not found");
+        if(vendorOptional.isEmpty())throw new AesException("Vendor not found");
         Vendor vendor = vendorOptional.get();
+        VendorDocumentVerificationStatus e = vendor.getVerificationStatus();
 
-        if (dto.getEmployeeType() == EmployeeType.ENLISTER && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION){
+        if (dto.getEmployeeType().equals(EmployeeType.ENLISTER) && vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.PENDING_VERIFICATION)){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
+
         }
         if(dto.getEmployeeType()  == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);

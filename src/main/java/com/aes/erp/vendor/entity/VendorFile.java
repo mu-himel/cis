@@ -30,10 +30,6 @@ public class VendorFile {
     @JsonIgnore
     private Vendor vendor;
 
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "business_detail_id")
-    private BusinessDetails businessDetails;
 
     private String fileName;
 

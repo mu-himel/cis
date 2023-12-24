@@ -55,7 +55,7 @@ public interface VendorService {
                            Optional<MultipartFile> tradeLicense,
                            Optional<MultipartFile> quotationFormat);
 
-    FileUploadResponse uploadVendorFile(Long id, Long businessDetailId,Optional<MultipartFile> file);
+    FileUploadResponse uploadVendorFile(Long id,Optional<MultipartFile> file);
 
     void updateVendorStatus(Long id, VendorStatus status);
     VendorProfileDto getVendorProfile(Long userId);
@@ -75,5 +75,5 @@ public interface VendorService {
 
     VendorDetailsDto getAllDetailsOfVendor(Long vendorId);
 
-    Optional<VendorFile> getShopFile(Long id, Long bid, String filename);
+    Optional<VendorFile> getShopFile(Long id,  String filename);
 }

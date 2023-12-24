@@ -27,4 +27,8 @@ public class VendorScoreDto {
     private Float relevantExperienceGrade;
     private Float totalScore;
     private EmployeeType employeeType;
+
+    public void setEmployeeType(String employeeType) {
+        this.employeeType = EmployeeType.valueOf(employeeType);
+    }
 }

@@ -178,18 +178,17 @@ public class VendorController {
     @PostMapping("/upload/{id}")
     public ResponseEntity<?> uploadFile(
             @PathVariable("id") Long id,
-            @RequestParam("businessDetailId") Long businessDetailId,
             @RequestPart("file") Optional<MultipartFile> file
     ){
         return new ResponseEntity<>(
-                vendorService.uploadVendorFile(id,businessDetailId, file),
+                vendorService.uploadVendorFile(id,file),
                 HttpStatus.OK
         );
     }
 
 
-    private ByteArrayResource load(Long id,Long businessDetailId, String filename) {
-            Optional<VendorFile> vendorFileOp = vendorService.getShopFile(id,businessDetailId,filename);
+    private ByteArrayResource load(Long id, String filename) {
+            Optional<VendorFile> vendorFileOp = vendorService.getShopFile(id,filename);
             if(vendorFileOp.isEmpty()){
                 return null;
             }
@@ -217,7 +216,7 @@ public class VendorController {
                 .ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(
-                    load(id,businessDetailId,filename)
+                    load(id,filename)
                 );
 
     }

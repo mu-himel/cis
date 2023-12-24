@@ -31,8 +31,6 @@ public class BusinessDetails {
     @JoinColumn(name = "document_holder_id")
     private DocumentHolder documentHolder;
 
-    @OneToMany(mappedBy = "businessDetails",cascade = CascadeType.ALL)
-    private List<VendorFile> vendorFileList;
 
     public BusinessDetails(Long id) {
         this.id = id;

@@ -2,6 +2,7 @@ package com.aes.erp.vendor.dto;
 
 import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
+import com.aes.erp.vendor.entity.VendorFile;
 import com.aes.erp.vendor.entity.VendorScore;
 import lombok.Data;
 
@@ -19,5 +20,6 @@ public class VendorProfileDto {
     private List<String> permittedProducts = new ArrayList<>();
     private GeneralDetails generalDetails;
     private List<BusinessDetails> businessDetails;
+    private List<VendorFile> vendorFileList;
     private VendorScore vendorScore;
 }
