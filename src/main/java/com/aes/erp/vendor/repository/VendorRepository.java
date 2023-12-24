@@ -97,16 +97,31 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
         String getEmail();
 
-        VendorDocumentVerificationStatus getVendorVerifyStatus();
+        VendorDocumentVerificationStatus getVerificationStatus();
 
         VendorStatus getStatus();
         UserInfo getUser();
 
         ReferenceObjectDto getCategory();
-        ReferenceObjectDto getSubCategory();
+//        ReferenceObjectDto getSubCategory();
+
+        List<VendorSubCategoryInfo> getVendorSubCategories();
 
         List<VendorItem> getVendorItems();
         List<VendorFile> getFiles();
+    }
+
+    interface VendorSubCategoryInfo{
+        Long getId();
+        CategoryInfo getSubcategory();
+    }
+
+    interface CategoryInfo{
+        Long getId();
+        String getName();
+        String getCode();
+
+        CategoryInfo getParentCategory();
     }
 
     interface VendorFile{
