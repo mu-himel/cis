@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-public interface SubcategoryBrandService {
+interface BrandService {
     Page<?> getAllBrands(Optional<Integer> page, Optional<Integer> size);
     void create(String name);
 }

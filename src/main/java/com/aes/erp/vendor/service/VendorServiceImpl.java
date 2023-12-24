@@ -3,11 +3,8 @@ package com.aes.erp.vendor.service;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
-import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.SubcategoryBrand;
 import com.aes.erp.inventory.service.CategoryService;
-import com.aes.erp.inventory.service.ItemService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.*;
@@ -139,7 +136,7 @@ public class VendorServiceImpl implements VendorService {
         //Update SubCategory List For Vendor
         if(vendorDto.getSubCategory() != null && !vendorDto.getSubCategory().isEmpty()){
             //First Remove the Detached SubCategory for a vendor id any
-            RemoveSubCategoryListForVendor(vendor.getId(), vendor.getVendorSubCategories(), vendorDto.getSubCategory());
+            removeSubCategoryListForVendor(vendor.getId(), vendor.getVendorSubCategories(), vendorDto.getSubCategory());
             //Add the new SubCategories
             for(Long subCategoryId: vendorDto.getSubCategory()){
                 VendorSubCategory vendorSubCategory = vendorSubCategoryRepository.findByVendorIdAndSubCategoryId(vendor.getId(), subCategoryId);
@@ -162,7 +159,7 @@ public class VendorServiceImpl implements VendorService {
         }
         vendorRepository.save(vendor);
     }
-    public void RemoveSubCategoryListForVendor(Long vendorId, Set<VendorSubCategory> subCategoryList, List<Long> subCategoryIdList){
+    public void removeSubCategoryListForVendor(Long vendorId, Set<VendorSubCategory> subCategoryList, List<Long> subCategoryIdList){
         if(subCategoryIdList != null){
             List<VendorSubCategory> subCategoriesToBeDeleted = new ArrayList<>();
             for (VendorSubCategory category : subCategoryList) {

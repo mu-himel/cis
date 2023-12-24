@@ -2,21 +2,13 @@ package com.aes.erp.inventory.entity;
 
 
 import com.aes.erp.vendor.entity.Vendor;
-import com.aes.erp.vendor.entity.VendorSubCategory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiParam;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +19,7 @@ import java.util.Set;
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"subcategoryBrands"})
 @Table(name = "item_categories")
 public class ItemCategory {
 
@@ -41,6 +33,8 @@ public class ItemCategory {
   @Column(unique = true, name="code")
   private String code;
 
+  @OneToMany(mappedBy = "subcategory", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  private Set<SubCategoryBrand> subcategoryBrands = new HashSet<>();
   @ManyToOne
   private ItemCategory parentCategory;
   @ManyToOne(fetch = FetchType.EAGER)
@@ -53,8 +47,6 @@ public class ItemCategory {
 
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
   private List<CategoryAttribute> attributes;
-  @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-  private List<SubcategoryBrand> brands = new ArrayList<>();
 
   private Boolean active=true;
 

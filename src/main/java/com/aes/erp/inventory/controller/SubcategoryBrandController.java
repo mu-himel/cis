@@ -1,6 +1,6 @@
 package com.aes.erp.inventory.controller;
 
-import com.aes.erp.inventory.service.SubcategoryBrandService;
+import com.aes.erp.inventory.service.BrandServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +11,10 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/item-categories/brands")
 public class SubcategoryBrandController {
-    private final SubcategoryBrandService brandService;
 
-    public SubcategoryBrandController(SubcategoryBrandService brandService) {
+    private final BrandServiceImpl brandService;
+
+    public SubcategoryBrandController(BrandServiceImpl brandService) {
         this.brandService = brandService;
     }
 
