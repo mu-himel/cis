@@ -31,14 +31,14 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             "WHERE v.id=:id")
     Optional<Vendor> findById(Long id);
 
-    @Query(value = "SELECT DISTINCT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt LEFT JOIN FETCH v.category c LEFT JOIN FETCH v.vendorSubCategories " +
+    @Query(value = "SELECT DISTINCT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt LEFT JOIN FETCH v.category c " +
             "WHERE v.verificationStatus NOT IN ('APPROVED','VERIFIED')" +
             "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
             "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
             "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
             "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
             "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)",
-            countQuery = "SELECT COUNT(DISTINCT v) FROM Vendor v LEFT JOIN v.vendorType vt LEFT JOIN v.category c LEFT JOIN v.vendorSubCategories " +
+            countQuery = "SELECT COUNT(DISTINCT v) FROM Vendor v LEFT JOIN v.vendorType vt LEFT JOIN v.category c " +
                     "WHERE v.verificationStatus NOT IN ('APPROVED','VERIFIED') " +
                     "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
                     "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
@@ -57,8 +57,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
     @Query(value = "SELECT v FROM Vendor v " +
             " LEFT JOIN FETCH v.vendorType vt " +
             " LEFT JOIN FETCH v.category c " +
-
-            " LEFT JOIN FETCH v.vendorSubCategories sc" +
             " WHERE v.verificationStatus IN (:status)" +
             "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
             "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
@@ -68,7 +66,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             countQuery =  "SELECT count(v) FROM Vendor v " +
                     " LEFT JOIN v.vendorType vt " +
                     " LEFT JOIN v.category c " +
-                    " LEFT JOIN v.vendorSubCategories sc" +
                     " WHERE v.verificationStatus IN (:status)" +
                     "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
                     "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
@@ -162,6 +159,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
         VendorType getVendorType();
         ItemCategory getCategory();
-        List<VendorSubCategory> getVendorSubCategories();
+//        List<VendorSubCategory> getVendorSubCategories();
     }
 }
