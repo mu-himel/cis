@@ -3,6 +3,7 @@ package com.aes.erp.vendor.repository;
 import com.aes.erp.employee.entity.Employee;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.entity.VendorSubCategory;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
@@ -25,14 +26,14 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             "WHERE v.id=:id")
     Optional<Vendor> findById(Long id);
 
-    @Query(value = "SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt LEFT JOIN FETCH v.category c LEFT JOIN FETCH v.subCategoryList sc " +
+    @Query(value = "SELECT DISTINCT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt LEFT JOIN FETCH v.category c LEFT JOIN FETCH v.vendorSubCategories " +
             "WHERE v.verificationStatus NOT IN ('APPROVED','VERIFIED')" +
             "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
             "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
             "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
             "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
             "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)",
-            countQuery = "SELECT COUNT(v) FROM Vendor v LEFT JOIN v.vendorType vt LEFT JOIN v.category c LEFT JOIN v.subCategoryList sc " +
+            countQuery = "SELECT COUNT(DISTINCT v) FROM Vendor v LEFT JOIN v.vendorType vt LEFT JOIN v.category c LEFT JOIN v.vendorSubCategories " +
                     "WHERE v.verificationStatus NOT IN ('APPROVED','VERIFIED') " +
                     "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
                     "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
@@ -46,15 +47,17 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                                     @Param("vendorStatus") String vendorStatus,
                                     Pageable pageable);
 
+
+
     @Query(value = "SELECT v FROM Vendor v " +
             " LEFT JOIN FETCH v.vendorType vt " +
             " LEFT JOIN FETCH v.category c " +
-            " LEFT JOIN FETCH v.subCategoryList sc " +
+            " LEFT JOIN FETCH v.vendorSubCategories sc" +
             " WHERE v.verificationStatus IN (:status)",
             countQuery =  "SELECT count(v) FROM Vendor v " +
                     " LEFT JOIN v.vendorType vt " +
                     " LEFT JOIN v.category c " +
-                    " LEFT JOIN v.subCategoryList sc " +
+                    " LEFT JOIN v.vendorSubCategories sc" +
                     " WHERE v.verificationStatus IN (:status)"
     )
     Page<VendorInfo> findAllVendorForStatus(@Param("status") VendorDocumentVerificationStatus status, Pageable pageable);
@@ -131,6 +134,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
         VendorType getVendorType();
         ItemCategory getCategory();
-        List<ItemCategory> getSubCategoryList();
+        List<VendorSubCategory> getVendorSubCategories();
     }
 }

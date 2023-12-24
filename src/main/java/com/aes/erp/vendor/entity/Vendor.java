@@ -9,15 +9,16 @@ import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Entity
+@EqualsAndHashCode(exclude = {"vendorSubCategories"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class Vendor implements DtoConvertable<VendorDto> {
@@ -54,10 +55,6 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @OneToOne
     private ItemCategory category;
 
-    ///Need switching to ManyToMany
-    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
-    private List<ItemCategory> subCategoryList = new ArrayList<>();
-
     @OneToMany(cascade = CascadeType.ALL)
     private List<VendorItem> vendorItems;
     @OneToOne(fetch = FetchType.LAZY)
@@ -65,6 +62,9 @@ public class Vendor implements DtoConvertable<VendorDto> {
     private Date startedAt;
     @OneToOne
     private VendorScore vendorScore;
+
+    @OneToMany(mappedBy = "vendor", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private Set<VendorSubCategory> vendorSubCategories = new HashSet<>();;
     @Override
     @JsonIgnore
     public VendorDto getDto() {

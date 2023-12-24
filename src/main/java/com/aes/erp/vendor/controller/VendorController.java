@@ -33,7 +33,7 @@ public class VendorController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getVendor(@PathVariable("id") Long id) {
         return new ResponseEntity<>(
-                vendorService.getVendorDetail(id),
+                vendorService.getVendorDetail(id).get(),
                 HttpStatus.OK
         );
     }
@@ -159,5 +159,10 @@ public class VendorController {
     @GetMapping("/details/{id}")
     public ResponseEntity<?> getAllDetailsOfVendor(@PathVariable("id") Long id){
         return new ResponseEntity<>(vendorService.getAllDetailsOfVendor(id), HttpStatus.OK);
+    }
+    @DeleteMapping("{vendorId}/subcategory/{subCategoryId}")
+    public ResponseEntity<?> removeSubCategoryForVendor(@PathVariable("vendorId") Long vendorId, @PathVariable("subCategoryId") Long subCategoryId){
+        vendorService.removeSubCategoryFromVendor(vendorId, subCategoryId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -11,19 +11,13 @@ import com.aes.erp.inventory.service.ItemService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.*;
+import com.aes.erp.vendor.entity.*;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
-import com.aes.erp.vendor.entity.Vendor;
-import com.aes.erp.vendor.entity.VendorFile;
-import com.aes.erp.vendor.entity.VendorScore;
-import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
-import com.aes.erp.vendor.repository.GeneralDetailsRepository;
-import com.aes.erp.vendor.repository.VendorFileRepository;
-import com.aes.erp.vendor.repository.VendorRepository;
-import com.aes.erp.vendor.repository.VendorScoreRepository;
+import com.aes.erp.vendor.repository.*;
 import com.aes.erp.vendor.utils.EmailSenderUtil;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static org.hibernate.tool.schema.SchemaToolingLogging.LOGGER;
 
 @Service
 public class VendorServiceImpl implements VendorService {
@@ -50,6 +43,7 @@ public class VendorServiceImpl implements VendorService {
     private VendorRepository vendorRepository;
     @Autowired
     private VendorProfileService vendorProfileService;
+    private final VendorSubCategoryRepository vendorSubCategoryRepository;
     private final GenericModelMapper modelMapper;
 
     @Autowired
@@ -67,8 +61,9 @@ public class VendorServiceImpl implements VendorService {
 
 
 
-    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, GenericModelMapper modelMapper, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
+    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, VendorSubCategoryRepository vendorSubCategoryRepository, GenericModelMapper modelMapper, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
         this.emailSenderUtil = emailSenderUtil;
+        this.vendorSubCategoryRepository = vendorSubCategoryRepository;
         this.modelMapper = modelMapper;
         this.categoryService = categoryService;
         this.generalDetailsRepository = generalDetailsRepository;
@@ -92,20 +87,21 @@ public class VendorServiceImpl implements VendorService {
         Vendor vendor = vendorDto.getEntity();
         vendor.setStatus(VendorStatus.CREATED);
         vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
-        //Set SubCategory List For Vendor
+        //Create SubCategory List For Vendor
         if(vendorDto.getSubCategory() != null && !vendorDto.getSubCategory().isEmpty()){
-           List<ItemCategory> subCategoryList = new ArrayList<>();
-           for(Long id: vendorDto.getSubCategory()){
-               Optional<ItemCategory> existingItemCategory = categoryService.getItemCategory(id);
-               if(existingItemCategory.isPresent()){
-                   ItemCategory previousReference = existingItemCategory.get();
-                   ItemCategory itemCategory = new ItemCategory();
-                   setNewItemCategory(previousReference, itemCategory);
-                   itemCategory.setVendor(vendor);
-                   itemCategory = categoryService.addCategoryFromCategoryEntity(itemCategory);
-                   subCategoryList.add(itemCategory);
-               }
-           }
+            Set<VendorSubCategory> newSubcategorySet = new HashSet<>();
+            for(Long id: vendorDto.getSubCategory()){
+                Optional<ItemCategory> existingItemCategory = categoryService.getItemCategory(id);
+                if(existingItemCategory.isPresent()){
+                    ItemCategory previousReference = existingItemCategory.get();
+                    VendorSubCategory vendorSubCategory = new VendorSubCategory();
+                    vendorSubCategory.setSubcategory(previousReference);
+                    vendorSubCategory.setVendor(vendor);
+                    vendorSubCategory = vendorSubCategoryRepository.save(vendorSubCategory);
+                    newSubcategorySet.add(vendorSubCategory);
+                }
+            }
+            vendor.setVendorSubCategories(newSubcategorySet);
         }
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
         vendor.setVendorType(vendorDto.getVendorType());
@@ -116,27 +112,6 @@ public class VendorServiceImpl implements VendorService {
         VendorRegistrationMailSender senderBody = new VendorRegistrationMailSender(vendor.getEmail());
         senderBody.setContent(senderBody.getContent() +  "Email: " + vendorDto.getEmail() + "\n" + "Password: " + vendorDto.getPassword());
         emailSenderUtil.sendMail(senderBody);
-    }
-    public void setNewItemCategory(ItemCategory refCat, ItemCategory destination){
-        destination.setName(refCat.getName());
-        destination.setCopiedFrom(refCat.getId());
-        if(refCat.getParentCategory() != null){
-            destination.setParentCategory(refCat.getParentCategory());
-        }
-        if(refCat.getStoreType() != null)destination.setStoreType(refCat.getStoreType());
-        if(refCat.getActive() != null)destination.setActive(refCat.getActive());
-//        if(!refCat.getBrands().isEmpty())destination.setBrands(refCat.getBrands());
-//        if(!refCat.getAttributes().isEmpty()){
-//            List<CategoryAttribute> attributeList = new ArrayList<>();
-//            for(CategoryAttribute attribute : refCat.getAttributes()){
-//                CategoryAttribute newAttribute = new CategoryAttribute();
-//                newAttribute = attribute;
-//                newAttribute.setCategory(null);
-//                attributeList.add(newAttribute);
-//            }
-//            destination.setAttributes(attributeList);
-//        }
-//        if(!refCat.getBudgets().isEmpty())destination.setBudgets(refCat.getBudgets());
     }
 
     @Override
@@ -161,11 +136,24 @@ public class VendorServiceImpl implements VendorService {
         if(vendorDto.getCategory() != null){
             vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
         }
-        //Set SubCategory List For Vendor
+        //Update SubCategory List For Vendor
         if(vendorDto.getSubCategory() != null && !vendorDto.getSubCategory().isEmpty()){
-            List<ItemCategory> subCategoryList = new ArrayList<>();
-            subCategoryList = updateSubCategoryListForVendor(vendor, id, vendor.getSubCategoryList(), vendorDto.getSubCategory());
-            vendor.setSubCategoryList(subCategoryList);
+            //First Remove the Detached SubCategory for a vendor id any
+            RemoveSubCategoryListForVendor(vendor.getId(), vendor.getVendorSubCategories(), vendorDto.getSubCategory());
+            //Add the new SubCategories
+            for(Long subCategoryId: vendorDto.getSubCategory()){
+                VendorSubCategory vendorSubCategory = vendorSubCategoryRepository.findByVendorIdAndSubCategoryId(vendor.getId(), subCategoryId);
+                if(vendorSubCategory == null){
+                    Optional<ItemCategory> existingItemCategory = categoryService.getItemCategory(subCategoryId);
+                    if(existingItemCategory.isPresent()){
+                        ItemCategory previousReference = existingItemCategory.get();
+                        vendorSubCategory = new VendorSubCategory();
+                        vendorSubCategory.setSubcategory(previousReference);
+                        vendorSubCategory.setVendor(vendor);
+                        vendorSubCategoryRepository.save(vendorSubCategory);
+                    }
+                }
+            }
         }
         if(vendorDto.getVendorType() != null){
             VendorType vendorType = new VendorType();
@@ -174,58 +162,57 @@ public class VendorServiceImpl implements VendorService {
         }
         vendorRepository.save(vendor);
     }
-    public List<ItemCategory> updateSubCategoryListForVendor(Vendor vendor, Long vendorId, List<ItemCategory> subCategoryList, List<Long> subCategoryIdList){
+    public void RemoveSubCategoryListForVendor(Long vendorId, Set<VendorSubCategory> subCategoryList, List<Long> subCategoryIdList){
         if(subCategoryIdList != null){
-            List<ItemCategory> subCategoriesToBeDeleted = new ArrayList<>();
-            for (ItemCategory category : subCategoryList) {
-                if(!subCategoryIdList.contains(category.getId())){
+            List<VendorSubCategory> subCategoriesToBeDeleted = new ArrayList<>();
+            for (VendorSubCategory category : subCategoryList) {
+                if(!subCategoryIdList.contains(category.getSubcategory().getId())){
                     subCategoriesToBeDeleted.add(category);
                 }
             }
-            for(ItemCategory ic: subCategoriesToBeDeleted){
-                categoryService.deleteCategory(ic.getId());
+            for(VendorSubCategory ic: subCategoriesToBeDeleted){
+                removeSubCategoryFromVendor(vendorId, ic.getSubcategory().getId());
                 subCategoryList.remove(ic);
             }
-            for(Long id: subCategoryIdList) {
-                Optional<ItemCategory> existingCategoryOptional = categoryService.getCategoryForAVendor(vendorId, id);
-                if(!existingCategoryOptional.isPresent()){
-                    Optional<ItemCategory> refCat = categoryService.findRootReferenceItem(id);
-                    ItemCategory refCategory = refCat.get();
-                    ItemCategory newItem = new ItemCategory();
-                    setNewItemCategory(refCategory, newItem);
-                    newItem.setVendor(vendor);
-                    newItem = categoryService.addCategoryFromCategoryEntity(newItem);
-                    subCategoryList.add(newItem);
-                }
-            }
         }
-        return subCategoryList;
     }
     @Override
     public void deleteVendor(Long id) {
         vendorRepository.deleteById(id);
     }
-
     @Override
-    public Page<?> getVendors(Optional<Integer> page, Optional<Integer> size,
-                                        Optional<String> name,
-                                        Optional<String> email,
-                                        Optional<String> phone,
-                                        Optional<String> vendorType,
-                                        Optional<String> vendorStatus
-    ) {
-        Sort sort = Sort.by(Sort.Direction.DESC,"id");
-        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendors(
-                name.orElse(null),
-                email.orElse(null),
-                phone.orElse(null),
-                vendorType.orElse(null),
-                vendorStatus.orElse(null),
-                pageable
-        );
+    public void removeSubCategoryFromVendor(Long vendorId, Long subCategoryId){
+        VendorSubCategory vendorSubCategory = vendorSubCategoryRepository.findByVendorIdAndSubCategoryId(vendorId, subCategoryId);
+        if(vendorSubCategory == null) throw new AesException("No such sub category found for this vendor");
+        vendorSubCategoryRepository.deleteById(vendorSubCategory.getId());
     }
 
+    @Override
+    public Page<?> getVendors(
+            Optional<Integer> page,
+            Optional<Integer> size,
+            Optional<String> name,
+            Optional<String> email,
+            Optional<String> phone,
+            Optional<String> vendorType,
+            Optional<String> vendorStatus
+    ) {
+        try {
+            Sort sort = Sort.by(Sort.Direction.DESC, "id");
+            Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
+            return vendorRepository.findAllVendors(
+                    name.orElse(null),
+                    email.orElse(null),
+                    phone.orElse(null),
+                    vendorType.orElse(null),
+                    vendorStatus.orElse(null),
+                    pageable
+            );
+        } catch (Exception e) {
+            LOGGER.error("Error in getVendors method", e);
+            throw e; // rethrow the exception after logging
+        }
+    }
     @Override
     public Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
@@ -261,10 +248,10 @@ public class VendorServiceImpl implements VendorService {
        if(vendorEntity.getVendorType() != null) dto.setVendorType(vendorEntity.getVendorType().toString());
        if(vendorEntity.getName() != null)dto.setVendorName(vendorEntity.getName());
        if(vendorEntity.getCategory() != null)dto.setVendorCategory(vendorEntity.getCategory().getName());
-       if(!vendorEntity.getSubCategoryList().isEmpty()){
+       if(!vendorEntity.getVendorSubCategories().isEmpty()){
            List<String> subCategories = new ArrayList<>();
-           for(ItemCategory item: vendorEntity.getSubCategoryList()){
-               String subCategoryName = item.getName();
+           for(VendorSubCategory item: vendorEntity.getVendorSubCategories()){
+               String subCategoryName = item.getSubcategory().getName();
                subCategories.add(subCategoryName);
            }
            dto.setSubCategories(subCategories);
@@ -372,10 +359,12 @@ public class VendorServiceImpl implements VendorService {
         vendor.setStatus(status);
 
     }
-    public void setPermittedProductsForVendor(VendorProfileDto dto, List<ItemCategory> categoryList){
-        for(ItemCategory subCategory: categoryList){
-            Optional<ItemCategory> refCategory = categoryService.getItemCategory(subCategory.getCopiedFrom());
-            refCategory.ifPresent(category -> dto.getPermittedProducts().add(subCategory.getName() + category.getCode()));
+    public void setPermittedProductsForVendor(VendorProfileDto dto, Set<VendorSubCategory> categoryList){
+        for(VendorSubCategory vendorSubCategory: categoryList){
+            ItemCategory subCategory = vendorSubCategory.getSubcategory();
+            if(subCategory != null){
+                dto.getPermittedProducts().add(subCategory.getName() + subCategory.getCode());
+            }
         }
     }
     @Override
@@ -384,7 +373,7 @@ public class VendorServiceImpl implements VendorService {
         if(vendorOptional.isEmpty())throw new AesException("Vendor couldn't be found with this user Id");
         Vendor vendor = vendorOptional.get();
         VendorProfileDto profileDto = new VendorProfileDto();
-        setPermittedProductsForVendor(profileDto, vendor.getSubCategoryList());
+        setPermittedProductsForVendor(profileDto, vendor.getVendorSubCategories());
         profileDto.setBasicInformation(vendorProfileService.getVendorBasicInformation(vendor));
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));

@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public interface VendorService {
     Optional<?> getVendorDetail(Long vendorId);
+    public void removeSubCategoryFromVendor(Long vendorId, Long subCategoryId);
     void createVendor(VendorDto vendorDto);
 
     void updateVendor(Long id, VendorDto vendorDto);
