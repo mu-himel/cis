@@ -173,7 +173,9 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         VendorDocumentVerificationStatus getVerificationStatus();
 
         VendorType getVendorType();
-        ItemCategory getCategory();
+        CategoryInfo getCategory();
 //        List<VendorSubCategory> getVendorSubCategories();
     }
+
+
 }
