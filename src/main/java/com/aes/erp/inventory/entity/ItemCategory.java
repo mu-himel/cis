@@ -2,7 +2,9 @@ package com.aes.erp.inventory.entity;
 
 
 import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.entity.VendorSubCategory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
 import lombok.*;
@@ -16,7 +18,9 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -63,9 +67,6 @@ public class ItemCategory {
   @JsonIgnore
   @ManyToOne
   private Vendor vendor;
-  private Long copiedFrom;
-
-
   public ItemCategory(Long id) {
     this.id = id;
   }
