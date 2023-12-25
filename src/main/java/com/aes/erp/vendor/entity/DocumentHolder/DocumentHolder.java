@@ -4,7 +4,9 @@ import com.aes.erp.vendor.entity.DocmentEntities.*;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "document_holders")
@@ -18,7 +20,7 @@ public class DocumentHolder {
     private String name;
 
     @OneToMany(mappedBy = "documentHolder")
-    private List<Document> documentList;
+    private Set<Document> documentList = new HashSet<>();
     @OneToOne
     private NIDDocument nidDocument;
     @OneToOne
@@ -34,5 +36,17 @@ public class DocumentHolder {
     @OneToOne
     private GeneralDetails generalDetails;
 
+    public void addDocument(Document document) {
+        if (document != null) {
+            documentList.add(document);
+            document.setDocumentHolder(this);
+        }
+    }
+    public void removeDocument(Document document) {
+        if (document != null) {
+            documentList.remove(document);
+            document.setDocumentHolder(null); // Remove the reference to this DocumentHolder
+        }
+    }
 
 }

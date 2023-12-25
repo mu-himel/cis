@@ -3,6 +3,7 @@ package com.aes.erp.vendor.service;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.document_response_dto.*;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.repository.DocumentHolderRepository;
 import com.aes.erp.vendor.service.DocumentServices.DocumentService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
@@ -45,11 +46,11 @@ public class VendorDocumentValidationService {
         //Starting an Asynchronous Task
         //Creating a document Entity first
         Document document = new Document();
-        document.setDocumentHolder(documentHolderRepository.getReferenceById(documentHolderId));
+        DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
         document.setContentType(file.getContentType());
         multipartFileToBytes(file, document);
         document.setName(fileName);
-
+        document.setFileName(file.getName());
         String url = "";
         String result = "";
         if(fileName.equals("TIN")){
@@ -81,7 +82,10 @@ public class VendorDocumentValidationService {
            }
            else{
                document.setResultFromMachineLearning(result);
-               documentService.create(document);
+               document = documentService.create(document);
+               removePreviousSameTypeDocument(documentHolder, document.getDocumentType());
+               documentHolder.addDocument(document);
+               documentHolderRepository.save(documentHolder);
                //Finishing The asynchronous task
                return mapToDto(result, fileName);
            }
@@ -112,5 +116,11 @@ public class VendorDocumentValidationService {
             default -> null;
         };
     }
-
+    public void removePreviousSameTypeDocument(DocumentHolder documentHolder, DocumentType documentType){
+        for(Document document : documentHolder.getDocumentList()){
+            if(documentType.equals(document.getDocumentType())){
+                documentHolder.removeDocument(document);
+            }
+        }
+    }
 }

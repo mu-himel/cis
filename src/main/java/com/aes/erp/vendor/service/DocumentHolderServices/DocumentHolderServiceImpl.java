@@ -73,8 +73,13 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             return responseDto;
         }
         else{
+            DocumentHolder documentHolder = vendorOptional.get().getDocumentHolder();
             responseDto.setMsg("Document Holder Already Exists");
-            responseDto.setId(vendorOptional.get().getDocumentHolder().getId());
+            responseDto.setId(documentHolder.getId());
+            if (documentHolder.getDocumentList() != null && !documentHolder.getDocumentList().isEmpty()) {
+                responseDto.setDocumentsList(new HashSet<>(documentHolder.getDocumentList()));
+            }
+
             return responseDto;
         }
     }
@@ -207,23 +212,23 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
 
     private DocumentHolderResponseDto mapEntityToDTO(DocumentHolder documentHolder) {
         DocumentHolderResponseDto responseDto = new DocumentHolderResponseDto();
-        if(documentHolder.getName() != null && !documentHolder.getName().isEmpty()){
+        if(documentHolder.getName() != null){
             responseDto.setDocumentHolderName(documentHolder.getName());
         }
         if(documentHolder.getId() != null)responseDto.setId(documentHolder.getId());
-        if(documentHolder.getBinDocument()!= null && !documentHolder.getBinDocument().getBin().isEmpty()){
+        if(documentHolder.getBinDocument()!= null ){
             responseDto.setBinNumber(documentHolder.getBinDocument().getBin());
         }
-        if(documentHolder.getBankSolvencyDocument()!= null && !documentHolder.getBankSolvencyDocument().getAccount().isEmpty()){
+        if(documentHolder.getBankSolvencyDocument()!= null){
             responseDto.setBankAccountNumber(documentHolder.getBankSolvencyDocument().getAccount());
         }
-        if(documentHolder.getTinDocument() != null && !documentHolder.getTinDocument().getTin().isEmpty()){
+        if(documentHolder.getTinDocument() != null){
             responseDto.setTinNumber(documentHolder.getTinDocument().getTin());
         }
-        if(documentHolder.getNidDocument()!= null && !documentHolder.getNidDocument().getNid().isEmpty()){
+        if(documentHolder.getNidDocument()!= null){
             responseDto.setNidNumber(documentHolder.getNidDocument().getNid());
         }
-        if(documentHolder.getTradeDocument()!= null && !documentHolder.getTradeDocument().getTradeLicenseNumber().isEmpty()){
+        if(documentHolder.getTradeDocument()!= null ){
             responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
         }
         return responseDto;
