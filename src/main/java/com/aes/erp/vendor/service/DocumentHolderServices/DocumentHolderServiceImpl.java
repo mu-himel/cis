@@ -3,14 +3,17 @@ package com.aes.erp.vendor.service.DocumentHolderServices;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.document_response_dto.*;
 import com.aes.erp.vendor.dto.BusinessDetailsDto;
+import com.aes.erp.vendor.dto.ExtractedInformationDto;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorScore;
+import com.aes.erp.vendor.entity.VendorSubCategory;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.repository.*;
 import com.aes.erp.vendor.service.DocumentServices.*;
+import com.aes.erp.vendor.service.VendorDocumentValidationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ import java.util.*;
 @Service
 public class DocumentHolderServiceImpl implements DocumentHolderService{
     private final DocumentHolderRepository documentHolderRepository;
+    private final VendorDocumentValidationService vendorDocumentValidationService;
     private final TINService tinService;
     private final BinService binService;
     private final VendorRepository vendorRepository;
@@ -32,10 +36,12 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
 
     private final BusinessDetailsRepository businessDetailsRepository;
     private final GeneralDetailsRepository generalDetailsRepository;
+    private final DocumentRepository documentRepository;
     ModelMapper modelMapper = new ModelMapper();
 
-    public DocumentHolderServiceImpl(DocumentHolderRepository documentHolderRepository, TINService tinService, BinService binService, VendorRepository vendorRepository, TradeLicenseService tradeLicenseService, NIDService nidService, BankSolvencyService bankSolvencyService, VendorScoreRepository vendorScoreRepository, BusinessDetailsRepository businessDetailsRepository, GeneralDetailsRepository generalDetailsRepository) {
+    public DocumentHolderServiceImpl(DocumentHolderRepository documentHolderRepository, VendorDocumentValidationService vendorDocumentValidationService, TINService tinService, BinService binService, VendorRepository vendorRepository, TradeLicenseService tradeLicenseService, NIDService nidService, BankSolvencyService bankSolvencyService, VendorScoreRepository vendorScoreRepository, BusinessDetailsRepository businessDetailsRepository, GeneralDetailsRepository generalDetailsRepository, DocumentRepository documentRepository) {
         this.documentHolderRepository = documentHolderRepository;
+        this.vendorDocumentValidationService = vendorDocumentValidationService;
         this.tinService = tinService;
         this.binService = binService;
         this.vendorRepository = vendorRepository;
@@ -45,6 +51,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         this.vendorScoreRepository = vendorScoreRepository;
         this.businessDetailsRepository = businessDetailsRepository;
         this.generalDetailsRepository = generalDetailsRepository;
+        this.documentRepository = documentRepository;
     }
 
 
@@ -76,9 +83,9 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             DocumentHolder documentHolder = vendorOptional.get().getDocumentHolder();
             responseDto.setMsg("Document Holder Already Exists");
             responseDto.setId(documentHolder.getId());
-            if (documentHolder.getDocumentList() != null && !documentHolder.getDocumentList().isEmpty()) {
-                responseDto.setDocumentsList(new HashSet<>(documentHolder.getDocumentList()));
-            }
+//            if (documentHolder.getDocumentList() != null && !documentHolder.getDocumentList().isEmpty()) {
+//                responseDto.setDocumentsList(new HashSet<>(documentHolder.getDocumentList()));
+//            }
 
             return responseDto;
         }
@@ -127,7 +134,12 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     @Override
     public DocumentHolderResponseDto getDocumentHolderById(Long id) {
         DocumentHolder documentHolder = documentHolderRepository.getReferenceById(id);
-        return mapEntityToDTO(documentHolder);
+        Optional<Vendor> vendorOptional = vendorRepository.findByDocumentHolderId(id);
+        Vendor vendor = new Vendor();
+        if(vendorOptional.isPresent()){
+            vendor = vendorOptional.get();
+        }
+        return mapEntityToDTO(documentHolder, vendor);
     }
 
     @Override
@@ -159,6 +171,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         return misMatchResponseDto;
     }
 
+
     @Override
     public void addHolderDetails(DetailsDTO dto, Long userId,  Long documentHolderId) {
         Optional<Vendor> vendorOptional = vendorRepository.findByUserId(userId);
@@ -177,16 +190,56 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             newBusinessDetails = businessDetailsRepository.save(newBusinessDetails);
             businessDetailsList.add(newBusinessDetails);
         }
+        GeneralDetails generalDetails = modelMapper.map(dto.getGeneralDetails(), GeneralDetails.class);
+        generalDetails.setDocumentHolder(documentHolder);
+        generalDetails = generalDetailsRepository.save(generalDetails);
+        documentHolder.setGeneralDetails(generalDetails);
+        documentHolder = documentHolderRepository.save(documentHolder);
+        vendor.setDocumentHolder(documentHolder);
+        vendorRepository.save(vendor);
+    }
+
+    @Override
+    public void updateHolderDetails(DetailsDTO dto, Long documentHolderId) {
+        DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
+        List<BusinessDetails> businessDetailsList = new ArrayList<>();
+        for(BusinessDetailsDto details: dto.getBusinessDetails()){
+            BusinessDetails previousBusinessDetails = businessDetailsRepository.getReferenceById(details.getId());
+            previousBusinessDetails.setBusinessType(details.getBusinessType());
+            previousBusinessDetails.setAnnualVolume(details.getAnnualVolume());
+            previousBusinessDetails.setNumberOfYear(details.getNumberOfYear());
+            previousBusinessDetails.setWorkOrderFile(details.getWorkOrderFile());
+            previousBusinessDetails.setOrgName(details.getOrgName());
+            previousBusinessDetails.setDocumentHolder(documentHolder);
+            previousBusinessDetails = businessDetailsRepository.save(previousBusinessDetails);
+            businessDetailsList.add(previousBusinessDetails);
+        }
+        documentHolder.getBusinessDetailsRecords().clear();
         documentHolder.setBusinessDetailsRecords(businessDetailsList);
         GeneralDetails generalDetails = modelMapper.map(dto.getGeneralDetails(), GeneralDetails.class);
         generalDetails.setDocumentHolder(documentHolder);
-        generalDetailsRepository.save(generalDetails);
-//        generalDetails = generalDetailsRepository.save(generalDetails);
-//        documentHolder.setGeneralDetails(generalDetails);
-//        documentHolder = documentHolderRepository.save(documentHolder);
-//        vendor.setDocumentHolder(documentHolder);
-//        vendorRepository.save(vendor);
+        generalDetails = generalDetailsRepository.save(generalDetails);
+        documentHolder.setGeneralDetails(generalDetails);
+        documentHolderRepository.save(documentHolder);
     }
+
+    @Override
+    public ExtractedInformationDto getHolderExtractedDetailsForConfirmation(Long id) {
+        ExtractedInformationDto dto = new ExtractedInformationDto();
+        List<DocumentType> allDocTypes = Arrays.asList(DocumentType.BIN, DocumentType.TIN, DocumentType.NID, DocumentType.BANK_SOLVENCY, DocumentType.TRADE);
+        for(DocumentType type: allDocTypes){
+            Document document = documentRepository.getDocumentByDocumentHolderId(id, type.ordinal());
+            if(document != null){
+                if(type == DocumentType.BANK_SOLVENCY)dto.setSolvency(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+                else if(type == DocumentType.NID)dto.setNid(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+                else if(type == DocumentType.BIN)dto.setBin(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+                else if(type == DocumentType.TIN)dto.setTin(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+                else if(type == DocumentType.TRADE)dto.setTrade(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+            }
+        }
+        return dto;
+    }
+
     public int calculateYearsOfBusiness(DocumentHolder documentHolder){
         Timestamp issueDateBin = documentHolder.getBinDocument().getIssueDate();
         if(issueDateBin == null)issueDateBin = Timestamp.from(Instant.now());
@@ -210,7 +263,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         vendorRepository.save(vendor);
     }
 
-    private DocumentHolderResponseDto mapEntityToDTO(DocumentHolder documentHolder) {
+    private DocumentHolderResponseDto mapEntityToDTO(DocumentHolder documentHolder, Vendor vendor) {
         DocumentHolderResponseDto responseDto = new DocumentHolderResponseDto();
         if(documentHolder.getName() != null){
             responseDto.setDocumentHolderName(documentHolder.getName());
@@ -230,6 +283,24 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         }
         if(documentHolder.getTradeDocument()!= null ){
             responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
+        }
+        if(documentHolder.getBusinessDetailsRecords() != null && !documentHolder.getBusinessDetailsRecords().isEmpty()){
+            responseDto.setBusinessDetailsRecords(documentHolder.getBusinessDetailsRecords());
+        }
+        Optional<GeneralDetails> generalDetails = generalDetailsRepository.findByDocumentHolderId(documentHolder.getId());
+        generalDetails.ifPresent(responseDto::setGeneralDetails);
+        if(vendor != null){
+            if(vendor.getCategory() != null){
+                responseDto.setCategory(vendor.getCategory().getName());
+            }
+            if(vendor.getVendorType() != null){
+                responseDto.setVendorType(vendor.getVendorType().getName());
+            }
+            if(vendor.getVendorSubCategories() != null){
+                for(VendorSubCategory subCategory: vendor.getVendorSubCategories()){
+                    responseDto.getVendorSubCategories().add(subCategory.getSubcategory().getName());
+                }
+            }
         }
         return responseDto;
     }

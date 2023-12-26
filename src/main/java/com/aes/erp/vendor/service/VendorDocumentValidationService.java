@@ -47,10 +47,11 @@ public class VendorDocumentValidationService {
         //Creating a document Entity first
         Document document = new Document();
         DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
+        document.setDocumentHolder(documentHolder);
         document.setContentType(file.getContentType());
         multipartFileToBytes(file, document);
         document.setName(fileName);
-        document.setFileName(file.getName());
+        document.setFileName(file.getOriginalFilename());
         String url = "";
         String result = "";
         if(fileName.equals("TIN")){
@@ -82,10 +83,7 @@ public class VendorDocumentValidationService {
            }
            else{
                document.setResultFromMachineLearning(result);
-               document = documentService.create(document);
-               removePreviousSameTypeDocument(documentHolder, document.getDocumentType());
-               documentHolder.addDocument(document);
-               documentHolderRepository.save(documentHolder);
+               documentService.create(document);
                //Finishing The asynchronous task
                return mapToDto(result, fileName);
            }

@@ -5,6 +5,7 @@ import com.aes.erp.vendor.entity.VendorFile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.util.List;
 @Table(name = "business_details")
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = {"documentHolder"})
 @AllArgsConstructor
 public class BusinessDetails {
     @Id

@@ -3,11 +3,13 @@ package com.aes.erp.vendor.entity.DocmentEntities;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "tin")
+@EqualsAndHashCode(exclude = "documentHolder")
 public class TINDocument {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

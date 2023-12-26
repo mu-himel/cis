@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class BusinessDetailsDto {
+    private Long id;
     private String orgName;
     private String businessType;
     private String numberOfYear;

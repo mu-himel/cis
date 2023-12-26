@@ -39,4 +39,13 @@ public class DocumentHolderController {
         documentHolderService.addHolderDetails(dto, userId, id);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+    @PutMapping("update-details/{id}")
+    public ResponseEntity<?> updateHolderDetails(@PathVariable("id") Long id, @RequestBody DetailsDTO dto){
+        documentHolderService.updateHolderDetails(dto, id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    @GetMapping("information/{id}")
+    public ResponseEntity<?> getHolderInformation(@PathVariable("id") Long id){
+        return new ResponseEntity<>(documentHolderService.getHolderExtractedDetailsForConfirmation(id), HttpStatus.OK);
+    }
 }
