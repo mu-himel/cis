@@ -132,8 +132,7 @@ public class CategoryServiceImpl implements CategoryService {
             Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
             if(storeType.isPresent())itemCategory.setStoreType(storeType.get());
         }
-        removeBrandsForSubCategory(itemCategory, categoryRequestDto.getBrands());
-        addBrandToSubCategory(categoryRequestDto, itemCategory);
+
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalItemCategory = itemCategory;
             itemCategory.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
@@ -145,6 +144,8 @@ public class CategoryServiceImpl implements CategoryService {
             itemCategory.setParentCategory(categoryRequestDto.getEntity().getParentCategory());
         }
         categoryRepository.save(itemCategory);
+        removeBrandsForSubCategory(itemCategory, categoryRequestDto.getBrands());
+        addBrandToSubCategory(categoryRequestDto, itemCategory);
     }
     public void removeBrandsForSubCategory(ItemCategory itemCategory, List<String> brandNames){
         if(brandNames != null){
