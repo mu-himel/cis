@@ -4,6 +4,7 @@ import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
+import com.aes.erp.inventory.dto.response.ItemCategoryDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.user_management.entity.User;
@@ -457,6 +458,16 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setVendorFileList(vendor.getFiles());
         if(!vendor.getName().isEmpty())profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
+        if(vendor.getVendorSubCategories() != null){
+            List<ItemCategoryDto> itemCategories = new ArrayList<>();
+            for(VendorSubCategory vendorSubCategory: vendor.getVendorSubCategories()){
+                ItemCategoryDto itemCategoryDto = new ItemCategoryDto();
+                itemCategoryDto.setName(vendorSubCategory.getSubcategory().getName());
+                itemCategoryDto.setId(vendorSubCategory.getSubcategory().getId());
+                itemCategories.add(itemCategoryDto);
+            }
+            profileDto.setVendorSubCategories(itemCategories);
+        }
         if(vendor.getDocumentHolder() != null){
             DocumentHolder documentHolder = vendor.getDocumentHolder();
             if(documentHolder.getBusinessDetailsRecords() != null)profileDto.setBusinessDetails(vendor.getDocumentHolder().getBusinessDetailsRecords());

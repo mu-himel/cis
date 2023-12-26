@@ -1,5 +1,7 @@
 package com.aes.erp.vendor.dto;
 
+import com.aes.erp.inventory.dto.response.ItemCategoryDto;
+import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.VendorFile;
@@ -22,4 +24,5 @@ public class VendorProfileDto {
     private List<BusinessDetails> businessDetails;
     private List<VendorFile> vendorFileList;
     private VendorScore vendorScore;
+    private List<ItemCategoryDto> vendorSubCategories = new ArrayList<>();
 }
