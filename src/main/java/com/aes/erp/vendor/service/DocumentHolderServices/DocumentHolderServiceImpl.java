@@ -78,12 +78,14 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             vendorRepository.save(vendor);
             responseDto.setId(documentHolder.getId());
             responseDto.setMsg("Document Holder Created");
+            responseDto.setDocumentHolderStatus(documentHolder.getDocumentHolderStatus());
             return responseDto;
         }
         else{
             DocumentHolder documentHolder = vendorOptional.get().getDocumentHolder();
             responseDto.setMsg("Document Holder Already Exists");
             responseDto.setId(documentHolder.getId());
+            responseDto.setDocumentHolderStatus(documentHolder.getDocumentHolderStatus());
 //            if (documentHolder.getDocumentList() != null && !documentHolder.getDocumentList().isEmpty()) {
 //                responseDto.setDocumentsList(new HashSet<>(documentHolder.getDocumentList()));
 //            }
