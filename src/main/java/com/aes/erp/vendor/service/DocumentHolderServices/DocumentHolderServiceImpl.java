@@ -87,7 +87,6 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
 //            if (documentHolder.getDocumentList() != null && !documentHolder.getDocumentList().isEmpty()) {
 //                responseDto.setDocumentsList(new HashSet<>(documentHolder.getDocumentList()));
 //            }
-
             return responseDto;
         }
     }
@@ -242,12 +241,14 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     }
 
     @Override
-    public void updateDocumentHolderStatus(Long id, DocumentHolderStatus status) {
+    public DocumentHolder updateDocumentHolderStatus(Long id, DocumentHolderStatus status) {
         Optional<DocumentHolder> documentHolderOptional = documentHolderRepository.findById(id);
-        if(documentHolderOptional.isPresent()){
-            DocumentHolder documentHolder = documentHolderOptional.get();
-            documentHolder.setDocumentHolderStatus(status);
+        if(documentHolderOptional.isEmpty()){
+            throw new AesException("No document holder found with this id. Status couldn't be updated");
         }
+        DocumentHolder documentHolder = documentHolderOptional.get();
+        documentHolder.setDocumentHolderStatus(status);
+        return documentHolderRepository.save(documentHolder);
     }
 
     public int calculateYearsOfBusiness(DocumentHolder documentHolder){

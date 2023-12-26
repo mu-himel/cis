@@ -479,18 +479,19 @@ public class VendorServiceImpl implements VendorService {
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
             if(vendor.getDocumentHolder() != null){
                 DocumentHolder documentHolder = vendor.getDocumentHolder();
-                documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_ENLISTER);
+                documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_ENLISTER);
+                vendor.setDocumentHolder(documentHolder);
             }
         }
         if(dto.getEmployeeType()  == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
             if(vendor.getDocumentHolder() != null){
                 DocumentHolder documentHolder = vendor.getDocumentHolder();
-                documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_AUDITOR);
+                documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_AUDITOR);
+                vendor.setDocumentHolder(documentHolder);
             }
             vendor.setStatus(VendorStatus.ENABLED);
         }
-
         vendorRepository.save(vendor);
     }
 
