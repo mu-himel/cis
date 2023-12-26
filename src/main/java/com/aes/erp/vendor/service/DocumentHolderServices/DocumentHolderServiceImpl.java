@@ -135,7 +135,9 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
 
     @Override
     public DocumentHolderResponseDto getDocumentHolderById(Long id) {
-        DocumentHolder documentHolder = documentHolderRepository.getReferenceById(id);
+        Optional<DocumentHolder> documentHolderOptional = documentHolderRepository.findById(id);
+        if(documentHolderOptional.isEmpty()) throw new AesException("No Document Holder found with this id");
+        DocumentHolder documentHolder = documentHolderOptional.get();
         Optional<Vendor> vendorOptional = vendorRepository.findByDocumentHolderId(id);
         Vendor vendor = new Vendor();
         if(vendorOptional.isPresent()){
