@@ -24,6 +24,8 @@ public class BankSolvencyDto {
     private String bankName;
     @JsonProperty("Routing No")
     private String routingNo;
+    @JsonProperty("Error")
+    private String error;
 
 
     public BankSolvencyDocument dtoToEntityMapping(BankSolvencyDto dto, BankSolvencyDocument bankSolvencyDocument){

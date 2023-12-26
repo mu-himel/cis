@@ -4,6 +4,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.Document;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolderStatus;
 import lombok.Data;
 
 import javax.persistence.OneToMany;
@@ -28,5 +29,6 @@ public class DocumentHolderResponseDto {
     private List<BusinessDetails> businessDetailsRecords;
     private GeneralDetails generalDetails;
     private String msg;
+    private DocumentHolderStatus documentHolderStatus;
 //    private Set<Document> documentsList = new HashSet<>();
 }

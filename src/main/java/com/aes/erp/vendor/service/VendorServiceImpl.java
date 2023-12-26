@@ -13,13 +13,16 @@ import com.aes.erp.vendor.dto.*;
 import com.aes.erp.vendor.entity.*;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolderStatus;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.repository.*;
+import com.aes.erp.vendor.service.DocumentHolderServices.DocumentHolderService;
 import com.aes.erp.vendor.utils.EmailSenderUtil;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +48,9 @@ public class VendorServiceImpl implements VendorService {
     private VendorProfileService vendorProfileService;
     private final VendorSubCategoryRepository vendorSubCategoryRepository;
     private final GenericModelMapper modelMapper;
+    @Autowired
+    @Lazy
+    private  DocumentHolderService documentHolderService;
 
     @Autowired
     private FileUploadService fileUploadService;
@@ -471,10 +477,17 @@ public class VendorServiceImpl implements VendorService {
 
         if (dto.getEmployeeType().equals(EmployeeType.ENLISTER) && vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.PENDING_VERIFICATION)){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
-
+            if(vendor.getDocumentHolder() != null){
+                DocumentHolder documentHolder = vendor.getDocumentHolder();
+                documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_ENLISTER);
+            }
         }
         if(dto.getEmployeeType()  == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
+            if(vendor.getDocumentHolder() != null){
+                DocumentHolder documentHolder = vendor.getDocumentHolder();
+                documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_AUDITOR);
+            }
             vendor.setStatus(VendorStatus.ENABLED);
         }
 

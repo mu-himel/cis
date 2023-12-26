@@ -6,6 +6,7 @@ import com.aes.erp.vendor.dto.BusinessDetailsDto;
 import com.aes.erp.vendor.dto.ExtractedInformationDto;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolderStatus;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorScore;
 import com.aes.erp.vendor.entity.VendorSubCategory;
@@ -240,6 +241,15 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         return dto;
     }
 
+    @Override
+    public void updateDocumentHolderStatus(Long id, DocumentHolderStatus status) {
+        Optional<DocumentHolder> documentHolderOptional = documentHolderRepository.findById(id);
+        if(documentHolderOptional.isPresent()){
+            DocumentHolder documentHolder = documentHolderOptional.get();
+            documentHolder.setDocumentHolderStatus(status);
+        }
+    }
+
     public int calculateYearsOfBusiness(DocumentHolder documentHolder){
         Timestamp issueDateBin = documentHolder.getBinDocument().getIssueDate();
         if(issueDateBin == null)issueDateBin = Timestamp.from(Instant.now());
@@ -265,6 +275,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
 
     private DocumentHolderResponseDto mapEntityToDTO(DocumentHolder documentHolder, Vendor vendor) {
         DocumentHolderResponseDto responseDto = new DocumentHolderResponseDto();
+        responseDto.setDocumentHolderStatus(documentHolder.getDocumentHolderStatus());
         if(documentHolder.getName() != null){
             responseDto.setDocumentHolderName(documentHolder.getName());
         }

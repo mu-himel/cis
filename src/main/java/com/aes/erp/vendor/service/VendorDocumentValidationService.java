@@ -76,17 +76,17 @@ public class VendorDocumentValidationService {
         }
         try{
             result = restClient.postPdfFile(documentHolderId, fileName, file, orgName, url);
+            document.setResultFromMachineLearning(result);
+            documentService.create(document);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(result);
-           if(result == null || jsonNode.has("Error")){
+            if(result == null || jsonNode.has("Error")){
                throw new AesException("Wrong document uploaded");
-           }
-           else{
-               document.setResultFromMachineLearning(result);
-               documentService.create(document);
+            }
+            else{
                //Finishing The asynchronous task
                return mapToDto(result, fileName);
-           }
+            }
         }catch(Error | IOException e){
             System.out.println(e.getMessage());
             throw new AesException("Document information extraction process failed. Error -->" + e.getMessage());

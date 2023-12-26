@@ -35,6 +35,8 @@ public class DocumentHolder {
     private List<BusinessDetails> businessDetailsRecords;
     @OneToOne
     private GeneralDetails generalDetails;
+    @Enumerated(EnumType.STRING)
+    private DocumentHolderStatus documentHolderStatus = DocumentHolderStatus.CREATED;
 
     public void addDocument(Document document) {
         if (document != null) {

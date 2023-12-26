@@ -31,6 +31,8 @@ public class TradeLicenseDto {
     @JsonProperty("None")
     @JsonIgnore
     private String ignore;
+    @JsonProperty("Error")
+    private String error;
 
     public TradeDocument dtoToEntityMapping(TradeLicenseDto dto, TradeDocument tradeDocument){
         if(dto.getIssueDate() != null)tradeDocument.setIssueDate(new Timestamp(dto.getIssueDate().getTime()));
