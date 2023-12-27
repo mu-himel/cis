@@ -43,4 +43,9 @@ public class VendorTypeServiceImpl implements VendorTypeService{
     public void deleteVendorType(Long id) {
         vendorTypeRepository.deleteById(id);
     }
+
+    @Override
+    public Long getVendorTypeCount() {
+        return vendorTypeRepository.count();
+    }
 }

@@ -12,6 +12,9 @@ import com.aes.erp.user_management.entity.Role;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.RoleService;
 import com.aes.erp.user_management.service.UserService;
+import com.aes.erp.vendor.entity.VendorType;
+import com.aes.erp.vendor.service.VendorServiceImpl;
+import com.aes.erp.vendor.service.VendorTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -46,6 +49,9 @@ public class DataSeed implements CommandLineRunner {
     @Autowired
     private ModuleAccessPermissionService moduleAccessPermissionService;
 
+    @Autowired
+    private VendorTypeService vendorTypeService;
+
     @Override
     public void run(String... args) throws Exception {
         this.init();
@@ -61,6 +67,7 @@ public class DataSeed implements CommandLineRunner {
         this.initUserAccounts();
         this.assignUserToRole();
         this.initModules();
+        this.initVendorTypes();
     }
 
     private void initRoles(){
@@ -134,6 +141,18 @@ public class DataSeed implements CommandLineRunner {
         Long count = moduleAccessService.initModuleAccess();
         if(count==0) {
             moduleAccessPermissionService.initModulePermissions();
+        }
+    }
+
+    private void initVendorTypes(){
+        Long count = vendorTypeService.getVendorTypeCount();
+        if(count == 0){
+            vendorTypeService.createVendorType(new VendorType("MANUFACTURER"));
+            vendorTypeService.createVendorType(new VendorType("SUPPLIER"));
+            vendorTypeService.createVendorType(new VendorType("GENERAL"));
+            vendorTypeService.createVendorType(new VendorType("TRADER"));
+            vendorTypeService.createVendorType(new VendorType("SERVICE PROVIDER"));
+            vendorTypeService.createVendorType(new VendorType("CONTRACTOR"));
         }
     }
 }

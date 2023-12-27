@@ -17,6 +17,7 @@ import com.aes.erp.vendor.service.DocumentServices.*;
 import com.aes.erp.vendor.service.VendorDocumentValidationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -245,13 +246,19 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     }
 
     @Override
+    @Transactional
     public DocumentHolder updateDocumentHolderStatus(Long id, DocumentHolderStatus status) {
         Optional<DocumentHolder> documentHolderOptional = documentHolderRepository.findById(id);
         if(documentHolderOptional.isEmpty()){
             throw new AesException("No document holder found with this id. Status couldn't be updated");
         }
         DocumentHolder documentHolder = documentHolderOptional.get();
+
         documentHolder.setDocumentHolderStatus(status);
+        if(status==DocumentHolderStatus.DOCUMENTS_SUBMITTED) {
+            Optional<Vendor> vendorOptional = vendorRepository.findByDocumentHolderId(documentHolder.getId());
+            vendorOptional.ifPresent(vendor -> vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION));
+        }
         return documentHolderRepository.save(documentHolder);
     }
 

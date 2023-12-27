@@ -17,5 +17,7 @@ public interface VendorTypeService {
 
     void deleteVendorType(Long id);
 
+    Long getVendorTypeCount();
+
 
 }
