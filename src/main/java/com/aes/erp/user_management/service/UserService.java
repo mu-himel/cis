@@ -18,6 +18,7 @@ import com.aes.erp.user_management.entity.UserCredentialToRole;
 import com.aes.erp.user_management.user_credential.entity.PasswordResetToken;
 import com.aes.erp.user_management.user_credential.entity.UserCredential;
 import com.aes.erp.user_management.user_credential.service.PasswordTokenRepository;
+import com.aes.erp.user_management.user_credential.service.UserCredentialRepository;
 import com.aes.erp.vendor.dto.VendorDto;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -51,6 +52,8 @@ public class UserService {
     private final Authorization authorization;
     private final PasswordTokenRepository passwordTokenRepository;
     private final UserCredentialToRoleRepository userCredentialToRoleRepository;
+
+    private final UserCredentialRepository userCredentialRepository;
 
     private final RoleService roleService;
 
@@ -267,6 +270,7 @@ public class UserService {
         return userRepository.findByEmailAddress(userDetails.getUsername()).orElse(null);
     }
 
+    @Transactional
     public void createSuperAdmin() {
         User user = new User();
         user.setEmailAddress("superadmin@mail.com");
@@ -277,7 +281,9 @@ public class UserService {
         userCredential.setEmailAddress(user.getEmailAddress());
         userCredential.setPassword(passwordEncoder.encode("12345678"));
         userCredential.setActive(true);
+        userCredentialRepository.save(userCredential);
         user.setUserCredential(userCredential);
+
 
         UserCredentialToRole userCredentialToRole = new UserCredentialToRole();
         userCredentialToRole.setUserCredential(userCredential);
