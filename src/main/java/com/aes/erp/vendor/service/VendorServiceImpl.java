@@ -443,7 +443,7 @@ public class VendorServiceImpl implements VendorService {
         for(VendorSubCategory vendorSubCategory: categoryList){
             ItemCategory subCategory = vendorSubCategory.getSubcategory();
             if(subCategory != null){
-                dto.getPermittedProducts().add(subCategory.getName() + subCategory.getCode());
+                dto.getPermittedProducts().add(subCategory.getName() +" "+ subCategory.getCode());
             }
         }
     }
@@ -464,7 +464,7 @@ public class VendorServiceImpl implements VendorService {
             List<ItemCategoryDto> itemCategories = new ArrayList<>();
             for(VendorSubCategory vendorSubCategory: vendor.getVendorSubCategories()){
                 ItemCategoryDto itemCategoryDto = new ItemCategoryDto();
-                itemCategoryDto.setName(vendorSubCategory.getSubcategory().getName());
+                itemCategoryDto.setName(vendorSubCategory.getSubcategory().getCode()+" "+vendorSubCategory.getSubcategory().getName());
                 itemCategoryDto.setId(vendorSubCategory.getSubcategory().getId());
                 itemCategories.add(itemCategoryDto);
             }
