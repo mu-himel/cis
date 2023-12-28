@@ -12,6 +12,6 @@ RUN useradd -ms /bin/bash appuser
 USER appuser
 
 # set the startup command to execute the jar
-EXPOSE 8080
+EXPOSE 8082
 
 ENTRYPOINT ["java", "-jar", "/app.jar"]
