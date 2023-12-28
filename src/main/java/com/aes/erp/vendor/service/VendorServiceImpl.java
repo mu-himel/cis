@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.hibernate.tool.schema.SchemaToolingLogging.LOGGER;
@@ -270,8 +271,7 @@ public class VendorServiceImpl implements VendorService {
                                       ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendorForStatus(
-                VendorDocumentVerificationStatus.APPROVED,
+        return vendorRepository.findAllVendorForComplete(
                 name.orElse(null),
                 email.orElse(null),
                 phone.orElse(null),
@@ -439,11 +439,25 @@ public class VendorServiceImpl implements VendorService {
         vendor.setStatus(status);
 
     }
+
+    @Override
+    @Transactional
+    public void rejectVendor(Long id) {
+        Optional<Vendor> vendorOptional = vendorRepository.findById(id);
+        if(vendorOptional.isEmpty()){
+            throw new AesException("Sorry! Vendor is not found");
+        }
+        Vendor vendor = vendorOptional.get();
+        vendor.getUser().getUserCredential().setActive(false);
+        vendor.setStatus(VendorStatus.DISABLED);
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.REJECTED);
+    }
+
     public void setPermittedProductsForVendor(VendorProfileDto dto, Set<VendorSubCategory> categoryList){
         for(VendorSubCategory vendorSubCategory: categoryList){
             ItemCategory subCategory = vendorSubCategory.getSubcategory();
             if(subCategory != null){
-                dto.getPermittedProducts().add(subCategory.getName() + subCategory.getCode());
+                dto.getPermittedProducts().add(subCategory.getName() +" "+ subCategory.getCode());
             }
         }
     }
@@ -464,7 +478,7 @@ public class VendorServiceImpl implements VendorService {
             List<ItemCategoryDto> itemCategories = new ArrayList<>();
             for(VendorSubCategory vendorSubCategory: vendor.getVendorSubCategories()){
                 ItemCategoryDto itemCategoryDto = new ItemCategoryDto();
-                itemCategoryDto.setName(vendorSubCategory.getSubcategory().getName());
+                itemCategoryDto.setName(vendorSubCategory.getSubcategory().getCode()+" "+vendorSubCategory.getSubcategory().getName());
                 itemCategoryDto.setId(vendorSubCategory.getSubcategory().getId());
                 itemCategories.add(itemCategoryDto);
             }
@@ -490,6 +504,7 @@ public class VendorServiceImpl implements VendorService {
 
         if (dto.getEmployeeType().equals(EmployeeType.ENLISTER) && vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.PENDING_VERIFICATION)){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
+            vendor.setVerificationDate(LocalDate.now());
             if(vendor.getDocumentHolder() != null){
                 DocumentHolder documentHolder = vendor.getDocumentHolder();
                 documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_ENLISTER);
@@ -498,6 +513,7 @@ public class VendorServiceImpl implements VendorService {
         }
         if(dto.getEmployeeType()  == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
+            vendor.setApprovedDate(LocalDate.now());
             if(vendor.getDocumentHolder() != null){
                 DocumentHolder documentHolder = vendor.getDocumentHolder();
                 documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_AUDITOR);

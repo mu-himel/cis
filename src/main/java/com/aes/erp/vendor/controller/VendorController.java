@@ -236,6 +236,13 @@ public class VendorController {
         approvalDto.setMessage("Approved");
         return new ResponseEntity<>(approvalDto, HttpStatus.OK);
     }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<?> rejectVendor(@PathVariable("id") Long id){
+        vendorService.rejectVendor(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @GetMapping("/details/{id}")
     public ResponseEntity<?> getAllDetailsOfVendor(@PathVariable("id") Long id){
         return new ResponseEntity<>(vendorService.getAllDetailsOfVendor(id), HttpStatus.OK);

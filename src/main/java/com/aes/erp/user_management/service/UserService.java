@@ -273,7 +273,7 @@ public class UserService {
     @Transactional
     public void createSuperAdmin() {
         User user = new User();
-        user.setEmailAddress("superadmin@mail.com");
+        user.setEmailAddress("superadmin@gmail.com");
         user.setFirstName("Super");
         user.setLastName("Admin");
 

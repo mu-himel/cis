@@ -77,4 +77,6 @@ public interface VendorService {
     VendorDetailsDto getAllDetailsOfVendor(Long vendorId);
 
     Optional<VendorFile> getShopFile(Long id,  String filename);
+
+    void rejectVendor(Long id);
 }
