@@ -15,6 +15,7 @@ import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -38,6 +39,10 @@ public class Vendor implements DtoConvertable<VendorDto> {
 
     @Enumerated(EnumType.STRING)
     private VendorDocumentVerificationStatus verificationStatus;
+
+    private LocalDate verificationDate;
+
+    private LocalDate approvedDate;
 
 
     @Enumerated(EnumType.STRING)

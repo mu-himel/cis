@@ -32,14 +32,14 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
     Optional<Vendor> findById(Long id);
 
     @Query(value = "SELECT DISTINCT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt LEFT JOIN FETCH v.category c " +
-            "WHERE v.verificationStatus NOT IN ('APPROVED','VERIFIED')" +
+            "WHERE v.verificationStatus NOT IN ('APPROVED','VERIFIED','REJECTED')" +
             "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
             "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
             "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
             "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
             "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)",
             countQuery = "SELECT COUNT(DISTINCT v) FROM Vendor v LEFT JOIN v.vendorType vt LEFT JOIN v.category c " +
-                    "WHERE v.verificationStatus NOT IN ('APPROVED','VERIFIED') " +
+                    "WHERE v.verificationStatus NOT IN ('APPROVED','VERIFIED','REJECTED') " +
                     "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
                     "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
                     "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
@@ -80,6 +80,34 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                                             @Param("vendorType") String vendorType,
                                             @Param("vendorStatus") String vendorStatus,
                     Pageable pageable);
+
+
+    @Query(value = "SELECT v FROM Vendor v " +
+            " LEFT JOIN FETCH v.vendorType vt " +
+            " LEFT JOIN FETCH v.category c " +
+            " WHERE v.verificationStatus IN ('APPROVED','REJECTED')" +
+            "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+            "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
+            "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
+            "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
+            "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)",
+            countQuery =  "SELECT count(v) FROM Vendor v " +
+                    " LEFT JOIN v.vendorType vt " +
+                    " LEFT JOIN v.category c " +
+                    " WHERE v.verificationStatus IN ('APPROVED','REJECTED')" +
+                    "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+                    "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
+                    "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
+                    "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
+                    "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)"
+    )
+    Page<VendorInfo> findAllVendorForComplete(
+                                            @Param("name") String name,
+                                            @Param("email") String email,
+                                            @Param("phone") String phone,
+                                            @Param("vendorType") String vendorType,
+                                            @Param("vendorStatus") String vendorStatus,
+                                            Pageable pageable);
 
 
     @Query("SELECT v FROM Vendor v LEFT JOIN FETCH v.vendorType vt " +

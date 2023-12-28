@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class VendorIdentificationDto {
     private String nid;
+    private String ownerName;
     private String tin;
     private String bin;
     private String trade;

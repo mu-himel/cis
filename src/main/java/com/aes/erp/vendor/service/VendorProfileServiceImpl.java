@@ -47,6 +47,7 @@ public class VendorProfileServiceImpl implements VendorProfileService{
                 identificationDto.setNidFile(nidDocument.getFile());
                 identificationDto.setNidContentType(nidDocument.getContentType());
                 identificationDto.setNid(documentHolder.getNidDocument().getNid());
+                identificationDto.setOwnerName(documentHolder.getNidDocument().getEName());
             }
             Document tinDocument = documentHolder.getTinDocument().getDocument();
             if(tinDocument != null){
