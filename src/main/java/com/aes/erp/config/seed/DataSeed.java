@@ -74,6 +74,7 @@ public class DataSeed implements CommandLineRunner {
         List<String> roleNames = new ArrayList<>();
         roleNames.add("SYS_ADMIN");
         roleNames.add("VENDOR");
+        roleNames.add("EMPLOYEE");
         roleNames.add("ENLISTER");
         roleNames.add("AUDITOR");
         List<Role> roles = roleService.getRoleByRoleNames(roleNames);
