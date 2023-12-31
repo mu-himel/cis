@@ -1,5 +1,9 @@
 package com.aes.erp.config.seed;
 
+
+import com.aes.erp.inventory.entity.AttributeUnit;
+import com.aes.erp.inventory.repository.AttributeUnitRepository;
+import com.aes.erp.inventory.service.CategoryAttributeService;
 import com.aes.erp.module_access.service.ModuleAccessPermissionService;
 import com.aes.erp.module_access.service.ModuleAccessService;
 import com.aes.erp.organogram_system.entity.Department;
@@ -52,6 +56,9 @@ public class DataSeed implements CommandLineRunner {
     @Autowired
     private VendorTypeService vendorTypeService;
 
+    @Autowired
+    private AttributeUnitRepository attributeUnitRepository;
+
     @Override
     public void run(String... args) throws Exception {
         this.init();
@@ -68,6 +75,7 @@ public class DataSeed implements CommandLineRunner {
         this.assignUserToRole();
         this.initModules();
         this.initVendorTypes();
+        this.initAttributeUnits();
     }
 
     private void initRoles(){
@@ -154,6 +162,22 @@ public class DataSeed implements CommandLineRunner {
             vendorTypeService.createVendorType(new VendorType("TRADER"));
             vendorTypeService.createVendorType(new VendorType("SERVICE PROVIDER"));
             vendorTypeService.createVendorType(new VendorType("CONTRACTOR"));
+        }
+    }
+
+    private void initAttributeUnits(){
+        Long count = attributeUnitRepository.count();
+        if(count == 0){
+            List<AttributeUnit> attributeUnits = new ArrayList<>();
+            attributeUnits.add(new AttributeUnit(1L, "GB"));
+            attributeUnits.add(new AttributeUnit(2L, "Pcs"));
+            attributeUnits.add(new AttributeUnit(3L, "Kg"));
+            attributeUnits.add(new AttributeUnit(4L, "meter"));
+            attributeUnits.add(new AttributeUnit(5L, "cm"));
+            attributeUnits.add(new AttributeUnit(6L, "ltr"));
+            attributeUnits.add(new AttributeUnit(7L, "gallon"));
+            attributeUnits.add(new AttributeUnit(7L, "None"));
+            attributeUnitRepository.saveAll(attributeUnits);
         }
     }
 }
