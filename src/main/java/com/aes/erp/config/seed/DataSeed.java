@@ -176,7 +176,7 @@ public class DataSeed implements CommandLineRunner {
             attributeUnits.add(new AttributeUnit(5L, "cm"));
             attributeUnits.add(new AttributeUnit(6L, "ltr"));
             attributeUnits.add(new AttributeUnit(7L, "gallon"));
-            attributeUnits.add(new AttributeUnit(7L, "None"));
+            attributeUnits.add(new AttributeUnit(8L, "None"));
             attributeUnitRepository.saveAll(attributeUnits);
         }
     }
