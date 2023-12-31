@@ -20,15 +20,17 @@ public interface ItemQuery {
             "   AND (:stockThresholdQty IS NULL OR i.stockThresholdQty = :stockThresholdQty) " +
             "GROUP BY i";
 
-    String countItemsWithSearch = "SELECT count(i) FROM Item i " +
-            "LEFT JOIN i.stocks s " +
-            "LEFT JOIN i.itemCategory ic " +
-            "LEFT JOIN i.itemParentCategory ipc " +
-            "WHERE i.active=1 AND (:name IS NULL OR i.name LIKE concat(:name,'%')) " +
-            "   AND (:code IS NULL OR i.code LIKE concat(:code,'%')) " +
-            "   AND (:subCategoryId IS NULL OR ic.id = :subCategoryId) " +
-            "   AND (:categoryId IS NULL OR ipc.id = :categoryId) " +
-            "   AND (:reorderPercentage IS NULL OR i.reorderPercentage = :reorderPercentage) " +
-            "   AND (:stockThresholdQty IS NULL OR i.stockThresholdQty = :stockThresholdQty) " +
-            " GROUP BY i";
+    String countItemsWithSearch = """
+            SELECT count(i) FROM Item i 
+            LEFT JOIN i.stocks s
+            LEFT JOIN i.itemCategory ic
+            LEFT JOIN i.itemParentCategory ipc
+            WHERE i.active=1 AND (:name IS NULL OR i.name LIKE concat(:name,'%'))
+               AND (:code IS NULL OR i.code LIKE concat(:code,'%'))
+               AND (:subCategoryId IS NULL OR ic.id = :subCategoryId)
+               AND (:categoryId IS NULL OR ipc.id = :categoryId)
+               AND (:reorderPercentage IS NULL OR i.reorderPercentage = :reorderPercentage)
+               AND (:stockThresholdQty IS NULL OR i.stockThresholdQty = :stockThresholdQty)
+             GROUP BY i
+             """;
 }
