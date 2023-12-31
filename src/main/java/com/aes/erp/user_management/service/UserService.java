@@ -271,15 +271,15 @@ public class UserService {
     }
 
     @Transactional
-    public void createSuperAdmin() {
+    public void createSuperAdmin(String username, String pass) {
         User user = new User();
-        user.setEmailAddress("superadmin@gmail.com");
+        user.setEmailAddress(username);
         user.setFirstName("Super");
         user.setLastName("Admin");
 
         UserCredential userCredential = new UserCredential();
         userCredential.setEmailAddress(user.getEmailAddress());
-        userCredential.setPassword(passwordEncoder.encode("12345678"));
+        userCredential.setPassword(passwordEncoder.encode(pass));
         userCredential.setActive(true);
         userCredentialRepository.save(userCredential);
         user.setUserCredential(userCredential);
@@ -301,5 +301,10 @@ public class UserService {
         employee.setRoleNode(null);
         employee.setReportingManager(null);
         employeeService.createEmployee(employee);
+    }
+
+    public User getUserByEmail(String s) {
+        User user = userRepository.findByEmailAddress(s).orElse(null);
+        return user;
     }
 }
