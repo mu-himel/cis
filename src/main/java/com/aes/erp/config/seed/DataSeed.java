@@ -135,9 +135,9 @@ public class DataSeed implements CommandLineRunner {
             System.out.println("Super admin Exist");
         }
 
-        User admin = userService.getUserByEmail("admin@mail.com");
+        User admin = userService.getUserByEmail("admin2@gmail.com");
         if(admin == null){
-            userService.createSuperAdmin("admin@gmail.com", "12345678");
+            userService.createSuperAdmin("admin2@gmail.com", "12345678");
         }
     }
 
