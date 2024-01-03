@@ -17,4 +17,7 @@ public interface TenderService {
                           Optional<Long> startDate, Optional<Long> endDate);
     TenderResponseDto getTenderResponseById(Long id);
     Tender getTenderById(Long id);
+    Page<?> getAllTenderProjection(Optional<String> searchFilter, Optional<Integer> page,
+                                   Optional<Integer> size, Optional<TenderType> tenderType,
+                                   Optional<Long> startDate, Optional<Long> endDate);
 }

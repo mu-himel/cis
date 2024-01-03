@@ -1,16 +1,12 @@
-package com.aes.erp.scm.controller;
+package com.aes.erp.scm.Controller;
 
-import com.aes.erp.inventory.service.OrganizationService;
 import com.aes.erp.scm.DtoCollection.TenderCreateDto;
 import com.aes.erp.scm.Entities.TenderType;
 import com.aes.erp.scm.services.TenderService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RestController
@@ -27,7 +23,7 @@ public class TenderController {
         tenderService.createTender(tenderDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    @GetMapping("/list")
+    @GetMapping("/tender-entity/page")
     public ResponseEntity<?> getAllTenders(@RequestParam("searchFilter") Optional<String> searchFilter,
                                            @RequestParam("startDate") Optional<Long> startDate,
                                            @RequestParam("endDate")  Optional<Long> endDate ,
@@ -35,6 +31,16 @@ public class TenderController {
                                            @RequestParam("size") Optional<Integer> size,
                                            @RequestParam("tenderType") Optional<TenderType> tenderType){
         return new ResponseEntity<>(tenderService.getAllTenders(searchFilter, page, size, tenderType, startDate, endDate),
+                HttpStatus.OK);
+    }
+    @GetMapping("/tender-projection/page")
+    public ResponseEntity<?> getTenderProjection(@RequestParam("searchFilter") Optional<String> searchFilter,
+                                           @RequestParam("startDate") Optional<Long> startDate,
+                                           @RequestParam("endDate")  Optional<Long> endDate ,
+                                           @RequestParam("page") Optional<Integer> page,
+                                           @RequestParam("size") Optional<Integer> size,
+                                           @RequestParam("tenderType") Optional<TenderType> tenderType){
+        return new ResponseEntity<>(tenderService.getAllTenderProjection(searchFilter, page, size, tenderType, startDate, endDate),
                 HttpStatus.OK);
     }
     @GetMapping("/{id}")

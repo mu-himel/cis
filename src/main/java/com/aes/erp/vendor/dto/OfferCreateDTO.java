@@ -20,5 +20,5 @@ public class OfferCreateDTO {
     private Long finalOfferPrice;
     private Long creditPaymentDays;
     //Only used for counter offer
-    private Long counterOfferVendorId;
+    private Long negotiationHistoryId;
 }

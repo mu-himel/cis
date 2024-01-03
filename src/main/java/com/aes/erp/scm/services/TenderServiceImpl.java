@@ -11,12 +11,14 @@ import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderItem;
 import com.aes.erp.scm.Entities.TenderStatus;
 import com.aes.erp.scm.Entities.TenderType;
+import com.aes.erp.scm.Query.TenderQuerySpecification;
 import com.aes.erp.scm.repositories.TenderRepository;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +70,8 @@ public class TenderServiceImpl implements TenderService{
     public Page<?> getAllTenders(Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
-        return tenderRepository.getAllTenders(pageable, searchFilter, tenderType, startDate, endDate);
+        Specification<Tender> specification = TenderQuerySpecification.getTenderSpecification(searchFilter, tenderType, startDate, endDate);
+        return tenderRepository.findAll(specification, pageable);
     }
 
     @Override
@@ -83,5 +86,12 @@ public class TenderServiceImpl implements TenderService{
         Optional<Tender> tender = tenderRepository.findById(id);
         if(tender.isEmpty()) throw new AesException("Tender couldn't be found");
         return tender.get();
+    }
+
+    @Override
+    public Page<?> getAllTenderProjection(Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
+        return tenderRepository.findAllTenderProjection(searchFilter.orElse(""), tenderType, startDate, endDate, pageable);
     }
 }

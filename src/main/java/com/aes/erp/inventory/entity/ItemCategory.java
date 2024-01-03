@@ -33,6 +33,7 @@ public class ItemCategory {
   @Column(unique = true, name="code")
   private String code;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "subcategory", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   private Set<SubCategoryBrand> subcategoryBrands = new HashSet<>();
   @ManyToOne

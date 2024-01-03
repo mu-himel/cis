@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Data
 @Entity
 @NoArgsConstructor
-@EqualsAndHashCode
 @AllArgsConstructor
 @Table(name = "subcategory_brands")
 public class SubCategoryBrand {

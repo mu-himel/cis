@@ -5,6 +5,7 @@ import com.aes.erp.vendor.entity.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -13,20 +14,22 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "offer_participator")
-public class OfferParticipator {
+@EqualsAndHashCode(exclude = {"negotiationHistory"})
+@Table(name = "negotiator")
+public class Negotiator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
 
-    private PartyType partyType;
+    private NegotiationPartyType partyType;
     @OneToOne
     private Vendor vendor;
     @OneToOne
     private Organization organization;
+
     @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "offer_id")
-    private Offer offer;
+    @OneToOne
+    @JoinColumn(name = "negotiation_history_id")
+    private NegotiationHistory negotiationHistory;
 }

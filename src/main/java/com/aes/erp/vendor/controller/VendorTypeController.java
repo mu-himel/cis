@@ -1,5 +1,6 @@
 package com.aes.erp.vendor.controller;
 
+import com.aes.erp.vendor.dto.VendorTypeCreateDto;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.service.VendorTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class VendorTypeController {
     private VendorTypeService vendorTypeService;
 
     @PostMapping
-    public ResponseEntity<?> createVendorType(@RequestBody VendorType vendorType){
+    public ResponseEntity<?> createVendorType(@RequestBody VendorTypeCreateDto vendorType){
         vendorTypeService.createVendorType(vendorType);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

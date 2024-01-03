@@ -1,6 +1,8 @@
 package com.aes.erp.vendor.service;
 
+import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.service.FileUploadService;
+import com.aes.erp.vendor.dto.VendorTypeCreateDto;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.repository.VendorTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,9 @@ public class VendorTypeServiceImpl implements VendorTypeService{
     private VendorTypeRepository vendorTypeRepository;
 
     @Override
-    public void createVendorType(VendorType vendorType) {
+    public void createVendorType(VendorTypeCreateDto vendorTypeCreateDto) {
+        VendorType vendorType = new VendorType();
+        vendorType.setName(vendorTypeCreateDto.getName());
         vendorTypeRepository.save(vendorType);
     }
 
@@ -42,5 +46,12 @@ public class VendorTypeServiceImpl implements VendorTypeService{
     @Override
     public void deleteVendorType(Long id) {
         vendorTypeRepository.deleteById(id);
+    }
+
+    @Override
+    public VendorType getVendorById(Long id) {
+        Optional<VendorType> vendorTypeOptional = vendorTypeRepository.findById(id);
+        if(vendorTypeOptional.isEmpty()) throw new AesException("Vendor Type not found");
+        return vendorTypeOptional.get();
     }
 }

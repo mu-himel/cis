@@ -50,6 +50,7 @@ public class VendorServiceImpl implements VendorService {
     private UserService userService;
     @Autowired
     private VendorScoreRepository vendorScoreRepository;
+    private final VendorTypeService vendorTypeService;
 
     @Autowired
     private VendorFileRepository vendorFileRepository;
@@ -58,10 +59,11 @@ public class VendorServiceImpl implements VendorService {
 
 
 
-    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, VendorSubCategoryRepository vendorSubCategoryRepository, GenericModelMapper modelMapper, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
+    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, VendorSubCategoryRepository vendorSubCategoryRepository, GenericModelMapper modelMapper, VendorTypeService vendorTypeService, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
         this.emailSenderUtil = emailSenderUtil;
         this.vendorSubCategoryRepository = vendorSubCategoryRepository;
         this.modelMapper = modelMapper;
+        this.vendorTypeService = vendorTypeService;
         this.categoryService = categoryService;
         this.generalDetailsRepository = generalDetailsRepository;
     }
@@ -101,7 +103,7 @@ public class VendorServiceImpl implements VendorService {
             vendor.setVendorSubCategories(newSubcategorySet);
         }
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
-        vendor.setVendorType(vendorDto.getVendorType());
+        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorTypeId()));
         vendor.setUser(user);
         vendor.setStartedAt(new Date());
         vendor = vendorRepository.save(vendor);
@@ -152,11 +154,7 @@ public class VendorServiceImpl implements VendorService {
                 }
             }
         }
-        if(vendorDto.getVendorType() != null){
-            VendorType vendorType = new VendorType();
-            vendorType.setId(vendorDto.getVendorType().getId());
-            vendor.setVendorType(vendorType);
-        }
+        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorTypeId()));
         vendorRepository.save(vendor);
     }
     public void removeSubCategoryListForVendor(Long vendorId, Set<VendorSubCategory> subCategoryList, List<Long> subCategoryIdList){

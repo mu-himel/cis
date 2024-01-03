@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface NegotiationHistoryRepository extends JpaRepository<NegotiationHistory, Long> {
     @Query(value = "Select * from negotiation_history " +
-            "WHERE negotiation_history.tender_id=:tenderId", nativeQuery = true)
-    Optional<NegotiationHistory> getByTenderId(@Param("tenderId") Long tenderId);
+            "   WHERE negotiation_history.tender_id=:tenderId AND " +
+            "   negotiation_history.owner_party_id=:vendorId", nativeQuery = true)
+    Optional<NegotiationHistory> getByTenderId(@Param("tenderId") Long tenderId, @Param("vendorId") Long vendorId);
 }

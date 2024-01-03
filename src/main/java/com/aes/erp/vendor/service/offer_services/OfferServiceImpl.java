@@ -9,133 +9,173 @@ import com.aes.erp.scm.repositories.PriceQuotationRepository;
 import com.aes.erp.scm.services.TenderService;
 import com.aes.erp.vendor.dto.OfferCreateDTO;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.*;
-import com.aes.erp.vendor.entity.Vendor;
-import com.aes.erp.vendor.repository.NegotiationHistoryRepository;
-import com.aes.erp.vendor.repository.OfferParticipatorRepository;
+import com.aes.erp.vendor.repository.OfferNegotiatorRepository;
 import com.aes.erp.vendor.repository.OfferRepository;
-import com.aes.erp.vendor.service.VendorService;
+import com.aes.erp.vendor.service.negotiation_history.NegotiationHistoryService;
+import com.aes.erp.vendor.service.participator.NegotiatorService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OfferServiceImpl implements OfferService{
 
     private final GenericModelMapper genericModelMapper;
+    private final TenderService tenderService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final NegotiationHistoryService negotiationHistoryService;
+    private final NegotiatorService negotiatorService;
+    private final OfferNegotiatorRepository offerNegotiatorRepository;
     private final PriceQuotationRepository priceQuotationRepository;
     private final OfferItemRepository offerItemRepository;
     private final OfferRepository offerRepository;
-    private final TenderService tenderService;
-    private final NegotiationHistoryRepository negotiationHistoryRepository;
-    private final CustomUserDetailsService customUserDetailsService;
-    private final VendorService vendorService;
-    private final OfferParticipatorRepository offerParticipatorRepository;
 
     public OfferServiceImpl(GenericModelMapper genericModelMapper, PriceQuotationRepository priceQuotationRepository,
                             OfferItemRepository offerItemRepository, OfferRepository offerRepository, TenderService tenderService,
-                            NegotiationHistoryRepository negotiationHistoryRepository, CustomUserDetailsService customUserDetailsService,
-                            VendorService vendorService, OfferParticipatorRepository offerParticipatorRepository) {
+                            CustomUserDetailsService customUserDetailsService,
+                            NegotiationHistoryService negotiationHistoryService, NegotiatorService negotiatorService,
+                            OfferNegotiatorRepository offerNegotiatorRepository) {
         this.genericModelMapper = genericModelMapper;
         this.priceQuotationRepository = priceQuotationRepository;
         this.offerItemRepository = offerItemRepository;
         this.offerRepository = offerRepository;
         this.tenderService = tenderService;
-        this.negotiationHistoryRepository = negotiationHistoryRepository;
         this.customUserDetailsService = customUserDetailsService;
-        this.vendorService = vendorService;
-        this.offerParticipatorRepository = offerParticipatorRepository;
+        this.negotiationHistoryService = negotiationHistoryService;
+        this.negotiatorService = negotiatorService;
+        this.offerNegotiatorRepository = offerNegotiatorRepository;
     }
+    public void createOfferItemsFromTenderItems(Offer offer){
+        List<OfferItem> savedItems = new ArrayList<>();
+        for(OfferItem item : offer.getOfferItems()){
+            PriceQuotation priceQuotation = item.getPriceQuotation();
+            priceQuotation = priceQuotationRepository.save(priceQuotation);
+            item.setPriceQuotation(priceQuotation);
+            item.setOffer(offer);
+            item = offerItemRepository.save(item);
+            savedItems.add(item);
+        }
+        offer.getOfferItems().clear();
+        offer.setOfferItems(savedItems);
+    }
+
+    /// Initiated By Vendor
+    @Transactional
     @Override
     public void createInitialOffer(OfferCreateDTO createDTO, Long tenderId) {
+        Offer offer = genericModelMapper.map(createDTO, Offer.class);
+        offer = offerRepository.save(offer);
+        createOfferItemsFromTenderItems(offer);
+
         Tender parentTender = tenderService.getTenderById(tenderId);
         NegotiationHistory negotiationHistory = new NegotiationHistory();
         negotiationHistory.setTender(parentTender);
-        negotiationHistory = negotiationHistoryRepository.save(negotiationHistory);
 
-        Offer offer = genericModelMapper.map(createDTO, Offer.class);
         offer.setTender(parentTender);
-        offer.setNegotiationHistory(negotiationHistory);
-        //Set Parties
-        OfferParticipator creator = new OfferParticipator();
-        creator.setPartyType(PartyType.CREATOR);
+
+        //Set Owner Parties
+        Negotiator creator = new Negotiator();
+        creator.setPartyType(NegotiationPartyType.NEGOTIATION_CREATOR);
         creator.setVendor(customUserDetailsService.getLoggedInVendor());
-        creator = offerParticipatorRepository.save(creator);
-        offer.addParticipator(creator);
+        creator = negotiatorService.saveNegotiator(creator);
+        negotiationHistory.addNegotiators(creator);
+        OfferNegotiator newOfferParticipatorEntry = new OfferNegotiator();
+        newOfferParticipatorEntry.setNegotiator(creator);
+        newOfferParticipatorEntry.setOffer(offer);
+        newOfferParticipatorEntry.setPartyType(OfferPartyType.OFFER_CREATOR);
+        newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
+        offer.addParticipator(newOfferParticipatorEntry);
 
-        OfferParticipator counterParty = new OfferParticipator();
-        counterParty.setPartyType(PartyType.COUNTER);
+        //Set Counter Parties
+        Negotiator counterParty = new Negotiator();
+        counterParty.setPartyType(NegotiationPartyType.NEGOTIATION_COUNTER_PART);
         counterParty.setOrganization(parentTender.getTenderCreator());
-        counterParty = offerParticipatorRepository.save(counterParty);
-        offer.addParticipator(counterParty);
+        counterParty = negotiatorService.saveNegotiator(counterParty);
+        negotiationHistory.addNegotiators(counterParty);
+        newOfferParticipatorEntry = new OfferNegotiator();
+        newOfferParticipatorEntry.setNegotiator(counterParty);
+        newOfferParticipatorEntry.setPartyType(OfferPartyType.OFFER_COUNTER_PART);
+        newOfferParticipatorEntry.setOffer(offer);
+        newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
+        offer.addParticipator(newOfferParticipatorEntry);
 
-        List<OfferItem> savedItems = new ArrayList<>();
-        for(OfferItem item : offer.getOfferItems()){
-            PriceQuotation priceQuotation = item.getPriceQuotation();
-            priceQuotation = priceQuotationRepository.save(priceQuotation);
-            item.setPriceQuotation(priceQuotation);
-            savedItems.add(item);
-        }
-        offer.getOfferItems().clear();
-        offer.setOfferItems(savedItems);
+        negotiationHistory = negotiationHistoryService.saveHistory(negotiationHistory);
+        offer.setNegotiationHistory(negotiationHistory);
         offer.setOfferStage(OfferStage.INITIAL_OFFER);
-        offer = offerRepository.save(offer);
-        for (OfferItem item : offer.getOfferItems()){
-            item.setOffer(offer);
-            offerItemRepository.save(item);
-        }
+        offerRepository.save(offer);
     }
 
+
+
+    /// Initiated By ORG
+    @Transactional
     @Override
     public void createCounterOffer(OfferCreateDTO createDTO, Long tenderId) {
         Tender parentTender = tenderService.getTenderById(tenderId);
-        Optional<NegotiationHistory> negotiationHistoryOptional;
-        negotiationHistoryOptional = negotiationHistoryRepository.getByTenderId(tenderId);
-        if(negotiationHistoryOptional.isEmpty()) throw new AesException("No Negotiation History found with this tender id " + tenderId );
-        NegotiationHistory negotiationHistory = negotiationHistoryOptional.get();
+        NegotiationHistory negotiationHistory = negotiationHistoryService.getHistoryById(createDTO.getNegotiationHistoryId());
 
         Offer offer = genericModelMapper.map(createDTO, Offer.class);
+        offer = offerRepository.save(offer);
+
+        createOfferItemsFromTenderItems(offer);
+
         offer.setTender(parentTender);
         offer.setNegotiationHistory(negotiationHistory);
 
         //Set Parties
-        OfferParticipator creator = new OfferParticipator();
-        creator.setPartyType(PartyType.CREATOR);
-        creator.setOrganization(parentTender.getTenderCreator());
-        creator = offerParticipatorRepository.save(creator);
-        offer.addParticipator(creator);
+        Negotiator negotiationCreator = null;
+        Negotiator negotiationCounterPart = null;
+        for(Negotiator negotiator: negotiationHistory.getNegotiators()){
+            if(negotiator.getPartyType().equals(NegotiationPartyType.NEGOTIATION_CREATOR)){
+                negotiationCreator = negotiator;
+            }
+            else if(negotiator.getPartyType().equals(NegotiationPartyType.NEGOTIATION_COUNTER_PART)){
+                negotiationCounterPart = negotiator;
+            }
 
-        OfferParticipator counterParty = new OfferParticipator();
-        counterParty.setPartyType(PartyType.COUNTER);
-        Vendor counterPartyVendor = vendorService.getById(createDTO.getCounterOfferVendorId());
-        counterParty.setVendor(counterPartyVendor);
-        counterParty = offerParticipatorRepository.save(counterParty);
-        offer.addParticipator(counterParty);
-
-        List<OfferItem> savedItems = new ArrayList<>();
-        for(OfferItem item : offer.getOfferItems()){
-            PriceQuotation priceQuotation = item.getPriceQuotation();
-            priceQuotation = priceQuotationRepository.save(priceQuotation);
-            item.setPriceQuotation(priceQuotation);
-            savedItems.add(item);
         }
-        offer.getOfferItems().clear();
-        offer.setOfferItems(savedItems);
+        OfferNegotiator newOfferParticipatorEntry = new OfferNegotiator();
+        if(negotiationCreator != null)newOfferParticipatorEntry.setNegotiator(negotiationCreator);
+        newOfferParticipatorEntry.setPartyType(OfferPartyType.OFFER_CREATOR);
+        newOfferParticipatorEntry.setOffer(offer);
+        newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
+        offer.addParticipator(newOfferParticipatorEntry);
+
+        newOfferParticipatorEntry = new OfferNegotiator();
+        newOfferParticipatorEntry.setNegotiator(negotiationCounterPart);
+        newOfferParticipatorEntry.setPartyType(OfferPartyType.OFFER_COUNTER_PART);
+        newOfferParticipatorEntry.setOffer(offer);
+        newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
+        offer.addParticipator(newOfferParticipatorEntry);
+
         offer.setOfferStage(OfferStage.COUNTER_OFFER);
-        Vendor vendor = vendorService.getById(createDTO.getCounterOfferVendorId());
         offerRepository.save(offer);
-        for (OfferItem item : offer.getOfferItems()){
-            item.setOffer(offer);
-            offerItemRepository.save(item);
-        }
     }
-
     @Override
     public Offer getById(Long id) {
        Optional<Offer> offer = offerRepository.findById(id);
        if(offer.isEmpty()) throw new AesException("Offer couldn't be found for this id");
        return offer.get();
+    }
+
+    @Override
+    public List<Offer> getAllOffersByNegotiationHistoryId(Long id) {
+        return offerRepository.findAllOffersByHistoryId(id);
+    }
+
+    @Override
+    public void counterOfferByVendor(OfferCreateDTO createDTO, Long tenderId) {
+        Offer offer = genericModelMapper.map(createDTO, Offer.class);
+        offer = offerRepository.save(offer);
+        createOfferItemsFromTenderItems(offer);
+
+        Tender parentTender = tenderService.getTenderById(tenderId);
+        offer.setTender(parentTender);
+
     }
 }

@@ -1,9 +1,8 @@
-package com.aes.erp.scm.Entities;
+package com.aes.erp.vendor.entity.RFQ_Negotiation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -12,19 +11,22 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"tender"})
-@Table(name = "tender_items")
-public class TenderItem {
+@Table(name = "offer_negotiator")
+public class OfferNegotiator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
-    private String productDescription;
-    private String specification;
-    private String location;
-    private Long itemQuantity;
+
+    private OfferPartyType partyType;
+
+    @ManyToOne
+    @JoinColumn(name = "negotiator_id")
+    private Negotiator negotiator;
+
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "tender_id")
-    private Tender tender;
+    @JoinColumn(name = "offer_id")
+    private Offer offer;
+
 }
