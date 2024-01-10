@@ -26,6 +26,8 @@ public class VendorScoreDto {
     private Float relevantExperienceWeight;
     private Float relevantExperienceGrade;
     private Float totalScore;
+
+    private Integer aitPercentage;
     private EmployeeType employeeType;
 
     public void setEmployeeType(String employeeType) {

@@ -52,6 +52,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @ManyToOne(fetch = FetchType.EAGER)
     private VendorType vendorType;
 
+    private Integer aitPercentage;
 
     @OneToMany(mappedBy = "vendor",cascade = CascadeType.ALL)
     private List<VendorFile> files;

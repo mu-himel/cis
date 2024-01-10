@@ -500,11 +500,13 @@ public class VendorServiceImpl implements VendorService {
         Optional<Vendor> vendorOptional = vendorRepository.findById(vendorId);
         if(vendorOptional.isEmpty())throw new AesException("Vendor not found");
         Vendor vendor = vendorOptional.get();
+
         VendorDocumentVerificationStatus e = vendor.getVerificationStatus();
 
         if (dto.getEmployeeType().equals(EmployeeType.ENLISTER) && vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.PENDING_VERIFICATION)){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
             vendor.setVerificationDate(LocalDate.now());
+            vendor.setAitPercentage(dto.getAitPercentage());
             if(vendor.getDocumentHolder() != null){
                 DocumentHolder documentHolder = vendor.getDocumentHolder();
                 documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_ENLISTER);

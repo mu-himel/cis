@@ -34,6 +34,8 @@ public class CategoryRequestDto implements EntityConvertible<ItemCategory> {
     private List<String> brands;
     private StoreType storeType;
 
+    private BigDecimal vat;
+
     @Override
     @ApiModelProperty(hidden = true)
     public ItemCategory getEntity() {
