@@ -19,7 +19,7 @@ import java.util.Set;
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"subcategoryBrands"})
+@EqualsAndHashCode
 @Table(name = "item_categories")
 public class ItemCategory {
 

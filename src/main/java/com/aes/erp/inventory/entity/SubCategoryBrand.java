@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"subcategory"})
 @AllArgsConstructor
 @Table(name = "subcategory_brands")
 public class SubCategoryBrand {
