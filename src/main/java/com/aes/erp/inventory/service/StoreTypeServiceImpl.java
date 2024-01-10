@@ -30,6 +30,10 @@ public class StoreTypeServiceImpl implements StoreTypeService{
     @Override
     public StoreTypeGetDto createStoreType(StoreTypeCreateDto createDto) {
         StoreType storeType = new StoreType();
+        Optional<StoreType> storeTypeOptional = storeTypeRepository.findByNameAndActive(createDto.getName(),true);
+        storeTypeOptional.ifPresent(storeType1 -> {
+            throw new AesException("Store Type Already Exit");
+        });
         storeType = mapper.map(createDto, StoreType.class);
         storeType = storeTypeRepository.save(storeType);
         StoreTypeGetDto getDto = new StoreTypeGetDto();

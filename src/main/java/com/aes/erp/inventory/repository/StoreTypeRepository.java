@@ -22,6 +22,12 @@ public interface StoreTypeRepository extends JpaRepository<StoreType, Long> {
             nativeQuery = true)
     List<StoreTypeExt> getAllStoreTypes(@Param("name") String name);
     StoreType getStoreTypeByName(String name);
+
+    Optional<StoreType> findByName(String name);
+
+    @Query(value = "SELECT st FROM StoreType st WHERE lower(st.name) = lower(:name) AND st.active=:active")
+    Optional<StoreType> findByNameAndActive(@Param("name") String name, @Param("active") Boolean active);
+
     public interface StoreTypeExt{
         Long getId();
         String getName();

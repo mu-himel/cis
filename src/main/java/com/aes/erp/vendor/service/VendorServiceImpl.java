@@ -472,6 +472,7 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));
         profileDto.setVendorFileList(vendor.getFiles());
+        profileDto.setAitPercentage(vendor.getAitPercentage());
         if(!vendor.getName().isEmpty())profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
         if(vendor.getVendorSubCategories() != null){

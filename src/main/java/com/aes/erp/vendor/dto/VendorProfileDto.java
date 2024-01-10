@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 public class VendorProfileDto {
     private String name;
+    private Integer aitPercentage;
     private Date startedAt;
     private VendorIdentificationDto identification;
     private VendorBasicInformationDto basicInformation;
