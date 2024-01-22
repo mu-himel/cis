@@ -3,7 +3,6 @@ package com.aes.erp.module_access.controller;
 import com.aes.erp.module_access.entity.ModuleAccessPermission;
 import com.aes.erp.module_access.service.ModuleAccessPermissionService;
 import com.aes.erp.module_access.service.ModuleAccessService;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,6 @@ public class ModuleController {
     private ModuleAccessService moduleAccessService;
 
     @GetMapping
-    @ApiOperation(value = "Get All Modules")
     public ResponseEntity<?> getAllModules(){
         return new ResponseEntity<>(
                 moduleAccessService.getAllModules(),

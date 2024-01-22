@@ -78,7 +78,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     private VendorScore vendorScore;
 
     @OneToMany(mappedBy = "vendor", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private Set<VendorSubCategory> vendorSubCategories = new HashSet<>();;
+    private Set<VendorSubCategory> vendorSubCategories = new HashSet<>();
     @Override
     @JsonIgnore
     public VendorDto getDto() {
