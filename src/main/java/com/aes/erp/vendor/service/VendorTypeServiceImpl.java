@@ -27,6 +27,11 @@ public class VendorTypeServiceImpl implements VendorTypeService{
     }
 
     @Override
+    public void createVendorType(VendorType vendorType) {
+        vendorTypeRepository.save(vendorType);
+    }
+
+    @Override
     public List<?> getAlLVendorTypes() {
         return vendorTypeRepository.findAll();
     }

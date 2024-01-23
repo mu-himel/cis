@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface VendorTypeService {
     void createVendorType(VendorTypeCreateDto vendorType);
+    void createVendorType(VendorType vendorType);
     List<?> getAlLVendorTypes();
 
     Page<?> getAllVendorTypes(Optional<Integer> page,
