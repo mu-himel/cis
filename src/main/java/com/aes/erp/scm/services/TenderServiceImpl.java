@@ -94,4 +94,6 @@ public class TenderServiceImpl implements TenderService{
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
         return tenderRepository.findAllTenderProjection(searchFilter.orElse(""), tenderType, startDate, endDate, pageable);
     }
+
+    
 }
