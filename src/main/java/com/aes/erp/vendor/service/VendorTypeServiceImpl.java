@@ -1,7 +1,6 @@
 package com.aes.erp.vendor.service;
 
 import com.aes.erp.exception.AesException;
-import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.vendor.dto.VendorTypeCreateDto;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.repository.VendorTypeRepository;
@@ -10,9 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,5 +49,8 @@ public class VendorTypeServiceImpl implements VendorTypeService{
         Optional<VendorType> vendorTypeOptional = vendorTypeRepository.findById(id);
         if(vendorTypeOptional.isEmpty()) throw new AesException("Vendor Type not found");
         return vendorTypeOptional.get();
+    }
+    public Long getVendorTypeCount() {
+        return vendorTypeRepository.count();
     }
 }

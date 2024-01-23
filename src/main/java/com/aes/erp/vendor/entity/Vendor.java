@@ -12,9 +12,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.*;
+
 
 @Data
 @Entity
@@ -37,6 +40,10 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @Enumerated(EnumType.STRING)
     private VendorDocumentVerificationStatus verificationStatus;
 
+    private LocalDate verificationDate;
+
+    private LocalDate approvedDate;
+
 
     @Enumerated(EnumType.STRING)
     private VendorStatus status;
@@ -45,6 +52,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @ManyToOne(fetch = FetchType.EAGER)
     private VendorType vendorType;
 
+    private Integer aitPercentage;
 
     @OneToMany(mappedBy = "vendor",cascade = CascadeType.ALL)
     private List<VendorFile> files;
@@ -57,14 +65,20 @@ public class Vendor implements DtoConvertable<VendorDto> {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<VendorItem> vendorItems;
+
     @OneToOne(fetch = FetchType.LAZY)
     private DocumentHolder documentHolder;
+
     private Date startedAt;
+
+    @UpdateTimestamp
+    private Date completedAt;
+
     @OneToOne
     private VendorScore vendorScore;
 
     @OneToMany(mappedBy = "vendor", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private Set<VendorSubCategory> vendorSubCategories = new HashSet<>();;
+    private Set<VendorSubCategory> vendorSubCategories = new HashSet<>();
     @Override
     @JsonIgnore
     public VendorDto getDto() {

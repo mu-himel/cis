@@ -54,4 +54,6 @@ public interface CategoryService {
     void deleteAttribute(Long categoryId, Long attributeId);
     Optional<ItemCategory> getCategoryForAVendor(Long vendorId, Long Id);
     Optional<ItemCategory> findRootReferenceItem(Long Id);
+
+    List<ItemCategory> existCategoryByNameIgnoreCase(String category_name);
 }

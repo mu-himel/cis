@@ -24,12 +24,13 @@ public class ItemCategoryController {
 
     @GetMapping("/subcategories")
     @ApiOperation(value = "Get Item SubCategories Filtered By Store Type Name and Parent Category Name, With Pagination")
-    public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("page") Optional<Integer> page,
-                                               @RequestParam("size") Optional<Integer> size,
-                                               @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
-                                               @RequestParam("parentCategoryId")  Optional<Long> parentCategoryId,
-                                               @RequestParam("name") Optional<String> name,
-                                               @RequestParam("code") Optional<String> code
+    public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
+            @RequestParam("parentCategoryId")  Optional<Long> parentCategoryId,
+            @RequestParam("name") Optional<String> name,
+            @RequestParam("code") Optional<String> code
     ){
         return new ResponseEntity<>(
                 categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(page,size,

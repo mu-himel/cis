@@ -8,14 +8,17 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="release-v1" />
+        <module name="cps_vms" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="cps_vms" target="17" />
       <module name="release-v1" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="cps_vms" options="-parameters" />
       <module name="release-v1" options="-parameters" />
     </option>
   </component>

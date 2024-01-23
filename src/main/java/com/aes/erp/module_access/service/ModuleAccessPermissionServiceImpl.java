@@ -668,5 +668,37 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
         }
     }
 
+    @Override
+    public void initModulePermissions() {
+        // ADD PERMISSION FOR VENDOR ROLE_NODE
+        addPermission(1L,4L,2L,true);
+
+        // ADD PERMISSION FOR ENLISTER ROLE_NODE
+        addPermission(1L,2L,11L,true);
+        addPermission(1L,2L,12L,true);
+        addPermission(1L,2L,13L,true);
+        addPermission(1L,2L,14L,false);
+        addPermission(1L,2L,15L,true);
+
+        // ADD PERMISSION FOR AUDITOR ROLE_NODE
+        addPermission(1L,3L,11L,true);
+        addPermission(1L,3L,12L,true);
+        addPermission(1L,3L,13L,false);
+        addPermission(1L,3L,14L,true);
+        addPermission(1L,3L,15L,true);
+
+    }
+
+    private void addPermission(Long departmentId, Long roleNodeId, Long moduleId,Boolean permission){
+        ModuleAccessPermission mapDashboard = new ModuleAccessPermission();
+        mapDashboard.setDepartment(new Department(departmentId));
+        mapDashboard.setDesignation(new RoleNode(roleNodeId));
+        mapDashboard.setModuleAccess(new ModuleAccess(moduleId));
+        mapDashboard.setCreatePermission(permission);
+        mapDashboard.setReadPermission(permission);
+        mapDashboard.setUpdatePermission(permission);
+        mapDashboard.setDeletePermission(permission);
+        moduleAccessPermissionRepository.save(mapDashboard);
+    }
 }
 

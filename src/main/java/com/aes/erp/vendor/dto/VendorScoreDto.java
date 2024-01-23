@@ -1,6 +1,8 @@
 package com.aes.erp.vendor.dto;
 
+import com.aes.erp.employee.enums.EmployeeType;
 import lombok.Data;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Data
 public class VendorScoreDto {
@@ -24,4 +26,11 @@ public class VendorScoreDto {
     private Float relevantExperienceWeight;
     private Float relevantExperienceGrade;
     private Float totalScore;
+
+    private Integer aitPercentage;
+    private EmployeeType employeeType;
+
+    public void setEmployeeType(String employeeType) {
+        this.employeeType = EmployeeType.valueOf(employeeType);
+    }
 }

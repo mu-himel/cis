@@ -41,6 +41,8 @@ public class BinResponseDto {
     private String tin;
     @JsonProperty("Ownership Type")
     private String ownershipType;
+    @JsonProperty("Error")
+    private String error;
 
     public BINDocument dtoToEntityMapping(BinResponseDto dto, BINDocument document){
         if(!dto.getAddress().isEmpty())document.setAddress(dto.getAddress());

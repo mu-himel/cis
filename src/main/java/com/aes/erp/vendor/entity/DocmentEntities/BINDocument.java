@@ -4,6 +4,7 @@ import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.w3c.dom.Text;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "bin")
+@EqualsAndHashCode(exclude = "documentHolder")
 @Data
 public class BINDocument {
     @Id

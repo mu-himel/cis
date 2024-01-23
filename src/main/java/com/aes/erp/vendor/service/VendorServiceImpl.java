@@ -1,32 +1,40 @@
 package com.aes.erp.vendor.service;
 
+import com.aes.erp.employee.enums.EmployeeType;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
+import com.aes.erp.inventory.dto.response.ItemCategoryDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.*;
+
 import com.aes.erp.vendor.entity.*;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolderStatus;
 import com.aes.erp.vendor.enums.VendorDocType;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.repository.*;
+import com.aes.erp.vendor.service.DocumentHolderServices.DocumentHolderService;
 import com.aes.erp.vendor.utils.EmailSenderUtil;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.hibernate.tool.schema.SchemaToolingLogging.LOGGER;
@@ -42,6 +50,9 @@ public class VendorServiceImpl implements VendorService {
     private VendorProfileService vendorProfileService;
     private final VendorSubCategoryRepository vendorSubCategoryRepository;
     private final GenericModelMapper modelMapper;
+    @Autowired
+    @Lazy
+    private  DocumentHolderService documentHolderService;
 
     @Autowired
     private FileUploadService fileUploadService;
@@ -74,6 +85,8 @@ public class VendorServiceImpl implements VendorService {
         return vendorOptional;
     }
 
+
+
     @Override
     @Transactional
     public void createVendor(VendorDto vendorDto) {
@@ -105,6 +118,7 @@ public class VendorServiceImpl implements VendorService {
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
         vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorTypeId()));
         vendor.setUser(user);
+
         vendor.setStartedAt(new Date());
         vendor = vendorRepository.save(vendor);
         //Notify user Through a mail
@@ -209,24 +223,59 @@ public class VendorServiceImpl implements VendorService {
         }
     }
     @Override
-    public Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size) {
+    public Page<?> getPendingVerificationVendors(Optional<Integer> page, Optional<Integer> size,
+                                                 Optional<String> name,
+                                                 Optional<String> email,
+                                                 Optional<String> phone,
+                                                 Optional<String> vendorType,
+                                                 Optional<String> vendorStatus
+                                                 ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION,pageable);
+        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.PENDING_VERIFICATION,
+                name.orElse(null),
+                email.orElse(null),
+                phone.orElse(null),
+                vendorType.orElse(null),
+                vendorStatus.orElse(null),
+                pageable);
     }
 
     @Override
-    public Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size) {
+    public Page<?> getPendingApprovalVendors(Optional<Integer> page, Optional<Integer> size,
+                                             Optional<String> name,
+                                             Optional<String> email,
+                                             Optional<String> phone,
+                                             Optional<String> vendorType,
+                                             Optional<String> vendorStatus) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL,pageable);
+        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL,
+                name.orElse(null),
+                email.orElse(null),
+                phone.orElse(null),
+                vendorType.orElse(null),
+                vendorStatus.orElse(null),
+                pageable);
     }
 
     @Override
-    public Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size) {
+    public Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size,
+                                      Optional<String> name,
+                                      Optional<String> email,
+                                      Optional<String> phone,
+                                      Optional<String> vendorType,
+                                      Optional<String> vendorStatus
+                                      ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        return vendorRepository.findAllVendorForStatus(VendorDocumentVerificationStatus.APPROVED,pageable);
+        return vendorRepository.findAllVendorForComplete(
+                name.orElse(null),
+                email.orElse(null),
+                phone.orElse(null),
+                vendorType.orElse(null),
+                vendorStatus.orElse(null),
+                pageable);
     }
 
     @Override
@@ -342,6 +391,40 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
+    public FileUploadResponse uploadVendorFile(Long id,  Optional<MultipartFile> file) {
+        Optional<Vendor> vendorOptional = vendorRepository.findById(id);
+        if (vendorOptional.isEmpty()) {
+            throw new AesException("Vendor not found");
+        }
+        List<VendorFile> vendorFiles = new ArrayList<>();
+        Vendor vendor = vendorOptional.get();
+        Path shopPhotoPath = Path.of("./uploads/vendor/" + vendor.getId() + "/shop");
+        FileUploadResponse fileUploadResponse = null;
+        if (file.isPresent()) {
+            fileUploadResponse = fileUploadService.uploadFile(shopPhotoPath, file.get());
+            if (fileUploadResponse != null) {
+                VendorFile vendorFile = new VendorFile(vendor,
+                        fileUploadResponse.getFilename(),
+                        fileUploadResponse.getPath(),
+                        fileUploadResponse.getSize(),
+                        fileUploadResponse.getMimeType(),
+                        VendorDocType.NONE);
+//                vendorFile.setBusinessDetails(new BusinessDetails(businessDetailId));
+                vendorFiles.add(vendorFile);
+            }
+        }
+        vendorFileRepository.saveAll(vendorFiles);
+
+        return fileUploadResponse;
+    }
+
+    @Override
+    public Optional<VendorFile> getShopFile(Long id,  String filename) {
+        return vendorFileRepository.findByVendorIdAndFileName(id, filename);
+    }
+
+    @Override
+    @Transactional
     public void updateVendorStatus(Long id, VendorStatus status) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(id);
         if(vendorOptional.isEmpty()){
@@ -354,11 +437,25 @@ public class VendorServiceImpl implements VendorService {
         vendor.setStatus(status);
 
     }
+
+    @Override
+    @Transactional
+    public void rejectVendor(Long id) {
+        Optional<Vendor> vendorOptional = vendorRepository.findById(id);
+        if(vendorOptional.isEmpty()){
+            throw new AesException("Sorry! Vendor is not found");
+        }
+        Vendor vendor = vendorOptional.get();
+        vendor.getUser().getUserCredential().setActive(false);
+        vendor.setStatus(VendorStatus.DISABLED);
+        vendor.setVerificationStatus(VendorDocumentVerificationStatus.REJECTED);
+    }
+
     public void setPermittedProductsForVendor(VendorProfileDto dto, Set<VendorSubCategory> categoryList){
         for(VendorSubCategory vendorSubCategory: categoryList){
             ItemCategory subCategory = vendorSubCategory.getSubcategory();
             if(subCategory != null){
-                dto.getPermittedProducts().add(subCategory.getName() + subCategory.getCode());
+                dto.getPermittedProducts().add(subCategory.getName() +" "+ subCategory.getCode());
             }
         }
     }
@@ -372,8 +469,21 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setBasicInformation(vendorProfileService.getVendorBasicInformation(vendor));
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));
+        profileDto.setVendorFileList(vendor.getFiles());
+        profileDto.setVendorType(vendor.getVendorType());
+        profileDto.setAitPercentage(vendor.getAitPercentage());
         if(!vendor.getName().isEmpty())profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
+        if(vendor.getVendorSubCategories() != null){
+            List<ItemCategoryDto> itemCategories = new ArrayList<>();
+            for(VendorSubCategory vendorSubCategory: vendor.getVendorSubCategories()){
+                ItemCategoryDto itemCategoryDto = new ItemCategoryDto();
+                itemCategoryDto.setName(vendorSubCategory.getSubcategory().getCode()+" "+vendorSubCategory.getSubcategory().getName());
+                itemCategoryDto.setId(vendorSubCategory.getSubcategory().getId());
+                itemCategories.add(itemCategoryDto);
+            }
+            profileDto.setVendorSubCategories(itemCategories);
+        }
         if(vendor.getDocumentHolder() != null){
             DocumentHolder documentHolder = vendor.getDocumentHolder();
             if(documentHolder.getBusinessDetailsRecords() != null)profileDto.setBusinessDetails(vendor.getDocumentHolder().getBusinessDetailsRecords());
@@ -385,12 +495,34 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public void approveVendor(Long vendorId) {
+    @Transactional
+    public void approveVendor(Long vendorId, VendorScoreDto dto) {
         Optional<Vendor> vendorOptional = vendorRepository.findById(vendorId);
-        if(!vendorOptional.isPresent())throw new AesException("Vendor not found");
+        if(vendorOptional.isEmpty())throw new AesException("Vendor not found");
         Vendor vendor = vendorOptional.get();
-        vendor.setVerificationStatus(VendorDocumentVerificationStatus.VERIFIED);
-        vendor.setStatus(VendorStatus.ENABLED);
+
+        VendorDocumentVerificationStatus e = vendor.getVerificationStatus();
+
+        if (dto.getEmployeeType().equals(EmployeeType.ENLISTER) && vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.PENDING_VERIFICATION)){
+            vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
+            vendor.setVerificationDate(LocalDate.now());
+            vendor.setAitPercentage(dto.getAitPercentage());
+            if(vendor.getDocumentHolder() != null){
+                DocumentHolder documentHolder = vendor.getDocumentHolder();
+                documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_ENLISTER);
+                vendor.setDocumentHolder(documentHolder);
+            }
+        }
+        if(dto.getEmployeeType()  == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
+            vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
+            vendor.setApprovedDate(LocalDate.now());
+            if(vendor.getDocumentHolder() != null){
+                DocumentHolder documentHolder = vendor.getDocumentHolder();
+                documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_AUDITOR);
+                vendor.setDocumentHolder(documentHolder);
+            }
+            vendor.setStatus(VendorStatus.ENABLED);
+        }
         vendorRepository.save(vendor);
     }
 

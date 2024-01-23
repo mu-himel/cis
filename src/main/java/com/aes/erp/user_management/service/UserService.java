@@ -18,6 +18,7 @@ import com.aes.erp.user_management.entity.UserCredentialToRole;
 import com.aes.erp.user_management.user_credential.entity.PasswordResetToken;
 import com.aes.erp.user_management.user_credential.entity.UserCredential;
 import com.aes.erp.user_management.user_credential.service.PasswordTokenRepository;
+import com.aes.erp.user_management.user_credential.service.UserCredentialRepository;
 import com.aes.erp.vendor.dto.VendorDto;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -51,6 +52,8 @@ public class UserService {
     private final Authorization authorization;
     private final PasswordTokenRepository passwordTokenRepository;
     private final UserCredentialToRoleRepository userCredentialToRoleRepository;
+
+    private final UserCredentialRepository userCredentialRepository;
 
     private final RoleService roleService;
 
@@ -268,17 +271,19 @@ public class UserService {
     }
 
     @Transactional
-    public void createSuperAdmin() {
+    public void createSuperAdmin(String username, String pass) {
         User user = new User();
-        user.setEmailAddress("superadmin@mail.com");
+        user.setEmailAddress(username);
         user.setFirstName("Super");
         user.setLastName("Admin");
 
         UserCredential userCredential = new UserCredential();
         userCredential.setEmailAddress(user.getEmailAddress());
-        userCredential.setPassword(passwordEncoder.encode("12345678"));
+        userCredential.setPassword(passwordEncoder.encode(pass));
         userCredential.setActive(true);
+        userCredentialRepository.save(userCredential);
         user.setUserCredential(userCredential);
+
 
         UserCredentialToRole userCredentialToRole = new UserCredentialToRole();
         userCredentialToRole.setUserCredential(userCredential);
@@ -297,5 +302,10 @@ public class UserService {
         employee.setRoleNode(null);
         employee.setReportingManager(null);
         employeeService.createEmployee(employee);
+    }
+
+    public User getUserByEmail(String s) {
+        User user = userRepository.findByEmailAddress(s).orElse(null);
+        return user;
     }
 }

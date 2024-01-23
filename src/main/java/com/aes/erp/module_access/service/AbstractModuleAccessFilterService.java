@@ -10,6 +10,8 @@ import com.aes.erp.module_access.entity.ModuleAccessPermission;
 import com.aes.erp.module_access.entity.ModuleAccessVerifierConfig;
 import com.aes.erp.module_access.repository.ModuleAccessFilterRepository;
 import com.aes.erp.module_access.repository.ModuleAccessPermissionRepository;
+import com.aes.erp.organogram_system.entity.Department;
+import com.aes.erp.organogram_system.entity.RoleNode;
 import com.aes.erp.organogram_system.service.DepartmentService;
 import com.aes.erp.organogram_system.service.DesignationService;
 import com.aes.erp.user_management.service.UserRepository;
@@ -47,22 +49,34 @@ public class AbstractModuleAccessFilterService {
         List<String> roles = claimResponseDto.getAuthorities().stream()
                 .map(dto->dto.getAuthority())
                 .collect(Collectors.toList());
+        RoleNode roleNode = null;
+        if(roles.contains("ROLE_EMPLOYEE")){
+            Optional<RoleNode> roleNodeOptional = designationService.findByName((String)claimResponseDto.getUserInfoDto().get("employeeType"));
+            if(roleNodeOptional.isPresent()){
+                roleNode = roleNodeOptional.get();
+            }
+        }else if(roles.contains("ROLE_VENDOR")){
+            Optional<RoleNode> roleNodeOptional = designationService.findByName("VENDOR");
+            if(roleNodeOptional.isPresent()){
+                roleNode = roleNodeOptional.get();
+            }
+        }
         List<ModuleAccessPermissionRepository.PermittedModule> permittedModules = new ArrayList<>();
 //        if(roles.contains("ROLE_EMPLOYEE")) {
             Map<String,Object> employeeInfoDto = claimResponseDto.getUserInfoDto();
-            List<ModuleAccessPermissionRepository.PermittedModule> userPermittedModules =
-                    moduleAccessPermissionRepository.findAllByDepartmentIdAndDesignationIdAndUserId(
-//                            (Long)employeeInfoDto.get("departmentId"),
-//                            (Long)employeeInfoDto.get("designationId"),
-                            null,null,
-                            claimResponseDto.getId()
-                    );
+//            List<ModuleAccessPermissionRepository.PermittedModule> userPermittedModules =
+//                    moduleAccessPermissionRepository.findAllByDepartmentIdAndDesignationIdAndUserId(
+////                            (Long)employeeInfoDto.get("departmentId"),
+////                            (Long)employeeInfoDto.get("designationId"),
+//                             1L,null,
+//                            null
+//                    );
 
             List<ModuleAccessPermissionRepository.PermittedModule> rolePermittedRoleModules =
                     moduleAccessPermissionRepository
                             .findAllByDepartmentIdAndDesignationId(
-                                    (Long)employeeInfoDto.get("departmentId"),
-                                    (Long)employeeInfoDto.get("designationId")
+                                    1L,
+                                    roleNode.getId()
                             );
 
             List<ModuleAccessPermissionRepository.PermittedModule> departmentPermittedModules =
@@ -70,15 +84,15 @@ public class AbstractModuleAccessFilterService {
                             .findAllByDepartmentId((Long)employeeInfoDto.get("departmentId"));
 
 
-            for (ModuleAccessPermissionRepository.PermittedModule p : userPermittedModules) {
-                Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->
-                        permittedModule.getModuleAccess().getName().equals(
-                                p.getModuleAccess().getName()
-                        )).findFirst();
-                if (permittedModuleExist.isEmpty()) {
-                    permittedModules.add(p);
-                }
-            }
+//            for (ModuleAccessPermissionRepository.PermittedModule p : userPermittedModules) {
+//                Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->
+//                        permittedModule.getModuleAccess().getName().equals(
+//                                p.getModuleAccess().getName()
+//                        )).findFirst();
+//                if (permittedModuleExist.isEmpty()) {
+//                    permittedModules.add(p);
+//                }
+//            }
 
             for (ModuleAccessPermissionRepository.PermittedModule p : rolePermittedRoleModules) {
                 Optional<?> permittedModuleExist = permittedModules.stream().filter(permittedModule ->

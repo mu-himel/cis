@@ -110,6 +110,12 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             "WHERE (:id IS NOT NULL AND ic.id = :id) " +
             "AND (:vendorId IS NOT NULL AND ic.vendor_id = :vendorId)", nativeQuery = true)
     Optional<ItemCategory> findSavedCategoryForVendor(@Param("vendorId") Long vendorId, @Param("id") Long id);
+
+    @Query("SELECT c FROM ItemCategory c " +
+            "WHERE c.parentCategory IS NULL " +
+            " AND LOWER(c.name) = :name")
+    List<ItemCategory> findCategoryByNameIgnoreCase(@Param("name") String name);
+
     interface ItemCategoryInfo {
 
 

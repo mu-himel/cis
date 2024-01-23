@@ -1,6 +1,5 @@
 package com.aes.erp.inventory.entity;
 
-import com.aes.erp.vendor.entity.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +11,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = {"subcategory"})
 @AllArgsConstructor
 @Table(name = "subcategory_brands")
 public class SubCategoryBrand {

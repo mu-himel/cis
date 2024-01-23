@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface GeneralDetailsRepository extends JpaRepository<GeneralDetails, Long> {
-    @Query(value = "SELECT * FROM general_details gd WHERE gd.document_holder_id = :documentHolderId", nativeQuery = true)
+    @Query(value = "SELECT * FROM general_details gd WHERE gd.document_holder_id = :documentHolderId ORDER  BY id desc limit 1 ", nativeQuery = true)
     Optional<GeneralDetails> findByDocumentHolderId(@Param("documentHolderId") Long documentHolderId);
 }

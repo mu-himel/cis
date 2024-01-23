@@ -36,39 +36,36 @@ public class VendorProfileServiceImpl implements VendorProfileService{
         VendorIdentificationDto identificationDto = new VendorIdentificationDto();
         if(vendor.getDocumentHolder() != null){
             DocumentHolder documentHolder = vendor.getDocumentHolder();
-            Document binDocument = documentService.getDocumentByDocumentHolderIdAndType(documentHolder.getId(), DocumentType.BIN);
+            Document binDocument = documentHolder.getBinDocument().getDocument();
             if(binDocument != null){
                 identificationDto.setBinFile(binDocument.getFile());
                 identificationDto.setBinContentType(binDocument.getContentType());
+                identificationDto.setBin(documentHolder.getBinDocument().getBin());
             }
-            if(documentHolder.getBinDocument() != null)identificationDto.setBin(documentHolder.getBinDocument().getBin());
-
-            Document nidDocument = documentService.getDocumentByDocumentHolderIdAndType(documentHolder.getId(), DocumentType.NID);
+            Document nidDocument = documentHolder.getNidDocument().getDocument();
             if(nidDocument != null){
                 identificationDto.setNidFile(nidDocument.getFile());
                 identificationDto.setNidContentType(nidDocument.getContentType());
+                identificationDto.setNid(documentHolder.getNidDocument().getNid());
+                identificationDto.setOwnerName(documentHolder.getNidDocument().getEName());
             }
-            if(documentHolder.getNidDocument() != null)identificationDto.setNid(documentHolder.getNidDocument().getNid());
-
-            if(documentHolder.getTinDocument() != null)identificationDto.setTin(documentHolder.getTinDocument().getTin());
-            Document tinDocument = documentService.getDocumentByDocumentHolderIdAndType(documentHolder.getId(), DocumentType.TIN);
+            Document tinDocument = documentHolder.getTinDocument().getDocument();
             if(tinDocument != null){
+                identificationDto.setTin(documentHolder.getTinDocument().getTin());
                 identificationDto.setTinFile(tinDocument.getFile());
                 identificationDto.setTinContentType(tinDocument.getContentType());
             }
-
-            if(documentHolder.getBankSolvencyDocument() != null)identificationDto.setSolvency(documentHolder.getBankSolvencyDocument().getAccount());
-            Document bankSolvencyDocument = documentService.getDocumentByDocumentHolderIdAndType(documentHolder.getId(), DocumentType.BANK_SOLVENCY);
+            Document bankSolvencyDocument = documentHolder.getBankSolvencyDocument().getDocument();
             if(bankSolvencyDocument != null){
+                identificationDto.setSolvency(documentHolder.getBankSolvencyDocument().getAccount());
                 identificationDto.setSolvencyFile(bankSolvencyDocument.getFile());
                 identificationDto.setSolvencyContentType(bankSolvencyDocument.getContentType());
             }
-
-            if(documentHolder.getTradeDocument() != null)identificationDto.setTrade(documentHolder.getTradeDocument().getTradeLicenseNumber());
-            Document tradeDocument = documentService.getDocumentByDocumentHolderIdAndType(documentHolder.getId(), DocumentType.TRADE);
+            Document tradeDocument = documentHolder.getTradeDocument().getDocument();
             if(tradeDocument != null){
                 identificationDto.setTradeFile(tradeDocument.getFile());
                 identificationDto.setTradeContentType(tradeDocument.getContentType());
+                identificationDto.setTrade(documentHolder.getTradeDocument().getTradeLicenseNumber());
             }
         }
         return identificationDto;

@@ -4,6 +4,7 @@ import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ import java.util.Date;
 
 @Data
 @Entity
+@EqualsAndHashCode(exclude = "documentHolder")
 @Table(name = "trade_license")
 public class TradeDocument {
     @Id

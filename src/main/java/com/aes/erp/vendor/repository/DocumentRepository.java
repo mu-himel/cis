@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query(value = "SELECT * FROM documents d " +
             "WHERE d.document_holder_id = :document_holder_id" +
-            " AND d.document_type = :documentType", nativeQuery = true)
+            " AND d.document_type = :documentType" +
+            " ORDER BY d.id DESC LIMIT 1", nativeQuery = true)
     Document getDocumentByDocumentHolderId(@Param("document_holder_id") Long documentHolder,
-                                            @Param("documentType")int documentType);
+                                           @Param("documentType") int documentType);
+
 }

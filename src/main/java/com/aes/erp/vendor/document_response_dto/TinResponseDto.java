@@ -32,6 +32,8 @@ public class TinResponseDto {
     private String tin;
     @JsonProperty("Status")
     private String status;
+    @JsonProperty("Error")
+    private String error;
     public TINDocument dtoToEntityMapping(TinResponseDto dto, TINDocument tinDocument){
         if(!dto.getName().isEmpty())tinDocument.setName(dto.getName());
         if(!dto.getTin().isEmpty())tinDocument.setTin(dto.getTin());

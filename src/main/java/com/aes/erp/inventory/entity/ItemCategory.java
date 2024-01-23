@@ -3,13 +3,11 @@ package com.aes.erp.inventory.entity;
 
 import com.aes.erp.vendor.entity.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +17,7 @@ import java.util.Set;
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"subcategoryBrands"})
+@EqualsAndHashCode
 @Table(name = "item_categories")
 public class ItemCategory {
 
@@ -43,7 +41,6 @@ public class ItemCategory {
   private StoreType storeType;
 
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-  @ApiModelProperty(hidden = true)
   private List<CategoryBudget> budgets;
 
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)

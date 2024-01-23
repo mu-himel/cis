@@ -3,6 +3,7 @@ package com.aes.erp.vendor.service;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.document_response_dto.*;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
+import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.repository.DocumentHolderRepository;
 import com.aes.erp.vendor.service.DocumentServices.DocumentService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
@@ -45,11 +46,12 @@ public class VendorDocumentValidationService {
         //Starting an Asynchronous Task
         //Creating a document Entity first
         Document document = new Document();
-        document.setDocumentHolder(documentHolderRepository.getReferenceById(documentHolderId));
+        DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
+        document.setDocumentHolder(documentHolder);
         document.setContentType(file.getContentType());
         multipartFileToBytes(file, document);
         document.setName(fileName);
-
+        document.setFileName(file.getOriginalFilename());
         String url = "";
         String result = "";
         if(fileName.equals("TIN")){
@@ -74,17 +76,17 @@ public class VendorDocumentValidationService {
         }
         try{
             result = restClient.postPdfFile(documentHolderId, fileName, file, orgName, url);
+            document.setResultFromMachineLearning(result);
+            documentService.create(document);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(result);
-           if(result == null || jsonNode.has("Error")){
+            if(result == null || jsonNode.has("Error")){
                throw new AesException("Wrong document uploaded");
-           }
-           else{
-               document.setResultFromMachineLearning(result);
-               documentService.create(document);
+            }
+            else{
                //Finishing The asynchronous task
                return mapToDto(result, fileName);
-           }
+            }
         }catch(Error | IOException e){
             System.out.println(e.getMessage());
             throw new AesException("Document information extraction process failed. Error -->" + e.getMessage());
@@ -112,5 +114,11 @@ public class VendorDocumentValidationService {
             default -> null;
         };
     }
-
+    public void removePreviousSameTypeDocument(DocumentHolder documentHolder, DocumentType documentType){
+        for(Document document : documentHolder.getDocumentList()){
+            if(documentType.equals(document.getDocumentType())){
+                documentHolder.removeDocument(document);
+            }
+        }
+    }
 }
