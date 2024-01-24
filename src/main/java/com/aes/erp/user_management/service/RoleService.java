@@ -25,18 +25,12 @@ public class RoleService {
         }
     }
 
-
     public Role read(String roleName) {
         Role role = roleRepository.findRoleByRoleName(roleName);
         if(Objects.nonNull(role)) {
         }
         return role;
     }
-
-
-
-
-
 
     public Optional<Role> getRoleById(long id) {
         return roleRepository.findById(id);

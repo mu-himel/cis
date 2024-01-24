@@ -16,6 +16,7 @@ import com.aes.erp.user_management.entity.Role;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.RoleService;
 import com.aes.erp.user_management.service.UserService;
+import com.aes.erp.vendor.dto.VendorTypeCreateDto;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.service.VendorServiceImpl;
 import com.aes.erp.vendor.service.VendorTypeService;
@@ -85,6 +86,7 @@ public class DataSeed implements CommandLineRunner {
         roleNames.add("EMPLOYEE");
         roleNames.add("ENLISTER");
         roleNames.add("AUDITOR");
+        roleNames.add("ORGANIZATION");
         List<Role> roles = roleService.getRoleByRoleNames(roleNames);
         if(roles.size()==0){
             roleService.createRoles(roleNames);
@@ -161,12 +163,12 @@ public class DataSeed implements CommandLineRunner {
     private void initVendorTypes(){
         Long count = vendorTypeService.getVendorTypeCount();
         if(count == 0){
-            vendorTypeService.createVendorType(new VendorType("MANUFACTURER"));
-            vendorTypeService.createVendorType(new VendorType("SUPPLIER"));
-            vendorTypeService.createVendorType(new VendorType("GENERAL"));
-            vendorTypeService.createVendorType(new VendorType("TRADER"));
-            vendorTypeService.createVendorType(new VendorType("SERVICE PROVIDER"));
-            vendorTypeService.createVendorType(new VendorType("CONTRACTOR"));
+            vendorTypeService.createVendorType(new VendorTypeCreateDto("MANUFACTURER"));
+            vendorTypeService.createVendorType(new VendorTypeCreateDto("SUPPLIER"));
+            vendorTypeService.createVendorType(new VendorTypeCreateDto("GENERAL"));
+            vendorTypeService.createVendorType(new VendorTypeCreateDto("TRADER"));
+            vendorTypeService.createVendorType(new VendorTypeCreateDto("SERVICE PROVIDER"));
+            vendorTypeService.createVendorType(new VendorTypeCreateDto("CONTRACTOR"));
         }
     }
 

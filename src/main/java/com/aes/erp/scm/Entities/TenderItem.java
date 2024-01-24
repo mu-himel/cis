@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -21,8 +23,9 @@ public class TenderItem {
     private Long id;
     private String productDescription;
     private String specification;
-    private String location;
-    private Long itemQuantity;
+    private Long orderQuantity;
+    @OneToMany(mappedBy = "tenderItem")
+    private List<DeliveryDetails> deliveryDetails = new ArrayList<>();
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "tender_id")

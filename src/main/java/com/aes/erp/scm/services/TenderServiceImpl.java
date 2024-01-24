@@ -5,13 +5,14 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.service.CategoryServiceImpl;
 import com.aes.erp.inventory.service.OrganizationService;
+import com.aes.erp.scm.DtoCollection.DeliveryDetailsCreateDto;
 import com.aes.erp.scm.DtoCollection.TenderCreateDto;
+import com.aes.erp.scm.DtoCollection.TenderItemCreateDto;
 import com.aes.erp.scm.DtoCollection.TenderResponseDto;
-import com.aes.erp.scm.Entities.Tender;
-import com.aes.erp.scm.Entities.TenderItem;
-import com.aes.erp.scm.Entities.TenderStatus;
-import com.aes.erp.scm.Entities.TenderType;
+import com.aes.erp.scm.Entities.*;
 import com.aes.erp.scm.Query.TenderQuerySpecification;
+import com.aes.erp.scm.repositories.DeliveryDetailsRepository;
+import com.aes.erp.scm.repositories.TenderItemRepository;
 import com.aes.erp.scm.repositories.TenderRepository;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.data.domain.Page;
@@ -21,10 +22,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,20 +36,44 @@ import java.util.Optional;
 public class TenderServiceImpl implements TenderService{
     private final GenericModelMapper genericModelMapper;
     private final TenderRepository tenderRepository;
+    private final TenderItemRepository tenderItemRepository;
     private final OrganizationService organizationService;
     private final CategoryServiceImpl categoryService;
+    private final DeliveryDetailsRepository deliveryDetailsRepository;
 
 
-    public TenderServiceImpl(GenericModelMapper genericModelMapper, TenderRepository tenderRepository, OrganizationService organizationService, CategoryServiceImpl categoryService) {
+
+
+    public TenderServiceImpl(GenericModelMapper genericModelMapper, TenderRepository tenderRepository, TenderItemRepository tenderItemRepository, OrganizationService organizationService, CategoryServiceImpl categoryService, DeliveryDetailsRepository deliveryDetailsRepository) {
         this.genericModelMapper = genericModelMapper;
         this.tenderRepository = tenderRepository;
+        this.tenderItemRepository = tenderItemRepository;
         this.organizationService = organizationService;
         this.categoryService = categoryService;
+        this.deliveryDetailsRepository = deliveryDetailsRepository;
     }
 
+    @Transactional
     @Override
     public void createTender(TenderCreateDto dto) {
+        List<TenderItem> tenderItems = new ArrayList<>();
+        for(TenderItemCreateDto itemDto: dto.getTenderItems()){
+            List<DeliveryDetails> newDeliveryDetails = genericModelMapper.mapDtoListToEntityList(itemDto.getDeliveryDetails(), DeliveryDetails.class);
+            TenderItem item = genericModelMapper.map(itemDto, TenderItem.class);
+            item.setDeliveryDetails(newDeliveryDetails);
+            item = tenderItemRepository.save(item);
+            tenderItems.add(item);
+            List<DeliveryDetails> savedDeliveryDetails = new ArrayList<>();
+            for(DeliveryDetails details : item.getDeliveryDetails()){
+                details.setTenderItem(item);
+                details = deliveryDetailsRepository.save(details);
+                savedDeliveryDetails.add(details);
+            }
+            item.setDeliveryDetails(savedDeliveryDetails);
+            tenderItemRepository.save(item);
+        }
         Tender tender = genericModelMapper.map(dto, Tender.class);
+        tender.setTenderItems(tenderItems);
         tender.setTenderStatus(TenderStatus.PENDING);
         tender.setTenderType(TenderType.PENDING);
         OrganizationPrincipal organizationPrincipal = (OrganizationPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
