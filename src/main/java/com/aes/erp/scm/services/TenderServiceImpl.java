@@ -81,8 +81,8 @@ public class TenderServiceImpl implements TenderService{
             tender.setTenderCreator(organizationService.getOrganizationById(organizationPrincipal.getOrgId()));
         }
         else throw new AesException("Organization doesn't exist or doesn't have permission to create the tender");
-        if(categoryService.getItemCategory(dto.getItemCategoryId()).isPresent()){
-            tender.setItemCategory(categoryService.getItemCategory(dto.getItemCategoryId()).get());
+        if(categoryService.existByCode(dto.getItemCategoryCode()).isPresent()){
+            tender.setItemCategory(categoryService.existByCode(dto.getItemCategoryCode()).get());
         }
         else throw new AesException("No Item Category couldn't be found with given Id");
         tender = tenderRepository.save(tender);
