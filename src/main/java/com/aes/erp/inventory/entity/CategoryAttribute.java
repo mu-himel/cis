@@ -1,6 +1,5 @@
 package com.aes.erp.inventory.entity;
 
-import com.aes.erp.inventory.enums.AttributeUnit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
