@@ -21,8 +21,8 @@ public class DemandDetailAttribute {
 
     private String attributeType;
 
-    @Enumerated(EnumType.STRING)
-    private AttributeUnit attributeUnit;
+    // @Enumerated(EnumType.STRING)
+    private String attributeUnit;
 
     @Column(length = 500)
     private String attributeValue;
