@@ -37,7 +37,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
         if(file.isPresent()) {
             fileUploadResponse = fileUploadService.uploadFile(path, file.get());
 
-            Iterable<CSVRecord> records = getRecords(fileUploadResponse);
+            Iterable<CSVRecord> records = getCategoryRecords(fileUploadResponse);
 
             for(CSVRecord r:records){
                 String catName = r.get("CATEGORY_NAME");
@@ -67,11 +67,18 @@ public class BulkUploadServiceImpl implements BulkUploadService{
         FileUploadResponse fileUploadResponse = null;
         if(file.isPresent()) {
             fileUploadResponse = fileUploadService.uploadFile(path, file.get());
-            Iterable<CSVRecord> records = getRecords(fileUploadResponse);
+            Iterable<CSVRecord> records = getSubCategoryRecords(fileUploadResponse);
         }
     }
 
-    private Iterable<CSVRecord> getRecords(FileUploadResponse fileUploadResponse) throws IOException {
+    private Iterable<CSVRecord> getCategoryRecords(FileUploadResponse fileUploadResponse) throws IOException {
+        FileReader in = new FileReader(fileUploadResponse.getPath()+"/"+fileUploadResponse.getFilename());
+        Iterable<CSVRecord> records  = CSVFormat.RFC4180.withHeader(CategoryHeader.class).parse(in);
+        records.iterator().next();
+        return records;
+    }
+    
+    private Iterable<CSVRecord> getSubCategoryRecords(FileUploadResponse fileUploadResponse) throws IOException {
         FileReader in = new FileReader(fileUploadResponse.getPath()+"/"+fileUploadResponse.getFilename());
         Iterable<CSVRecord> records  = CSVFormat.RFC4180.withHeader(CategoryHeader.class).parse(in);
         records.iterator().next();
