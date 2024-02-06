@@ -6,6 +6,7 @@ import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.VendorFile;
 import com.aes.erp.vendor.entity.VendorScore;
+import com.aes.erp.vendor.entity.VendorType;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import java.util.List;
 @Data
 public class VendorProfileDto {
     private String name;
+    private Integer aitPercentage;
+    private VendorType vendorType;
     private Date startedAt;
     private VendorIdentificationDto identification;
     private VendorBasicInformationDto basicInformation;

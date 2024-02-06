@@ -2,6 +2,7 @@ package com.aes.erp.inventory.controller;
 
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.service.CategoryService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -11,9 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/item-categories")
@@ -106,10 +106,38 @@ public class ItemCategoryController {
     public ResponseEntity<?> getItemCategory(
             @ApiParam(value = "Category Id",example = "1", required = true)
             @PathVariable("id") Long id){
+        ItemCategory itemCategory = categoryService.getItemCategory(id).get();
+        Map<String, Object> subCategory = entityToMap(itemCategory);
         return new ResponseEntity<>(
-                categoryService.getItemCategory(id).get(),
+                subCategory,
                 HttpStatus.OK
         );
+    }
+
+    private static Map<String, Object> entityToMap(ItemCategory itemCategory) {
+        Map<String,Object> subCategory  = new HashMap<>();
+        Map<String,Object> parentCategory = new HashMap<>();
+        parentCategory.put("id", itemCategory.getParentCategory().getId());
+        parentCategory.put("code", itemCategory.getParentCategory().getCode());
+        parentCategory.put("name", itemCategory.getParentCategory().getName());
+        List<Map<String,Object>> subcategoryBrands = itemCategory.getSubcategoryBrands().stream().map(sb->{
+            Map<String,Object> sbmap = new HashMap<>();
+            sbmap.put("id",sb.getId());
+            sbmap.put("brand",sb.getBrand());
+            return sbmap;
+        }).collect(Collectors.toList());
+        subCategory.put("id", itemCategory.getId());
+        subCategory.put("name", itemCategory.getName());
+        subCategory.put("code", itemCategory.getCode());
+        subCategory.put("parentCategory",parentCategory);
+        subCategory.put("storeType", itemCategory.getStoreType());
+        subCategory.put("budgets", itemCategory.getBudgets());
+        subCategory.put("attributes", itemCategory.getAttributes());
+        subCategory.put("active", itemCategory.getActive());
+        subCategory.put("vat", itemCategory.getVat());
+        subCategory.put("createdAt", itemCategory.getCreatedAt());
+        subCategory.put("subcategoryBrands", subcategoryBrands);
+        return subCategory;
     }
 
     @PostMapping

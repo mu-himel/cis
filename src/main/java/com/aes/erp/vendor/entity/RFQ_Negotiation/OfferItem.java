@@ -1,10 +1,12 @@
 package com.aes.erp.vendor.entity.RFQ_Negotiation;
 
+import com.aes.erp.scm.Entities.DeliveryDetails;
 import com.aes.erp.scm.Entities.PriceQuotation;
 import com.aes.erp.vendor.entity.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -12,6 +14,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = {"offer"})
 @Table(name = "offer_items")
 public class OfferItem {
     @Id
@@ -20,7 +23,7 @@ public class OfferItem {
     private Long id;
     private String productDescription;
     private String specification;
-    private String location;
+//    private OfferItemDeliveryDetails offerItemDeliveryDetails;
     private Long estimatedDeliveryDays;
     private Long itemQuantity;
     @OneToOne

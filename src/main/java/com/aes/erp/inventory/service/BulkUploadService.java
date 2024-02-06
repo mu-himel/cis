@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface BulkUploadService {
 
     void categoryBulkUpload(Optional<StoreType> storeTypeOp, Optional<MultipartFile> file) throws IOException;
-    void subCategoryBulkUpload(Long categoryId, Optional<StoreType> storeTypeOp, Optional<MultipartFile> file) throws IOException;
+    void subCategoryBulkUpload(Optional<MultipartFile> file) throws IOException;
 }

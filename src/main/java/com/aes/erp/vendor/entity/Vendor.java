@@ -52,6 +52,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @ManyToOne(fetch = FetchType.EAGER)
     private VendorType vendorType;
 
+    private Integer aitPercentage;
 
     @OneToMany(mappedBy = "vendor",cascade = CascadeType.ALL)
     private List<VendorFile> files;
@@ -77,7 +78,7 @@ public class Vendor implements DtoConvertable<VendorDto> {
     private VendorScore vendorScore;
 
     @OneToMany(mappedBy = "vendor", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private Set<VendorSubCategory> vendorSubCategories = new HashSet<>();;
+    private Set<VendorSubCategory> vendorSubCategories = new HashSet<>();
     @Override
     @JsonIgnore
     public VendorDto getDto() {

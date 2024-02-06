@@ -287,7 +287,8 @@ public class UserService {
 
         UserCredentialToRole userCredentialToRole = new UserCredentialToRole();
         userCredentialToRole.setUserCredential(userCredential);
-        userCredentialToRole.setRole((Role) roleService.read("SYS_ADMIN"));
+        Role role = roleService.read("SYS_ADMIN");
+        userCredentialToRole.setRole(role);
         userCredentialToRoleRepository.save(userCredentialToRole);
         user = userRepository.save(user);
         Employee employee = new Employee(

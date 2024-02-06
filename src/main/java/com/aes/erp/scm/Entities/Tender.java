@@ -27,14 +27,19 @@ public class Tender {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organization_id")
     private Organization tenderCreator;
+
     @OneToOne(fetch = FetchType.EAGER)
     private ItemCategory itemCategory ;
+
     @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
     private List<TenderItem> tenderItems;
+
     @Enumerated(EnumType.STRING)
     private TenderStatus tenderStatus;
+
     @Enumerated(EnumType.STRING)
     private TenderType tenderType;
+
     @JsonIgnore
     @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
     private List<Offer> offerList;

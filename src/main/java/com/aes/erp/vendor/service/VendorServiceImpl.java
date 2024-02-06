@@ -61,6 +61,7 @@ public class VendorServiceImpl implements VendorService {
     private UserService userService;
     @Autowired
     private VendorScoreRepository vendorScoreRepository;
+    private final VendorTypeService vendorTypeService;
 
     @Autowired
     private VendorFileRepository vendorFileRepository;
@@ -69,10 +70,11 @@ public class VendorServiceImpl implements VendorService {
 
 
 
-    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, VendorSubCategoryRepository vendorSubCategoryRepository, GenericModelMapper modelMapper, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
+    public VendorServiceImpl(EmailSenderUtil emailSenderUtil, VendorSubCategoryRepository vendorSubCategoryRepository, GenericModelMapper modelMapper, VendorTypeService vendorTypeService, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
         this.emailSenderUtil = emailSenderUtil;
         this.vendorSubCategoryRepository = vendorSubCategoryRepository;
         this.modelMapper = modelMapper;
+        this.vendorTypeService = vendorTypeService;
         this.categoryService = categoryService;
         this.generalDetailsRepository = generalDetailsRepository;
     }
@@ -114,7 +116,7 @@ public class VendorServiceImpl implements VendorService {
             vendor.setVendorSubCategories(newSubcategorySet);
         }
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
-        vendor.setVendorType(vendorDto.getVendorType());
+        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorTypeId()));
         vendor.setUser(user);
 
         vendor.setStartedAt(new Date());
@@ -166,11 +168,7 @@ public class VendorServiceImpl implements VendorService {
                 }
             }
         }
-        if(vendorDto.getVendorType() != null){
-            VendorType vendorType = new VendorType();
-            vendorType.setId(vendorDto.getVendorType().getId());
-            vendor.setVendorType(vendorType);
-        }
+        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorTypeId()));
         vendorRepository.save(vendor);
     }
     public void removeSubCategoryListForVendor(Long vendorId, Set<VendorSubCategory> subCategoryList, List<Long> subCategoryIdList){
@@ -472,6 +470,8 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setIdentification(vendorProfileService.getVendorIdentification(vendor));
         profileDto.setAddress(vendorProfileService.getVendorAddress(vendor));
         profileDto.setVendorFileList(vendor.getFiles());
+        profileDto.setVendorType(vendor.getVendorType());
+        profileDto.setAitPercentage(vendor.getAitPercentage());
         if(!vendor.getName().isEmpty())profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
         if(vendor.getVendorSubCategories() != null){
@@ -500,11 +500,13 @@ public class VendorServiceImpl implements VendorService {
         Optional<Vendor> vendorOptional = vendorRepository.findById(vendorId);
         if(vendorOptional.isEmpty())throw new AesException("Vendor not found");
         Vendor vendor = vendorOptional.get();
+
         VendorDocumentVerificationStatus e = vendor.getVerificationStatus();
 
         if (dto.getEmployeeType().equals(EmployeeType.ENLISTER) && vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.PENDING_VERIFICATION)){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_APPROVAL);
             vendor.setVerificationDate(LocalDate.now());
+            vendor.setAitPercentage(dto.getAitPercentage());
             if(vendor.getDocumentHolder() != null){
                 DocumentHolder documentHolder = vendor.getDocumentHolder();
                 documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_ENLISTER);

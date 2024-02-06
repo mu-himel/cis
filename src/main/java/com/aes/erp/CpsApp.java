@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AesErp {
+public class CpsApp{
 
 	public static void main(String[] args) {
-		SpringApplication.run(AesErp.class, args);
+		SpringApplication.run(CpsApp.class, args);
 	}
 
 }

@@ -143,6 +143,9 @@ public class CategoryServiceImpl implements CategoryService {
         if(categoryRequestDto.getEntity().getParentCategory()!=null) {
             itemCategory.setParentCategory(categoryRequestDto.getEntity().getParentCategory());
         }
+        if(categoryRequestDto.getVat()!=null){
+            itemCategory.setVat(categoryRequestDto.getVat());
+        }
         categoryRepository.save(itemCategory);
         removeBrandsForSubCategory(itemCategory, categoryRequestDto.getBrands());
         addBrandToSubCategory(categoryRequestDto, itemCategory);
