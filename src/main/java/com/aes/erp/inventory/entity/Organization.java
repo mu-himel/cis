@@ -20,6 +20,12 @@ public class Organization {
 
     private String name;
     private OrganizationStatus status;
+
+    private String serviceIpAddress;
+    private String serviceUsername;
+    private String servicePassword;
+
+
     @OneToOne(fetch = FetchType.EAGER)
     private Role role;
 }

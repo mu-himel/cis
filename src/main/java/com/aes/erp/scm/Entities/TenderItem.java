@@ -26,6 +26,7 @@ public class TenderItem {
     private Long orderQuantity;
     @OneToMany(mappedBy = "tenderItem")
     private List<DeliveryDetails> deliveryDetails = new ArrayList<>();
+    
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "tender_id")

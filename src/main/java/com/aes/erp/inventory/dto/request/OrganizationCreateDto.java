@@ -10,4 +10,8 @@ public class OrganizationCreateDto {
     @NotBlank(message = "code is required")
     private String code;
 
+    private String serviceIpAddress;
+    private String serviceUsername;
+    private String servicePassword;
+
 }
