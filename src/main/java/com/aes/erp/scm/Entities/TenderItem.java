@@ -25,7 +25,7 @@ public class TenderItem {
     private String specification;
     private Long orderQuantity;
     @OneToMany(mappedBy = "tenderItem")
-    private List<DeliveryDetails> deliveryDetails = new ArrayList<>();
+    private List<TenderDeliveryDetail> deliveryDetails = new ArrayList<>();
     
     @JsonIgnore
     @ManyToOne

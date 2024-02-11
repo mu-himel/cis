@@ -5,6 +5,7 @@ import com.aes.erp.authentication.JwtUtil;
 import com.aes.erp.authentication.OrganizationPrincipal;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.inventory.service.OrganizationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,44 +35,58 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private CustomUserDetailsService myUserDetailsService;
 
     @Autowired
+    private OrganizationService organizationService;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
-        final String orgId = request.getHeader("orgId");
-        final String orgName = request.getHeader("orgName");
+
+        Organization organization = null;
+        Long orgId = null;
+
+        if((request.getHeader("orgId")!=null)){
+            orgId =Long.parseLong(request.getHeader("orgId"));
+            organization = organizationService.getOrganizationById(orgId);
+        }
+
+        if(orgId != null && organization == null){
+            throw new AesException("Sorry! Organization not registered");
+        }
+
         String username = null;
         String jwt = null;
         try {
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
-        }
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(username);
-            if(jwtUtil.validateToken(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                jwt = authorizationHeader.substring(7);
+                username = jwtUtil.extractUsername(jwt);
             }
-        }
-        else if(orgId != null && !orgName.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null){
-            if(!jwtUtil.validateOrganization(Long.parseLong(orgId))){
-                throw new AesException("Organization ID is not Registered in our system");
+            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(username);
+                if(jwtUtil.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
             }
-            Organization organization = jwtUtil.getOrganization(Long.parseLong(orgId));
-            if(organization.getRole() == null || !organization.getRole().getRoleName().equals("ORGANIZATION")){
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                throw new AesException("Organization doesn't have necessary role permission");
+            else if(orgId != null && organization!=null && SecurityContextHolder.getContext().getAuthentication() == null){
+                if(!jwtUtil.validateOrganization(orgId)){
+                    throw new AesException("Organization ID is not Registered in our system");
+                }
+                Organization _organization = jwtUtil.getOrganization(orgId);
+                if(_organization.getRole() == null || !_organization.getRole().getRoleName().equals("ORGANIZATION")){
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    throw new AesException("Organization doesn't have necessary role permission");
+                }
+                Set<GrantedAuthority> authorities = new HashSet<>();
+                authorities.add(new SimpleGrantedAuthority(organization.getRole().getRoleName()));
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        new OrganizationPrincipal(orgId, organization.getName()), null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-            Set<GrantedAuthority> authorities = new HashSet<>();
-            authorities.add(new SimpleGrantedAuthority(organization.getRole().getRoleName()));
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    new OrganizationPrincipal(orgId, orgName), null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
 
             filterChain.doFilter(request, response);
         }catch (Exception ex){

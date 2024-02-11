@@ -1,9 +1,12 @@
 package com.aes.erp.scm.dto.remote;
 
+import lombok.Data;
+
 import java.util.List;
 
-public class PriceQuotationDReqDto {
-    private Long rfqId;
+@Data
+public class PriceQuotationReqDto {
+    private String code;
     private String paymentMethod;
     private Long vendorId;
     private String vendorName;

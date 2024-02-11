@@ -4,10 +4,10 @@ import java.security.Principal;
 import java.sql.Struct;
 
 public class OrganizationPrincipal implements Principal {
-    private final String orgId;
+    private final Long orgId;
     private final String name;
 
-    public OrganizationPrincipal(String orgId, String name) {
+    public OrganizationPrincipal(Long orgId, String name) {
         this.orgId = orgId;
         this.name = name;
     }
@@ -17,6 +17,6 @@ public class OrganizationPrincipal implements Principal {
         return name;
     }
     public Long getOrgId(){
-        return Long.valueOf(orgId);
+        return orgId;
     }
 }

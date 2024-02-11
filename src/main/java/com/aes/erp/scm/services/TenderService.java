@@ -1,13 +1,11 @@
 package com.aes.erp.scm.services;
 
-import com.aes.erp.scm.DtoCollection.TenderCreateDto;
-import com.aes.erp.scm.DtoCollection.TenderResponseDto;
+import com.aes.erp.scm.dto.TenderCreateDto;
+import com.aes.erp.scm.dto.TenderResponseDto;
 import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderType;
 import org.springframework.data.domain.Page;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface TenderService {

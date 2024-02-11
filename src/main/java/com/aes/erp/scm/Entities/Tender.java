@@ -24,12 +24,14 @@ public class Tender {
 
     private Long creationDate;
 
+    private String code;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organization_id")
     private Organization tenderCreator;
 
     @OneToOne(fetch = FetchType.EAGER)
-    private ItemCategory itemCategory ;
+    private ItemCategory itemCategory;
 
     @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
     private List<TenderItem> tenderItems;

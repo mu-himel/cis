@@ -1,9 +1,14 @@
 package com.aes.erp.scm.dto.remote;
 
-import java.math.BigDecimal;
+import lombok.Data;
 
-public class PriceQuotationDeliveryDetailDto {
-    private String warehouseName;
-    private String deliveryCharge;
-    private BigDecimal deliveryChargeAmount;
+import java.math.BigDecimal;
+import java.util.List;
+
+@Data
+public class PriceQuotationDetailReqDto {
+    private String itemAttribute;
+    private Long rfqQty;
+    private BigDecimal unitPrice;
+    private List<PriceQuotationDeliveryDetailDto> deliveryDetails;
 }

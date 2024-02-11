@@ -1,6 +1,6 @@
 package com.aes.erp.vendor.entity.RFQ_Negotiation;
 
-import com.aes.erp.scm.Entities.DeliveryDetails;
+import com.aes.erp.scm.Entities.TenderDeliveryDetail;
 import com.aes.erp.scm.Entities.PriceQuotation;
 import com.aes.erp.vendor.entity.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;

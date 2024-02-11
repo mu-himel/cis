@@ -1,4 +1,4 @@
-package com.aes.erp.scm.DtoCollection;
+package com.aes.erp.scm.dto;
 
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
