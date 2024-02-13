@@ -46,4 +46,12 @@ public class TenderController {
     public ResponseEntity<?> getTenderById(@PathVariable("id") Long id){
         return new ResponseEntity<>(tenderService.getTenderById(id), HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/negotiation-history")
+    public ResponseEntity<?> getNegotiationHistory(@PathVariable("id") Long id){
+        return new ResponseEntity<>(
+            tenderService.getNegotiationHistories(id),
+            HttpStatus.OK
+        );
+    }
 }

@@ -117,5 +117,11 @@ public class TenderServiceImpl implements TenderService{
         return tenderRepository.findAllTenderProjection(searchFilter.orElse(""), tenderType, startDate, endDate, pageable);
     }
 
+    @Override
+    public List<?> getNegotiationHistories(Long id) {
+        return tenderRepository.getNegotiationHistoriesByTender(id);
+    }
+
+    
     
 }
