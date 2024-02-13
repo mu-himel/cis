@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 
 @Data
@@ -17,5 +19,5 @@ public class PriceQuotation {
     @Column(updatable = false)
     private Long id;
     private String pricePerUnit;
-    private String totalPrice;
+    private BigDecimal totalPrice;
 }

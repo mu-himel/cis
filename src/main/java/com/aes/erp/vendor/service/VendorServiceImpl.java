@@ -547,4 +547,18 @@ public class VendorServiceImpl implements VendorService {
         if(vendorOptional.isEmpty()) throw  new AesException("Vendor Score couldn't be found");
         return vendorOptional.get();
     }
+
+    @Override
+    public Optional<?> getAvailableVendorCountBySubCategory(String subCatCode) {
+        Optional<Integer> countOp = vendorRepository.countVendorsBySubCategory(subCatCode);
+        Map<String,Object> map = new HashMap<>();
+        if(countOp.isPresent()){
+            Integer count =countOp.get();
+            map.put("count", count);
+        }else{
+            map.put("count",0);
+        }
+
+        return Optional.ofNullable(map);
+    }
 }

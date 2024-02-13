@@ -23,7 +23,6 @@ public class OfferItem {
     private Long id;
     private String productDescription;
     private String specification;
-//    private OfferItemDeliveryDetails offerItemDeliveryDetails;
     private Long estimatedDeliveryDays;
     private Long itemQuantity;
     @OneToOne

@@ -247,9 +247,16 @@ public class VendorController {
     public ResponseEntity<?> getAllDetailsOfVendor(@PathVariable("id") Long id){
         return new ResponseEntity<>(vendorService.getAllDetailsOfVendor(id), HttpStatus.OK);
     }
-    @DeleteMapping("{vendorId}/subcategory/{subCategoryId}")
+    @DeleteMapping("/{vendorId}/subcategory/{subCategoryId}")
     public ResponseEntity<?> removeSubCategoryForVendor(@PathVariable("vendorId") Long vendorId, @PathVariable("subCategoryId") Long subCategoryId){
         vendorService.removeSubCategoryFromVendor(vendorId, subCategoryId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    @GetMapping("/count/{subCatCode}")
+    public ResponseEntity<?> getAvailableVendorsBySubCategory(@PathVariable String subCatCode){
+        return new ResponseEntity<>(
+                vendorService.getAvailableVendorCountBySubCategory(subCatCode).orElse(null),
+                HttpStatus.OK
+        );
     }
 }

@@ -161,7 +161,7 @@ public class OfferServiceImpl implements OfferService{
                     deliveryChargeType = "Include";
                 }
                 pqdd.setDeliveryChargeType(deliveryChargeType);
-                pqdd.setDeliveryChargeAmount(BigDecimal.valueOf(offer.getDeliveryChargeAmount()));
+                pqdd.setDeliveryChargeAmount(offer.getDeliveryChargeAmount());
                 return pqdd;
             }).collect(Collectors.toList()));
 

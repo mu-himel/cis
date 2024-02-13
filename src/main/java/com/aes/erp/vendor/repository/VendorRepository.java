@@ -116,6 +116,14 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
     Optional<Vendor> findByUserId(Long id);
     Optional<Vendor> findByDocumentHolderId(Long id);
 
+    @Query(value = """
+            SELECT count(v.name) as total  FROM vendor v
+            			LEFT JOIN vendor_sub_category vsc ON vsc.vendor_id = v.id
+            			LEFT JOIN item_categories ic ON ic.id= vsc.subcategory_id
+            			WHERE ic.active =1 AND ic.code=:subCatCode
+            """,nativeQuery = true)
+    Optional<Integer> countVendorsBySubCategory(@Param("subCatCode") String subCatCode);
+
     interface VendorDetail{
         Long getId();
         String getName();

@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController()
 @RequestMapping("/api/v1/offers")
 public class OfferController {
+
     private final OfferService offerService;
 
     public OfferController(OfferServiceImpl offerService) {
         this.offerService = offerService;
     }
 
-    @PostMapping("/accept-tender/{tenderId}")
+    @PostMapping("/initial-offer/{tenderId}")
     public ResponseEntity<?> acceptTender(@PathVariable("tenderId") Long tenderId,
                                           @RequestBody OfferCreateDTO offerCreateDTO){
         offerService.createInitialOffer(offerCreateDTO, tenderId);
