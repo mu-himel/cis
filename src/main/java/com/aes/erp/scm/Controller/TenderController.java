@@ -1,6 +1,6 @@
 package com.aes.erp.scm.Controller;
 
-import com.aes.erp.scm.DtoCollection.TenderCreateDto;
+import com.aes.erp.scm.dto.TenderCreateDto;
 import com.aes.erp.scm.Entities.TenderType;
 import com.aes.erp.scm.services.TenderService;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,6 @@ public class TenderController {
     public TenderController(TenderService tenderService) {
         this.tenderService = tenderService;
     }
-
     @PostMapping()
     public ResponseEntity<?> createTender(@RequestBody TenderCreateDto tenderDto) {
         tenderService.createTender(tenderDto);
@@ -46,5 +45,13 @@ public class TenderController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getTenderById(@PathVariable("id") Long id){
         return new ResponseEntity<>(tenderService.getTenderById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/negotiation-history")
+    public ResponseEntity<?> getNegotiationHistory(@PathVariable("id") Long id){
+        return new ResponseEntity<>(
+            tenderService.getNegotiationHistories(id),
+            HttpStatus.OK
+        );
     }
 }

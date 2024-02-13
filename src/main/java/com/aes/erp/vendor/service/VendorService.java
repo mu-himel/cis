@@ -79,4 +79,6 @@ public interface VendorService {
     Optional<VendorFile> getShopFile(Long id,  String filename);
 
     void rejectVendor(Long id);
+
+    Optional<?> getAvailableVendorCountBySubCategory(String subCatCode);
 }

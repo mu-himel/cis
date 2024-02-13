@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -34,5 +35,31 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
         Organization getTenderCreator();
         Long getCreationDate();
         Long getTenderItemCount();
+    }
+
+    @Query(value = """
+            SELECT 
+                op.id as id, v.name as vendorName, o2.name as orgName, 
+                op.party_type as partyType, op.organization_id as organizationId, op.vendor_id as vendorId, 
+                op.participator_id  as participatorId
+            FROM offer_participator op 
+            LEFT JOIN offers o ON op.offer_id  = o.id
+            LEFT JOIN vendor v ON op.vendor_id = v.id 
+            LEFT JOIN organizations o2 ON op.organization_id = o2.id 
+            WHERE o.tender_id = :tenderId
+            """, nativeQuery = true)
+    List<NegotiationHistoryInfo> getNegotiationHistoriesByTender(@Param("tenderId") Long id);
+
+    /**
+     * NegotiationHistoryInfo
+     */ 
+    public interface NegotiationHistoryInfo {
+        Long getId();
+        String getVendorName();
+        String getOrgName();
+        String getPartyType();
+        Long getOrganizationId();
+        Long getVendorId();
+        Long getParticipatorId();
     }
 }

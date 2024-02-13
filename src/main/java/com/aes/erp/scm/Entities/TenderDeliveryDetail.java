@@ -13,13 +13,15 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = {"tenderItem"})
-@Table(name = "delivery_details")
-public class DeliveryDetails {
+@Table(name = "tender_delivery_details")
+public class TenderDeliveryDetail {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
 
+    private Long warehouseId;
     private String wareHouseName;
     private String wareHouseAddress;
     private Long deliveryOrderQTY;

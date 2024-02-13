@@ -1,4 +1,4 @@
-package com.aes.erp.scm.DtoCollection;
+package com.aes.erp.scm.dto;
 
 import lombok.Data;
 

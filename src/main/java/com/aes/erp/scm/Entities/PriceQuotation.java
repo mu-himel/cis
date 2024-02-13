@@ -1,10 +1,10 @@
 package com.aes.erp.scm.Entities;
 
-import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
-import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 import javax.persistence.*;
 
@@ -19,5 +19,5 @@ public class PriceQuotation {
     @Column(updatable = false)
     private Long id;
     private String pricePerUnit;
-    private String totalPrice;
+    private BigDecimal totalPrice;
 }

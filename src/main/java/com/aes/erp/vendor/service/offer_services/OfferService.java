@@ -12,4 +12,6 @@ public interface OfferService {
     Offer getById(Long id);
     List<Offer> getAllOffersByNegotiationHistoryId(Long id);
     void counterOfferByVendor(OfferCreateDTO createDTO, Long tenderId);
+
+    void receiveCounterOffer(OfferCreateDTO offerCreateDTO, Long tenderId);
 }

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +26,7 @@ public class Offer {
     @Column(updatable = false)
     private Long id;
     private boolean deliveryChargeIncluded;
-    private Long deliveryChargeAmount;
+    private BigDecimal deliveryChargeAmount;
 
     @Enumerated(value = EnumType.STRING)
     private OfferStage offerStage;
@@ -36,7 +37,7 @@ public class Offer {
     private boolean mushakIncluded;
     private boolean vatIncluded;
     private String note;
-    private Long finalOfferPrice;
+    private BigDecimal finalOfferPrice;
     private Long creditPaymentDays;
 
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)

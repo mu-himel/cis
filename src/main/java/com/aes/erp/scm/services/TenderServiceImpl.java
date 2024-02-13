@@ -2,13 +2,11 @@ package com.aes.erp.scm.services;
 
 import com.aes.erp.authentication.OrganizationPrincipal;
 import com.aes.erp.exception.AesException;
-import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.service.CategoryServiceImpl;
 import com.aes.erp.inventory.service.OrganizationService;
-import com.aes.erp.scm.DtoCollection.DeliveryDetailsCreateDto;
-import com.aes.erp.scm.DtoCollection.TenderCreateDto;
-import com.aes.erp.scm.DtoCollection.TenderItemCreateDto;
-import com.aes.erp.scm.DtoCollection.TenderResponseDto;
+import com.aes.erp.scm.dto.TenderCreateDto;
+import com.aes.erp.scm.dto.TenderItemCreateDto;
+import com.aes.erp.scm.dto.TenderResponseDto;
 import com.aes.erp.scm.Entities.*;
 import com.aes.erp.scm.Query.TenderQuerySpecification;
 import com.aes.erp.scm.repositories.DeliveryDetailsRepository;
@@ -24,11 +22,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,13 +53,13 @@ public class TenderServiceImpl implements TenderService{
     public void createTender(TenderCreateDto dto) {
         List<TenderItem> tenderItems = new ArrayList<>();
         for(TenderItemCreateDto itemDto: dto.getTenderItems()){
-            List<DeliveryDetails> newDeliveryDetails = genericModelMapper.mapDtoListToEntityList(itemDto.getDeliveryDetails(), DeliveryDetails.class);
+            List<TenderDeliveryDetail> newDeliveryDetails = genericModelMapper.mapDtoListToEntityList(itemDto.getDeliveryDetails(), TenderDeliveryDetail.class);
             TenderItem item = genericModelMapper.map(itemDto, TenderItem.class);
             item.setDeliveryDetails(newDeliveryDetails);
             item = tenderItemRepository.save(item);
             tenderItems.add(item);
-            List<DeliveryDetails> savedDeliveryDetails = new ArrayList<>();
-            for(DeliveryDetails details : item.getDeliveryDetails()){
+            List<TenderDeliveryDetail> savedDeliveryDetails = new ArrayList<>();
+            for(TenderDeliveryDetail details : item.getDeliveryDetails()){
                 details.setTenderItem(item);
                 details = deliveryDetailsRepository.save(details);
                 savedDeliveryDetails.add(details);
@@ -122,5 +117,11 @@ public class TenderServiceImpl implements TenderService{
         return tenderRepository.findAllTenderProjection(searchFilter.orElse(""), tenderType, startDate, endDate, pageable);
     }
 
+    @Override
+    public List<?> getNegotiationHistories(Long id) {
+        return tenderRepository.getNegotiationHistoriesByTender(id);
+    }
+
+    
     
 }

@@ -1,13 +1,12 @@
-package com.aes.erp.scm.DtoCollection;
+package com.aes.erp.scm.dto;
 
-import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.scm.Entities.TenderItem;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class TenderCreateDto {
+    private String code;
     private String itemCategoryCode;
     private List<TenderItemCreateDto> tenderItems;
 }
