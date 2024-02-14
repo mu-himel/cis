@@ -22,6 +22,7 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
 
     @Query(value = tenderProjectionQuery, countQuery = tenderProjectionCountQuery)
     Page<TenderExt> findAllTenderProjection(@Param("searchFilter") String searchFilter,
+                                            @Param("subCategoryIds") List<Long> subCategoryIds,
                                             @Param("tenderType") Optional<TenderType> tenderType,
                                             @Param("startDate") Optional<Long> startDate,
                                             @Param("endDate") Optional<Long> endDate,

@@ -3,6 +3,7 @@ package com.aes.erp.authentication.filter;
 import com.aes.erp.authentication.CustomUserDetailsService;
 import com.aes.erp.authentication.JwtUtil;
 import com.aes.erp.authentication.OrganizationPrincipal;
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.service.OrganizationService;
@@ -58,10 +59,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String username = null;
         String jwt = null;
+        ClaimResponseDto claimResponseDto = null;
         try {
             if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7);
                 username = jwtUtil.extractUsername(jwt);
+                claimResponseDto = jwtUtil.extractId(jwt);
             }
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(username);
@@ -87,10 +90,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         new OrganizationPrincipal(orgId, organization.getName()), null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+            request.setAttribute("loggedInUser",claimResponseDto);
+            String uri = (request.getHeader("uri")!=null)? request.getHeader("uri") : null;
+            if(uri!=null){
+                request.setAttribute("uri", uri);
+            }
+            
 
             filterChain.doFilter(request, response);
         }catch (Exception ex){
-//            ex.printStackTrace();
+            ex.printStackTrace();
             Map<String,String> map = new HashMap<>();
             map.put("message", ex.getMessage());
             ObjectMapper objectMapper = new ObjectMapper();

@@ -1,7 +1,9 @@
 package com.aes.erp.scm.services;
 
 import com.aes.erp.authentication.OrganizationPrincipal;
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.service.CategoryServiceImpl;
 import com.aes.erp.inventory.service.OrganizationService;
 import com.aes.erp.scm.dto.TenderCreateDto;
@@ -26,6 +28,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 public class TenderServiceImpl implements TenderService{
@@ -89,7 +93,7 @@ public class TenderServiceImpl implements TenderService{
     }
 
     @Override
-    public Page<?> getAllTenders(Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
+    public Page<?> getAllTenders(ClaimResponseDto loggedInUser,Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
         Specification<Tender> specification = TenderQuerySpecification.getTenderSpecification(searchFilter, tenderType, startDate, endDate);
@@ -111,10 +115,16 @@ public class TenderServiceImpl implements TenderService{
     }
 
     @Override
-    public Page<?> getAllTenderProjection(Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
+    public Page<?> getAllTenderProjection(ClaimResponseDto loggedInUser,Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
-        return tenderRepository.findAllTenderProjection(searchFilter.orElse(""), tenderType, startDate, endDate, pageable);
+
+
+
+        List<SubCategory> subCategories = categoryService.getCategoriesForVendor(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
+        List<Long> subCatIds = subCategories.stream().map(sc->sc.getId()).collect(Collectors.toList());
+
+        return tenderRepository.findAllTenderProjection(searchFilter.orElse(""),subCatIds, tenderType, startDate, endDate, pageable);
     }
 
     @Override

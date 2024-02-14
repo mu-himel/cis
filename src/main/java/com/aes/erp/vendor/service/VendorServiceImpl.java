@@ -116,7 +116,7 @@ public class VendorServiceImpl implements VendorService {
             vendor.setVendorSubCategories(newSubcategorySet);
         }
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
-        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorTypeId()));
+        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorType().getId()));
         vendor.setUser(user);
 
         vendor.setStartedAt(new Date());
@@ -168,7 +168,7 @@ public class VendorServiceImpl implements VendorService {
                 }
             }
         }
-        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorTypeId()));
+        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorType().getId()));
         vendorRepository.save(vendor);
     }
     public void removeSubCategoryListForVendor(Long vendorId, Set<VendorSubCategory> subCategoryList, List<Long> subCategoryIdList){

@@ -40,6 +40,9 @@ public class VendorDto implements Serializable, EntityConvertible<Vendor> {
 
 
     @NotBlank(message = "Vendor Type is required")
+    private VendorType vendorType;
+    // @NotBlank(message = "Vendor Type is required")
+    
     private Long vendorTypeId;
 
     private String password;
