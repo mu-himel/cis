@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.service;
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
 import org.springframework.data.domain.Page;
 
@@ -53,6 +54,7 @@ public interface CategoryService {
 
     void deleteAttribute(Long categoryId, Long attributeId);
     Optional<ItemCategory> getCategoryForAVendor(Long vendorId, Long Id);
+    List<SubCategory> getCategoriesForVendor(Long vendorId);
     Optional<ItemCategory> findRootReferenceItem(Long Id);
 
     List<ItemCategory> existCategoryByNameIgnoreCase(String category_name);

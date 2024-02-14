@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.repository;
 
+import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -111,6 +112,16 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             "AND (:vendorId IS NOT NULL AND ic.vendor_id = :vendorId)", nativeQuery = true)
     Optional<ItemCategory> findSavedCategoryForVendor(@Param("vendorId") Long vendorId, @Param("id") Long id);
 
+    @Query(value = """
+        SELECT ic.id as id, ic.name as name, ic.code as code FROM item_categories ic
+                LEFT JOIN vendor_sub_category vsc ON vsc.subcategory_id = ic.id
+            WHERE ic.parent_category_id IS NOT NULL
+            AND vsc.vendor_id = :vendorId
+            GROUP BY ic.id
+            """, nativeQuery = true)
+    List<SubCategory> findSCategoryForVendor(@Param("vendorId") Long vendorId);
+
+    
     @Query("SELECT c FROM ItemCategory c " +
             "WHERE c.parentCategory IS NULL " +
             " AND LOWER(c.name) = :name")

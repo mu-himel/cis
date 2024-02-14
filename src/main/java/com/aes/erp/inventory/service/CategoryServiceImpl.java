@@ -2,6 +2,7 @@ package com.aes.erp.inventory.service;
 
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.entity.Brand;
@@ -311,6 +312,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Optional<ItemCategory> getCategoryForAVendor(Long vendorId, Long Id) {
        return categoryRepository.findSavedCategoryForVendor(vendorId, Id);
+    }
+
+    @Override
+    public List<SubCategory> getCategoriesForVendor(Long vendorId) {
+       return categoryRepository.findSCategoryForVendor(vendorId);
     }
 
     @Override

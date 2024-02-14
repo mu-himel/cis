@@ -1,6 +1,7 @@
 package com.aes.erp.scm.Controller;
 
 import com.aes.erp.scm.dto.TenderCreateDto;
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.scm.Entities.TenderType;
 import com.aes.erp.scm.services.TenderService;
 import org.springframework.http.HttpStatus;
@@ -23,23 +24,26 @@ public class TenderController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     @GetMapping("/tender-entity/page")
-    public ResponseEntity<?> getAllTenders(@RequestParam("searchFilter") Optional<String> searchFilter,
+    public ResponseEntity<?> getAllTenders(
+        @RequestAttribute ClaimResponseDto loggedInUser,
+                                           @RequestParam("searchFilter") Optional<String> searchFilter,
                                            @RequestParam("startDate") Optional<Long> startDate,
                                            @RequestParam("endDate")  Optional<Long> endDate ,
                                            @RequestParam("page") Optional<Integer> page,
                                            @RequestParam("size") Optional<Integer> size,
                                            @RequestParam("tenderType") Optional<TenderType> tenderType){
-        return new ResponseEntity<>(tenderService.getAllTenders(searchFilter, page, size, tenderType, startDate, endDate),
+        return new ResponseEntity<>(tenderService.getAllTenders(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
                 HttpStatus.OK);
     }
     @GetMapping("/tender-projection/page")
-    public ResponseEntity<?> getTenderProjection(@RequestParam("searchFilter") Optional<String> searchFilter,
+    public ResponseEntity<?> getTenderProjection(
+        @RequestAttribute ClaimResponseDto loggedInUser,@RequestParam("searchFilter") Optional<String> searchFilter,
                                            @RequestParam("startDate") Optional<Long> startDate,
                                            @RequestParam("endDate")  Optional<Long> endDate ,
                                            @RequestParam("page") Optional<Integer> page,
                                            @RequestParam("size") Optional<Integer> size,
                                            @RequestParam("tenderType") Optional<TenderType> tenderType){
-        return new ResponseEntity<>(tenderService.getAllTenderProjection(searchFilter, page, size, tenderType, startDate, endDate),
+        return new ResponseEntity<>(tenderService.getAllTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
                 HttpStatus.OK);
     }
     @GetMapping("/{id}")

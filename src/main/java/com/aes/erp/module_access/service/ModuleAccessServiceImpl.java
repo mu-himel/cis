@@ -143,7 +143,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
 
             ModuleAccess vendorManagement = new ModuleAccess();
             vendorManagement.setId(11L);
-            vendorManagement.setDisplayOrder(1);
+            vendorManagement.setDisplayOrder(10);
             vendorManagement.setName("Vendor Management");
             vendorManagement.setIcon("vendor_management.svg");
             vendorManagement.setRoute("vendor-management");
@@ -153,7 +153,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
 
             ModuleAccess pendingVendors = new ModuleAccess();
             pendingVendors.setId(12L);
-            pendingVendors.setDisplayOrder(2);
+            pendingVendors.setDisplayOrder(11);
             pendingVendors.setName("Pending Vendors");
             pendingVendors.setRoute("vendor-panel/pending-vendors");
             pendingVendors.setUri("vendor-panel/pending-vendors");
@@ -164,7 +164,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
 
             ModuleAccess pendingVerification = new ModuleAccess();
             pendingVerification.setId(13L);
-            pendingVerification.setDisplayOrder(3);
+            pendingVerification.setDisplayOrder(12);
             pendingVerification.setName("Pending Verification");
             pendingVerification.setRoute("vendor-panel/pending-vendors/pending-verification");
             pendingVerification.setUri("vendor-panel/pending-vendors/pending-verification");
@@ -175,7 +175,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
 
             ModuleAccess pendingApproval = new ModuleAccess();
             pendingApproval.setId(14L);
-            pendingApproval.setDisplayOrder(4);
+            pendingApproval.setDisplayOrder(13);
             pendingApproval.setName("Pending Approval");
             pendingApproval.setRoute("vendor-panel/pending-vendors/pending-approval");
             pendingApproval.setUri("vendor-panel/pending-vendors/pending-approval");
@@ -186,7 +186,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
 
             ModuleAccess approvedVendor = new ModuleAccess();
             approvedVendor.setId(15L);
-            approvedVendor.setDisplayOrder(5);
+            approvedVendor.setDisplayOrder(14);
             approvedVendor.setName("Complete");
             approvedVendor.setRoute("vendor-panel/pending-vendors/completed");
             approvedVendor.setUri("vendor-panel/pending-vendors/completed");
@@ -195,6 +195,28 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             approvedVendor.setParentModuleAccess(vendorManagement);
             vendorManagement.addChildModule(approvedVendor);
             moduleAccessRepository.save(vendorManagement);
+
+            ModuleAccess tenderModule = new ModuleAccess();
+            tenderModule.setId(11L);
+            tenderModule.setDisplayOrder(15);
+            tenderModule.setName("Tender");
+            tenderModule.setIcon("tender.svg");
+            tenderModule.setRoute("tenders");
+            tenderModule.setUri("tenders");
+            tenderModule.setModuleType(ModuleType.PARENT);
+            tenderModule.setShowInMenu(true);
+
+            ModuleAccess rfq = new ModuleAccess();
+            rfq.setId(16L);
+            rfq.setDisplayOrder(16);
+            rfq.setName("Complete");
+            rfq.setRoute("vendor-panel/pending-vendors/completed");
+            rfq.setUri("vendor-panel/pending-vendors/completed");
+            rfq.setModuleType(ModuleType.CHILD);
+            rfq.setShowInMenu(false);
+            rfq.setParentModuleAccess(tenderModule);
+            tenderModule.addChildModule(rfq);
+            moduleAccessRepository.save(tenderModule);
 
         }
         return count;
