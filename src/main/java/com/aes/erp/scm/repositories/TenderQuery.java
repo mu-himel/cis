@@ -7,12 +7,14 @@ public interface TenderQuery {
                 t.id as id, 
                 t.tenderStatus as tenderStatus, 
                 t.tenderType as tenderType, 
-                CONCAT(t.itemCategory.parentCategory.name, '-',t.itemCategory.name) as itemCategory, 
+                CONCAT(ipc.name, '-',ic.name) as itemCategory, 
                 tc.name as tenderCreator, 
                 t.creationDate as creationDate, 
                 t.deadline as deadline,
                 COUNT(ti) as tenderItemCount 
         FROM Tender t LEFT JOIN t.tenderItems ti 
+        LEFT JOIN t.itemCategory ic
+        LEFT JOIN ic.parentCategory ipc
         LEFT JOIN t.tenderCreator tc 
         WHERE (:searchFilter IS NULL OR LOWER(t.itemCategory.name) 
                 LIKE %:searchFilter% OR LOWER(t.tenderCreator.name) LIKE %:searchFilter%) 
