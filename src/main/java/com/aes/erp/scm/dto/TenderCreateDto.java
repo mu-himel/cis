@@ -2,6 +2,7 @@ package com.aes.erp.scm.dto;
 
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class TenderCreateDto {
     private String itemCategoryCode;
     private List<TenderItemCreateDto> tenderItems;
 
-    public LocalDateTime getDeadline(){
-        return LocalDateTime.parse(this.deadline);
+    public Long getDeadline(){
+        return Instant.parse(deadline).toEpochMilli();
     }
 }

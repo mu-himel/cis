@@ -127,6 +127,11 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             " AND LOWER(c.name) = :name")
     List<ItemCategory> findCategoryByNameIgnoreCase(@Param("name") String name);
 
+    @Query("SELECT c FROM ItemCategory c " +
+            "WHERE c.parentCategory IS NOT NULL " +
+            " AND LOWER(c.name) = :name")
+    List<ItemCategory> findCategoryBySubCatNameIgnoreCase(@Param("name") String name);
+
     interface ItemCategoryInfo {
 
 
