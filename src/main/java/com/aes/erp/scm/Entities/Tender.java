@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -24,7 +25,10 @@ public class Tender {
 
     private Long creationDate;
 
+    private LocalDateTime deadline;
+
     private String code;
+    private String rfqNo;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organization_id")

@@ -197,7 +197,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             moduleAccessRepository.save(vendorManagement);
 
             ModuleAccess tenderModule = new ModuleAccess();
-            tenderModule.setId(11L);
+            tenderModule.setId(16L);
             tenderModule.setDisplayOrder(15);
             tenderModule.setName("Tender");
             tenderModule.setIcon("tender.svg");
@@ -207,15 +207,38 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             tenderModule.setShowInMenu(true);
 
             ModuleAccess rfq = new ModuleAccess();
-            rfq.setId(16L);
+            rfq.setId(17L);
             rfq.setDisplayOrder(16);
-            rfq.setName("Complete");
-            rfq.setRoute("vendor-panel/pending-vendors/completed");
-            rfq.setUri("vendor-panel/pending-vendors/completed");
+            rfq.setName("Rfq");
+            rfq.setRoute("tenders/rfq/pending");
+            rfq.setUri("tenders/rfq/pending");
             rfq.setModuleType(ModuleType.CHILD);
             rfq.setShowInMenu(false);
             rfq.setParentModuleAccess(tenderModule);
             tenderModule.addChildModule(rfq);
+
+            ModuleAccess pendingRfq = new ModuleAccess();
+            pendingRfq.setId(18L);
+            pendingRfq.setDisplayOrder(17);
+            pendingRfq.setName("Pending Rfq");
+            pendingRfq.setRoute("tenders/rfq/pending");
+            pendingRfq.setUri("tenders/rfq/pending");
+            pendingRfq.setModuleType(ModuleType.CHILD);
+            pendingRfq.setShowInMenu(false);
+            pendingRfq.setParentModuleAccess(tenderModule);
+            tenderModule.addChildModule(pendingRfq);
+
+            ModuleAccess closedRfq = new ModuleAccess();
+            closedRfq.setId(19L);
+            closedRfq.setDisplayOrder(18);
+            closedRfq.setName("Closed Rfq");
+            closedRfq.setRoute("tenders/rfq/closed");
+            closedRfq.setUri("tenders/rfq/closed");
+            closedRfq.setModuleType(ModuleType.CHILD);
+            closedRfq.setShowInMenu(false);
+            closedRfq.setParentModuleAccess(tenderModule);
+            tenderModule.addChildModule(closedRfq);
+            
             moduleAccessRepository.save(tenderModule);
 
         }

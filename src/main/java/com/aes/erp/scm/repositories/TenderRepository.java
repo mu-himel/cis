@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,16 +27,19 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
                                             @Param("tenderType") Optional<TenderType> tenderType,
                                             @Param("startDate") Optional<Long> startDate,
                                             @Param("endDate") Optional<Long> endDate,
+                                            @Param("currentDateTime") LocalDateTime currentDateTime,
                                             Pageable pageable);
 
     interface TenderExt{
         Long getId();
+        String getTenderNo();
         TenderStatus getTenderStatus();
         TenderType getTenderType();
-        ItemCategory getItemCategory();
-        Organization getTenderCreator();
+        String getCategory();
+        String getCreatorName();
         Long getCreationDate();
         Long getTenderItemCount();
+        LocalDateTime getDeadline();
     }
 
     @Query(value = """

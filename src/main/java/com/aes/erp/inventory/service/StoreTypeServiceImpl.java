@@ -6,6 +6,8 @@ import com.aes.erp.inventory.dto.response.StoreTypeGetDto;
 import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.repository.StoreTypeRepository;
 import com.aes.erp.vendor.utils.GenericModelMapper;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,10 @@ import java.util.Optional;
 public class StoreTypeServiceImpl implements StoreTypeService{
 
     private final StoreTypeRepository storeTypeRepository;
+
+    @Autowired
+    private CategoryService categoryService;
+    
     private final GenericModelMapper mapper;
 
     public StoreTypeServiceImpl(StoreTypeRepository storeTypeRepository, GenericModelMapper mapper) {
@@ -70,6 +76,14 @@ public class StoreTypeServiceImpl implements StoreTypeService{
         Optional<StoreType> storeTypeOptional = storeTypeRepository.findById(id);
         if(storeTypeOptional.isPresent()){
             StoreType storeType = storeTypeOptional.get();
+
+            List<?> categories = categoryService.getItemCategoryListForStoreType(
+                    Optional.of(storeType.getId()), 
+                    Optional.empty(), 
+                    Optional.empty());
+            if(categories.size() > 0){
+                throw new AesException("Sorry! Store has category in it");
+            }
             storeType.setActive(false);
         }
         else throw new AesException("No store type found with given Id");

@@ -116,10 +116,14 @@ public class ItemCategoryController {
 
     private static Map<String, Object> entityToMap(ItemCategory itemCategory) {
         Map<String,Object> subCategory  = new HashMap<>();
-        Map<String,Object> parentCategory = new HashMap<>();
-        parentCategory.put("id", itemCategory.getParentCategory().getId());
-        parentCategory.put("code", itemCategory.getParentCategory().getCode());
-        parentCategory.put("name", itemCategory.getParentCategory().getName());
+        Map<String,Object> parentCategory =null;
+        if(itemCategory.getParentCategory()!=null){
+            parentCategory = new HashMap<>();
+            parentCategory.put("id", itemCategory.getParentCategory().getId());
+            parentCategory.put("code", itemCategory.getParentCategory().getCode());
+            parentCategory.put("name", itemCategory.getParentCategory().getName());
+        }
+        
         List<Map<String,Object>> subcategoryBrands = itemCategory.getSubcategoryBrands().stream().map(sb->{
             Map<String,Object> sbmap = new HashMap<>();
             sbmap.put("id",sb.getId());

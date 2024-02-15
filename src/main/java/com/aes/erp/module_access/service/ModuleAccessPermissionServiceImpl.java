@@ -679,13 +679,15 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
         addPermission(1L,2L,13L,true);
         addPermission(1L,2L,14L,false);
         addPermission(1L,2L,15L,true);
+        addPermission(1L,2L,3L,true);
+        addPermission(1L,2L,15L,true);
 
         // ADD PERMISSION FOR AUDITOR ROLE_NODE
         addPermission(1L,3L,11L,true);
         addPermission(1L,3L,12L,true);
         addPermission(1L,3L,13L,false);
         addPermission(1L,3L,14L,true);
-        addPermission(1L,3L,15L,true);
+        addPermission(1L,3L,9L,true);
 
     }
 
