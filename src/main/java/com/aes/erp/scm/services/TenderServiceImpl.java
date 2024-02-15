@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +76,7 @@ public class TenderServiceImpl implements TenderService{
         tender.setTenderItems(tenderItems);
         tender.setTenderStatus(TenderStatus.PENDING);
         tender.setTenderType(TenderType.PENDING);
+        tender.setDeadline(dto.getDeadline());
         OrganizationPrincipal organizationPrincipal = (OrganizationPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(organizationService.isOrganizationExistAndEnabled(organizationPrincipal.getOrgId())){
             tender.setTenderCreator(organizationService.getOrganizationById(organizationPrincipal.getOrgId()));
@@ -119,12 +121,15 @@ public class TenderServiceImpl implements TenderService{
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
 
+        List<SubCategory> subCategories = new ArrayList<>();
+        if(loggedInUser.getUserInfoDto().get("vendorId")!=null){
+            categoryService.getCategoriesForVendor(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
+        }
 
-
-        List<SubCategory> subCategories = categoryService.getCategoriesForVendor(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
         List<Long> subCatIds = subCategories.stream().map(sc->sc.getId()).collect(Collectors.toList());
 
-        return tenderRepository.findAllTenderProjection(searchFilter.orElse(""),subCatIds, tenderType, startDate, endDate, pageable);
+        return tenderRepository.findAllTenderProjection(searchFilter.orElse(""),subCatIds, tenderType, startDate,
+                endDate, LocalDateTime.now(),pageable);
     }
 
     @Override
