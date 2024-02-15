@@ -38,7 +38,7 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
         TenderStatus getTenderStatus();
         TenderType getTenderType();
         String getCategory();
-        String getCreatorName();
+        String getTenderCreator();
         Long getCreationDate();
         Long getTenderItemCount();
 

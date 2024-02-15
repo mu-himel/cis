@@ -47,7 +47,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
 
             for(CSVRecord r:records){
                 String catName = r.get("CATEGORY_NAME");
-                List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName);
+                List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
                 if(catOp.size()==0){
                     String code = categoryService.getNewCategoryCode();
                     CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
@@ -122,9 +122,9 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                 List<String> brands = (List<String>) ((Map<String, Object>)_subCat).get("brands");
                 List<Map<String,Object>> attributes = (List<Map<String,Object>>)((Map<String, Object>)_subCat).get("attributes");
 
-                List<ItemCategory> subCatOp = categoryService.existCategoryBySubCatNameIgnoreCase(subCatName);
+                List<ItemCategory> subCatOp = categoryService.existCategoryBySubCatNameIgnoreCase(subCatName.trim());
                 if(subCatOp.size()==0) {
-                    List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName);
+                    List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
                     ItemCategory category = catOp.stream().findFirst().get();
 
                     String code = categoryService.getNewCategoryCode();
