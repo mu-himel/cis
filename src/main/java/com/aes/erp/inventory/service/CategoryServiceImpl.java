@@ -328,4 +328,9 @@ public class CategoryServiceImpl implements CategoryService {
     public List<ItemCategory> existCategoryByNameIgnoreCase(String category_name) {
         return categoryRepository.findCategoryByNameIgnoreCase(category_name.toLowerCase());
     }
+
+    @Override
+    public List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name) {
+        return categoryRepository.findCategoryBySubCatNameIgnoreCase(category_name.toLowerCase());
+    }
 }

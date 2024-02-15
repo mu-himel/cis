@@ -58,4 +58,6 @@ public interface CategoryService {
     Optional<ItemCategory> findRootReferenceItem(Long Id);
 
     List<ItemCategory> existCategoryByNameIgnoreCase(String category_name);
+
+    List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name);
 }

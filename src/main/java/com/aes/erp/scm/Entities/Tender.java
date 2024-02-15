@@ -25,7 +25,7 @@ public class Tender {
 
     private Long creationDate;
 
-    private LocalDateTime deadline;
+    private Long deadline;
 
     private String code;
     private String rfqNo;

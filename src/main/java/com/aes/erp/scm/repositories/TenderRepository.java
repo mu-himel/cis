@@ -5,6 +5,8 @@ import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderStatus;
 import com.aes.erp.scm.Entities.TenderType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,7 +29,7 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
                                             @Param("tenderType") Optional<TenderType> tenderType,
                                             @Param("startDate") Optional<Long> startDate,
                                             @Param("endDate") Optional<Long> endDate,
-                                            @Param("currentDateTime") LocalDateTime currentDateTime,
+                                            @Param("currentDateTime") Long currentDateTime,
                                             Pageable pageable);
 
     interface TenderExt{
@@ -39,7 +41,9 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
         String getCreatorName();
         Long getCreationDate();
         Long getTenderItemCount();
-        LocalDateTime getDeadline();
+
+        
+        Long getDeadline();
     }
 
     @Query(value = """

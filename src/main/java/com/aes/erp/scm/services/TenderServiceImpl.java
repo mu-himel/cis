@@ -123,13 +123,13 @@ public class TenderServiceImpl implements TenderService{
 
         List<SubCategory> subCategories = new ArrayList<>();
         if(loggedInUser.getUserInfoDto().get("vendorId")!=null){
-            categoryService.getCategoriesForVendor(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
+            subCategories = categoryService.getCategoriesForVendor(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
         }
 
         List<Long> subCatIds = subCategories.stream().map(sc->sc.getId()).collect(Collectors.toList());
 
         return tenderRepository.findAllTenderProjection(searchFilter.orElse(""),subCatIds, tenderType, startDate,
-                endDate, LocalDateTime.now(),pageable);
+                endDate, Instant.now().toEpochMilli(),pageable);
     }
 
     @Override

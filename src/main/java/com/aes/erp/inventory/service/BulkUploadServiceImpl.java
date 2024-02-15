@@ -77,10 +77,10 @@ public class BulkUploadServiceImpl implements BulkUploadService{
             Iterable<CSVRecord> records = getSubCategoryRecords(fileUploadResponse);
             Map<String,Object> subCat = new HashMap<>();
             for(CSVRecord r:records){
-                String storeType = r.get("STORE_TYPE");
+                // String storeType = r.get("STORE_TYPE");
                 String catName = r.get("CATEGORY_NAME");
                 String subCatName = r.get("SUB_CATEGORY_NAME");
-                String itemName = r.get("ITEM_NAME");
+                // String itemName = r.get("ITEM_NAME");
                 String vat = r.get("VAT");
                 String attrType = r.get("ATTRIBUTE_TYPE");
                 String attrValue = r.get("ATTRIBUTE_VALUE");
@@ -115,7 +115,6 @@ public class BulkUploadServiceImpl implements BulkUploadService{
             }
             subCat.values().stream().forEach(_subCat->{
 
-
                 String catName = ((Map<String, Object>)_subCat).get("catName").toString();
                 String subCatName = ((Map<String, Object>)_subCat).get("name").toString();
                 String vat = ((Map<String, Object>)_subCat).get("vat").toString();
@@ -123,7 +122,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                 List<String> brands = (List<String>) ((Map<String, Object>)_subCat).get("brands");
                 List<Map<String,Object>> attributes = (List<Map<String,Object>>)((Map<String, Object>)_subCat).get("attributes");
 
-                List<ItemCategory> subCatOp = categoryService.existCategoryByNameIgnoreCase(subCatName);
+                List<ItemCategory> subCatOp = categoryService.existCategoryBySubCatNameIgnoreCase(subCatName);
                 if(subCatOp.size()==0) {
                     List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName);
                     ItemCategory category = catOp.stream().findFirst().get();
