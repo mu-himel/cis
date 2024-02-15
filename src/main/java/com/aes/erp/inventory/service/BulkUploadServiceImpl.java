@@ -125,29 +125,32 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                 List<ItemCategory> subCatOp = categoryService.existCategoryBySubCatNameIgnoreCase(subCatName.trim());
                 if(subCatOp.size()==0) {
                     List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
-                    ItemCategory category = catOp.stream().findFirst().get();
+                    ItemCategory category = catOp.stream().findFirst().orElse(null);
 
-                    String code = categoryService.getNewCategoryCode();
-                    CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
-                    categoryRequestDto.setName(subCatName);
-                    categoryRequestDto.setCode(code);
-                    String vatPercentage =vat.replace("%","");
-                    if(!vatPercentage.isEmpty()){
-                        categoryRequestDto.setVat(BigDecimal.valueOf(Long.valueOf(vatPercentage)));
+                    if(category!=null){
+                        String code = categoryService.getNewCategoryCode();
+                        CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
+                        categoryRequestDto.setName(subCatName);
+                        categoryRequestDto.setCode(code);
+                        String vatPercentage =vat.replace("%","");
+                        if(!vatPercentage.isEmpty()){
+                            categoryRequestDto.setVat(BigDecimal.valueOf(Long.valueOf(vatPercentage)));
+                        }
+                        categoryRequestDto.setParentCategory(category);
+                        categoryRequestDto.setStoreType(category.getStoreType());
+                        categoryRequestDto.setBrands(brands);
+                        categoryRequestDto.setAttributes(
+                                attributes.stream().map(attr->{
+                                    CategoryAttribute ca = new CategoryAttribute();
+                                    ca.setAttributeType((String)attr.get("attributeType"));
+                                    ca.setAttributeValue((String)attr.get("attributeValue"));
+                                    ca.setAttributeUnit((String)attr.get("attributeUnit"));
+                                    return ca;
+                                }).collect(Collectors.toList())
+                        );
+                        categoryService.addCategory(categoryRequestDto);
                     }
-                    categoryRequestDto.setParentCategory(category);
-                    categoryRequestDto.setStoreType(category.getStoreType());
-                    categoryRequestDto.setBrands(brands);
-                    categoryRequestDto.setAttributes(
-                            attributes.stream().map(attr->{
-                                CategoryAttribute ca = new CategoryAttribute();
-                                ca.setAttributeType((String)attr.get("attributeType"));
-                                ca.setAttributeValue((String)attr.get("attributeValue"));
-                                ca.setAttributeUnit((String)attr.get("attributeUnit"));
-                                return ca;
-                            }).collect(Collectors.toList())
-                    );
-                    categoryService.addCategory(categoryRequestDto);
+                    
                 }
             });
 
