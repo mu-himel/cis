@@ -13,8 +13,12 @@ import com.aes.erp.scm.Entities.*;
 import com.aes.erp.scm.Query.TenderQuerySpecification;
 import com.aes.erp.scm.repositories.DeliveryDetailsRepository;
 import com.aes.erp.scm.repositories.TenderItemRepository;
+import com.aes.erp.scm.repositories.TenderParticipatorRepository;
 import com.aes.erp.scm.repositories.TenderRepository;
+import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.utils.GenericModelMapper;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +44,9 @@ public class TenderServiceImpl implements TenderService{
     private final OrganizationService organizationService;
     private final CategoryServiceImpl categoryService;
     private final DeliveryDetailsRepository deliveryDetailsRepository;
+
+    @Autowired
+    private TenderParticipatorRepository tpRepository;
 
 
 
@@ -128,7 +135,11 @@ public class TenderServiceImpl implements TenderService{
 
         List<Long> subCatIds = subCategories.stream().map(sc->sc.getId()).collect(Collectors.toList());
 
-        return tenderRepository.findAllTenderProjection(searchFilter.orElse(""),subCatIds, tenderType, startDate,
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        return tenderRepository.findAllTenderProjection(
+                vendorId,
+                searchFilter.orElse(""),
+                subCatIds, tenderType, startDate,
                 endDate, Instant.now().toEpochMilli(),pageable);
     }
 
@@ -136,6 +147,26 @@ public class TenderServiceImpl implements TenderService{
     public List<?> getNegotiationHistories(Long id) {
         return tenderRepository.getNegotiationHistoriesByTender(id);
     }
+
+    @Override
+    @Transactional
+    public void rejectTender(ClaimResponseDto loggedInUser, Long id) {
+        
+        Optional<Tender> tenderOp = tenderRepository.findById(id);
+        if(tenderOp.isEmpty()){
+            throw new AesException("Sorry! Tender not found");
+        }
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        
+        TenderParticipator tenderParticipator = new TenderParticipator();
+        tenderParticipator.setStatus(TenderStatus.REJECTED);
+        tenderParticipator.setTender(tenderOp.get());
+        tenderParticipator.setVendor(new Vendor(vendorId));
+        tpRepository.save(tenderParticipator);
+        
+    }
+
+    
 
     
     

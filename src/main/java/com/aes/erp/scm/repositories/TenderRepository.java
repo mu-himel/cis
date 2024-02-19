@@ -18,8 +18,9 @@ import java.util.Optional;
 public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQuery {
     Page<Tender> findAll(Specification<Tender> specification, Pageable pageable);
 
-    @Query(value = tenderProjectionQuery, countQuery = tenderProjectionCountQuery)
-    Page<TenderExt> findAllTenderProjection(@Param("searchFilter") String searchFilter,
+    @Query(value = tenderProjectionQuery, countQuery = tenderProjectionCountQuery, nativeQuery = true)
+    Page<TenderExt> findAllTenderProjection(@Param("vendorId") Long vendorId,
+                                            @Param("searchFilter") String searchFilter,
                                             @Param("subCategoryIds") List<Long> subCategoryIds,
                                             @Param("tenderType") Optional<TenderType> tenderType,
                                             @Param("startDate") Optional<Long> startDate,

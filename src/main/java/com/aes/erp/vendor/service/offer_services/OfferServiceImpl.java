@@ -9,12 +9,15 @@ import com.aes.erp.network.NetworkService;
 import com.aes.erp.scm.Entities.PriceQuotation;
 import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderItem;
+import com.aes.erp.scm.Entities.TenderParticipator;
+import com.aes.erp.scm.Entities.TenderStatus;
 import com.aes.erp.scm.dto.remote.PriceQuotationDeliveryDetailDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationDetailReqDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationReqDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationSummaryDto;
 import com.aes.erp.scm.repositories.OfferItemRepository;
 import com.aes.erp.scm.repositories.PriceQuotationRepository;
+import com.aes.erp.scm.repositories.TenderParticipatorRepository;
 import com.aes.erp.scm.services.TenderService;
 import com.aes.erp.vendor.dto.OfferCreateDTO;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.*;
@@ -48,6 +51,9 @@ public class OfferServiceImpl implements OfferService{
     private final PriceQuotationRepository priceQuotationRepository;
     private final OfferItemRepository offerItemRepository;
     private final OfferRepository offerRepository;
+
+    @Autowired
+    private TenderParticipatorRepository tenderParticipatorRepository;
 
     @Autowired
     private NetworkService networkService;
@@ -138,6 +144,7 @@ public class OfferServiceImpl implements OfferService{
 
         NegotiationHistory negotiationHistory = new NegotiationHistory();
         Tender t = new Tender(parentTender.getId());
+        
         negotiationHistory.setTender(t);
         offer.setTender(t);
         negotiationHistory = negotiationHistoryService.saveHistory(negotiationHistory);
@@ -171,6 +178,12 @@ public class OfferServiceImpl implements OfferService{
         newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
         offer.addParticipator(newOfferParticipatorEntry);
 //
+
+        TenderParticipator tp = new TenderParticipator();
+        tp.setStatus(TenderStatus.TENDER_SENT);
+        tp.setVendor(new Vendor(vendorId));
+        tp.setTender(t);
+        tenderParticipatorRepository.save(tp);
         
         offer.setNegotiationHistory(negotiationHistory);
         offer.setOfferStage(OfferStage.INITIAL_OFFER);

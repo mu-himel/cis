@@ -71,4 +71,13 @@ public class TenderController {
             HttpStatus.OK
         );
     }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<?> rejectTender(
+        @RequestAttribute ClaimResponseDto loggedInUser,
+        @PathVariable("id") Long id
+        ){
+            tenderService.rejectTender(loggedInUser,id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

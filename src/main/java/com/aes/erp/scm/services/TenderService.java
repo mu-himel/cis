@@ -27,4 +27,5 @@ public interface TenderService {
                     );
                     
     List<?> getNegotiationHistories(Long id);
+    void rejectTender(ClaimResponseDto loggedInUser, Long id);
 }

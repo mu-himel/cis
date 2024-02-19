@@ -3,35 +3,35 @@ package com.aes.erp.scm.repositories;
 public interface TenderQuery {
     String tenderProjectionQuery = """
                 SELECT 
-                t.rfqNo as tenderNo,
+                t.rfq_no as tenderNo,
                 t.id as id, 
-                t.tenderStatus as tenderStatus, 
-                t.tenderType as tenderType, 
+                CASE WHEN tp.id IS NOT NULL THEN
+                        MAX(tp.status)
+                ELSE
+                        t.tender_status
+                END as tenderStatus, 
+                t.tender_type as tenderType, 
                 CONCAT(ipc.name, '-',ic.name) as itemCategory, 
                 tc.name as tenderCreator, 
-                t.creationDate as creationDate, 
+                t.creation_date as creationDate, 
                 t.deadline as deadline,
-                COUNT(ti) as tenderItemCount 
-        FROM Tender t LEFT JOIN t.tenderItems ti 
-        LEFT JOIN t.itemCategory ic
-        LEFT JOIN ic.parentCategory ipc
-        LEFT JOIN t.tenderCreator tc 
-        WHERE (:searchFilter IS NULL OR LOWER(t.itemCategory.name) 
-                LIKE %:searchFilter% OR LOWER(t.tenderCreator.name) LIKE %:searchFilter%) 
-        AND (:tenderType IS NULL OR t.tenderType = :tenderType) 
-        AND (:startDate IS NULL OR t.creationDate >= :startDate) 
-        AND (:endDate IS NULL OR t.creationDate <= :endDate) 
-        AND t.itemCategory.id IN :subCategoryIds
+                COUNT(ti.id) as tenderItemCount 
+        FROM tenders t 
+        LEFT JOIN tender_participators tp ON tp.tender_id = t.id AND tp.vendor_id = :vendorId
+        LEFT JOIN tender_items ti ON ti.tender_id = t.id 
+        LEFT JOIN item_categories ic ON ic.id = t.item_category_id
+        LEFT JOIN item_categories ipc ON ipc.id = ic.parent_category_id
+        LEFT JOIN organizations tc ON tc.id = t.organization_id 
+        WHERE (:searchFilter IS NULL OR LOWER(ic.name) 
+                LIKE %:searchFilter% OR LOWER(tc.name) LIKE %:searchFilter%) 
+        AND (:tenderType IS NULL OR t.tender_type = :tenderType) 
+        AND (:startDate IS NULL OR t.creation_date >= :startDate) 
+        AND (:endDate IS NULL OR t.creation_date <= :endDate) 
+        AND ic.id IN :subCategoryIds
         AND t.deadline > :currentDateTime
-        GROUP BY t.id, t.tenderStatus, t.tenderType, t.itemCategory, t.tenderCreator, t.creationDate""";
-                           
-                          
-    String tenderProjectionCountQuery = "SELECT COUNT(DISTINCT t.id) " +
-            "                    FROM Tender t LEFT JOIN t.tenderItems ti " +
-            "                    WHERE (:searchFilter IS NULL OR LOWER(t.itemCategory.name) LIKE %:searchFilter% OR LOWER(t.tenderCreator.name) LIKE %:searchFilter%) " +
-            "                    AND (:tenderType IS NULL OR t.tenderType = :tenderType) " +
-            "                    AND (:startDate IS NULL OR t.creationDate >= :startDate) " +
-            "                    AND (:endDate IS NULL OR t.creationDate <= :endDate)"+
-            " AND t.itemCategory.id IN :subCategoryIds";
+        GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
+
+
+        String tenderProjectionCountQuery = " SELECT count(*) FROM (" +tenderProjectionQuery+ " ) ";
 
 }
