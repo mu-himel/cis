@@ -30,11 +30,11 @@ public class Tender {
     private String code;
     private String rfqNo;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization tenderCreator;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
     private ItemCategory itemCategory;
 
     @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
@@ -49,4 +49,10 @@ public class Tender {
     @JsonIgnore
     @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
     private List<Offer> offerList;
+
+    public Tender(Long id) {
+        this.id = id;
+    }
+
+    
 }

@@ -18,6 +18,6 @@ public class PriceQuotation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
-    private String pricePerUnit;
+    private BigDecimal pricePerUnit;
     private BigDecimal totalPrice;
 }

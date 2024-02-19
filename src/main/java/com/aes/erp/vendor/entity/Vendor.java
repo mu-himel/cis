@@ -91,4 +91,10 @@ public class Vendor implements DtoConvertable<VendorDto> {
         this.email = email;
         this.phone = phone;
     }
+
+    public Vendor(Long id) {
+        this.id = id;
+    }
+
+    
 }

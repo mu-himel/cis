@@ -25,7 +25,7 @@ public class OfferItem {
     private String specification;
     private Long estimatedDeliveryDays;
     private Long itemQuantity;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private PriceQuotation priceQuotation;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)

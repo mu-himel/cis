@@ -11,4 +11,5 @@ public class PriceQuotationReqDto {
     private Long vendorId;
     private String vendorName;
     private List<PriceQuotationDetailReqDto> details;
+    private PriceQuotationSummaryDto priceQuotationSummary;
 }

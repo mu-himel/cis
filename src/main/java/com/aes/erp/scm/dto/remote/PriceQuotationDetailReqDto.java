@@ -10,5 +10,6 @@ public class PriceQuotationDetailReqDto {
     private String itemAttribute;
     private Long rfqQty;
     private BigDecimal unitPrice;
+    private Integer estDeliveryDays;
     private List<PriceQuotationDeliveryDetailDto> deliveryDetails;
 }
