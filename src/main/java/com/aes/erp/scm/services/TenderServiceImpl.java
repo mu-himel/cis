@@ -156,13 +156,17 @@ public class TenderServiceImpl implements TenderService{
         if(tenderOp.isEmpty()){
             throw new AesException("Sorry! Tender not found");
         }
+
+        Tender tender = tenderOp.get();
         Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        Optional<TenderParticipator> tpOp = tpRepository.findByTenderIdAndVendorId(tender.getId(), vendorId);
         
-        TenderParticipator tenderParticipator = new TenderParticipator();
-        tenderParticipator.setStatus(TenderStatus.REJECTED);
-        tenderParticipator.setTender(tenderOp.get());
-        tenderParticipator.setVendor(new Vendor(vendorId));
-        tpRepository.save(tenderParticipator);
+        if(tpOp.isPresent()){
+            TenderParticipator tenderParticipator = tpOp.get();
+            tenderParticipator.setStatus(TenderStatus.REJECTED);
+            tenderParticipator.setTender(tenderOp.get());
+            tenderParticipator.setVendor(new Vendor(vendorId));
+        }
         
     }
 
