@@ -78,6 +78,7 @@ public class OfferServiceImpl implements OfferService{
         offer.setAitIncluded(createDTO.getAitIncluded());
         offer.setVatIncluded(createDTO.getVatIncluded());
         offer.setDeliveryChargeAmount(createDTO.getTotalDeliveryChargeAmount());
+        offer.setVatAmount(createDTO.getVatAmount());
         offer.setCreditPaymentDays(createDTO.getCreditPaymentDays());
         offer.setCreditType(createDTO.getCreditType());
         offer.setMushakIncluded(createDTO.getMushakIncluded());
@@ -225,9 +226,9 @@ public class OfferServiceImpl implements OfferService{
                 PriceQuotationDeliveryDetailDto pqdd = new PriceQuotationDeliveryDetailDto();
                 pqdd.setWarehouseName(tdd.getWareHouseName());
                 if(offer.getDeliveryChargeAmount()!=null){
-                    deliveryChargeType.append("Include");
+                    deliveryChargeType.append("Excluded");
                 }else{
-                    deliveryChargeType.append("Exclude");
+                    deliveryChargeType.append("Included");
                 }
                 pqdd.setDeliveryChargeType(deliveryChargeType.toString());
                 pqdd.setDeliveryChargeAmount(offer.getDeliveryChargeAmount());
@@ -283,9 +284,9 @@ public class OfferServiceImpl implements OfferService{
         pqs.setIsVatAdded(createDTO.getVatIncluded());
         pqs.setNote(createDTO.getNote());
 
-        if(createDTO.getVatIncluded()){
-            pqs.setVatPercent(createDTO.getVatAmount().toString());
-        }
+        
+        pqs.setVatPercent(createDTO.getVatAmount().toString());
+        
 
         pqs.setSubTotalPrice(createDTO.getFinalOfferPrice());
         pqs.setTotalPrice(createDTO.getFinalOfferPrice());

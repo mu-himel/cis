@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Data
@@ -53,6 +53,13 @@ public class Tender {
     public Tender(Long id) {
         this.id = id;
     }
+
+    // public void setDeadline(String deadline){
+    //     long d = Instant.parse(deadline).toEpochMilli();
+    //     this.deadline = Long.valueOf(d);
+    // }
+
+    
 
     
 }

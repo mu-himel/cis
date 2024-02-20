@@ -63,6 +63,16 @@ public class TenderServiceImpl implements TenderService{
     @Transactional
     @Override
     public void createTender(TenderCreateDto dto) {
+        
+        Tender tender = new Tender(); //genericModelMapper.map(dto, Tender.class);
+        
+        tender.setTenderStatus(TenderStatus.PENDING);
+        tender.setTenderType(TenderType.PENDING);
+        tender.setDeadline(dto.getDeadline());
+        tender.setRfqNo(dto.getRfqNo());
+        tender.setCode(dto.getCode());
+        
+        
         List<TenderItem> tenderItems = new ArrayList<>();
         for(TenderItemCreateDto itemDto: dto.getTenderItems()){
             List<TenderDeliveryDetail> newDeliveryDetails = genericModelMapper.mapDtoListToEntityList(itemDto.getDeliveryDetails(), TenderDeliveryDetail.class);
@@ -79,11 +89,7 @@ public class TenderServiceImpl implements TenderService{
             item.setDeliveryDetails(savedDeliveryDetails);
             tenderItemRepository.save(item);
         }
-        Tender tender = genericModelMapper.map(dto, Tender.class);
         tender.setTenderItems(tenderItems);
-        tender.setTenderStatus(TenderStatus.PENDING);
-        tender.setTenderType(TenderType.PENDING);
-        tender.setDeadline(dto.getDeadline());
         OrganizationPrincipal organizationPrincipal = (OrganizationPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(organizationService.isOrganizationExistAndEnabled(organizationPrincipal.getOrgId())){
             tender.setTenderCreator(organizationService.getOrganizationById(organizationPrincipal.getOrgId()));
