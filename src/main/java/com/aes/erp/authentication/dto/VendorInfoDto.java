@@ -12,5 +12,7 @@ import lombok.NoArgsConstructor;
 public class VendorInfoDto extends UserInfoDto{
     private Long vendorId;
     private VendorStatus vendorStatus;
+    private String vendorEmail;
+    private String vendorPhoneNo;
     private VendorDocumentVerificationStatus vendorDocumentVerificationStatus;
 }

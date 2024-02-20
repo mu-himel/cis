@@ -200,10 +200,15 @@ public class OfferServiceImpl implements OfferService{
         Map<String,Object> vendorInfo =  loggedInUser.getUserInfoDto();
         Long VendorId = Long.parseLong(vendorInfo.get("vendorId").toString());
         String VendorName = (String)vendorInfo.get("name");
+        String vendorEmail = (String)vendorInfo.get("vendorEmail");
+        String vendorPhoneNo = (String)vendorInfo.get("vendorPhoneNo");
         priceQuotationReqDto.setCode(tender.getCode());
         priceQuotationReqDto.setPaymentMethod(offer.getCreditType().name());
         priceQuotationReqDto.setVendorId(VendorId);
         priceQuotationReqDto.setVendorName(VendorName);
+        priceQuotationReqDto.setVendorEmail(vendorEmail);
+        priceQuotationReqDto.setVendorPhoneNo(vendorPhoneNo);
+
         StringBuilder  deliveryChargeType = new StringBuilder();
         priceQuotationReqDto.setDetails(offer.getOfferItems().stream().map(o->{
             PriceQuotationDetailReqDto pqdrd = new PriceQuotationDetailReqDto();

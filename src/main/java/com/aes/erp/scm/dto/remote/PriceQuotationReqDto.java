@@ -10,6 +10,8 @@ public class PriceQuotationReqDto {
     private String paymentMethod;
     private Long vendorId;
     private String vendorName;
+    private String vendorEmail;
+    private String vendorPhoneNo;
     private List<PriceQuotationDetailReqDto> details;
     private PriceQuotationSummaryDto priceQuotationSummary;
 }
