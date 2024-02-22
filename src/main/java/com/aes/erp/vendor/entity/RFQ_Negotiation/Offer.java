@@ -36,11 +36,14 @@ public class Offer {
 
     private Boolean mushakIncluded;
     private Boolean vatIncluded;
+    private BigDecimal vatPercent;
     private BigDecimal vatAmount;
     private Boolean aitIncluded;
     private String note;
     private BigDecimal finalOfferPrice;
     private Long creditPaymentDays;
+
+    private Boolean isFinal;
 
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)
     private List<OfferItem> offerItems = new ArrayList<>();

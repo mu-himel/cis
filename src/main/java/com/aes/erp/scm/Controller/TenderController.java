@@ -65,9 +65,11 @@ public class TenderController {
     }
 
     @GetMapping("/{id}/negotiation-history")
-    public ResponseEntity<?> getNegotiationHistory(@PathVariable("id") Long id){
+    public ResponseEntity<?> getNegotiationHistory(
+        @RequestAttribute ClaimResponseDto loggedInUser,
+        @PathVariable("id") Long id){
         return new ResponseEntity<>(
-            tenderService.getNegotiationHistories(id),
+            tenderService.getNegotiationHistories(loggedInUser, id),
             HttpStatus.OK
         );
     }

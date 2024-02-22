@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -79,6 +80,7 @@ public class OfferServiceImpl implements OfferService{
         offer.setVatIncluded(createDTO.getVatIncluded());
         offer.setDeliveryChargeAmount(createDTO.getTotalDeliveryChargeAmount());
         offer.setVatAmount(createDTO.getVatAmount());
+        offer.setVatPercent(createDTO.getVatPercent());
         offer.setCreditPaymentDays(createDTO.getCreditPaymentDays());
         offer.setCreditType(createDTO.getCreditType());
         offer.setMushakIncluded(createDTO.getMushakIncluded());
@@ -183,6 +185,7 @@ public class OfferServiceImpl implements OfferService{
         TenderParticipator tp = new TenderParticipator();
         tp.setStatus(TenderStatus.TENDER_SENT);
         tp.setVendor(new Vendor(vendorId));
+        tp.setOffer(offer);
         tp.setTender(t);
         tenderParticipatorRepository.save(tp);
         
@@ -199,10 +202,12 @@ public class OfferServiceImpl implements OfferService{
     private void sentPriceQuotation(ClaimResponseDto loggedInUser, Tender tender, Offer offer, OfferStage offerStage){
         PriceQuotationReqDto priceQuotationReqDto = new PriceQuotationReqDto();
         Map<String,Object> vendorInfo =  loggedInUser.getUserInfoDto();
+        
         Long VendorId = Long.parseLong(vendorInfo.get("vendorId").toString());
         String VendorName = (String)vendorInfo.get("name");
         String vendorEmail = (String)vendorInfo.get("vendorEmail");
         String vendorPhoneNo = (String)vendorInfo.get("vendorPhoneNo");
+        priceQuotationReqDto.setRemoteOfferId(offer.getId());
         priceQuotationReqDto.setCode(tender.getCode());
         priceQuotationReqDto.setPaymentMethod(offer.getCreditType().name());
         priceQuotationReqDto.setVendorId(VendorId);
@@ -284,8 +289,8 @@ public class OfferServiceImpl implements OfferService{
         pqs.setIsVatAdded(createDTO.getVatIncluded());
         pqs.setNote(createDTO.getNote());
 
-        
-        pqs.setVatPercent(createDTO.getVatAmount().toString());
+        pqs.setVatPercent(createDTO.getVatPercent().toString());
+        pqs.setVatAmount(createDTO.getVatAmount().toString());
         
 
         pqs.setSubTotalPrice(createDTO.getFinalOfferPrice());
@@ -343,7 +348,7 @@ public class OfferServiceImpl implements OfferService{
 
     @Override
     @Transactional
-    public void receiveCounterOffer(OfferCreateDTO offerCreateDTO, Long tenderId) {
+    public Long receiveCounterOffer(OfferCreateDTO offerCreateDTO, Long tenderId) {
         Tender parentTender = tenderService.getTenderById(tenderId);
         NegotiationHistory negotiationHistory = negotiationHistoryService.getHistoryById(offerCreateDTO.getNegotiationHistoryId());
         Offer offer = genericModelMapper.map(offerCreateDTO, Offer.class);
@@ -380,13 +385,23 @@ public class OfferServiceImpl implements OfferService{
 
         offer.setOfferStage(OfferStage.COUNTER_OFFER);
         offerRepository.save(offer);
+
+        TenderParticipator tp = new TenderParticipator();
+        tp.setStatus(TenderStatus.COUNTERED);
+        tp.setVendor(negotiationCounterPart.getVendor());
+        tp.setOffer(offer);
+        tp.setTender(parentTender);
+        tenderParticipatorRepository.save(tp);
+
+        return offer.getId();
     }
 
     @Override
-    public Offer getById(Long id) {
-       Optional<Offer> offer = offerRepository.findById(id);
-       if(offer.isEmpty()) throw new AesException("Offer couldn't be found for this id");
-       return offer.get();
+    public Optional<?> getById(Long id) {
+       Optional<Offer> offerOp = offerRepository.findById(id);
+       if(offerOp.isEmpty()) throw new AesException("Offer couldn't be found for this id");
+       Offer offer = offerOp.get();
+       return Optional.ofNullable(offer);
     }
 
     @Override
@@ -404,4 +419,64 @@ public class OfferServiceImpl implements OfferService{
         offer.setTender(parentTender);
 
     }
+
+    @Override
+    @Transactional
+    public void lockOffer(Long id, Long vendorId) {
+        Optional<Offer> offerOp = offerRepository.findById(id);
+        if(offerOp.isEmpty()){
+            throw new AesException("Sorry! Offer not found");
+        }
+        Offer offer = offerOp.get();
+        Tender tender = offer.getTender();
+        TenderParticipator tp = new TenderParticipator();
+        tp.setStatus(TenderStatus.AWARDED);
+        tp.setVendor(new Vendor(vendorId));
+        tp.setOffer(offer);
+        tp.setTender(tender);
+        tenderParticipatorRepository.save(tp);
+    }
+
+    
+
+    @Override
+    @Transactional
+    public void declineOffer(Long id, Long vendorId) {
+        Optional<Offer> offerOp = offerRepository.findById(id);
+        if(offerOp.isEmpty()){
+            throw new AesException("Sorry! Offer not found");
+        }
+        Offer offer = offerOp.get();
+        Tender tender = offer.getTender();
+        TenderParticipator tp = new TenderParticipator();
+        tp.setStatus(TenderStatus.REJECTED);
+        tp.setVendor(new Vendor(vendorId));
+        tp.setOffer(offer);
+        tp.setTender(tender);
+        tenderParticipatorRepository.save(tp);
+    }
+
+
+    @Override
+    @Transactional
+    public void lockOffer(ClaimResponseDto loggedInUser, Long id) {
+        Optional<Offer> offerOp = offerRepository.findById(id);
+        if(offerOp.isEmpty()){
+            throw new AesException("Sorry! Offer not found");
+        }
+        Offer offer = offerOp.get();
+        Tender tender = offer.getTender();
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        TenderParticipator tp = new TenderParticipator();
+        tp.setStatus(TenderStatus.TENDER_SENT);
+        tp.setVendor(new Vendor(vendorId));
+        tp.setOffer(offer);
+        tp.setTender(tender);
+        tenderParticipatorRepository.save(tp);
+        
+    }
+
+    
+
+    
 }

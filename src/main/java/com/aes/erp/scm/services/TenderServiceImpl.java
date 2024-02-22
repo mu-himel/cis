@@ -150,8 +150,14 @@ public class TenderServiceImpl implements TenderService{
     }
 
     @Override
-    public List<?> getNegotiationHistories(Long id) {
-        return tenderRepository.getNegotiationHistoriesByTender(id);
+    public List<?> getNegotiationHistories(ClaimResponseDto loggedInUser,Long id) {
+        Optional<Tender> tenderOp = tenderRepository.findById(id);
+        if(tenderOp.isEmpty()){
+            throw new AesException("Sorry! tender is not found");
+        }
+        String vendorIdStr = loggedInUser.getUserInfoDto().get("vendorId").toString();
+        Long vendorId = Long.parseLong(vendorIdStr);
+        return tenderRepository.getNegotiationHistoriesByTender(id,vendorId);
     }
 
     @Override

@@ -19,9 +19,11 @@ public class OfferCreateDTO {
     private Boolean aitIncluded;
     private Boolean vatIncluded;
     private BigDecimal vatAmount;
+    private BigDecimal vatPercent;
     private String note;
     private BigDecimal finalOfferPrice;
     private Long creditPaymentDays;
+    private Boolean isFinal;
     //Only used for counter offer
     @ApiModelProperty(value = "Only for counter offer")
     private Long negotiationHistoryId;

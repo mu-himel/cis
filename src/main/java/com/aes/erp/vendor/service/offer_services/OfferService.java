@@ -5,14 +5,17 @@ import com.aes.erp.vendor.dto.OfferCreateDTO;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 public interface OfferService {
     void createInitialOffer(ClaimResponseDto loggedInUser, OfferCreateDTO createDTO, Long tenderId);
     void createCounterOffer(ClaimResponseDto loggedInUser, OfferCreateDTO createDTO, Long tenderId);
-    Offer getById(Long id);
+    Optional<?> getById(Long id);
     List<Offer> getAllOffersByNegotiationHistoryId(Long id);
     void counterOfferByVendor(OfferCreateDTO createDTO, Long tenderId);
 
-    void receiveCounterOffer(OfferCreateDTO offerCreateDTO, Long tenderId);
+    Long receiveCounterOffer(OfferCreateDTO offerCreateDTO, Long tenderId);
+    void lockOffer(Long id,Long vendorId);
+    void lockOffer(ClaimResponseDto loggedInUser, Long id);
+    void declineOffer(Long id, Long vendorId);
 }

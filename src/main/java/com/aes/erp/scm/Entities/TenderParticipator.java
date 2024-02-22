@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
 
 import lombok.Data;
 
@@ -24,6 +25,9 @@ public class TenderParticipator {
 
     @ManyToOne
     private Vendor vendor;
+
+    @ManyToOne
+    private Offer offer;
 
     @Enumerated(EnumType.STRING)
     private TenderStatus status;

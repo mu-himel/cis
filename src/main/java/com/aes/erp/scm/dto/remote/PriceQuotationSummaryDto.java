@@ -11,6 +11,7 @@ public class PriceQuotationSummaryDto {
     private Boolean mushak;
     private Boolean isVatAdded;
     private String vatPercent;
+    private String vatAmount;
     private Boolean isAitAdded;
     private BigDecimal subTotalPrice;
     private BigDecimal totalPrice;

@@ -3,6 +3,8 @@ package com.aes.erp.scm.repositories;
 import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderStatus;
 import com.aes.erp.scm.Entities.TenderType;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.NegotiationPartyType;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,16 +46,23 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
 
     @Query(value = """
             SELECT 
-                op.id as id, v.name as vendorName, o2.name as orgName, 
-                op.party_type as partyType, op.organization_id as organizationId, op.vendor_id as vendorId, 
-                op.participator_id  as participatorId
-            FROM offer_participator op 
-            LEFT JOIN offers o ON op.offer_id  = o.id
-            LEFT JOIN vendor v ON op.vendor_id = v.id 
-            LEFT JOIN organizations o2 ON op.organization_id = o2.id 
+                tp.id as id,tp.offer_id as offerId, tp.status, v.name as vendorName, org.name as orgName, 
+                ofn.party_type as partyType, n.organization_id as organizationId, tp.vendor_id as vendorId 
+                
+            FROM tender_participators tp 
+            LEFT JOIN offers o ON tp.offer_id  = o.id
+            LEFT JOIN vendor v ON tp.vendor_id = v.id
+            LEFT JOIN offer_negotiator ofn ON ofn.offer_id = o.id 
+            LEFT JOIN negotiator n ON ofn.negotiator_id = n.id 
+            LEFT JOIN organizations org ON org.id = n.organization_id
             WHERE o.tender_id = :tenderId
+            AND tp.vendor_id = :vendorId
+            GROUP BY tp.id
             """, nativeQuery = true)
-    List<NegotiationHistoryInfo> getNegotiationHistoriesByTender(@Param("tenderId") Long id);
+    List<NegotiationHistoryInfo> getNegotiationHistoriesByTender(
+        @Param("tenderId") Long id,
+        @Param("vendorId") Long vendorId
+    );
 
     /**
      * NegotiationHistoryInfo
@@ -62,9 +71,11 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
         Long getId();
         String getVendorName();
         String getOrgName();
-        String getPartyType();
+        NegotiationPartyType getPartyType();
         Long getOrganizationId();
         Long getVendorId();
+        Long getOfferId();
         Long getParticipatorId();
+        String getStatus();
     }
 }

@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -22,5 +25,6 @@ public class OfferItemDeliveryDetail {
    private BigDecimal deliveryOrderQTY;
 
    @ManyToOne
+   @JsonIgnore
    private OfferDeliveryDetail offerDeliveryDetail;
 }
