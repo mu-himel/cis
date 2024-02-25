@@ -6,6 +6,7 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.service.CategoryServiceImpl;
 import com.aes.erp.inventory.service.OrganizationService;
+import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.TenderCreateDto;
 import com.aes.erp.scm.dto.TenderItemCreateDto;
 import com.aes.erp.scm.dto.TenderResponseDto;
@@ -129,6 +130,15 @@ public class TenderServiceImpl implements TenderService{
         return tender.get();
     }
 
+    
+
+    @Override
+    public Tender getTenderByRfqNo(String tenderNo) {
+        Optional<Tender> tender = tenderRepository.findByRfqNo(tenderNo);
+        if(tender.isEmpty()) throw new AesException("Sorry! Tender not found");
+        return tender.get();
+    }
+
     @Override
     public Page<?> getAllTenderProjection(ClaimResponseDto loggedInUser,Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
@@ -162,7 +172,7 @@ public class TenderServiceImpl implements TenderService{
 
     @Override
     @Transactional
-    public void rejectTender(ClaimResponseDto loggedInUser, Long id) {
+    public void rejectTender(ClaimResponseDto loggedInUser, Long id, NoteDto noteDto) {
         
         Optional<Tender> tenderOp = tenderRepository.findById(id);
         if(tenderOp.isEmpty()){

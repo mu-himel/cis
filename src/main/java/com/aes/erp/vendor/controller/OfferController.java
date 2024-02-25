@@ -1,6 +1,7 @@
 package com.aes.erp.vendor.controller;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.vendor.dto.OfferCreateDTO;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
 import com.aes.erp.vendor.service.offer_services.OfferService;
@@ -38,11 +39,11 @@ public class OfferController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping("/counter-offer/{tenderId}/receive")
-    public ResponseEntity<?> receiveCounterOffer(@PathVariable("tenderId") Long tenderId,
+    @PutMapping("/counter-offer/{tenderNo}/receive")
+    public ResponseEntity<?> receiveCounterOffer(@PathVariable("tenderNo") String tenderNo,
                                                  @RequestBody OfferCreateDTO offerCreateDTO){
 
-        Long id = offerService.receiveCounterOffer(offerCreateDTO, tenderId);
+        Long id = offerService.receiveCounterOffer(offerCreateDTO, tenderNo);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("id", id.toString());
         return new ResponseEntity<>(httpHeaders, HttpStatus.NO_CONTENT);
@@ -77,6 +78,16 @@ public class OfferController {
         @PathVariable("vendorId") Long vendorId
     ){
         offerService.lockOffer(id,vendorId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}/decline")
+    public ResponseEntity<?> lockOfferFromOrganization(
+        @PathVariable("id") Long id, 
+        @RequestAttribute ClaimResponseDto loggedInUser,
+        @RequestBody NoteDto noteDto
+    ){
+        offerService.declineOffer(loggedInUser,id,noteDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

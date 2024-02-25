@@ -6,7 +6,8 @@ public interface TenderQuery {
                 t.rfq_no as tenderNo,
                 t.id as id, 
                 CASE WHEN tp.id IS NOT NULL THEN
-                        MAX(tp.status)
+                        (SELECT status from tender_participators tp2 WHERE 
+                        tp2.id in (select max(id) from tender_participators tp3 where tp3.tender_id=t.id))
                 ELSE
                         t.tender_status
                 END as tenderStatus, 

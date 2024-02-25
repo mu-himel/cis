@@ -1,5 +1,6 @@
 package com.aes.erp.scm.Controller;
 
+import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.TenderCreateDto;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.scm.Entities.TenderType;
@@ -77,9 +78,10 @@ public class TenderController {
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> rejectTender(
         @RequestAttribute ClaimResponseDto loggedInUser,
-        @PathVariable("id") Long id
+        @PathVariable("id") Long id,
+        @RequestBody NoteDto noteDto
         ){
-            tenderService.rejectTender(loggedInUser,id);
+            tenderService.rejectTender(loggedInUser,id, noteDto);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

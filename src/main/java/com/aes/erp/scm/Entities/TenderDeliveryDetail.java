@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 
 @Data
@@ -24,7 +26,7 @@ public class TenderDeliveryDetail {
     private Long warehouseId;
     private String wareHouseName;
     private String wareHouseAddress;
-    private Long deliveryOrderQTY;
+    private BigDecimal deliveryOrderQTY;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     private TenderItem tenderItem;

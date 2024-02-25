@@ -8,5 +8,6 @@ import java.math.BigDecimal;
 public class PriceQuotationDeliveryDetailDto {
     private String warehouseName;
     private String deliveryChargeType;
+    private BigDecimal deliveryOrderQty;
     private BigDecimal deliveryChargeAmount;
 }

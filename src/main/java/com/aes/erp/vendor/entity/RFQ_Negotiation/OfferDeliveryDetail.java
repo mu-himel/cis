@@ -31,7 +31,7 @@ public class OfferDeliveryDetail {
 
     private BigDecimal deliveryChargeAmount;
 
-    @OneToMany(mappedBy = "offerDeliveryDetail",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "offerDeliveryDetail", cascade = CascadeType.ALL)
     List<OfferItemDeliveryDetail> items;
 
     @ManyToOne

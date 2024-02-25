@@ -11,6 +11,7 @@ import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderItem;
 import com.aes.erp.scm.Entities.TenderParticipator;
 import com.aes.erp.scm.Entities.TenderStatus;
+import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationDeliveryDetailDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationDetailReqDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationReqDto;
@@ -86,6 +87,7 @@ public class OfferServiceImpl implements OfferService{
         offer.setMushakIncluded(createDTO.getMushakIncluded());
         offer.setFinalOfferPrice(createDTO.getFinalOfferPrice());
         offer.setNote(createDTO.getNote());
+        offer.setIsFinal(createDTO.getIsFinal());
         offer.setOfferItems(createDTO.getOfferItems().stream().map(oi->{
             OfferItem offerItem = new OfferItem();
             offerItem.setEstimatedDeliveryDays(oi.getEstimatedDeliveryDays());
@@ -142,8 +144,7 @@ public class OfferServiceImpl implements OfferService{
         offer = offerRepository.save(offer);
         Tender parentTender = tenderService.getTenderById(tenderId);
 
-        //sent price quotation to erp project
-        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.INITIAL_OFFER);
+        
 
         NegotiationHistory negotiationHistory = new NegotiationHistory();
         Tender t = new Tender(parentTender.getId());
@@ -191,6 +192,9 @@ public class OfferServiceImpl implements OfferService{
         
         offer.setNegotiationHistory(negotiationHistory);
         offer.setOfferStage(OfferStage.INITIAL_OFFER);
+
+        //sent price quotation to erp project
+        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.INITIAL_OFFER);
 // //
 // //        System.out.println(parentTender.getCode());
 
@@ -214,7 +218,8 @@ public class OfferServiceImpl implements OfferService{
         priceQuotationReqDto.setVendorName(VendorName);
         priceQuotationReqDto.setVendorEmail(vendorEmail);
         priceQuotationReqDto.setVendorPhoneNo(vendorPhoneNo);
-
+        priceQuotationReqDto.setNegotiationHistoryId(offer.getNegotiationHistory().getId());
+        priceQuotationReqDto.setIsFinal(offer.getIsFinal());
         StringBuilder  deliveryChargeType = new StringBuilder();
         priceQuotationReqDto.setDetails(offer.getOfferItems().stream().map(o->{
             PriceQuotationDetailReqDto pqdrd = new PriceQuotationDetailReqDto();
@@ -235,6 +240,7 @@ public class OfferServiceImpl implements OfferService{
                 }else{
                     deliveryChargeType.append("Included");
                 }
+                pqdd.setDeliveryOrderQty(tdd.getDeliveryOrderQTY());
                 pqdd.setDeliveryChargeType(deliveryChargeType.toString());
                 pqdd.setDeliveryChargeAmount(offer.getDeliveryChargeAmount());
                 return pqdd;
@@ -257,8 +263,8 @@ public class OfferServiceImpl implements OfferService{
 
             if(authToken!=null){
                 StringBuilder sb = new StringBuilder("/price-quotations");
-                if(offerStage.equals(OfferStage.COUNTER_OFFER) ||
-                    offerStage.equals(OfferStage.FINAL_OFFER)){
+                if(offerStage.equals(OfferStage.COUNTER_TO_COMPANY) ||
+                    offerStage.equals(OfferStage.FINAL_OFFER_TO_COMPANY)){
                     sb.append("/receive-counter");
                 }
                 String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
@@ -267,7 +273,7 @@ public class OfferServiceImpl implements OfferService{
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<PriceQuotationReqDto> pqPayload = new HttpEntity<>(priceQuotationReqDto,headers);
                 ResponseEntity<Void> response = networkService.post(priceQuotationEndpoint,pqPayload,Void.class);
-                if(response.getStatusCode()!=HttpStatus.CREATED){
+                if(response.getStatusCode()!=HttpStatus.NO_CONTENT){
                     throw new AesException("Something wrong");
                 }
             }
@@ -305,10 +311,9 @@ public class OfferServiceImpl implements OfferService{
         Tender parentTender = tenderService.getTenderById(tenderId);
         NegotiationHistory negotiationHistory = negotiationHistoryService.getHistoryById(createDTO.getNegotiationHistoryId());
 
-        Offer offer = genericModelMapper.map(createDTO, Offer.class);
-        offer = offerRepository.save(offer);
-
+        Offer offer = new Offer();
         createOfferItemsFromTenderItems(offer,createDTO);
+        offer = offerRepository.save(offer);
 
         offer.setTender(parentTender);
         offer.setNegotiationHistory(negotiationHistory);
@@ -339,21 +344,22 @@ public class OfferServiceImpl implements OfferService{
         newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
         offer.addParticipator(newOfferParticipatorEntry);
 
-        offer.setOfferStage(OfferStage.COUNTER_OFFER);
+        offer.setOfferStage(OfferStage.COUNTER_TO_COMPANY);
         offerRepository.save(offer);
 
         //Sent Counter Offer To ERP
-        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.COUNTER_OFFER);
+        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.COUNTER_TO_COMPANY);
     }
 
     @Override
     @Transactional
-    public Long receiveCounterOffer(OfferCreateDTO offerCreateDTO, Long tenderId) {
-        Tender parentTender = tenderService.getTenderById(tenderId);
+    public Long receiveCounterOffer(OfferCreateDTO offerCreateDTO, String tenderNo) {
+        Tender parentTender = tenderService.getTenderByRfqNo(tenderNo);
         NegotiationHistory negotiationHistory = negotiationHistoryService.getHistoryById(offerCreateDTO.getNegotiationHistoryId());
-        Offer offer = genericModelMapper.map(offerCreateDTO, Offer.class);
-        offer = offerRepository.save(offer);
+        Offer offer = new Offer();
         createOfferItemsFromTenderItems(offer,offerCreateDTO);
+        offer = offerRepository.save(offer);
+        
 
         offer.setTender(parentTender);
         offer.setNegotiationHistory(negotiationHistory);
@@ -383,7 +389,7 @@ public class OfferServiceImpl implements OfferService{
         newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
         offer.addParticipator(newOfferParticipatorEntry);
 
-        offer.setOfferStage(OfferStage.COUNTER_OFFER);
+        offer.setOfferStage(OfferStage.COUNTER_TO_VENDOR);
         offerRepository.save(offer);
 
         TenderParticipator tp = new TenderParticipator();
@@ -456,6 +462,26 @@ public class OfferServiceImpl implements OfferService{
         tenderParticipatorRepository.save(tp);
     }
 
+    
+
+
+    @Override
+    @Transactional
+    public void declineOffer(ClaimResponseDto loggedInUser, Long id, NoteDto noteDto) {
+        Optional<Offer> offerOp = offerRepository.findById(id);
+        if(offerOp.isEmpty()){
+            throw new AesException("Sorry! Offer not found");
+        }
+        Offer offer = offerOp.get();
+        Tender tender = offer.getTender();
+        TenderParticipator tp = new TenderParticipator();
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        tp.setStatus(TenderStatus.REJECTED);
+        tp.setVendor(new Vendor(vendorId));
+        tp.setOffer(offer);
+        tp.setTender(tender);
+        tenderParticipatorRepository.save(tp);
+    }
 
     @Override
     @Transactional

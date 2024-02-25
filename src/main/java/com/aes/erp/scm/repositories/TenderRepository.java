@@ -45,19 +45,18 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
     }
 
     @Query(value = """
-            SELECT 
-                tp.id as id,tp.offer_id as offerId, tp.status, v.name as vendorName, org.name as orgName, 
-                ofn.party_type as partyType, n.organization_id as organizationId, tp.vendor_id as vendorId 
-                
-            FROM tender_participators tp 
-            LEFT JOIN offers o ON tp.offer_id  = o.id
-            LEFT JOIN vendor v ON tp.vendor_id = v.id
-            LEFT JOIN offer_negotiator ofn ON ofn.offer_id = o.id 
-            LEFT JOIN negotiator n ON ofn.negotiator_id = n.id 
-            LEFT JOIN organizations org ON org.id = n.organization_id
-            WHERE o.tender_id = :tenderId
-            AND tp.vendor_id = :vendorId
-            GROUP BY tp.id
+        SELECT 
+        o.offer_stage as offerStage , o.is_final as isFinal , 
+        tp.id as id,tp.offer_id as offerId, tp.status, v.name as vendorName,
+        o2.name as orgName, t.organization_id as organizationId,  tp.vendor_id as vendorId 
+        FROM tender_participators tp 
+        LEFT JOIN offers o ON tp.offer_id  = o.id
+        LEFT JOIN vendor v ON tp.vendor_id = v.id
+        LEFT JOIN tenders t ON t.id = o.tender_id
+        LEFT JOIN organizations o2  on o2.id = t.organization_id
+        WHERE o.tender_id = :tenderId
+        AND tp.vendor_id = :vendorId
+        GROUP BY tp.id
             """, nativeQuery = true)
     List<NegotiationHistoryInfo> getNegotiationHistoriesByTender(
         @Param("tenderId") Long id,
@@ -71,11 +70,13 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
         Long getId();
         String getVendorName();
         String getOrgName();
-        NegotiationPartyType getPartyType();
+        String getOfferStage();
+        Boolean getIsFinal();
         Long getOrganizationId();
         Long getVendorId();
         Long getOfferId();
-        Long getParticipatorId();
         String getStatus();
     }
+
+    Optional<Tender> findByRfqNo(String tenderNo);
 }
