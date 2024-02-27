@@ -68,16 +68,17 @@ public class OfferController {
         @PathVariable("id") Long id, 
         @PathVariable("vendorId") Long vendorId
     ){
-        offerService.declineOffer(id,vendorId);
+        offerService.lockOffer(id,vendorId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}/decline/{vendorId}")
     public ResponseEntity<?> lockOfferFromOrganization(
         @PathVariable("id") Long id, 
-        @PathVariable("vendorId") Long vendorId
+        @PathVariable("vendorId") Long vendorId,
+        @RequestBody NoteDto noteDto
     ){
-        offerService.lockOffer(id,vendorId);
+        offerService.declineOffer(id,vendorId,noteDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -11,5 +11,7 @@ import com.aes.erp.scm.Entities.TenderParticipator;
 public interface TenderParticipatorRepository extends JpaRepository<TenderParticipator,Long>{
 
     Optional<TenderParticipator> findByTenderIdAndVendorId(Long id,Long vendorId);
+
+    Optional<TenderParticipator> findByOfferId(Long id);
     
 }

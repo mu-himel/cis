@@ -45,6 +45,8 @@ public class Offer {
 
     private Boolean isFinal;
 
+    private String declineMessage;
+
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)
     private List<OfferItem> offerItems = new ArrayList<>();
 
@@ -56,7 +58,7 @@ public class Offer {
     @JoinColumn(name = "tender_id")
     private Tender tender;
 
-    @JsonIgnore
+    // @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "negotiation_history_id")
     private NegotiationHistory negotiationHistory;

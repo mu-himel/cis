@@ -18,6 +18,6 @@ public interface OfferService {
     Long receiveCounterOffer(OfferCreateDTO offerCreateDTO, String tenderNo);
     void lockOffer(Long id,Long vendorId);
     void lockOffer(ClaimResponseDto loggedInUser, Long id);
-    void declineOffer(Long id, Long vendorId);
+    void declineOffer(Long id, Long vendorId,NoteDto noteDto);
     void declineOffer(ClaimResponseDto loggedInUser, Long id,NoteDto noteDto);
 }

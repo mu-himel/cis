@@ -33,6 +33,7 @@ public class NegotiationHistory {
     @JoinColumn(name = "tender_id")
     private Tender tender;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "negotiationHistory", cascade = CascadeType.ALL)
     private Set<Negotiator> negotiators = new HashSet<>();
 

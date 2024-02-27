@@ -34,6 +34,9 @@ public class NetworkService {
     public <P,R> ResponseEntity<R> post(String url, HttpEntity<P> payload, Class<R> returnType){
         return restTemplate.postForEntity(url,payload,returnType);
     }
+    public <P,R> ResponseEntity<R> put(String url, HttpEntity<P> payload, Class<R> returnType){
+        return restTemplate.exchange(url,HttpMethod.PUT,payload,returnType);
+    }
 
     public <P,R> ResponseEntity<R> get(String url, Class<R> returnType){
         return restTemplate.getForEntity(url,returnType);

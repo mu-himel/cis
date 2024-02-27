@@ -235,10 +235,10 @@ public class OfferServiceImpl implements OfferService{
             pqdrd.setDeliveryDetails(tenderItem.getDeliveryDetails().stream().map(tdd->{
                 PriceQuotationDeliveryDetailDto pqdd = new PriceQuotationDeliveryDetailDto();
                 pqdd.setWarehouseName(tdd.getWareHouseName());
-                if(offer.getDeliveryChargeAmount()!=null){
-                    deliveryChargeType.append("Excluded");
-                }else{
+                if(offer.getDeliveryChargeAmount().equals(BigDecimal.valueOf(0))){
                     deliveryChargeType.append("Included");
+                }else{
+                    deliveryChargeType.append("Excluded");
                 }
                 pqdd.setDeliveryOrderQty(tdd.getDeliveryOrderQTY());
                 pqdd.setDeliveryChargeType(deliveryChargeType.toString());
@@ -255,12 +255,12 @@ public class OfferServiceImpl implements OfferService{
         if(priceQuotationReqDto!=null){
             savePriceQuotationSummary(priceQuotationReqDto,offer,deliveryChargeType.toString());
             Organization organization = tender.getTenderCreator();
-            String url = organization.getServiceIpAddress().replace("/api/v1","")
-                                .concat("/authenticate");
-            String username = organization.getServiceUsername();
-            String password = organization.getServicePassword();
-            String authToken = networkService.getAuthToken(url,username,password);
-
+            // String url = organization.getServiceIpAddress().replace("/api/v1","")
+            //                     .concat("/authenticate");
+            // String username = organization.getServiceUsername();
+            // String password = organization.getServicePassword();
+            // String authToken = networkService.getAuthToken(url,username,password);
+            String authToken = login(organization);    
             if(authToken!=null){
                 StringBuilder sb = new StringBuilder("/price-quotations");
                 if(offerStage.equals(OfferStage.COUNTER_TO_COMPANY) ||
@@ -273,7 +273,8 @@ public class OfferServiceImpl implements OfferService{
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<PriceQuotationReqDto> pqPayload = new HttpEntity<>(priceQuotationReqDto,headers);
                 ResponseEntity<Void> response = networkService.post(priceQuotationEndpoint,pqPayload,Void.class);
-                if(response.getStatusCode()!=HttpStatus.NO_CONTENT){
+                if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
+                    !response.getStatusCode().equals(HttpStatus.CREATED)){
                     throw new AesException("Something wrong");
                 }
             }
@@ -347,6 +348,15 @@ public class OfferServiceImpl implements OfferService{
         offer.setOfferStage(OfferStage.COUNTER_TO_COMPANY);
         offerRepository.save(offer);
 
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+
+        TenderParticipator tp = new TenderParticipator();
+        tp.setStatus(TenderStatus.COUNTERED);
+        
+        tp.setVendor(new Vendor(vendorId));
+        tp.setOffer(offer);
+        tp.setTender(parentTender);
+        tenderParticipatorRepository.save(tp);
         //Sent Counter Offer To ERP
         sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.COUNTER_TO_COMPANY);
     }
@@ -434,32 +444,51 @@ public class OfferServiceImpl implements OfferService{
             throw new AesException("Sorry! Offer not found");
         }
         Offer offer = offerOp.get();
-        Tender tender = offer.getTender();
-        TenderParticipator tp = new TenderParticipator();
-        tp.setStatus(TenderStatus.AWARDED);
-        tp.setVendor(new Vendor(vendorId));
-        tp.setOffer(offer);
-        tp.setTender(tender);
-        tenderParticipatorRepository.save(tp);
+        // Tender tender = offer.getTender();
+        
+        Optional<TenderParticipator> tpOp = tenderParticipatorRepository.findByOfferId(offer.getId());
+        if(tpOp.isPresent()){
+            TenderParticipator tp = tpOp.get();
+            tp.setStatus(TenderStatus.LOCKED);
+        }
+        // TenderParticipator tp = new TenderParticipator();
+        // tp.setStatus(TenderStatus.AWARDED);
+        // tp.setVendor(new Vendor(vendorId));
+        // tp.setOffer(offer);
+        // tp.setTender(tender);
+        // tenderParticipatorRepository.save(tp);
     }
 
-    
+    private String login(Organization organization){
+       
+            String url = organization.getServiceIpAddress().replace("/api/v1","")
+                                .concat("/authenticate");
+            String username = organization.getServiceUsername();
+            String password = organization.getServicePassword();
+        return networkService.getAuthToken(url,username,password);
+    }
 
     @Override
     @Transactional
-    public void declineOffer(Long id, Long vendorId) {
+    public void declineOffer(Long id, Long vendorId,NoteDto noteDto) {
         Optional<Offer> offerOp = offerRepository.findById(id);
         if(offerOp.isEmpty()){
             throw new AesException("Sorry! Offer not found");
         }
         Offer offer = offerOp.get();
-        Tender tender = offer.getTender();
-        TenderParticipator tp = new TenderParticipator();
-        tp.setStatus(TenderStatus.REJECTED);
-        tp.setVendor(new Vendor(vendorId));
-        tp.setOffer(offer);
-        tp.setTender(tender);
-        tenderParticipatorRepository.save(tp);
+        // Tender tender = offer.getTender();
+        Optional<TenderParticipator> tpOp = tenderParticipatorRepository.findByOfferId(offer.getId());
+        if(tpOp.isPresent()){
+            TenderParticipator tp = tpOp.get();
+            tp.setStatus(TenderStatus.REJECTED);
+            offer.setDeclineMessage(noteDto.getNote());
+        }
+        // TenderParticipator tp = new TenderParticipator();
+        // tp.setStatus(TenderStatus.REJECTED);
+        // tp.setVendor(new Vendor(vendorId));
+        // tp.setOffer(offer);
+        // tp.setTender(tender);
+        // tenderParticipatorRepository.save(tp);
     }
 
     
@@ -474,13 +503,20 @@ public class OfferServiceImpl implements OfferService{
         }
         Offer offer = offerOp.get();
         Tender tender = offer.getTender();
-        TenderParticipator tp = new TenderParticipator();
-        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
-        tp.setStatus(TenderStatus.REJECTED);
-        tp.setVendor(new Vendor(vendorId));
-        tp.setOffer(offer);
-        tp.setTender(tender);
-        tenderParticipatorRepository.save(tp);
+        Optional<TenderParticipator> tpOp = tenderParticipatorRepository.findByOfferId(offer.getId());
+        if(tpOp.isPresent()){
+            offer.setDeclineMessage(noteDto.getNote());
+
+            TenderParticipator tp = tpOp.get();
+            tp.setStatus(TenderStatus.REJECTED);
+
+            Organization organization = tender.getTenderCreator();
+            String authToken = login(organization);
+        
+            if(authToken!=null){
+                sentOfferDeclineRequest(authToken, organization, offer, noteDto);
+            }
+        }
     }
 
     @Override
@@ -492,14 +528,56 @@ public class OfferServiceImpl implements OfferService{
         }
         Offer offer = offerOp.get();
         Tender tender = offer.getTender();
-        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
-        TenderParticipator tp = new TenderParticipator();
-        tp.setStatus(TenderStatus.TENDER_SENT);
-        tp.setVendor(new Vendor(vendorId));
-        tp.setOffer(offer);
-        tp.setTender(tender);
-        tenderParticipatorRepository.save(tp);
+        // Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
         
+        Optional<TenderParticipator> tpOp = tenderParticipatorRepository.findByOfferId(offer.getId());
+        if(tpOp.isPresent()){
+            TenderParticipator tp = tpOp.get();
+            tp.setStatus(TenderStatus.LOCKED);
+
+            Organization organization = tender.getTenderCreator();
+            String authToken = login(organization);
+        
+            if(authToken!=null){
+                sentOfferLockRequest(authToken, organization, offer);
+            }
+        }
+        
+        
+    }
+
+    private void sentOfferLockRequest(String authToken, Organization organization,Offer offer){
+        StringBuilder sb = new StringBuilder("/price-quotations");
+                
+            sb.append("/").append(offer.getId()).append("/lock/receive");
+        
+        String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Void> pqPayload = new HttpEntity<>(headers);
+        ResponseEntity<Void> response = networkService.put(priceQuotationEndpoint,pqPayload,Void.class);
+        if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
+            !response.getStatusCode().equals(HttpStatus.CREATED)){
+            throw new AesException("Something wrong");
+        }
+    }
+
+    private void sentOfferDeclineRequest(String authToken, Organization organization,Offer offer, NoteDto noteDto){
+        StringBuilder sb = new StringBuilder("/price-quotations");
+                
+            sb.append("/").append(offer.getId()).append("/decline/receive");
+        
+        String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<NoteDto> pqPayload = new HttpEntity<>(noteDto,headers);
+        ResponseEntity<Void> response = networkService.put(priceQuotationEndpoint,pqPayload,Void.class);
+        if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
+            !response.getStatusCode().equals(HttpStatus.CREATED)){
+            throw new AesException("Something wrong");
+        }
     }
 
     
