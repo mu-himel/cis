@@ -150,9 +150,37 @@ public class TenderServiceImpl implements TenderService{
         }
 
         List<Long> subCatIds = subCategories.stream().map(sc->sc.getId()).collect(Collectors.toList());
-
+        if(loggedInUser.getUserInfoDto()==null && loggedInUser.getUserInfoDto().get("vendorId") == null){
+            return Page.empty();
+        }
         Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
         return tenderRepository.findAllTenderProjection(
+                vendorId,
+                searchFilter.orElse(""),
+                subCatIds, tenderType, startDate,
+                endDate, Instant.now().toEpochMilli(),pageable);
+    }
+
+    
+
+    @Override
+    public Page<?> getClosedTenderProjection(ClaimResponseDto loggedInUser, Optional<String> searchFilter,
+            Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate,
+            Optional<Long> endDate) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
+
+        List<SubCategory> subCategories = new ArrayList<>();
+        if(loggedInUser.getUserInfoDto().get("vendorId")!=null){
+            subCategories = categoryService.getCategoriesForVendor(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
+        }
+
+        List<Long> subCatIds = subCategories.stream().map(sc->sc.getId()).collect(Collectors.toList());
+        if(loggedInUser.getUserInfoDto()==null && loggedInUser.getUserInfoDto().get("vendorId") == null){
+            return Page.empty();
+        }
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        return tenderRepository.findAllClosedTenderProjection(
                 vendorId,
                 searchFilter.orElse(""),
                 subCatIds, tenderType, startDate,

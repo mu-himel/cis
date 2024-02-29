@@ -30,6 +30,16 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
                                             @Param("currentDateTime") Long currentDateTime,
                                             Pageable pageable);
 
+    @Query(value = closedTenderProjectionQuery, countQuery = tenderProjectionCountQuery, nativeQuery = true)
+    Page<TenderExt> findAllClosedTenderProjection(@Param("vendorId") Long vendorId,
+                                            @Param("searchFilter") String searchFilter,
+                                            @Param("subCategoryIds") List<Long> subCategoryIds,
+                                            @Param("tenderType") Optional<TenderType> tenderType,
+                                            @Param("startDate") Optional<Long> startDate,
+                                            @Param("endDate") Optional<Long> endDate,
+                                            @Param("currentDateTime") Long currentDateTime,
+                                            Pageable pageable);
+
     interface TenderExt{
         Long getId();
         String getTenderNo();
