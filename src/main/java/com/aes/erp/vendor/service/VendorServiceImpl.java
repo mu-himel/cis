@@ -562,4 +562,12 @@ public class VendorServiceImpl implements VendorService {
 
         return Optional.ofNullable(map);
     }
+
+    @Override
+    public List<?> getVendorList(Optional<String> name) {
+      
+        return vendorRepository.findAllVendors(name.orElse(null));
+    }
+
+    
 }

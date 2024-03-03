@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface VendorService {
@@ -81,4 +82,6 @@ public interface VendorService {
     void rejectVendor(Long id);
 
     Optional<?> getAvailableVendorCountBySubCategory(String subCatCode);
+
+    List<?> getVendorList(Optional<String> name);
 }
