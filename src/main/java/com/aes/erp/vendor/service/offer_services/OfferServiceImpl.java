@@ -25,6 +25,7 @@ import com.aes.erp.vendor.entity.RFQ_Negotiation.*;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.repository.OfferNegotiatorRepository;
 import com.aes.erp.vendor.repository.OfferRepository;
+import com.aes.erp.vendor.repository.VendorScoreRepository;
 import com.aes.erp.vendor.service.negotiation_history.NegotiationHistoryService;
 import com.aes.erp.vendor.service.participator.NegotiatorService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
@@ -53,6 +54,9 @@ public class OfferServiceImpl implements OfferService{
     private final PriceQuotationRepository priceQuotationRepository;
     private final OfferItemRepository offerItemRepository;
     private final OfferRepository offerRepository;
+
+    @Autowired
+    private VendorScoreRepository vendorScoreRepository;
 
     @Autowired
     private TenderParticipatorRepository tenderParticipatorRepository;
@@ -208,6 +212,11 @@ public class OfferServiceImpl implements OfferService{
         Map<String,Object> vendorInfo =  loggedInUser.getUserInfoDto();
         
         Long VendorId = Long.parseLong(vendorInfo.get("vendorId").toString());
+        Optional<Integer> scoreOp = vendorScoreRepository.findByVendorId(VendorId);
+        Integer score=0;
+        if(scoreOp.isPresent()){
+            score = scoreOp.get();
+        }
         String VendorName = (String)vendorInfo.get("name");
         String vendorEmail = (String)vendorInfo.get("vendorEmail");
         String vendorPhoneNo = (String)vendorInfo.get("vendorPhoneNo");
@@ -218,6 +227,7 @@ public class OfferServiceImpl implements OfferService{
         priceQuotationReqDto.setVendorName(VendorName);
         priceQuotationReqDto.setVendorEmail(vendorEmail);
         priceQuotationReqDto.setVendorPhoneNo(vendorPhoneNo);
+        priceQuotationReqDto.setScore(score);
         priceQuotationReqDto.setNegotiationHistoryId(offer.getNegotiationHistory().getId());
         priceQuotationReqDto.setIsFinal(offer.getIsFinal());
         StringBuilder  deliveryChargeType = new StringBuilder();
@@ -413,7 +423,7 @@ public class OfferServiceImpl implements OfferService{
     }
 
     @Override
-    public Optional<?> getById(Long id) {
+    public Optional<Offer> getById(Long id) {
        Optional<Offer> offerOp = offerRepository.findById(id);
        if(offerOp.isEmpty()) throw new AesException("Offer couldn't be found for this id");
        Offer offer = offerOp.get();

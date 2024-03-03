@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface OfferService {
     void createInitialOffer(ClaimResponseDto loggedInUser, OfferCreateDTO createDTO, Long tenderId);
     void createCounterOffer(ClaimResponseDto loggedInUser, OfferCreateDTO createDTO, Long tenderId);
-    Optional<?> getById(Long id);
+    Optional<Offer> getById(Long id);
     List<Offer> getAllOffersByNegotiationHistoryId(Long id);
     void counterOfferByVendor(OfferCreateDTO createDTO, Long tenderId);
 
