@@ -17,6 +17,8 @@ import com.aes.erp.scm.repositories.TenderItemRepository;
 import com.aes.erp.scm.repositories.TenderParticipatorRepository;
 import com.aes.erp.scm.repositories.TenderRepository;
 import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
+import com.aes.erp.vendor.service.VendorService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +51,8 @@ public class TenderServiceImpl implements TenderService{
     @Autowired
     private TenderParticipatorRepository tpRepository;
 
-
+    @Autowired
+    private VendorService vendorService;
 
 
     public TenderServiceImpl(GenericModelMapper genericModelMapper, TenderRepository tenderRepository, TenderItemRepository tenderItemRepository, OrganizationService organizationService, CategoryServiceImpl categoryService, DeliveryDetailsRepository deliveryDetailsRepository) {
@@ -154,11 +157,17 @@ public class TenderServiceImpl implements TenderService{
             return Page.empty();
         }
         Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        Vendor vendor = vendorService.getById(vendorId);
+
+        if(!vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.APPROVED)){
+            return Page.empty();
+        }
         return tenderRepository.findAllTenderProjection(
                 vendorId,
                 searchFilter.orElse(""),
                 subCatIds, tenderType, startDate,
-                endDate, Instant.now().toEpochMilli(),pageable);
+                endDate, Instant.now().toEpochMilli(),pageable
+        );
     }
 
     

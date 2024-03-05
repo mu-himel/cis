@@ -56,7 +56,7 @@ public class TenderController {
             @RequestParam("page") Optional<Integer> page,
             @RequestParam("size") Optional<Integer> size,
             @RequestParam("tenderType") Optional<TenderType> tenderType){
-        return new ResponseEntity<>(tenderService.getAllTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
+        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
                 HttpStatus.OK);
     }
 

@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
@@ -22,6 +25,8 @@ import com.aes.erp.vendor.service.offer_services.OfferService;
 
 @Service
 public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
+
+    private static final Integer PAGE_SIZE = 10;
 
     @Autowired
     private PoRepository poRepository;
@@ -62,5 +67,15 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         }).collect(Collectors.toList()));
         poRepository.save(po);
     }
+
+    @Override
+    public Page<?> getPendingPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size) {
+        
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        return poRepository.findAllPendingPOs(vendorId,pageable);
+    }
+
+    
     
 }

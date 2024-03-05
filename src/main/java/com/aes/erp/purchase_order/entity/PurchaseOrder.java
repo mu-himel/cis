@@ -1,6 +1,5 @@
 package com.aes.erp.purchase_order.entity;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -15,9 +14,6 @@ import javax.persistence.Table;
 
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.vendor.entity.Vendor;
-import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
-import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferItem;
-
 import lombok.Data;
 
 @Data
@@ -35,12 +31,13 @@ public class PurchaseOrder {
     private String tenderNo;
     private String poNo;
     private Long poDate;
-    private String itemName;
     private Long deliveryDate;
-    private BigDecimal itemQty;
     private String categoryCode;
 
-    private String invoice;
+    private String poStatus;
+
+    @Column(length = 500)
+    private String invoicePath;
 
     @Column(length = 1000)
     private String qcResult;

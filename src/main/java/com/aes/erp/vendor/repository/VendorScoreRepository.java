@@ -15,7 +15,7 @@ public interface VendorScoreRepository extends JpaRepository<VendorScore, Long> 
 
     @Query(value = """
         SELECT ROUND((vs.total_score*100)/1000) as totalScore FROM vendor_score vs 
-        LEFT JOIN vendors v ON v.vendor_score_id = vs.id
+        LEFT JOIN vendor v ON v.vendor_score_id = vs.id
         WHERE v.id = :vendorId
         """,nativeQuery = true)
     Optional<Integer> findByVendorId(@Param("vendorId") Long vendorId);
