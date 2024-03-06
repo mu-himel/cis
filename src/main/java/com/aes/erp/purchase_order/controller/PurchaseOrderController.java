@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.purchase_order.dto.request.PoRequestDto;
-import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderDetailInfo;
+import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderInfo;
 import com.aes.erp.purchase_order.service.PurchaseOrderService;
 
 @RestController
@@ -57,7 +57,7 @@ public class PurchaseOrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getDetailById(@PathVariable("id") Long id){
-        return new ResponseEntity<>(poService.getDetailById(id,PurchaseOrderDetailInfo.class).orElse(null),
+        return new ResponseEntity<>(poService.getDetailById(id,PurchaseOrderInfo.class).orElse(null),
             HttpStatus.OK
         );
     }

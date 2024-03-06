@@ -1,5 +1,6 @@
 package com.aes.erp.purchase_order.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +12,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
-import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
+import com.aes.erp.scm.Entities.PriceQuotation;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferDeliveryDetail;
 
 @Repository
 public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,PurchaseQuery{
@@ -34,7 +36,7 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
 
     <T> Optional<T> findById(Long id, Class<T> t);
 
-    interface PurchaseOrderDetailInfo{
+    interface PurchaseOrderInfo{
         Long getId();
         String getTenderNo();
         String getPoNo(); 
@@ -45,8 +47,46 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
         String invoicePath();
         String qcResult();
 
-        List<PurchaseOrderDetail> getOrderDetails();
+        List<PurchaseOrderDetailInfo> getOrderDetails();
         VendorInfo getVendor();
+    }
+
+    /**
+     * PurchaseOrderDetailInfo
+     */
+    public interface PurchaseOrderDetailInfo {
+    
+        Long getId();
+
+        BigDecimal getItemQty();
+
+        OfferItemInfo getOfferItem();
+
+        String getItemName();
+    }
+
+    /**
+     * OfferItemInfo
+     */
+    public interface OfferItemInfo {
+    
+        Long getId();
+        String getProductDescription();
+        String getSpecification();
+        Long getEstimatedDeliveryDays();
+        Long getItemQuantity();
+     
+        PriceQuotation getPriceQuotation();
+     
+        OfferInfo getOffer();
+    }
+
+    /**
+     * OfferInfo
+     */
+    public interface OfferInfo {
+    
+        List<OfferDeliveryDetail> getWarehouses();
     }
 
     /**
