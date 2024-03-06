@@ -7,7 +7,9 @@ public interface TenderQuery {
                 t.id as id, 
                 CASE WHEN tp.id IS NOT NULL THEN
                         (SELECT status from tender_participators tp2 WHERE 
-                        tp2.id in (select max(id) from tender_participators tp3 where tp3.tender_id=t.id))
+                        tp2.id in (select max(id) from tender_participators tp3 
+                        WHERE tp3.tender_id=t.id 
+                                AND tp3.vendor_id = :vendorId))
                 ELSE
                         t.tender_status
                 END as tenderStatus, 
