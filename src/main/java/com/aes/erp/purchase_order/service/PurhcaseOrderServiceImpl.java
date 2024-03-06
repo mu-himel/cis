@@ -1,5 +1,6 @@
 package com.aes.erp.purchase_order.service;
 
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -10,9 +11,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.exception.AesException;
+import com.aes.erp.fileupload.dto.FileUploadResponse;
+import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.purchase_order.dto.request.PoRequestDto;
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
@@ -33,6 +37,9 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Autowired
     private OfferService offerService;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Override
     @Transactional
@@ -76,7 +83,6 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         return poRepository.findAllPendingPOs(vendorId,pageable);
     }
 
-    
 
     @Override
     public Page<?> getClosedPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size) {
@@ -90,8 +96,39 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         return poRepository.findById(id,t);
     }
 
-    
+    @Override
+    @Transactional
+    public void uploadInvoice(ClaimResponseDto loggedInUser, Long id, Optional<MultipartFile> fileOp) {
+        
+        Optional<PurchaseOrder> poOp = poRepository.findById(id, PurchaseOrder.class);
 
+        if(poOp.isEmpty()){
+            throw new AesException("Sorry! Purchase Order Not Found");
+        }
+        PurchaseOrder po = poOp.get();
+
+        if(fileOp.isPresent()){
+            MultipartFile file = fileOp.get();
+
+            if(!fileUploadService.validFileSize(file.getSize(), Long.valueOf(5*(1024*1024)))){
+                throw new AesException("Sorry! Valid file size upto 5M");
+            }
+
+            Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+            Path path = Path.of("./uploads/vendor/"+vendorId+"/po/invoice");
+            FileUploadResponse fileUploadResponse = fileUploadService.uploadFile(path, file);
+            if(fileUploadResponse!=null){
+
+                po.setInvoicePath(path.resolve(fileUploadResponse.getFilename()).toString());
+                // if invoice uploaded successfully then automatically send grn request to erp
+
+            }
+        }
+        
+    }
+
+    
+    
     
     
 }

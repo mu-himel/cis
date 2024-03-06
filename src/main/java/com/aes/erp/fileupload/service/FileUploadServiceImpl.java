@@ -32,4 +32,11 @@ public class FileUploadServiceImpl implements FileUploadService{
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public Boolean validFileSize(Long fileSize, Long limit) {
+        return fileSize.equals(limit) || fileSize < limit;
+    }
+
+    
 }

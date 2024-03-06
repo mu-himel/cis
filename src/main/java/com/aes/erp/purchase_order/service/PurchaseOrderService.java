@@ -3,6 +3,7 @@ package com.aes.erp.purchase_order.service;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.purchase_order.dto.request.PoRequestDto;
@@ -16,4 +17,6 @@ public interface PurchaseOrderService {
     <T> Optional<T> getDetailById(Long id, Class<T> t);
 
     Page<?> getClosedPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size);
+
+    void uploadInvoice(ClaimResponseDto loggedInUser, Long id, Optional<MultipartFile> fileOp);
 }
