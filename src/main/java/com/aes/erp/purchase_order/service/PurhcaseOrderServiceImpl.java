@@ -76,6 +76,13 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         return poRepository.findAllPendingPOs(vendorId,pageable);
     }
 
+    @Override
+    public <T> Optional<T> getDetailById(Long id, Class<T> t) {
+        return poRepository.findById(id,t);
+    }
+
+    
+
     
     
 }

@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -31,5 +32,6 @@ public class PurchaseOrderDetail {
     
 
     @ManyToOne
+    @JsonIgnore
     private PurchaseOrder purchaseOrder;
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.purchase_order.dto.request.PoRequestDto;
+import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderDetailInfo;
 import com.aes.erp.purchase_order.service.PurchaseOrderService;
 
 @RestController
@@ -39,6 +41,13 @@ public class PurchaseOrderController {
         @RequestParam("size") Optional<Integer> size
     ){
         return new ResponseEntity<>(poService.getPendingPOs(loggedInUser, page,size),HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getDetailById(@PathVariable("id") Long id){
+        return new ResponseEntity<>(poService.getDetailById(id,PurchaseOrderDetailInfo.class).orElse(null),
+            HttpStatus.OK
+        );
     }
     
 }
