@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import javax.persistence.*;
 
@@ -23,6 +24,8 @@ public class OfferItemDeliveryDetail {
    private Long id;
    private String itemName;
    private BigDecimal deliveryOrderQTY;
+
+   private LocalDate deliveryDate;
 
    @ManyToOne
    @JsonIgnore

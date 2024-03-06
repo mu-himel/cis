@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.scm.Entities.PriceQuotation;
+import com.aes.erp.scm.Entities.TenderDeliveryDetail;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferDeliveryDetail;
 
 @Repository
@@ -32,6 +33,7 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
         Long getDeliveryDate();
         Long getItemQty();
         String getPoStatus();
+        String getOrgName();
     }
 
     <T> Optional<T> findById(Long id, Class<T> t);
@@ -85,10 +87,51 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
      * OfferInfo
      */
     public interface OfferInfo {
-    
+        Long getId();
         List<OfferDeliveryDetail> getWarehouses();
+        Boolean getMushakIncluded();
+        Boolean getVatIncluded();
+        BigDecimal getVatPercent();
+        BigDecimal getVatAmount();
+        Boolean getAitIncluded();
+        String getNote();
+        BigDecimal getFinalOfferPrice();
+        Long getCreditPaymentDays();
+        Boolean getDeliveryChargeIncluded();
+        BigDecimal getDeliveryChargeAmount();
+        TenderInfo getTender();
     }
 
+    /**
+     * TenderInfo
+     */
+    public interface TenderInfo {
+        Long getId();
+        List<TenderItemInfo> getTenderItems();
+    }
+
+    /**
+     * TenderItemInfo
+     */
+    public interface TenderItemInfo {
+        Long getId();
+        String getProductDescription();
+        BigDecimal getOrderQuantity();
+        List<TenderDeliveryDetailInfo> getDeliveryDetails();
+        
+    }
+
+    /**
+     * TenderDeliveryDetailInfo
+     */
+    public interface TenderDeliveryDetailInfo {
+        Long getId();
+        BigDecimal getDeliveryOrderQTY();
+        String getWareHouseAddress();
+        String getWareHouseName();
+        Long getWarehouseId(); 
+        
+    }
     /**
      * VendorInfo
      *
