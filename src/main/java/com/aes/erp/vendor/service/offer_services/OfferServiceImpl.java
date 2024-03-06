@@ -217,6 +217,7 @@ public class OfferServiceImpl implements OfferService{
         if(scoreOp.isPresent()){
             score = scoreOp.get();
         }
+        
         String VendorName = (String)vendorInfo.get("name");
         String vendorEmail = (String)vendorInfo.get("vendorEmail");
         String vendorPhoneNo = (String)vendorInfo.get("vendorPhoneNo");
@@ -230,8 +231,9 @@ public class OfferServiceImpl implements OfferService{
         priceQuotationReqDto.setScore(score);
         priceQuotationReqDto.setNegotiationHistoryId(offer.getNegotiationHistory().getId());
         priceQuotationReqDto.setIsFinal(offer.getIsFinal());
-        StringBuilder  deliveryChargeType = new StringBuilder();
+        Map<String,Object>  deliveryChargeType = new HashMap<>();
         priceQuotationReqDto.setDetails(offer.getOfferItems().stream().map(o->{
+           
             PriceQuotationDetailReqDto pqdrd = new PriceQuotationDetailReqDto();
             Optional<TenderItem> tenderItemOp = tender.getTenderItems().stream().filter(ti->
                 ti.getProductDescription().equals(o.getProductDescription())
@@ -243,15 +245,18 @@ public class OfferServiceImpl implements OfferService{
             TenderItem tenderItem = tenderItemOp.get();
             pqdrd.setEstDeliveryDays(Integer.parseInt(o.getEstimatedDeliveryDays().toString()));
             pqdrd.setDeliveryDetails(tenderItem.getDeliveryDetails().stream().map(tdd->{
+                
                 PriceQuotationDeliveryDetailDto pqdd = new PriceQuotationDeliveryDetailDto();
                 pqdd.setWarehouseName(tdd.getWareHouseName());
                 if(offer.getDeliveryChargeAmount().equals(BigDecimal.valueOf(0))){
-                    deliveryChargeType.append("Included");
+                    
+                    deliveryChargeType.put("deliveryCharge","Included");
                 }else{
-                    deliveryChargeType.append("Excluded");
+                    deliveryChargeType.put("deliveryCharge","Excluded");
                 }
+              
                 pqdd.setDeliveryOrderQty(tdd.getDeliveryOrderQTY());
-                pqdd.setDeliveryChargeType(deliveryChargeType.toString());
+                pqdd.setDeliveryChargeType(String.valueOf(deliveryChargeType.get("deliveryCharge")));
                 pqdd.setDeliveryChargeAmount(offer.getDeliveryChargeAmount());
                 return pqdd;
             }).collect(Collectors.toList()));
@@ -263,7 +268,7 @@ public class OfferServiceImpl implements OfferService{
         }).collect(Collectors.toList()));
 
         if(priceQuotationReqDto!=null){
-            savePriceQuotationSummary(priceQuotationReqDto,offer,deliveryChargeType.toString());
+            savePriceQuotationSummary(priceQuotationReqDto,offer,String.valueOf(deliveryChargeType.get("deliveryCharge")));
             Organization organization = tender.getTenderCreator();
             // String url = organization.getServiceIpAddress().replace("/api/v1","")
             //                     .concat("/authenticate");
