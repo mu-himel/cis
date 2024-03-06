@@ -43,6 +43,18 @@ public class PurchaseOrderController {
         return new ResponseEntity<>(poService.getPendingPOs(loggedInUser, page,size),HttpStatus.OK);
     }
 
+    @GetMapping("/closed")
+    public ResponseEntity<?> getClosedPOs(
+        @RequestAttribute ClaimResponseDto loggedInUser,
+        @RequestParam("page") Optional<Integer> page,
+        @RequestParam("size") Optional<Integer> size
+    ){
+        return new ResponseEntity<>(
+            poService.getClosedPOs(loggedInUser,page,size),
+            HttpStatus.OK
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getDetailById(@PathVariable("id") Long id){
         return new ResponseEntity<>(poService.getDetailById(id,PurchaseOrderDetailInfo.class).orElse(null),

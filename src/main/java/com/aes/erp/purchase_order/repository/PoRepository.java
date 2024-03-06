@@ -19,6 +19,8 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
     @Query(value=pendingPos, countQuery = countPendingPos, nativeQuery=true)
     Page<PendingPOItem> findAllPendingPOs(@Param("vendorId") Long vendorId, Pageable pageable);
     
+    @Query(value=closedPos, countQuery = countClosedPos, nativeQuery=true)
+    Page<PendingPOItem> findAllClosedPOs(Long vendorId, Pageable pageable);
     interface PendingPOItem{
         Long getId();
         String getPoNo();
@@ -58,4 +60,6 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
         String getEmail();
         String getPhone();  
     }
+
+    
 }

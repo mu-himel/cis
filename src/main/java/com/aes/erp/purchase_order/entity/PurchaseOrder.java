@@ -42,6 +42,13 @@ public class PurchaseOrder {
     @Column(length = 1000)
     private String qcResult;
 
+    @Column(length = 500)
+    private String grnDeclineNote;
+
+    @Column(length = 500)
+    private String qcDeclineNote;
+
+
     @ManyToOne
     private Organization org;
 

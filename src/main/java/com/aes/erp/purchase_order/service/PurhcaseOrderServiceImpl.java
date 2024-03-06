@@ -76,6 +76,15 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         return poRepository.findAllPendingPOs(vendorId,pageable);
     }
 
+    
+
+    @Override
+    public Page<?> getClosedPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size) {
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        return poRepository.findAllClosedPOs(vendorId,pageable);
+    }
+
     @Override
     public <T> Optional<T> getDetailById(Long id, Class<T> t) {
         return poRepository.findById(id,t);
