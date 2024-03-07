@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class PriceQuotationDetailReqDto {
     private String itemAttribute;
+    private String brandName;
     private Long rfqQty;
     private BigDecimal unitPrice;
     private Integer estDeliveryDays;

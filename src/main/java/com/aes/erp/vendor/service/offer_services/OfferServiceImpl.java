@@ -100,6 +100,7 @@ public class OfferServiceImpl implements OfferService{
             pq.setPricePerUnit(oi.getPriceQuotation().getPricePerUnit());
             pq.setTotalPrice(oi.getPriceQuotation().getTotalPrice());
             offerItem.setPriceQuotation(pq);
+            offerItem.setBrandName(oi.getBrandName());
             offerItem.setProductDescription(oi.getProductDescription());
             offerItem.setSpecification(oi.getSpecification());
             offerItem.setOffer(offer);
@@ -263,6 +264,7 @@ public class OfferServiceImpl implements OfferService{
 
             pqdrd.setRfqQty(o.getItemQuantity());
             pqdrd.setUnitPrice(o.getPriceQuotation().getPricePerUnit());
+            pqdrd.setBrandName(o.getBrandName());
             pqdrd.setItemAttribute(o.getProductDescription());
             return pqdrd;
         }).collect(Collectors.toList()));

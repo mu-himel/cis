@@ -21,6 +21,7 @@ public class OfferItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
+    private String brandName;
     private String productDescription;
     private String specification;
     private Long estimatedDeliveryDays;
