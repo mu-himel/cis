@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
 import com.aes.erp.purchase_order.dto.request.PoRequestDto;
 import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderInfo;
 import com.aes.erp.purchase_order.service.PurchaseOrderService;
@@ -32,7 +33,7 @@ public class PurchaseOrderController {
     @PostMapping
     public ResponseEntity<?> receivePO(
         @RequestAttribute ClaimResponseDto loggedInUser,
-        @RequestBody PoRequestDto poDto){
+        @RequestBody PoReceiveRequestDto poDto){
         poService.receivePO(loggedInUser, poDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

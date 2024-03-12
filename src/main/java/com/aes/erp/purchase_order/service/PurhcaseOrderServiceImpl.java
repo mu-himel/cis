@@ -18,6 +18,7 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
 import com.aes.erp.purchase_order.dto.request.PoRequestDto;
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
@@ -43,36 +44,39 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Override
     @Transactional
-    public void receivePO(ClaimResponseDto loggedInUser,PoRequestDto poDto) {
-        Optional<Offer> offerOp = offerService.getById(poDto.getOfferId());
-        if(offerOp.isEmpty()){
-            throw new AesException("Sorry! Offer not found");
-        }
-        Offer offer = offerOp.get();
-        
-        Long id = (long)loggedInUser.getUserInfoDto().get("id");
-        PurchaseOrder po = new PurchaseOrder();
-        po.setPoDate(po.getPoDate());
-        po.setPoNo(poDto.getPoNo());
-        po.setTenderNo(poDto.getTenderNo());
-        po.setVendor(new Vendor(poDto.getVendorId()));
-        po.setDeliveryDate(poDto.getDeliveryDate());
-        po.setOrg(new Organization(id));
-        po.setCategoryCode(poDto.getCategoryCode());
-        po.setOrderDetails(poDto.getOrderDetails().stream().map(od->{
-            Optional<OfferItem> offerItemOp = offer.getOfferItems().stream()
-                    .filter(oi->oi.getProductDescription().equals(od.getItemName()))
-                    .findFirst();
-            if(offerItemOp.isEmpty()){
-                throw new AesException("Sorry! Offer Item not found");
+    public void receivePO(ClaimResponseDto loggedInUser,PoReceiveRequestDto pgGroup) {
+        pgGroup.getPurchaseOrders().stream().forEach(poDto->{
+            Optional<Offer> offerOp = offerService.getById(poDto.getOfferId());
+            if(offerOp.isEmpty()){
+                throw new AesException("Sorry! Offer not found");
             }
-           PurchaseOrderDetail pod = new PurchaseOrderDetail();
-           pod.setItemName(od.getItemName());
-           pod.setItemQty(od.getItemQty());
-           pod.setOfferItem(offerItemOp.get());
-           return pod; 
-        }).collect(Collectors.toList()));
-        poRepository.save(po);
+            Offer offer = offerOp.get();
+            
+            Long id = (long)loggedInUser.getUserInfoDto().get("id");
+            PurchaseOrder po = new PurchaseOrder();
+            po.setPoDate(poDto.getPoDate());
+            po.setPoNo(poDto.getPoNo());
+            po.setTenderNo(poDto.getTenderNo());
+            po.setVendor(new Vendor(poDto.getVendorId()));
+            po.setDeliveryDate(poDto.getDeliveryDate());
+            po.setOrg(new Organization(id));
+            po.setCategoryCode(poDto.getCategoryCode());
+            po.setOrderDetails(poDto.getOrderDetails().stream().map(od->{
+                Optional<OfferItem> offerItemOp = offer.getOfferItems().stream()
+                        .filter(oi->oi.getProductDescription().equals(od.getItemName()))
+                        .findFirst();
+                if(offerItemOp.isEmpty()){
+                    throw new AesException("Sorry! Offer Item not found");
+                }
+               PurchaseOrderDetail pod = new PurchaseOrderDetail();
+               pod.setItemName(od.getItemName());
+               pod.setItemQty(od.getItemQty());
+               pod.setOfferItem(offerItemOp.get());
+               return pod; 
+            }).collect(Collectors.toList()));
+            poRepository.save(po);
+        });
+        
     }
 
     @Override
