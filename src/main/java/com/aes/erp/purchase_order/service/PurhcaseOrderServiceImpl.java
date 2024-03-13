@@ -1,15 +1,25 @@
 package com.aes.erp.purchase_order.service;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.text.html.FormSubmitEvent.MethodType;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,16 +28,22 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.network.NetworkService;
 import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
-import com.aes.erp.purchase_order.dto.request.PoRequestDto;
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
 import com.aes.erp.purchase_order.repository.PoRepository;
+import com.aes.erp.scm.dto.NoteDto;
+import com.aes.erp.scm.dto.remote.GoodReceiveItemDetailDto;
+import com.aes.erp.scm.dto.remote.GoodReceiveNoteCreateDto;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferItem;
 import com.aes.erp.vendor.service.offer_services.OfferService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
@@ -41,6 +57,11 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Autowired
     private FileUploadService fileUploadService;
+
+    @Autowired
+    private NetworkService networkService;
+
+    
 
     @Override
     @Transactional
@@ -57,6 +78,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setPoDate(poDto.getPoDate());
             po.setPoNo(poDto.getPoNo());
             po.setTenderNo(poDto.getTenderNo());
+            po.setRemotePoId(poDto.getId());
             po.setVendor(new Vendor(poDto.getVendorId()));
             po.setDeliveryDate(poDto.getDeliveryDate());
             po.setOrg(new Organization(id));
@@ -124,12 +146,65 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             if(fileUploadResponse!=null){
 
                 po.setInvoicePath(path.resolve(fileUploadResponse.getFilename()).toString());
-                // if invoice uploaded successfully then automatically send grn request to erp
+                
 
             }
         }
         
     }
+
+    @Override
+    public void sendPO(Long id) {
+        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        if(poOp.isPresent()){
+            PurchaseOrder po = poOp.get();
+            Organization organization = po.getOrg();
+            
+            GoodReceiveNoteCreateDto grn = new GoodReceiveNoteCreateDto();
+            grn.setRemotePoId(po.getRemotePoId());
+            List<GoodReceiveItemDetailDto> grids = new ArrayList<>();
+            po.getOrderDetails().stream().forEach(od->{
+                GoodReceiveItemDetailDto grid = new GoodReceiveItemDetailDto();
+                grid.setItemAttribute(od.getItemName());
+                grid.setReceiveQty(od.getItemQty());
+                grids.add(grid);
+            });
+            grn.setGoodReceiveItemDetails(grids);
+
+            String authToken = login(organization);
+            
+            log.info("authtoken:" +authToken);
+            sendGrnRequest(organization, authToken, grn);
+        }
+        
+    }
+
+    private String login(Organization organization){
+       
+        String url = organization.getServiceIpAddress().replace("/api/v1","")
+                            .concat("/authenticate");
+        String username = organization.getServiceUsername();
+        String password = organization.getServicePassword();
+        return networkService.getAuthToken(url,username,password);
+    }
+
+   
+    private void sendGrnRequest(Organization organization, String authToken, GoodReceiveNoteCreateDto grn){
+        StringBuilder sb = new StringBuilder("/goods-receive-note/receive");
+        
+        String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<GoodReceiveNoteCreateDto> pqPayload = new HttpEntity<>(grn, headers);
+        ResponseEntity<Void> response = networkService.post(priceQuotationEndpoint,pqPayload,Void.class);
+        if(!response.getStatusCode().equals(HttpStatus.CREATED)) {
+            throw new AesException("something wrong.");
+        }
+    }
+
+
+    
 
     
     

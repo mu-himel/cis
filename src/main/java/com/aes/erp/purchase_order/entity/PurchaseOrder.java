@@ -28,6 +28,7 @@ public class PurchaseOrder {
     @ManyToOne
     private Vendor vendor;
 
+    private Long remotePoId;
     private String tenderNo;
     private String poNo;
     private Long poDate;

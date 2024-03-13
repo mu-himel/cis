@@ -19,4 +19,6 @@ public interface PurchaseOrderService {
     Page<?> getClosedPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size);
 
     void uploadInvoice(ClaimResponseDto loggedInUser, Long id, Optional<MultipartFile> fileOp);
+
+    void sendPO(Long id);
 }

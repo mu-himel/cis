@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class PoRequestDto {
+    private Long id;
     private String poNo;
     private Long vendorId;
     private String tenderNo;
