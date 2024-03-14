@@ -61,8 +61,8 @@ public class PurchaseOrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getDetailById(@PathVariable("id") Long id){
-        return new ResponseEntity<>(poService.getDetailById(id,PurchaseOrderInfo.class).orElse(null),
+    public ResponseEntity<?> getDetailById(@RequestAttribute ClaimResponseDto loggedInUser, @PathVariable("id") Long id){
+        return new ResponseEntity<>(poService.getDetailById(loggedInUser, id,PurchaseOrderInfo.class).orElse(null),
             HttpStatus.OK
         );
     }

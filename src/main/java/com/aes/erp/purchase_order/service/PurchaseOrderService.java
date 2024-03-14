@@ -15,7 +15,7 @@ public interface PurchaseOrderService {
     
     Page<?> getPendingPOs(ClaimResponseDto loggedInUser, Optional<Integer>page, Optional<Integer>size);
 
-    <T> Optional<T> getDetailById(Long id, Class<T> t);
+    <T> Optional<T> getDetailById(ClaimResponseDto loggedInUser, Long id, Class<T> t);
 
     Page<?> getClosedPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size);
 

@@ -33,6 +33,8 @@ import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
 import com.aes.erp.purchase_order.repository.PoRepository;
+import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderDetailInfo;
+import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderInfo;
 import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.remote.GoodReceiveItemDetailDto;
 import com.aes.erp.scm.dto.remote.GoodReceiveNoteCreateDto;
@@ -120,8 +122,22 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     }
 
     @Override
-    public <T> Optional<T> getDetailById(Long id, Class<T> t) {
-        return poRepository.findById(id,t);
+    public <T> Optional<T> getDetailById(ClaimResponseDto loggedInUser, Long id, Class<T> t) {
+      
+        var detailOp = poRepository.findById(id,t);
+
+        if(detailOp.isPresent()){
+            var detail = detailOp.get();
+            if (detail  instanceof PurchaseOrderInfo){
+                Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+                if(!((PurchaseOrderInfo)detail).getVendor().getId().equals(vendorId)){
+                    throw new AesException("Sorry! po not for this user");
+                }
+            }
+        }
+
+        return detailOp;
+        
     }
 
     @Override
@@ -205,12 +221,5 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             throw new AesException("something wrong.");
         }
     }
-
-
-    
-
-    
-    
-    
-    
+ 
 }

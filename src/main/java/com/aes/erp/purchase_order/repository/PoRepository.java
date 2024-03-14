@@ -46,8 +46,8 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
         Long getDeliveryDate();
         String getCategoryCode();
         String getPoStatus();
-        String invoicePath();
-        String qcResult();
+        String getInvoicePath();
+        String getQcResult();
 
         List<PurchaseOrderDetailInfo> getOrderDetails();
         VendorInfo getVendor();
