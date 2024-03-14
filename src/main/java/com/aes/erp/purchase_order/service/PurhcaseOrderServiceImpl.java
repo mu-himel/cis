@@ -65,7 +65,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Override
     @Transactional
-    public void receivePO(ClaimResponseDto loggedInUser,PoReceiveRequestDto pgGroup) {
+    public void receivePO(Organization organization,PoReceiveRequestDto pgGroup) {
         pgGroup.getPurchaseOrders().stream().forEach(poDto->{
             Optional<Offer> offerOp = offerService.getById(poDto.getOfferId());
             if(offerOp.isEmpty()){
@@ -73,7 +73,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             }
             Offer offer = offerOp.get();
             
-            Long id = (long)loggedInUser.getUserInfoDto().get("id");
+            // Long id = (long)loggedInUser.getUserInfoDto().get("id");
             PurchaseOrder po = new PurchaseOrder();
             po.setPoDate(poDto.getPoDate());
             po.setPoNo(poDto.getPoNo());
@@ -81,7 +81,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setRemotePoId(poDto.getId());
             po.setVendor(new Vendor(poDto.getVendorId()));
             po.setDeliveryDate(poDto.getDeliveryDate());
-            po.setOrg(new Organization(id));
+            po.setOrg(organization);
+            po.setPoStatus("PENDING");
             po.setCategoryCode(poDto.getCategoryCode());
             po.setOrderDetails(poDto.getOrderDetails().stream().map(od->{
                 Optional<OfferItem> offerItemOp = offer.getOfferItems().stream()
@@ -94,6 +95,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                pod.setItemName(od.getItemName());
                pod.setItemQty(od.getItemQty());
                pod.setOfferItem(offerItemOp.get());
+               pod.setPurchaseOrder(po);
                return pod; 
             }).collect(Collectors.toList()));
             poRepository.save(po);
@@ -162,6 +164,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             
             GoodReceiveNoteCreateDto grn = new GoodReceiveNoteCreateDto();
             grn.setRemotePoId(po.getRemotePoId());
+
             List<GoodReceiveItemDetailDto> grids = new ArrayList<>();
             po.getOrderDetails().stream().forEach(od->{
                 GoodReceiveItemDetailDto grid = new GoodReceiveItemDetailDto();
