@@ -11,4 +11,5 @@ public class GoodReceiveItemDetailDto {
     String itemAttribute;
     String brandName;
     BigDecimal receiveQty;
+    String subCategoryCode;
 }

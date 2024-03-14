@@ -172,23 +172,25 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     }
 
     @Override
+    @Transactional
     public void sendPO(Long id) {
         Optional<PurchaseOrder> poOp = poRepository.findById(id);
         if(poOp.isPresent()){
             PurchaseOrder po = poOp.get();
             Organization organization = po.getOrg();
-            
+            po.setIsPoSent(true);
             GoodReceiveNoteCreateDto grn = new GoodReceiveNoteCreateDto();
             grn.setRemotePoId(po.getRemotePoId());
-
             List<GoodReceiveItemDetailDto> grids = new ArrayList<>();
             po.getOrderDetails().stream().forEach(od->{
                 GoodReceiveItemDetailDto grid = new GoodReceiveItemDetailDto();
                 grid.setItemAttribute(od.getItemName());
+                grid.setBrandName(od.getOfferItem().getBrandName());
                 grid.setReceiveQty(od.getItemQty());
+                grid.setSubCategoryCode(po.getCategoryCode());
                 grids.add(grid);
             });
-            grn.setGoodReceiveItemDetails(grids);
+            grn.setDetails(grids);
 
             String authToken = login(organization);
             

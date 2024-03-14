@@ -35,6 +35,8 @@ public class PurchaseOrder {
     private Long deliveryDate;
     private String categoryCode;
 
+    private Boolean isPoSent;
+
     private String poStatus;
 
     @Column(length = 500)

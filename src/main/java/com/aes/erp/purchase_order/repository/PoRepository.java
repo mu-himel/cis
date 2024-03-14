@@ -43,6 +43,7 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
         String getTenderNo();
         String getPoNo(); 
         Long getPoDate();
+        Boolean getIsPoSent();
         Long getDeliveryDate();
         String getCategoryCode();
         String getPoStatus();

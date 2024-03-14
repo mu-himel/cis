@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class GoodReceiveNoteCreateDto {
     Long remotePoId;
     Long warehouseId;
-    private List<GoodReceiveItemDetailDto> goodReceiveItemDetails;
+    private List<GoodReceiveItemDetailDto> details;
 }
