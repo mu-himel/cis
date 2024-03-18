@@ -1,6 +1,7 @@
 package com.aes.erp.purchase_order.service;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -181,6 +182,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setIsPoSent(true);
             GoodReceiveNoteCreateDto grn = new GoodReceiveNoteCreateDto();
             grn.setRemotePoId(po.getRemotePoId());
+            grn.setPoId(po.getId());
             List<GoodReceiveItemDetailDto> grids = new ArrayList<>();
             po.getOrderDetails().stream().forEach(od->{
                 GoodReceiveItemDetailDto grid = new GoodReceiveItemDetailDto();
@@ -196,6 +198,34 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             
             log.info("authtoken:" +authToken);
             sendGrnRequest(organization, authToken, grn);
+        }
+        
+    }
+
+    @Override
+    @Transactional
+    public void grnReceive(Long id) {
+        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        if(poOp.isPresent()){
+            PurchaseOrder po = poOp.get();
+            po.setPoStatus("RECEIVED");
+            po.setIsGrnReceived(true);
+            po.setGrnReceiveDate(Instant.now().toEpochMilli());
+        }
+    }
+
+    
+
+    @Override
+    @Transactional
+    public void declineGrn(Long id, NoteDto noteDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        if(poOp.isPresent()){
+            PurchaseOrder po = poOp.get();
+            po.setPoStatus("DECLINED");
+            po.setIsGrnReceived(false);
+            po.setGrnReceiveDate(Instant.now().toEpochMilli());
+            po.setGrnDeclineNote(noteDto.getNote());
         }
         
     }

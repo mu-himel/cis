@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aes.erp.purchase_order.service.PurchaseOrderService;
+import com.aes.erp.scm.dto.NoteDto;
 
 @RestController
 @RequestMapping("/api/v1/po-send")
@@ -20,6 +22,20 @@ public class PoSendController {
     @PutMapping("/{id}")
     public ResponseEntity<?> sendPoToErp(@PathVariable("id") Long id){
         purchaseOrderService.sendPO(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}/received-grn")
+    public ResponseEntity<?> receiveGrn(@PathVariable("id") Long id){
+        purchaseOrderService.grnReceive(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}/declined-grn")
+    public ResponseEntity<?> declineGrn(@PathVariable("id") Long id,
+    @RequestBody NoteDto noteDto
+    ){
+        purchaseOrderService.declineGrn(id,noteDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

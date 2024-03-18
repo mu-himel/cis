@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class GoodReceiveNoteCreateDto {
+    Long poId;
     Long remotePoId;
     Long warehouseId;
     private List<GoodReceiveItemDetailDto> details;

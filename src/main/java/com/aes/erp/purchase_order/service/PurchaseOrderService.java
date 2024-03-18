@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
+import com.aes.erp.scm.dto.NoteDto;
 
 public interface PurchaseOrderService {
 
@@ -22,4 +23,7 @@ public interface PurchaseOrderService {
     void uploadInvoice(ClaimResponseDto loggedInUser, Long id, Optional<MultipartFile> fileOp);
 
     void sendPO(Long id);
+    void grnReceive(Long id);
+    void declineGrn(Long id,NoteDto noteDto);
+    
 }

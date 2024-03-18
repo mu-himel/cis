@@ -48,6 +48,12 @@ public class PurchaseOrder {
     @Column(length = 500)
     private String grnDeclineNote;
 
+    private Boolean isGrnReceived;
+
+    private Long grnReceiveDate;
+
+    private Boolean isQcPass;
+
     @Column(length = 500)
     private String qcDeclineNote;
 
