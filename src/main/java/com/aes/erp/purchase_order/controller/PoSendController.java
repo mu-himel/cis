@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aes.erp.purchase_order.dto.request.QcResultDto;
 import com.aes.erp.purchase_order.service.PurchaseOrderService;
 import com.aes.erp.scm.dto.NoteDto;
 
@@ -36,6 +38,20 @@ public class PoSendController {
     @RequestBody NoteDto noteDto
     ){
         purchaseOrderService.declineGrn(id,noteDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}/receive-qc")
+    public ResponseEntity<?> receiveQc(@PathVariable("id") Long id,
+        @RequestBody QcResultDto qcResultDto){
+        purchaseOrderService.receiveQc(id,qcResultDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    @PutMapping("/{id}/decline-qc")
+    public ResponseEntity<?> declineQc(@PathVariable("id") Long id,
+        @RequestBody QcResultDto qcResultDto){
+        purchaseOrderService.declineQc(id,qcResultDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

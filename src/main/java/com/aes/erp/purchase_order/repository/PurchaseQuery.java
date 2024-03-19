@@ -16,7 +16,7 @@ public interface PurchaseQuery {
         FROM purchase_orders po 
         LEFT JOIN purchase_order_details pod ON pod.purchase_order_id = po.id
         LEFT JOIN organizations o ON o.id = po.org_id
-        WHERE po.vendor_id = :vendorId  AND po.po_status IN ('PENDING','DECLINED')
+        WHERE po.vendor_id = :vendorId  AND po.po_status IN ('PENDING','IN PROGRESS','DECLINED','QC_FAILED','RECEIVED')
         GROUP BY po.id      
         """;
 

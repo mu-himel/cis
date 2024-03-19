@@ -31,6 +31,7 @@ import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
+import com.aes.erp.purchase_order.dto.request.QcResultDto;
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
 import com.aes.erp.purchase_order.repository.PoRepository;
@@ -180,6 +181,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             PurchaseOrder po = poOp.get();
             Organization organization = po.getOrg();
             po.setIsPoSent(true);
+            po.setPoStatus("IN PROGRESS");
             GoodReceiveNoteCreateDto grn = new GoodReceiveNoteCreateDto();
             grn.setRemotePoId(po.getRemotePoId());
             grn.setPoId(po.getId());
@@ -195,7 +197,6 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             grn.setDetails(grids);
 
             String authToken = login(organization);
-            
             log.info("authtoken:" +authToken);
             sendGrnRequest(organization, authToken, grn);
         }
@@ -228,6 +229,35 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setIsGrnReceived(false);
             po.setGrnReceiveDate(Instant.now().toEpochMilli());
             po.setGrnDeclineNote(noteDto.getNote());
+        }
+        
+    }
+
+    @Override
+    @Transactional
+    public void receiveQc(Long id, QcResultDto qcResultDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        if(poOp.isPresent()){
+            PurchaseOrder po = poOp.get();
+            po.setIsQcPass(true);
+            po.setIsPoSent(true);
+            po.setQcDeclineNote(null);
+            po.setPoStatus(qcResultDto.getStatus());
+            po.setQcResult(qcResultDto.getQcResult());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void declineQc(Long id, QcResultDto qcResultDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        if(poOp.isPresent()){
+            PurchaseOrder po = poOp.get();
+            po.setIsQcPass(false);
+            po.setIsPoSent(false);
+            po.setQcDeclineNote(qcResultDto.getNote());
+            po.setPoStatus(qcResultDto.getStatus());
+            po.setQcResult(qcResultDto.getQcResult());
         }
         
     }
