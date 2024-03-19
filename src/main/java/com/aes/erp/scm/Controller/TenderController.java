@@ -1,5 +1,6 @@
 package com.aes.erp.scm.Controller;
 
+import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.TenderCreateDto;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.scm.Entities.TenderType;
@@ -55,7 +56,7 @@ public class TenderController {
             @RequestParam("page") Optional<Integer> page,
             @RequestParam("size") Optional<Integer> size,
             @RequestParam("tenderType") Optional<TenderType> tenderType){
-        return new ResponseEntity<>(tenderService.getAllTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
+        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
                 HttpStatus.OK);
     }
 
@@ -65,10 +66,22 @@ public class TenderController {
     }
 
     @GetMapping("/{id}/negotiation-history")
-    public ResponseEntity<?> getNegotiationHistory(@PathVariable("id") Long id){
+    public ResponseEntity<?> getNegotiationHistory(
+        @RequestAttribute ClaimResponseDto loggedInUser,
+        @PathVariable("id") Long id){
         return new ResponseEntity<>(
-            tenderService.getNegotiationHistories(id),
+            tenderService.getNegotiationHistories(loggedInUser, id),
             HttpStatus.OK
         );
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<?> rejectTender(
+        @RequestAttribute ClaimResponseDto loggedInUser,
+        @PathVariable("id") Long id,
+        @RequestBody NoteDto noteDto
+        ){
+            tenderService.rejectTender(loggedInUser,id, noteDto);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

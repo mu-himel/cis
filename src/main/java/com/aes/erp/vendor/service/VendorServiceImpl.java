@@ -528,7 +528,8 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     public Optional<Vendor> getVendorByUserId(Long userId) {
-        return vendorRepository.findByUserId(userId);
+        Optional<Vendor> vendor = vendorRepository.findByUserId(userId);
+        return vendor;
     }
 
     @Override
@@ -561,4 +562,12 @@ public class VendorServiceImpl implements VendorService {
 
         return Optional.ofNullable(map);
     }
+
+    @Override
+    public List<?> getVendorList(Optional<String> name) {
+      
+        return vendorRepository.findAllVendors(name.orElse(null));
+    }
+
+    
 }

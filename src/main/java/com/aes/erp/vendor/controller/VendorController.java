@@ -40,6 +40,14 @@ public class VendorController {
         );
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<?> getVendors(@RequestParam("name") Optional<String> name){
+        return new ResponseEntity<>(
+            vendorService.getVendorList(name),
+            HttpStatus.OK
+        );
+    }
+
     @GetMapping
     public ResponseEntity<?> getVendors(
             @RequestParam("page") Optional<Integer> page,

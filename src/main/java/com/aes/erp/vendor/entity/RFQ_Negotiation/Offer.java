@@ -34,21 +34,31 @@ public class Offer {
     @Enumerated(value = EnumType.STRING)
     private CreditType creditType;
 
-    private boolean mushakIncluded;
-    private boolean vatIncluded;
+    private Boolean mushakIncluded;
+    private Boolean vatIncluded;
+    private BigDecimal vatPercent;
+    private BigDecimal vatAmount;
+    private Boolean aitIncluded;
     private String note;
     private BigDecimal finalOfferPrice;
     private Long creditPaymentDays;
 
+    private Boolean isFinal;
+
+    private String declineMessage;
+
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)
     private List<OfferItem> offerItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)
+    private List<OfferDeliveryDetail> warehouses = new ArrayList<>();
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tender_id")
     private Tender tender;
 
-    @JsonIgnore
+    // @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "negotiation_history_id")
     private NegotiationHistory negotiationHistory;

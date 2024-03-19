@@ -8,7 +8,14 @@ import java.util.List;
 public class PriceQuotationReqDto {
     private String code;
     private String paymentMethod;
+    private Long remoteOfferId;
     private Long vendorId;
     private String vendorName;
+    private String vendorEmail;
+    private String vendorPhoneNo;
+    private Integer score;
+    private Long negotiationHistoryId;
+    private Boolean isFinal;
     private List<PriceQuotationDetailReqDto> details;
+    private PriceQuotationSummaryDto priceQuotationSummary;
 }

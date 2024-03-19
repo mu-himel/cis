@@ -21,11 +21,12 @@ public class OfferItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
+    private String brandName;
     private String productDescription;
     private String specification;
     private Long estimatedDeliveryDays;
     private Long itemQuantity;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private PriceQuotation priceQuotation;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)

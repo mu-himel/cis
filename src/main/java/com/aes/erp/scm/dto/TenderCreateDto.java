@@ -4,17 +4,20 @@ import lombok.Data;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Data
 public class TenderCreateDto {
     private String code;
     private String rfqNo;
-    private String deadline;
+    private Long deadline;
     private String itemCategoryCode;
     private List<TenderItemCreateDto> tenderItems;
 
-    public Long getDeadline(){
-        return Instant.parse(deadline).toEpochMilli();
+    public void setDeadline(String deadline){
+        ZoneId zoneId = ZoneId.systemDefault();
+        this.deadline = LocalDateTime.parse(deadline).atZone(zoneId).toEpochSecond()*1000;
     }
+    
 }

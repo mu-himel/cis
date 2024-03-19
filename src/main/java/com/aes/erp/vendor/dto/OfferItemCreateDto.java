@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class OfferItemCreateDto {
     private String productDescription;
+    private String brandName;
     private String specification;
     private String location;
     private Long itemQuantity;

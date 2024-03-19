@@ -53,7 +53,32 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                                     Pageable pageable);
 
 
+    @Query(value="""
+            SELECT 
+                v.id as id,
+                v.name as name,
+                v.email as email, 
+                v.phone as phone, 
+                v.verification_status as verificationStatus,
+                (total_score*100/1000) as score 
+            FROM vendor v
+            LEFT JOIN vendor_score vs ON v.vendor_score_id = vs.id
+            WHERE v.verification_status IN ('PENDING_DOCUMENT_VERIFICATION','PENDING_VERIFICATION','VERIFIED','APPROVED') 
+                AND (:name IS NULL OR LOWER(v.name) LIKE CONCAT('%',LOWER(:name),'%')) 
+            """, nativeQuery = true)
+    List<VendorListInfo> findAllVendors(@Param("name") String name);
 
+    /**
+     * InnerVendorRepository
+     */
+    public interface VendorListInfo {
+        Long getId();
+        String getName();
+        String getEmail();
+        String getPhone();
+        Integer getScore();
+        String getVerificationStatus();
+    }
     @Query(value = "SELECT v FROM Vendor v " +
             " LEFT JOIN FETCH v.vendorType vt " +
             " LEFT JOIN FETCH v.category c " +

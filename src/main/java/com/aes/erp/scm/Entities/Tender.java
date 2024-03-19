@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Data
@@ -30,11 +30,11 @@ public class Tender {
     private String code;
     private String rfqNo;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization tenderCreator;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
     private ItemCategory itemCategory;
 
     @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
@@ -49,4 +49,17 @@ public class Tender {
     @JsonIgnore
     @OneToMany(mappedBy = "tender", cascade = CascadeType.ALL)
     private List<Offer> offerList;
+
+    public Tender(Long id) {
+        this.id = id;
+    }
+
+    // public void setDeadline(String deadline){
+    //     long d = Instant.parse(deadline).toEpochMilli();
+    //     this.deadline = Long.valueOf(d);
+    // }
+
+    
+
+    
 }

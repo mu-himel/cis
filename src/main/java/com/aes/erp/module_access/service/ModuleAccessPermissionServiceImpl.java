@@ -672,6 +672,13 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
     public void initModulePermissions() {
         // ADD PERMISSION FOR VENDOR ROLE_NODE
         addPermission(1L,4L,2L,true);
+        addPermission(1L,4L,16L,true);
+        addPermission(1L,4L,17L,true);
+        addPermission(1L,4L,18L,true);
+        addPermission(1L,4L,19L,true);
+        addPermission(1L,4L,20L,true);
+        addPermission(1L,4L,21L,true);
+        addPermission(1L,4L,22L,true);
 
         // ADD PERMISSION FOR ENLISTER ROLE_NODE
         addPermission(1L,2L,11L,true);
@@ -680,14 +687,15 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
         addPermission(1L,2L,14L,false);
         addPermission(1L,2L,15L,true);
         addPermission(1L,2L,3L,true);
-        addPermission(1L,2L,15L,true);
+        addPermission(1L,2L,9L,true);
 
         // ADD PERMISSION FOR AUDITOR ROLE_NODE
         addPermission(1L,3L,11L,true);
         addPermission(1L,3L,12L,true);
         addPermission(1L,3L,13L,false);
         addPermission(1L,3L,14L,true);
-        addPermission(1L,3L,9L,true);
+        addPermission(1L,2L,15L,true);
+        
 
     }
 

@@ -28,4 +28,11 @@ public class Organization {
 
     @OneToOne(fetch = FetchType.EAGER)
     private Role role;
+
+
+    public Organization(Long id) {
+        this.id = id;
+    }
+
+    
 }

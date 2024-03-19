@@ -238,6 +238,39 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             closedRfq.setShowInMenu(false);
             closedRfq.setParentModuleAccess(tenderModule);
             tenderModule.addChildModule(closedRfq);
+
+            ModuleAccess po = new ModuleAccess();
+            po.setId(20L);
+            po.setDisplayOrder(19);
+            po.setName("PO");
+            po.setRoute("tenders/po");
+            po.setUri("tenders/po");
+            po.setModuleType(ModuleType.CHILD);
+            po.setShowInMenu(true);
+            po.setParentModuleAccess(tenderModule);
+            tenderModule.addChildModule(po);
+
+            ModuleAccess pendingPo = new ModuleAccess();
+            pendingPo.setId(21L);
+            pendingPo.setDisplayOrder(20);
+            pendingPo.setName("Pending PO");
+            pendingPo.setRoute("tenders/po/pending");
+            pendingPo.setUri("tenders/po/pending");
+            pendingPo.setModuleType(ModuleType.CHILD);
+            pendingPo.setShowInMenu(true);
+            pendingPo.setParentModuleAccess(tenderModule);
+            tenderModule.addChildModule(pendingPo);
+
+            ModuleAccess closedPo = new ModuleAccess();
+            closedPo.setId(22L);
+            closedPo.setDisplayOrder(21);
+            closedPo.setName("Closed PO");
+            closedPo.setRoute("tenders/po/closed");
+            closedPo.setUri("tenders/po/closed");
+            closedPo.setModuleType(ModuleType.CHILD);
+            closedPo.setShowInMenu(true);
+            closedPo.setParentModuleAccess(tenderModule);
+            tenderModule.addChildModule(closedPo);
             
             moduleAccessRepository.save(tenderModule);
 

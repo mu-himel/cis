@@ -89,8 +89,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
                         new OrganizationPrincipal(orgId, organization.getName()), null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                request.setAttribute("organization", organization);
             }
-            request.setAttribute("loggedInUser",claimResponseDto);
+            if(claimResponseDto !=null){
+                request.setAttribute("loggedInUser",claimResponseDto);
+            }
+            
             String uri = (request.getHeader("uri")!=null)? request.getHeader("uri") : null;
             if(uri!=null){
                 request.setAttribute("uri", uri);

@@ -1,5 +1,6 @@
 package com.aes.erp.scm.services;
 
+import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.TenderCreateDto;
 import com.aes.erp.scm.dto.TenderResponseDto;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
@@ -25,6 +26,15 @@ public interface TenderService {
                         Optional<Integer> size, Optional<TenderType> tenderType,
                         Optional<Long> startDate, Optional<Long> endDate
                     );
+
+    Page<?> getClosedTenderProjection(
+                        ClaimResponseDto loggedInUser,
+                        Optional<String> searchFilter, Optional<Integer> page,
+                        Optional<Integer> size, Optional<TenderType> tenderType,
+                        Optional<Long> startDate, Optional<Long> endDate
+                    );
                     
-    List<?> getNegotiationHistories(Long id);
+    List<?> getNegotiationHistories(ClaimResponseDto loggedInUser, Long id);
+    void rejectTender(ClaimResponseDto loggedInUser, Long id, NoteDto noteDto);
+    Tender getTenderByRfqNo(String tenderNo);
 }

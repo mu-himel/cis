@@ -11,6 +11,13 @@ import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -40,8 +47,12 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @Enumerated(EnumType.STRING)
     private VendorDocumentVerificationStatus verificationStatus;
 
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate verificationDate;
 
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate approvedDate;
 
 
@@ -91,4 +102,10 @@ public class Vendor implements DtoConvertable<VendorDto> {
         this.email = email;
         this.phone = phone;
     }
+
+    public Vendor(Long id) {
+        this.id = id;
+    }
+
+    
 }
