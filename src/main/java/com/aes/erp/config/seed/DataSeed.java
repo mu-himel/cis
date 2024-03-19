@@ -154,10 +154,8 @@ public class DataSeed implements CommandLineRunner {
     }
 
     private void initModules(){
-        Long count = moduleAccessService.initModuleAccess();
-        if(count==0) {
-            moduleAccessPermissionService.initModulePermissions();
-        }
+        moduleAccessService.initModuleAccess();
+        moduleAccessPermissionService.initModulePermissions();
     }
 
     private void initVendorTypes(){
