@@ -208,6 +208,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         Optional<PurchaseOrder> poOp = poRepository.findById(id);
         if(poOp.isPresent()){
             PurchaseOrder po = poOp.get();
+            po.setIsPoSent(true);
             po.setPoStatus("RECEIVED");
             po.setIsGrnReceived(true);
             po.setGrnReceiveDate(Instant.now().toEpochMilli());
@@ -222,6 +223,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         Optional<PurchaseOrder> poOp = poRepository.findById(id);
         if(poOp.isPresent()){
             PurchaseOrder po = poOp.get();
+            po.setIsPoSent(false);
             po.setPoStatus("DECLINED");
             po.setIsGrnReceived(false);
             po.setGrnReceiveDate(Instant.now().toEpochMilli());
