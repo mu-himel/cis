@@ -240,7 +240,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         if(poOp.isPresent()){
             PurchaseOrder po = poOp.get();
             po.setIsQcPass(true);
-            po.setIsPoSent(true);
+            po.setIsPoSent(qcResultDto.getStatus().equals("QC_PASS")? true : false);
             po.setQcDeclineNote(null);
             po.setPoStatus(qcResultDto.getStatus());
             po.setQcResult(qcResultDto.getQcResult());
