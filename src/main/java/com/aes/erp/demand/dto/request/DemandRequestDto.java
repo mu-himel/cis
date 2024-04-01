@@ -1,6 +1,6 @@
 package com.aes.erp.demand.dto.request;
 
-import com.aes.erp.common.EntityConvertible;
+import com.aes.erp.common.EntityConvertable;
 import com.aes.erp.demand.entity.Demand;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DemandRequestDto implements EntityConvertible<Demand> {
+public class DemandRequestDto implements EntityConvertable<Demand> {
 
     private Long id;
 

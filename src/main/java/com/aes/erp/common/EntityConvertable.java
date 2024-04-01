@@ -1,6 +1,6 @@
 package com.aes.erp.common;
 
-public interface EntityConvertible<T> {
+public interface EntityConvertable<T> {
 
     T getEntity();
 }

@@ -1,6 +1,6 @@
 package com.aes.erp.inventory.dto.request;
 
-import com.aes.erp.common.EntityConvertible;
+import com.aes.erp.common.EntityConvertable;
 import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.*;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,7 +17,7 @@ import java.util.Optional;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryRequestDto implements EntityConvertible<ItemCategory> {
+public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
 
     private Long id;
 

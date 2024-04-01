@@ -1,6 +1,6 @@
 package com.aes.erp.indent.dto.request;
 
-import com.aes.erp.common.EntityConvertible;
+import com.aes.erp.common.EntityConvertable;
 import com.aes.erp.indent.entity.Indent;
 import com.aes.erp.indent.entity.IndentDetail;
 import com.aes.erp.indent.enums.IndentPriority;
@@ -20,7 +20,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class IndentRequestDto implements EntityConvertible<Indent> {
+public class IndentRequestDto implements EntityConvertable<Indent> {
     @NotNull
     private List<Long> ids;
 

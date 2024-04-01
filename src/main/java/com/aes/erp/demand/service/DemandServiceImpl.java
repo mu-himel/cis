@@ -344,22 +344,22 @@ public class DemandServiceImpl implements DemandService{
         Integer completeCount  = demandDetailRepository.countByStatusAndDemandId(DemandStatus.COMPLETED,demand.getId());
         Integer demandCount = demand.getDemandDetails().size();
 
-        demand.setDemandDetails(demand.getDemandDetails().stream().map(demandDetail -> {
-            Long demandDetailId = demandDetail.getId();
-            if(demandDetailId.equals(demandReceiveDto.getDemandDetailId())) {
-                Item item = demandDetail.getItem();
-                if(demandReceiveDto.getQty()!=null && demandDetail.getApprovedQuantity()>=demandReceiveDto.getQty()) {
-                    itemService.stockOut(item, demandReceiveDto.getQty());
-                }else{
-                    itemService.stockOut(item,demandDetail.getApprovedQuantity());
-                }
-                if(demandReceiveDto.getNote()!=null && !demandReceiveDto.getNote().isEmpty()){
-                    demandDetail.setReceiveNote(demandReceiveDto.getNote());
-                }
-                demandDetail.setStatus(DemandStatus.COMPLETED);
-            }
-           return demandDetail;
-        }).collect(Collectors.toList()));
+        // demand.setDemandDetails(demand.getDemandDetails().stream().map(demandDetail -> {
+        //     Long demandDetailId = demandDetail.getId();
+        //     if(demandDetailId.equals(demandReceiveDto.getDemandDetailId())) {
+        //         Item item = demandDetail.getItem();
+        //         if(demandReceiveDto.getQty()!=null && demandDetail.getApprovedQuantity()>=demandReceiveDto.getQty()) {
+        //             itemService.stockOut(item, demandReceiveDto.getQty());
+        //         }else{
+        //             itemService.stockOut(item,demandDetail.getApprovedQuantity());
+        //         }
+        //         if(demandReceiveDto.getNote()!=null && !demandReceiveDto.getNote().isEmpty()){
+        //             demandDetail.setReceiveNote(demandReceiveDto.getNote());
+        //         }
+        //         demandDetail.setStatus(DemandStatus.COMPLETED);
+        //     }
+        //    return demandDetail;
+        // }).collect(Collectors.toList()));
 
         if((demandCount-completeCount) == 1){
             demand.setStatus(DemandStatus.COMPLETED);

@@ -1,6 +1,6 @@
 package com.aes.erp.vendor.dto;
 
-import com.aes.erp.common.EntityConvertible;
+import com.aes.erp.common.EntityConvertable;
 import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VendorDto implements Serializable, EntityConvertible<Vendor> {
+public class VendorDto implements Serializable, EntityConvertable<Vendor> {
     // TODO: 11-Oct-23 validations for dto
 
     private Long id;
