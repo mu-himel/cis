@@ -4,9 +4,6 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.Item;
-import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.ItemStock;
-import com.aes.erp.inventory.enums.StockType;
 import com.aes.erp.inventory.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -115,6 +111,8 @@ public class ItemServiceImpl implements ItemService {
         if(item.getItemParentCategory()==null){
             throw new AesException("Item Main Category Missing");
         }
+
+        
 
         if(itemRequestDto.getBrand()!=null && itemRequestDto.getBrand().getId()!=null){
             item.setBrand(new Brand(itemRequestDto.getBrand().getId()));

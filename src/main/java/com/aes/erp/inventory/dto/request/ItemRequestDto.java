@@ -6,6 +6,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.enums.ItemUnit;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -44,6 +45,9 @@ public class ItemRequestDto implements EntityConvertable<Item> {
     private Integer reorderPercentage;
 
     private ReferenceObjectDto brand;
+
+    
+    private StoreType storeType;
 
     private List<ItemAttribute> attributes;
 

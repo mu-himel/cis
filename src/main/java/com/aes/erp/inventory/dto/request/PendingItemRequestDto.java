@@ -25,10 +25,20 @@ public class PendingItemRequestDto implements EntityConvertable<PendingItemReque
     private String warehouseName;
     private String warehouseLocation;
     private List<PendingItemAttribute> attributes;
+
     @Override
     public PendingItemRequest getEntity() {
-        // TODO Auto-generated method stub
-        return null;
+        PendingItemRequest pir = new PendingItemRequest();
+        pir.setReportingManager(this.reportingManager);
+        pir.setAttributes(this.attributes);
+        pir.setRequestedBy(this.requestedBy);
+        pir.setEmployeeId(this.employeeId);
+        pir.setDesignation(this.designation);
+        pir.setDepartment(this.department);
+        pir.setWarehouseId(this.warehouseId);
+        pir.setWarehouseName(this.warehouseName);
+        pir.setWarehouseLocation(this.warehouseLocation);
+        return pir;
     }
 
     
