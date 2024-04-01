@@ -31,15 +31,15 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             @Param("storeTypeId") Long storeTypeId, @Param("name") String name, @Param("code") String code);
 
     @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
-            countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory)
+            countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory,
+            nativeQuery = true)
     Page<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
             @Param("store_type_id") Long store_type_id,
             @Param("parent_category") Long parent_category,
             @Param("name") String name, @Param("code") String code,
             Pageable pageable);
 
-    @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
-            countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory)
+    @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory, nativeQuery = true)
     List<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
             @Param("store_type_id") Long store_type_id,
             @Param("parent_category") Long parent_category,
@@ -150,6 +150,9 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
         String getParentCategoryCode();
         String getStoreTypeName();
         Long getStoreTypeId();
+        Long getPendingBrands();
+        Long getPendingAttributes();
+        Long getProducts();
     }
     public interface ItemCategoryWithSubCategoryCountExt {
         Long getCategoryId();

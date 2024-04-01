@@ -14,11 +14,14 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @Table(name = "brands")
 public class Brand {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
     private String name;
 
-
+    public Brand(Long id) {
+        this.id = id;
+    }
 }

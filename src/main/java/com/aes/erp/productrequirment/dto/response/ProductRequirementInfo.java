@@ -1,6 +1,6 @@
 package com.aes.erp.productrequirment.dto.response;
 
-import com.aes.erp.common.EntityConvertible;
+import com.aes.erp.common.EntityConvertable;
 import com.aes.erp.productrequirment.entity.ProductRequirement;
 import lombok.*;
 

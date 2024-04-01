@@ -30,8 +30,7 @@ public interface ItemService {
 
     List<?> getAllItems(Optional<Long> categoryId,Optional<String> name, Optional<String> code);
 
-    void stockIn(Item item,Integer qty);
-    void stockOut(Item item, Integer qty);
+    
 
     String getNextItemCode();
 }

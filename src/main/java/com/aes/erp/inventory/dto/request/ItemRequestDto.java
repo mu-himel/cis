@@ -1,7 +1,8 @@
 package com.aes.erp.inventory.dto.request;
 
 
-import com.aes.erp.common.EntityConvertible;
+import com.aes.erp.common.EntityConvertable;
+import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
@@ -18,7 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequestDto implements EntityConvertible<Item> {
+public class ItemRequestDto implements EntityConvertable<Item> {
 
     private Long id;
 
@@ -41,6 +42,8 @@ public class ItemRequestDto implements EntityConvertible<Item> {
     private Integer currentStockQty;
 
     private Integer reorderPercentage;
+
+    private ReferenceObjectDto brand;
 
     private List<ItemAttribute> attributes;
 

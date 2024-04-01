@@ -2,6 +2,7 @@ package com.aes.erp.inventory.service;
 
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.ItemStock;
@@ -87,20 +88,40 @@ public class ItemServiceImpl implements ItemService {
     public void createItem(ItemRequestDto itemRequestDto) {
         Item item = itemRequestDto.getEntity();
 
+        StringBuilder sb = new StringBuilder();
+
+        itemRequestDto.getAttributes().stream().forEach(itemAttribute -> {
+            sb.append(itemAttribute.getAttributeType()
+                    +" "+itemAttribute.getAttributeValue()
+                    +" "+itemAttribute.getAttributeUnit());
+            sb.append(" - ");
+        });
+
+        String itemAttributeName = sb.toString().substring(0,sb.length()-3);
+        Long brandId = (itemRequestDto.getBrand()!=null)? itemRequestDto.getBrand().getId() : null;
+        List<?> itemExistByAttr = this.getByAttributes(brandId,itemAttributeName);
+        if(itemExistByAttr.size()>0){
+            throw new AesException("Sorry! Item Already exist with same attributes for this brand");
+        }
+
         if(itemRepository.existsByCode(item.getCode())){
             throw new AesException("Item code already exist");
         }
 
-//        if(item.getItemParentCategory()==null && item.getItemCategory()==null){
-//            throw new AesException("Item Sub Category Missing");
-//        }
+        if(item.getItemParentCategory()==null && item.getItemCategory()==null){
+            throw new AesException("Item Sub Category Missing");
+        }
 
         if(item.getItemParentCategory()==null){
             throw new AesException("Item Main Category Missing");
         }
 
-        item.setStocks(Arrays.asList(new ItemStock(itemRequestDto.getCurrentStockQty(), item, StockType.STOCK_IN)));
-        if(itemRequestDto.getAttributes()!=null && itemRequestDto.getAttributes().size()>0) {
+        if(itemRequestDto.getBrand()!=null && itemRequestDto.getBrand().getId()!=null){
+            item.setBrand(new Brand(itemRequestDto.getBrand().getId()));
+        }
+
+       if(itemRequestDto.getAttributes()!=null && itemRequestDto.getAttributes().size()>0) {
+
             item.setAttributes(itemRequestDto.getAttributes().stream().map(itemAttribute -> {
                 itemAttribute.setItem(item);
                 return itemAttribute;
@@ -108,6 +129,10 @@ public class ItemServiceImpl implements ItemService {
         }
         itemRepository.save(item);
 
+    }
+
+    private List<?> getByAttributes(Long brandId, String attribute) {
+        return itemRepository.findByAttributes(brandId,attribute);
     }
 
     @Override
@@ -153,34 +178,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void deleteItem(Long id) {
         Optional<Item> itemOptional = itemRepository.findById(id);
-        // TODO check if demand or other area where item used that item should not delete
         if(itemOptional.isPresent()) {
             Item item = itemOptional.get();
+            if(item.getIsSyncronized()){
+                throw new AesException("Sorry! Not possible to delete this item is syncronized with erp system");
+            }
             item.setActive(false);
             itemRepository.save(item);
         }
     }
 
-    @Override
-    @Transactional
-    public void stockOut(Item item, Integer qty) {
-        qty = -1*qty;
-        this.updateStock(item,qty);
-    }
-
-    @Override
-    @Transactional
-    public void stockIn(Item item, Integer qty) {
-        this.updateStock(item,qty);
-    }
-
-    private void updateStock(Item item,Integer qty){
-        List<ItemStock> stocks = item.getStocks();
-        stocks.add(new ItemStock(qty, item));
-        item.setStocks(stocks);
-    }
 
     @Override
     public String getNextItemCode() {

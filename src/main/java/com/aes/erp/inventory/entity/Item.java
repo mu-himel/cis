@@ -1,7 +1,6 @@
 package com.aes.erp.inventory.entity;
 
 import com.aes.erp.inventory.enums.ItemUnit;
-import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.user_management.entity.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -9,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,6 +35,8 @@ public class Item {
 
     private String name;
 
+    private Boolean isSyncronized;
+
     public Item(Long id) {
         this.id = id;
     }
@@ -48,6 +48,12 @@ public class Item {
     private String sku;
 
     private String manufacturer;
+
+    @ManyToOne
+    private Brand brand;
+
+    @ManyToOne
+    private StoreType storeType;
 
     @OneToMany(mappedBy = "item",cascade = CascadeType.ALL)
     @ApiModelProperty(hidden = true)

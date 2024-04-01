@@ -1,6 +1,6 @@
 package com.aes.erp.productrequirment.dto.request;
 
-import com.aes.erp.common.EntityConvertible;
+import com.aes.erp.common.EntityConvertable;
 import com.aes.erp.demand.entity.Demand;
 import com.aes.erp.demand.entity.DemandDetail;
 import com.aes.erp.inventory.entity.ItemCategory;
@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductRequirementRequestDto implements EntityConvertible<ProductRequirement> {
+public class ProductRequirementRequestDto implements EntityConvertable<ProductRequirement> {
 
     private Long id;
 

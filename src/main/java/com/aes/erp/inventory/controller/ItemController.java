@@ -85,16 +85,6 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/stock-out")
-//    @Transactional
-    public ResponseEntity<?> stockAdd(@RequestParam("id") Long id){
-        Optional<Item> item = itemService.getItemDetail(id);
-        itemService.stockOut(item.get(),15);
-        return new ResponseEntity<>(
-                HttpStatus.OK
-        );
-    }
-
     @GetMapping("/next-id")
     @ApiOperation(value = "Get New Product Id")
     public ResponseEntity<?> getNextId(){
