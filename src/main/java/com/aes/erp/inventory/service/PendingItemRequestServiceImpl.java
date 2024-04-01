@@ -5,6 +5,9 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.aes.erp.exception.AesException;
@@ -17,6 +20,8 @@ import com.aes.erp.inventory.repository.PendingItemRequestRepository;
 
 @Service
 public class PendingItemRequestServiceImpl implements PendingItemRequestService{
+
+    private static final Integer PAGE_SIZE = 10;
 
     @Autowired
     private PendingItemRequestRepository pendingItemRequestRepository;
@@ -46,10 +51,21 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
         pir.setSubCategory(subCat);
         pir.setCategory(subCat.getParentCategory());
         pir.setBrand(brandOp.get());
-    
-
         pendingItemRequestRepository.save(pir);
         
     }
+
+    @Override
+    public Optional<?> getDetail(Long id) {
+        return pendingItemRequestRepository.findById(id,PendingItemRequest.class);
+    }
+
+    @Override
+    public Page<?> getPage(Optional<Integer> page, Optional<Integer> size) {
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
+        return pendingItemRequestRepository.findAllPendingItemRequests(pageable);
+    }
+
+    
     
 }

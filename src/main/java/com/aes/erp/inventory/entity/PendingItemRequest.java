@@ -26,6 +26,8 @@ public class PendingItemRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String requestNo;
+
     private String requestedBy;
 
     @ManyToOne
