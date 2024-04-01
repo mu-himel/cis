@@ -80,6 +80,9 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
                 Long getBrandId();
                 Long getId();
                 String getItemAttributes();
-            }
+        }
+
+
+        List<Item> findAllByItemCategoryIdAndActive(Long subCategoryId, boolean b);
 
 }

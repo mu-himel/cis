@@ -33,4 +33,6 @@ public interface ItemService {
     
 
     String getNextItemCode();
+
+    List<?> getSubCategoryWiseItemListWithAttribute(Long subCategoryId);
 }

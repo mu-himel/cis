@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
+import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.PendingItemRequest;
 import com.aes.erp.inventory.repository.BrandRepository;
@@ -48,11 +49,22 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
             throw new AesException("Sorry! Sub Category not specified");
         }
         ItemCategory subCat = catOp.get();
+        pir.setRequestNo(getNextItemCode());
         pir.setSubCategory(subCat);
         pir.setCategory(subCat.getParentCategory());
         pir.setBrand(brandOp.get());
         pendingItemRequestRepository.save(pir);
         
+    }
+
+    private String getNextItemCode() {
+        Optional<PendingItemRequest> pirOp = pendingItemRequestRepository.findMaxOrderById();
+        if(pirOp.isPresent()){
+            PendingItemRequest pir = pirOp.get();
+            Long newProductId = pir.getId() + 1;
+            return String.format("%05d",newProductId);
+        }
+        return String.format("%05d",1);
     }
 
     @Override

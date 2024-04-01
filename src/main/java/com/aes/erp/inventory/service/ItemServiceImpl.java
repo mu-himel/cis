@@ -200,4 +200,16 @@ public class ItemServiceImpl implements ItemService {
         }
         return String.format("%05d",1);
     }
+
+    @Override
+    public List<?> getSubCategoryWiseItemListWithAttribute(Long subCategoryId) {
+        List<Item> items = itemRepository.findAllByItemCategoryIdAndActive(subCategoryId,true);
+        
+        List<?> _items = items.stream().map(i->{
+            return i;
+        }).collect(Collectors.toList());
+        return _items;
+    }
+
+    
 }

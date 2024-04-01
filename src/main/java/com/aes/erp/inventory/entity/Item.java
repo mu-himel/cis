@@ -55,7 +55,7 @@ public class Item {
     @ManyToOne
     private StoreType storeType;
 
-    @OneToMany(mappedBy = "item",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     @ApiModelProperty(hidden = true)
     private List<ItemStock> stocks;
 
