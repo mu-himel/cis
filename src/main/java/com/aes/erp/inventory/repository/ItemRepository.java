@@ -66,7 +66,7 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
     }
 
     @Query(value = """
-            SELECT * FROM (SELECT i.id, i.brand_id ,i.active, s.warehouse_id,
+            SELECT * FROM (SELECT i.id, i.brand_id ,i.active,
                     GROUP_CONCAT(DISTINCT ia.attribute_type,' ',ia.attribute_value , ' ',
                     ia.attribute_unit order by ia.id asc separator ' - ') itemAttributes
             FROM item_attributes ia
@@ -82,7 +82,12 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
                 String getItemAttributes();
         }
 
+        @Query("SELECT i FROM Item i LEFT JOIN FETCH i.itemCategory ic " +
+        "LEFT JOIN FETCH i.itemParentCategory ipc " +
+        "LEFT JOIN FETCH ic.parentCategory pc WHERE ic.code=:subCatcode AND i.active=:b")
+        List<Item> findAllByItemCategoryIdAndActive(@Param("subCatcode") String subCatcode, @Param("b") Boolean active);
 
-        List<Item> findAllByItemCategoryIdAndActive(Long subCategoryId, boolean b);
+
+        Optional<Item> findByCode(String code);
 
 }

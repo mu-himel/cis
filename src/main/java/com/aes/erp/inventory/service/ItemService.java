@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.entity.Item;
 import org.springframework.data.domain.Page;
@@ -10,7 +11,7 @@ import java.util.Optional;
 public interface ItemService {
 
 
-    void createItem(ItemRequestDto itemRequestDto);
+    void createItem(ClaimResponseDto loggedInUser,ItemRequestDto itemRequestDto);
 
     void updateItem(Long id, ItemRequestDto itemRequestDto);
 
@@ -35,5 +36,5 @@ public interface ItemService {
 
     String getNextItemCode();
 
-    List<?> getSubCategoryWiseItemListWithAttribute(Long subCategoryId);
+    List<?> getSubCategoryWiseItemListWithAttribute(String subCatcode);
 }

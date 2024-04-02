@@ -1,4 +1,5 @@
 package com.aes.erp.inventory.controller;
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.service.ItemService;
@@ -23,8 +24,10 @@ public class ItemController {
 
     @PostMapping
     @ApiOperation(value = "Create Item")
-    public ResponseEntity<?> addItem(@RequestBody @Valid ItemRequestDto itemRequestDto){
-        itemService.createItem(itemRequestDto);
+    public ResponseEntity<?> addItem(
+        @RequestAttribute ClaimResponseDto loggedInUser,
+        @RequestBody @Valid ItemRequestDto itemRequestDto){
+        itemService.createItem(loggedInUser, itemRequestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -73,7 +76,7 @@ public class ItemController {
     public ResponseEntity<?> getItem(@ApiParam(value = "Item Id", example = "1", required = true)
                                      @PathVariable("id") Long id){
         return new ResponseEntity<>(
-                itemService.getItemDetail(id),
+                itemService.getItemDetail(id).orElse(null),
                 HttpStatus.OK
         );
     }
@@ -94,6 +97,14 @@ public class ItemController {
         return new ResponseEntity<>(
                 response,
                 HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/sub-category/{subCatcode}")
+    public ResponseEntity<?> getItemListBySubCategoryWithAttribute(@PathVariable("subCatcode") String subCatcode){
+        return new ResponseEntity<>(
+            itemService.getSubCategoryWiseItemListWithAttribute(subCatcode),    
+            HttpStatus.OK
         );
     }
 }

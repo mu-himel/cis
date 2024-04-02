@@ -1,10 +1,13 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.repository.ItemRepository;
+import com.aes.erp.user_management.entity.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -83,8 +88,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public void createItem(ItemRequestDto itemRequestDto) {
+    public void createItem(ClaimResponseDto loggedInUser, ItemRequestDto itemRequestDto) {
         Item item = itemRequestDto.getEntity();
+
+        item.setCreatedBy(new User(loggedInUser.getId()));
 
         StringBuilder sb = new StringBuilder();
 
@@ -148,8 +155,13 @@ public class ItemServiceImpl implements ItemService {
             item.setName(itemRequestDto.getName());
         }
 
-        if(!item.getCode().equalsIgnoreCase(itemRequestDto.getCode())){
-            throw new AesException("Item Code should be unique");
+        itemOptional = itemRepository.findByCode(itemRequestDto.getCode());
+        if(itemOptional.isPresent() && !id.equals(itemOptional.get().getId())){
+            throw new AesException("Item already exist with same attributes");
+        }
+
+        if(itemRequestDto.getCode()!=null){
+            item.setCode(itemRequestDto.getCode());
         }
         if(itemRequestDto.getItemCategory()!=null) {
             item.setItemCategory(itemRequestDto.getItemCategory());
@@ -158,16 +170,7 @@ public class ItemServiceImpl implements ItemService {
         if(itemRequestDto.getItemUnit()!=null) {
             item.setItemUnit(itemRequestDto.getItemUnit());
         }
-        if(itemRequestDto.getStockThresholdQty()!=null) {
-            item.setStockThresholdQty(itemRequestDto.getStockThresholdQty());
-        }
-        if(itemRequestDto.getReorderPercentage()!=null) {
-            item.setReorderPercentage(itemRequestDto.getReorderPercentage());
-        }
-        if(itemRequestDto.getReorderPercentage()!=null) {
-            item.setReorderPercentage(itemRequestDto.getReorderPercentage());
-        }
-
+        
         if(itemRequestDto.getAttributes()!=null && itemRequestDto.getAttributes().size()>0) {
             item.setAttributes(itemRequestDto.getAttributes().stream().map(itemAttribute -> {
                 itemAttribute.setItem(item);
@@ -204,14 +207,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<?> getSubCategoryWiseItemListWithAttribute(Long subCategoryId) {
-        List<Item> items = itemRepository.findAllByItemCategoryIdAndActive(subCategoryId,true);
-        
-        List<?> _items = items.stream().map(i->{
-            return i;
-        }).collect(Collectors.toList());
-
-        return _items;
+    public List<?> getSubCategoryWiseItemListWithAttribute(String subCatcode) {
+        List<Item> items = itemRepository.findAllByItemCategoryIdAndActive(subCatcode,true);
+        return items;
     }
 
     
