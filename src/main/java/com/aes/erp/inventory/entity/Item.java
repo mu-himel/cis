@@ -41,6 +41,8 @@ public class Item {
 
     private String name;
 
+    private String itemAttributeName;
+
     private Boolean isSyncronized;
 
     public Item(Long id) {

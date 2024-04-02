@@ -102,8 +102,10 @@ public class ItemController {
 
     @GetMapping("/sub-category/{subCatcode}")
     public ResponseEntity<?> getItemListBySubCategoryWithAttribute(@PathVariable("subCatcode") String subCatcode){
+        Map<String,Object> items = new HashMap<>();
+        items.put("items", itemService.getSubCategoryWiseItemListWithAttribute(subCatcode));
         return new ResponseEntity<>(
-            itemService.getSubCategoryWiseItemListWithAttribute(subCatcode),    
+            items,    
             HttpStatus.OK
         );
     }

@@ -5,6 +5,7 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.Item;
+import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.repository.ItemRepository;
 import com.aes.erp.user_management.entity.User;
 
@@ -86,28 +87,33 @@ public class ItemServiceImpl implements ItemService {
         return new ArrayList<>();
     }
 
-    @Override
-    @Transactional
-    public void createItem(ClaimResponseDto loggedInUser, ItemRequestDto itemRequestDto) {
-        Item item = itemRequestDto.getEntity();
-
-        item.setCreatedBy(new User(loggedInUser.getId()));
-
+    private String generateItemAttributeName(List<ItemAttribute> attributes){
         StringBuilder sb = new StringBuilder();
 
-        itemRequestDto.getAttributes().stream().forEach(itemAttribute -> {
+        attributes.stream().forEach(itemAttribute -> {
             sb.append(itemAttribute.getAttributeType()
                     +" "+itemAttribute.getAttributeValue()
                     +" "+itemAttribute.getAttributeUnit());
             sb.append(" - ");
         });
 
-        String itemAttributeName = sb.toString().substring(0,sb.length()-3);
+        return (sb.isEmpty())? "" : sb.toString().substring(0,sb.length()-3);
+    }
+
+    @Override
+    @Transactional
+    public void createItem(ClaimResponseDto loggedInUser, ItemRequestDto itemRequestDto) {
+        Item item = itemRequestDto.getEntity();
+
+        item.setCreatedBy(new User(loggedInUser.getId()));
+        String itemAttributeName = generateItemAttributeName(itemRequestDto.getAttributes());
+        
         Long brandId = (itemRequestDto.getBrand()!=null)? itemRequestDto.getBrand().getId() : null;
         List<?> itemExistByAttr = this.getByAttributes(brandId,itemAttributeName);
         if(itemExistByAttr.size()>0){
             throw new AesException("Sorry! Item Already exist with same attributes for this brand");
         }
+        item.setItemAttributeName(itemAttributeName);
 
         if(itemRepository.existsByCode(item.getCode())){
             throw new AesException("Item code already exist");
@@ -176,6 +182,8 @@ public class ItemServiceImpl implements ItemService {
                 itemAttribute.setItem(item);
                 return itemAttribute;
             }).collect(Collectors.toList()));
+
+            item.setItemAttributeName(generateItemAttributeName(item.getAttributes()));
         }
         itemRepository.save(item);
     }

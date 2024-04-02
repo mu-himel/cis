@@ -32,8 +32,6 @@ public interface ItemService {
 
     List<?> getAllItems(Optional<Long> categoryId,Optional<String> name, Optional<String> code);
 
-    
-
     String getNextItemCode();
 
     List<?> getSubCategoryWiseItemListWithAttribute(String subCatcode);

@@ -17,8 +17,7 @@ public class ItemAttribute {
 
     private String attributeType;
 
-    @Enumerated(EnumType.STRING)
-    private AttributeUnit attributeUnit;
+    private String attributeUnit;
 
     @Column(length = 500)
     private String attributeValue;
