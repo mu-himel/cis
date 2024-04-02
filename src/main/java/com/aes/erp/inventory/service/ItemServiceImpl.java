@@ -36,7 +36,8 @@ public class ItemServiceImpl implements ItemService {
                                Optional<Integer> reorderPercentage,
                                Optional<Integer> stockThresholdQty,
                                Optional<Long> categoryId,
-                               Optional<Long> subCategoryId
+                               Optional<Long> subCategoryId,
+                               Optional<Long> storeTypeId
 
     ) {
 
@@ -49,6 +50,7 @@ public class ItemServiceImpl implements ItemService {
                 stockThresholdQty.orElse(null),
                 categoryId.orElse(null),
                 subCategoryId.orElse(null),
+                storeTypeId.orElse(null),
                 pageable);
 
 
@@ -208,6 +210,7 @@ public class ItemServiceImpl implements ItemService {
         List<?> _items = items.stream().map(i->{
             return i;
         }).collect(Collectors.toList());
+
         return _items;
     }
 

@@ -46,12 +46,13 @@ public class ItemController {
                                       @RequestParam("reorderPercentage") Optional<Integer> reorderPercentage,
                                       @RequestParam("stockThresholdQty") Optional<Integer> stockThresholdQty,
                                       @RequestParam("categoryId") Optional<Long> categoryId,
-                                      @RequestParam("subCategoryId") Optional<Long> subCategoryId
+                                      @RequestParam("subCategoryId") Optional<Long> subCategoryId,
+                                      @RequestParam("storeTypeId") Optional<Long> storeTypeId
     ){
 
         return new ResponseEntity<>(
                 itemService.getAllItems(page,size, name,code,reorderPercentage,stockThresholdQty,
-                        categoryId,subCategoryId),
+                        categoryId,subCategoryId, storeTypeId),
                 HttpStatus.OK
         );
     }

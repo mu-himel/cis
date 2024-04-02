@@ -24,7 +24,8 @@ public interface ItemService {
                                    Optional<Integer> reorderPercentage,
                                    Optional<Integer> stockThresholdQty,
                                    Optional<Long> categoryId,
-                                   Optional<Long> subCategoryId
+                                   Optional<Long> subCategoryId,
+                                   Optional<Long> storeTypeId
 
     );
 
