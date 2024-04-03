@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -11,12 +12,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.dto.request.PendingAttributeDto;
+import com.aes.erp.inventory.dto.request.PendingBrandDto;
 import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
-import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.PendingAttribute;
+import com.aes.erp.inventory.entity.PendingBrand;
 import com.aes.erp.inventory.entity.PendingItemRequest;
 import com.aes.erp.inventory.repository.BrandRepository;
+import com.aes.erp.inventory.repository.PendingAttributeRepository;
+import com.aes.erp.inventory.repository.PendingBrandRepository;
 import com.aes.erp.inventory.repository.PendingItemRequestRepository;
 
 @Service
@@ -29,6 +35,12 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
     @Autowired
     private BrandRepository brandRepository;
+
+    @Autowired
+    private PendingBrandRepository pendingBrandRepository;
+
+    @Autowired
+    private PendingAttributeRepository pendingAttributeRepository;
 
     @Autowired
     private CategoryService categoryService;
@@ -76,6 +88,30 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     public Page<?> getPage(Optional<Integer> page, Optional<Integer> size) {
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
         return pendingItemRequestRepository.findAllPendingItemRequests(pageable);
+    }
+
+    @Override
+    public List<?> getPendingBrands(Long subCatId) {
+        return pendingBrandRepository.findAllBySubCategoryId(subCatId);
+    }
+
+    @Override
+    @Transactional
+    public void createPendingBrand(PendingBrandDto pendingBrandDto) {
+        PendingBrand pendingBrand = pendingBrandDto.getEntity();
+        pendingBrandRepository.save(pendingBrand);
+    }
+
+    @Override
+    public List<?> getPendingAttributes(Long subCatId) {
+        return pendingAttributeRepository.findAllBySubCategoryId(subCatId);
+    }
+
+    @Override
+    @Transactional
+    public void createPendingAttribute(PendingAttributeDto pendingAttributeDto) {
+        PendingAttribute pendingAttribute = pendingAttributeDto.getEntity();
+        pendingAttributeRepository.save(pendingAttribute);
     }
 
     

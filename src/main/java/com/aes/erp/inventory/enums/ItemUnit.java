@@ -6,4 +6,8 @@ public enum ItemUnit {
     KG,
     LTR,
     MILLIGRAM,
+    METER,
+    CM,
+    GALLON,
+    NONE
 }

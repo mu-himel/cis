@@ -128,7 +128,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                     ItemCategory category = catOp.stream().findFirst().orElse(null);
 
                     if(category!=null){
-                        String code = categoryService.getNewCategoryCode();
+                        String code = category.getCode()+"-"+categoryService.getNewCategoryCode();
                         CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                         categoryRequestDto.setName(subCatName);
                         categoryRequestDto.setCode(code);
