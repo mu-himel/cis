@@ -266,6 +266,7 @@ public class OfferServiceImpl implements OfferService{
             pqdrd.setRfqQty(o.getItemQuantity());
             pqdrd.setUnitPrice(o.getPriceQuotation().getPricePerUnit());
             pqdrd.setBrandName(o.getBrandName());
+            pqdrd.setExtendedAttributes(o.getExtendedAttributes());
             pqdrd.setItemAttribute(o.getProductDescription());
             return pqdrd;
         }).collect(Collectors.toList()));
