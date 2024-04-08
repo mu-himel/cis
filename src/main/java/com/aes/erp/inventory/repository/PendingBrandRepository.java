@@ -11,6 +11,6 @@ import com.aes.erp.inventory.entity.PendingBrand;
 public interface PendingBrandRepository extends JpaRepository<PendingBrand,Long>{
 
     List<PendingBrand> findAllBySubCategoryId(Long subCatId);
-
+    List<PendingBrand> findAllByBrandName(String brandName);
     
 } 

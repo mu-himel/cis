@@ -18,6 +18,12 @@ public class SubcategoryBrandController {
         this.brandService = brandService;
     }
 
+    @GetMapping("/sub-category/{id}")
+    public ResponseEntity<?> getBrandsBySubCategoryId(@PathVariable("id") Long id){
+        
+        return new ResponseEntity<>(brandService.getAllBySubCategoryId(id),HttpStatus.OK);
+    }
+
     @GetMapping("/list")
     @ApiOperation(value = "Get all available brands for a subcategory")
     public ResponseEntity<?> getSubCategoriesFilteredByStoreTypeAndParentCategory(@RequestParam("page") Optional<Integer> page,

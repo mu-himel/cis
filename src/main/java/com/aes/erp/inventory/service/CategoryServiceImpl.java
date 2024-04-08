@@ -93,6 +93,9 @@ public class CategoryServiceImpl implements CategoryService {
             ItemCategory finalCategory = category;
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
                 categoryAttribute.setCategory(finalCategory);
+                categoryAttribute.setAttributeType(categoryAttribute.getAttributeType().trim());
+                categoryAttribute.setAttributeValue(categoryAttribute.getAttributeValue().trim());
+                categoryAttribute.setAttributeUnit(categoryAttribute.getAttributeUnit().trim());
                 return categoryAttribute;
             }).collect(Collectors.toList()));
         }
@@ -138,6 +141,9 @@ public class CategoryServiceImpl implements CategoryService {
             ItemCategory finalItemCategory = itemCategory;
             itemCategory.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
                 categoryAttribute.setCategory(finalItemCategory);
+                categoryAttribute.setAttributeType(categoryAttribute.getAttributeType().trim());
+                categoryAttribute.setAttributeValue(categoryAttribute.getAttributeValue().trim());
+                categoryAttribute.setAttributeUnit(categoryAttribute.getAttributeUnit().trim());
                 return categoryAttribute;
             }).collect(Collectors.toList()));
         }

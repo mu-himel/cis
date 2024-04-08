@@ -101,6 +101,7 @@ public class OfferServiceImpl implements OfferService{
             pq.setTotalPrice(oi.getPriceQuotation().getTotalPrice());
             offerItem.setPriceQuotation(pq);
             offerItem.setBrandName(oi.getBrandName());
+            offerItem.setExtendedAttributes(oi.getExtendedAttributes());
             offerItem.setProductDescription(oi.getProductDescription());
             offerItem.setSpecification(oi.getSpecification());
             offerItem.setOffer(offer);

@@ -17,4 +17,7 @@ public interface PendingItemRequestService {
     void createPendingBrand(PendingBrandDto pendingBrandDto);
     void createPendingAttribute(PendingAttributeDto pendingAttributeDto);
     List<?> getPendingAttributes(Long subCatId);
+    void deletePendingBrand(Long id);
+    void deletePendingAttribute(Long id);
+    void deletePendingBrands(List<Long> id);
 }

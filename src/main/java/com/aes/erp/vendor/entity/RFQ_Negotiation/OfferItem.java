@@ -23,6 +23,7 @@ public class OfferItem {
     private Long id;
     private String brandName;
     private String productDescription;
+    private String extendedAttributes;
     private String specification;
     private Long estimatedDeliveryDays;
     private Long itemQuantity;

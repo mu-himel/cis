@@ -82,6 +82,7 @@ public class TenderServiceImpl implements TenderService{
             List<TenderDeliveryDetail> newDeliveryDetails = genericModelMapper.mapDtoListToEntityList(itemDto.getDeliveryDetails(), TenderDeliveryDetail.class);
             TenderItem item = genericModelMapper.map(itemDto, TenderItem.class);
             item.setDeliveryDetails(newDeliveryDetails);
+            item.setBrandName(itemDto.getBrandName());
             item = tenderItemRepository.save(item);
             tenderItems.add(item);
             List<TenderDeliveryDetail> savedDeliveryDetails = new ArrayList<>();

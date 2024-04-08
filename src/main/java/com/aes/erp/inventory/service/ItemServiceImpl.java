@@ -127,13 +127,11 @@ public class ItemServiceImpl implements ItemService {
             throw new AesException("Item Main Category Missing");
         }
 
-        
-
         if(itemRequestDto.getBrand()!=null && itemRequestDto.getBrand().getId()!=null){
             item.setBrand(new Brand(itemRequestDto.getBrand().getId()));
         }
 
-       if(itemRequestDto.getAttributes()!=null && itemRequestDto.getAttributes().size()>0) {
+        if(itemRequestDto.getAttributes()!=null && itemRequestDto.getAttributes().size()>0) {
 
             item.setAttributes(itemRequestDto.getAttributes().stream().map(itemAttribute -> {
                 itemAttribute.setItem(item);

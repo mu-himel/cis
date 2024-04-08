@@ -1,10 +1,12 @@
 package com.aes.erp.inventory.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aes.erp.inventory.dto.request.BulkDeleteDto;
 import com.aes.erp.inventory.dto.request.PendingAttributeDto;
 import com.aes.erp.inventory.dto.request.PendingBrandDto;
 import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
@@ -58,6 +61,18 @@ public class PendingItemReqController {
         );
     }
 
+    @DeleteMapping("/pending-brands/{id}")
+    public ResponseEntity<?> deletePendingBrand(@PathVariable("id") Long id){
+        pendingItemRequestService.deletePendingBrand(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/pending-brands")
+    public ResponseEntity<?> deletePendingBrands(@RequestBody BulkDeleteDto bulkDeleteDto){
+        pendingItemRequestService.deletePendingBrands(bulkDeleteDto.getId());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PostMapping("/pending-brands")
     public ResponseEntity<?> savePendingBrand(@RequestBody PendingBrandDto pendingBrandDto){
         pendingItemRequestService.createPendingBrand(pendingBrandDto);
@@ -76,5 +91,11 @@ public class PendingItemReqController {
     public ResponseEntity<?> savePendingAttribute(@RequestBody PendingAttributeDto pendingAttributeDto){
         pendingItemRequestService.createPendingAttribute(pendingAttributeDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/pending-attributes/{id}")
+    public ResponseEntity<?> deletePendingAttribute(@PathVariable("id") Long id){
+        pendingItemRequestService.deletePendingAttribute(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

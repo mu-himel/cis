@@ -22,6 +22,7 @@ public class TenderItem {
     @Column(updatable = false)
     private Long id;
     private String productDescription;
+    private String brandName;
     private String specification;
     private Long orderQuantity;
     @OneToMany(mappedBy = "tenderItem")

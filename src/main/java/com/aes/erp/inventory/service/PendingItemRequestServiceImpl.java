@@ -99,7 +99,34 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     @Transactional
     public void createPendingBrand(PendingBrandDto pendingBrandDto) {
         PendingBrand pendingBrand = pendingBrandDto.getEntity();
+        List<PendingBrand> pendingBrands = pendingBrandRepository.findAllByBrandName(pendingBrand.getBrandName());
+        if(pendingBrands.size()>0){
+            throw new AesException("Brand Request Already Pending");
+        }
         pendingBrandRepository.save(pendingBrand);
+    }
+
+    
+
+    @Override
+    @Transactional
+    public void deletePendingBrand(Long id) {
+        Optional<PendingBrand> pendingBrandOp = pendingBrandRepository.findById(id);
+        if(pendingBrandOp.isPresent()){
+            PendingBrand pendingBrand = pendingBrandOp.get();
+            pendingBrandRepository.delete(pendingBrand);
+        }
+    }
+
+    
+
+    @Override
+    @Transactional
+    public void deletePendingBrands(List<Long> id) {
+        if(id.isEmpty()){
+            throw new AesException("Sorry! delete not possible list is empty");
+        }
+        pendingBrandRepository.deleteAllById(id);
     }
 
     @Override
@@ -113,6 +140,20 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
         PendingAttribute pendingAttribute = pendingAttributeDto.getEntity();
         pendingAttributeRepository.save(pendingAttribute);
     }
+
+    @Override
+    @Transactional
+    public void deletePendingAttribute(Long id) {
+        Optional<PendingAttribute> pendAttrOptional = pendingAttributeRepository.findById(id);
+        if(pendAttrOptional.isPresent()){
+
+            PendingAttribute pendingAttribute = pendAttrOptional.get();
+            pendingAttributeRepository.delete(pendingAttribute);
+        }
+        
+    }
+
+    
 
     
     
