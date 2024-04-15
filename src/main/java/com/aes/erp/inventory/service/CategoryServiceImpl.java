@@ -6,6 +6,7 @@ import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.entity.Brand;
+import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.repository.*;
 import com.aes.erp.vendor.entity.VendorSubCategory;
@@ -339,4 +340,13 @@ public class CategoryServiceImpl implements CategoryService {
     public List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name) {
         return categoryRepository.findCategoryBySubCatNameIgnoreCase(category_name.toLowerCase());
     }
+
+    @Override
+    public Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId,
+            String attributeType) {
+                return    categoryAttributeRepository.findByCategoryIdAndAttributeType(subCatId,attributeType);
+        
+    }
+
+    
 }

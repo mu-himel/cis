@@ -1,7 +1,9 @@
 package com.aes.erp.inventory.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -12,11 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.controller.PendingItemReqController.PendingAttributesDto;
 import com.aes.erp.inventory.dto.request.PendingAttributeDto;
 import com.aes.erp.inventory.dto.request.PendingBrandDto;
 import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
+import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.PendingAttribute;
 import com.aes.erp.inventory.entity.PendingBrand;
 import com.aes.erp.inventory.entity.PendingItemRequest;
@@ -65,6 +70,11 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
         pir.setSubCategory(subCat);
         pir.setCategory(subCat.getParentCategory());
         pir.setBrand(brandOp.get());
+        pir.setAttributes(pRequestDto.getAttributes().stream().map(pia->{
+            pia.setPendingItemRequest(pir);
+            return pia;
+        }).collect(Collectors.toList()));
+        pir.setOrganization(new Organization(pRequestDto.getOrganizationId()));
         pendingItemRequestRepository.save(pir);
         
     }
@@ -129,6 +139,23 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
         pendingBrandRepository.deleteAllById(id);
     }
 
+
+    @Override
+    @Transactional
+    public void deletePendingAttributes(List<Long> ids) {
+        if(ids.isEmpty()){
+            throw new AesException("Sorry! delete not possible list is empty");
+        }
+        pendingAttributeRepository.deleteAllById(ids);
+        
+    }
+
+    @Override
+    @Transactional
+    public void deletePendingItemRequest(Long id) {
+        pendingItemRequestRepository.deleteById(id);
+    }
+
     @Override
     public List<?> getPendingAttributes(Long subCatId) {
         return pendingAttributeRepository.findAllBySubCategoryId(subCatId);
@@ -136,9 +163,31 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
     @Override
     @Transactional
-    public void createPendingAttribute(PendingAttributeDto pendingAttributeDto) {
-        PendingAttribute pendingAttribute = pendingAttributeDto.getEntity();
-        pendingAttributeRepository.save(pendingAttribute);
+    public void createPendingAttribute(PendingAttributesDto pendingAttributesDto) {
+        List<PendingAttribute> pendingAttributes = new ArrayList<>();
+        pendingAttributesDto.pendingAttributes().stream().forEach(pendingAttributeDto->{
+            PendingAttribute pendingAttribute = pendingAttributeDto.getEntity();
+            Optional<PendingAttribute> pendingAttrOp = pendingAttributeRepository
+                .findAllBySubCategoryIdAndAttributeTypeAndAttributeValue(pendingAttribute.getSubCategory().getId(),
+            pendingAttribute.getAttributeType(),pendingAttribute.getAttributeValue());
+            if(pendingAttrOp.isEmpty()){
+
+                Optional<CategoryAttribute> catAttrOp = categoryService.getCategoryAttributeValueBySubCatAndAttributeType(pendingAttribute.getSubCategory().getId(),
+                pendingAttribute.getAttributeType());
+                if(catAttrOp.isPresent()){
+                    if(catAttrOp.get().getAttributeValue().toLowerCase().contains(pendingAttribute.getAttributeValue().toLowerCase())){
+                        throw new AesException("Sorry! Attribute already exist");
+                    }
+                }
+
+                pendingAttributes.add(pendingAttribute);
+            }else{
+                throw new AesException("Sorry! Attribute already exist as pending");
+            }
+            
+        });
+        
+        pendingAttributeRepository.saveAll(pendingAttributes);
     }
 
     @Override

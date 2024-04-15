@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 
+import com.aes.erp.inventory.controller.PendingItemReqController.PendingAttributesDto;
 import com.aes.erp.inventory.dto.request.PendingAttributeDto;
 import com.aes.erp.inventory.dto.request.PendingBrandDto;
 import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
@@ -15,9 +16,11 @@ public interface PendingItemRequestService {
     Optional<?> getDetail(Long id);
     List<?> getPendingBrands(Long subCatId);
     void createPendingBrand(PendingBrandDto pendingBrandDto);
-    void createPendingAttribute(PendingAttributeDto pendingAttributeDto);
+    void createPendingAttribute(PendingAttributesDto pendingAttributesDto);
     List<?> getPendingAttributes(Long subCatId);
     void deletePendingBrand(Long id);
     void deletePendingAttribute(Long id);
     void deletePendingBrands(List<Long> id);
+    void deletePendingAttributes(List<Long> id);
+    void deletePendingItemRequest(Long id);
 }

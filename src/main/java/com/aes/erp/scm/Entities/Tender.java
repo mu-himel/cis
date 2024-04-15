@@ -1,5 +1,6 @@
 package com.aes.erp.scm.Entities;
 
+import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
@@ -29,6 +30,8 @@ public class Tender {
 
     private String code;
     private String rfqNo;
+
+    
 
     @ManyToOne
     @JoinColumn(name = "organization_id")

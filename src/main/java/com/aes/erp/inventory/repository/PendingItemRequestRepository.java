@@ -11,6 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.PendingItemRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 @Repository
 public interface PendingItemRequestRepository extends JpaRepository<PendingItemRequest,Long>{
@@ -38,6 +43,10 @@ public interface PendingItemRequestRepository extends JpaRepository<PendingItemR
     interface PendingItemReqInfo{
         Long getId();
         String getRequestNo();
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime getCreatedAt();
         String getRequestedBy();
         String getCategoryName();

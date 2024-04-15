@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,12 @@ public class PendingItemReqController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePendingItemRequest(@PathVariable("id") Long id){
+        pendingItemRequestService.deletePendingItemRequest(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @GetMapping
     public ResponseEntity<?> getPendingItemReqeusts(
         @RequestParam("page") Optional<Integer> page,
@@ -47,7 +54,7 @@ public class PendingItemReqController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getDetailById(@PathVariable("id") Long id){
         return new ResponseEntity<>(
-            pendingItemRequestService.getDetail(id),
+            pendingItemRequestService.getDetail(id).orElse(null),
             HttpStatus.OK
         );
     }
@@ -87,9 +94,15 @@ public class PendingItemReqController {
     }
 
     @PostMapping("/pending-attributes")
-    public ResponseEntity<?> savePendingAttribute(@RequestBody PendingAttributeDto pendingAttributeDto){
-        pendingItemRequestService.createPendingAttribute(pendingAttributeDto);
+    public ResponseEntity<?> savePendingAttribute(@RequestBody PendingAttributesDto pendingAttributesDto){
+        pendingItemRequestService.createPendingAttribute(pendingAttributesDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/pending-attributes")
+    public ResponseEntity<?> deletePendingAttributes(@RequestBody BulkDeleteDto bulkDeleteDto){
+        pendingItemRequestService.deletePendingAttributes(bulkDeleteDto.getId());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/pending-attributes/{id}")
@@ -97,4 +110,6 @@ public class PendingItemReqController {
         pendingItemRequestService.deletePendingAttribute(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    public record PendingAttributesDto(List<PendingAttributeDto> pendingAttributes){};
 }

@@ -15,6 +15,12 @@ import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
 import lombok.Data;
 
 @Data
@@ -47,13 +53,24 @@ public class PendingItemRequest {
     private String warehouseName;
     private String warehouseLocation;
 
+    private String extendedAttributes;
+
+    @ManyToOne
+    private Organization organization;
+
     @OneToMany(mappedBy = "pendingItemRequest", cascade = CascadeType.ALL)
     private List<PendingItemAttribute> attributes;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updatedAt;
 
 }

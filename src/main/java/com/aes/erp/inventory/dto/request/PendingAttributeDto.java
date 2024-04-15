@@ -5,6 +5,8 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.PendingAttribute;
 
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
 @Data
@@ -19,6 +21,7 @@ public class PendingAttributeDto implements EntityConvertable<PendingAttribute>{
     private String attributeUnit;
 
     @Override
+    @ApiModelProperty(hidden = true)
     public PendingAttribute getEntity() {
         PendingAttribute pendingAttribute = new PendingAttribute();
         pendingAttribute.setSubCategory(new ItemCategory(subCategory.getId()));

@@ -4,6 +4,9 @@ import com.aes.erp.authentication.OrganizationPrincipal;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.response.SubCategory;
+import com.aes.erp.inventory.entity.CategoryAttribute;
+import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.PendingItemAttribute;
 import com.aes.erp.inventory.service.CategoryServiceImpl;
 import com.aes.erp.inventory.service.OrganizationService;
 import com.aes.erp.scm.dto.NoteDto;
@@ -129,12 +132,41 @@ public class TenderServiceImpl implements TenderService{
     }
     @Override
     public Tender getTenderById(Long id) {
-        Optional<Tender> tender = tenderRepository.findById(id);
-        if(tender.isEmpty()) throw new AesException("Tender couldn't be found");
-        return tender.get();
+        Optional<Tender> tenderOp = tenderRepository.findById(id);
+        if(tenderOp.isEmpty()) throw new AesException("Tender couldn't be found");
+        Tender tender = tenderOp.get();
+        tender.setTenderItems(tender.getTenderItems().stream().map(ti->{
+            ti.setAttributes(extractAttributesFromItemAttributeName(tender.getItemCategory(), ti.getProductDescription()));
+            return ti;
+        }).collect(Collectors.toList()));
+        return tender;
     }
 
-    
+    private List<CategoryAttribute> extractAttributesFromItemAttributeName(ItemCategory cat, String itemAttributeName){
+        String[] attrs = itemAttributeName.split(" - ");
+        List<CategoryAttribute> pendingItemAttrList = new ArrayList<>();
+        
+        
+        for(String attr : attrs){
+            String _attr="";
+            Optional<CategoryAttribute> catAttrOp = cat.getAttributes().stream().filter(c->{
+               return attr.contains(c.getAttributeType());
+              
+            }).findFirst();
+            
+            if(catAttrOp.isPresent()){
+                _attr = attr.replace(catAttrOp.get().getAttributeType(),"");
+            
+                String[] args = _attr.trim().split(" ");
+                CategoryAttribute pia = new CategoryAttribute();
+                pia.setAttributeType(catAttrOp.get().getAttributeType());
+                pia.setAttributeValue(args[0].trim());
+                pia.setAttributeUnit(catAttrOp.get().getAttributeUnit());
+                pendingItemAttrList.add(pia);
+            }
+        }
+        return pendingItemAttrList;
+    }
 
     @Override
     public Tender getTenderByRfqNo(String tenderNo) {

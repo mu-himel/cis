@@ -1,5 +1,6 @@
 package com.aes.erp.scm.Entities;
 
+import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,8 @@ public class TenderItem {
     @Column(updatable = false)
     private Long id;
     private String productDescription;
+    @Transient
+    private List<CategoryAttribute> attributes;
     private String brandName;
     private String specification;
     private Long orderQuantity;

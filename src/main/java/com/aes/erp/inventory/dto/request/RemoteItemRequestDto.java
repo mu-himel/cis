@@ -6,7 +6,6 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.enums.ItemUnit;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -15,19 +14,16 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 
 import javax.validation.constraints.NotBlank;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequestDto implements EntityConvertable<Item> {
+public class RemoteItemRequestDto implements EntityConvertable<Item> {
 
     private Long id;
-
-    private Boolean sync;
-
-    private Long orgId;
-    private Long warehouseId;
 
     @NotBlank(message = "name is required")
     @ApiModelProperty(required = true)
@@ -38,23 +34,23 @@ public class ItemRequestDto implements EntityConvertable<Item> {
 
     private String sku;
 
-    private ItemCategory itemCategory;
-    private ItemCategory itemParentCategory;
+    private String categoryCode;
 
     private ItemUnit itemUnit;
 
     private Integer stockThresholdQty;
 
-    private Integer currentStockQty;
+    private BigDecimal currentStockQty;
 
     private Integer reorderPercentage;
 
-    private ReferenceObjectDto brand;
-
-    
-    private StoreType storeType;
-
     private List<ItemAttribute> attributes;
+
+    private String brandName;
+
+    private ReferenceObjectDto warehouse;
+
+    private String storeType;
 
     @Override
     @ApiModelProperty(hidden = true)

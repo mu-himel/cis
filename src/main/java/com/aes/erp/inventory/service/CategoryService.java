@@ -2,6 +2,7 @@ package com.aes.erp.inventory.service;
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
+import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import org.springframework.data.domain.Page;
 
@@ -60,4 +61,6 @@ public interface CategoryService {
     List<ItemCategory> existCategoryByNameIgnoreCase(String category_name);
 
     List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name);
+
+    Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId, String attributeType);
 }

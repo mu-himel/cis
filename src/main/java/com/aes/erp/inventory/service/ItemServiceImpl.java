@@ -1,22 +1,34 @@
 package com.aes.erp.inventory.service;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.dto.request.RemoteItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
+import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.repository.ItemRepository;
+import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +41,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private NetworkService networkService;
+
+    @Autowired
+    private OrganizationService organizationService;
+
+    
 
     @Override
     public Optional<Item> getItemDetail(Long id) {
@@ -91,10 +114,13 @@ public class ItemServiceImpl implements ItemService {
         StringBuilder sb = new StringBuilder();
 
         attributes.stream().forEach(itemAttribute -> {
-            sb.append(itemAttribute.getAttributeType()
-                    +" "+itemAttribute.getAttributeValue()
-                    +" "+itemAttribute.getAttributeUnit());
-            sb.append(" - ");
+            String attrType = itemAttribute.getAttributeType().trim();
+            String attrValue = itemAttribute.getAttributeValue().trim();
+            String attrUnit = itemAttribute.getAttributeUnit().trim();
+            if(!attrType.isEmpty() && !attrValue.isEmpty() && !attrUnit.isEmpty()){
+                sb.append(attrType +" "+attrValue +" "+attrUnit);
+                sb.append(" - ");
+            }
         });
 
         return (sb.isEmpty())? "" : sb.toString().substring(0,sb.length()-3);
@@ -140,6 +166,57 @@ public class ItemServiceImpl implements ItemService {
         }
         itemRepository.save(item);
 
+        if(itemRequestDto.getOrgId() != null){
+            Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
+            sentItem(org,item,itemRequestDto.getWarehouseId());
+        }
+        
+
+    }
+
+    private void sentItemTransfer(String authToken, Organization organization,RemoteItemRequestDto remoteItemRequestDto){
+        StringBuilder sb = new StringBuilder("/items");
+                
+            sb.append("/").append("/receive-from-cps");
+        
+        String itemTransferEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<RemoteItemRequestDto> pqPayload = new HttpEntity<>(remoteItemRequestDto, headers);
+        ResponseEntity<Void> response = networkService.post(itemTransferEndpoint,pqPayload,Void.class);
+        if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
+            !response.getStatusCode().equals(HttpStatus.CREATED)){
+            throw new AesException("Something wrong");
+        }
+    }
+
+    private String login(Organization organization){
+       
+            String url = organization.getServiceIpAddress().replace("/api/v1","")
+                                .concat("/authenticate");
+            String username = organization.getServiceUsername();
+            String password = organization.getServicePassword();
+        return networkService.getAuthToken(url,username,password);
+    }
+
+    private void sentItem(Organization org, Item item,Long warehouseId) {
+        RemoteItemRequestDto remoteItemRequestDto = new RemoteItemRequestDto();
+        remoteItemRequestDto.setAttributes(item.getAttributes());
+        remoteItemRequestDto.setBrandName(item.getName());
+        Optional<ItemCategory> cateOp = categoryService.getItemCategory(item.getItemCategory().getId());
+        if(cateOp.isEmpty()){
+            throw new AesException("Sorry! Sub Category not found");
+        }
+        remoteItemRequestDto.setCategoryCode(cateOp.get().getCode());
+        remoteItemRequestDto.setCurrentStockQty(new BigDecimal(0l));
+        remoteItemRequestDto.setName(item.getName());
+        remoteItemRequestDto.setStockThresholdQty(0);
+        ReferenceObjectDto w = new ReferenceObjectDto();
+        w.setId(warehouseId);
+        remoteItemRequestDto.setWarehouse(w);
+        String authToken = login(org);
+        sentItemTransfer(authToken, org, remoteItemRequestDto);
     }
 
     private List<?> getByAttributes(Long brandId, String attribute) {
