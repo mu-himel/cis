@@ -95,6 +95,42 @@ public interface UserRepository extends JpaRepository<User, Long> {
                                      @Param("employeeType") String employeeType,
                                      Pageable pageable);
 
+        @Query(value =
+                "select e.id as empId, e.employee_id as employeeId , e.name as name , e.phone as phone," +
+                        " e.employee_type as employeeType, users.id, users.first_name as firstName, \n" +
+                        "            users.last_name as lastName, \n" +
+                        "            users.email_address as emailAddress, \n" +
+                        "            uc.active as active  ,r.role_name as roleName\n" +
+                        "            from users\n" +
+                        "            LEFT JOIN  user_credential uc on uc.id = users.user_credential_id\n" +
+                        "            LEFT JOIN user_credential_to_role uctr on uctr.user_credential_id  = uc.id \n" +
+                        "            LEFT JOIN role r on r.id  = uctr.role_id  \n" +
+                        "            LEFT JOIN employees e on e.user_id = users.id\n" +
+                        "            where r.role_name IN ('EMPLOYEE','ENLISTER','AUDITOR','INVENTORY CONTROLLER')  " +
+                        " AND (:name IS NULL OR LOWER(e.name) LIKE concat(LOWER(:name),'%'))" +
+                        " AND (:employeeId IS NULL OR e.employee_id LIKE concat(:employeeId,'%'))" +
+                        " AND (:email IS NULL OR LOWER(users.email_address) LIKE concat(LOWER(:email),'%'))" +
+                        " AND (:phone IS NULL OR e.phone LIKE concat(:phone,'%'))" +
+                        " AND (:employeeType IS NULL OR e.employee_type = :employeeType)",
+                countQuery = "select count(*) " +
+                        "            from users\n" +
+                        "            LEFT JOIN  user_credential uc on uc.id = users.user_credential_id\n" +
+                        "            LEFT JOIN user_credential_to_role uctr on uctr.user_credential_id  = uc.id \n" +
+                        "            LEFT JOIN role r on r.id  = uctr.role_id  \n" +
+                        "            LEFT JOIN employees e on e.user_id = users.id\n" +
+                        "            where r.role_name IN ('EMPLOYEE','ENLISTER','AUDITOR','INVENTORY CONTROLLER')  AND (:name IS NULL OR LOWER(e.name) LIKE concat(LOWER(:name),'%'))" +
+                        " AND (:employeeId IS NULL OR e.employee_id LIKE concat(:employeeId,'%'))" +
+                        " AND (:email IS NULL OR LOWER(users.email_address) LIKE concat(LOWER(:email),'%'))" +
+                        " AND (:phone IS NULL OR e.phone LIKE concat(:phone,'%'))" +
+                        " AND (:employeeType IS NULL OR e.employee_type = :employeeType)",
+                nativeQuery = true)
+        Page<UserInfo> findAllEmployee( @Param("employeeId") String employeeId,
+                                        @Param("name") String name,
+                                        @Param("email") String email,
+                                        @Param("phone") String phone,
+                                        @Param("employeeType") String employeeType,
+                                        Pageable pageable);
+
     @Query(value =  "select e.employee_id employeeId , e.name name , e.phone phone, " +
             "        users.id,users.first_name firstName, \n" +
             "        users.last_name lastName, \n" +

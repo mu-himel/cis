@@ -73,6 +73,15 @@ public class DesignationServiceImpl implements DesignationService{
     }
 
     @Override
+    public void createInventoryControllerRoleNode() {
+        RoleNode roleNode = new RoleNode();
+        roleNode.setId(5L);
+        roleNode.setName("INVENTORY CONTROLLER");
+        roleNode.setParentDepartment(new Department(1L));
+        roleNodeRepository.save(roleNode);
+    }
+
+    @Override
     public Optional<RoleNode> findByName(String enlister) {
         return roleNodeRepository.findByName(enlister);
     }

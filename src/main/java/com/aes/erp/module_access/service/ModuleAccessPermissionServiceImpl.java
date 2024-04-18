@@ -697,6 +697,13 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
             addPermission(1L,3L,13L,false);
             addPermission(1L,3L,14L,true);
             addPermission(1L,2L,15L,true);
+
+            // ADD PERMISSION FOR INVENTORY CONTROLLER
+            addPermission(1L,5L,3L,true);
+            addPermission(1L,5L,5L,true);
+            addPermission(1L,5L,6L,true);
+            addPermission(1L,5L,7L,true);
+            addPermission(1L,5L,23L,true);
         
         }
     }

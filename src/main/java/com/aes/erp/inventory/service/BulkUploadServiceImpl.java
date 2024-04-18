@@ -137,7 +137,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                             categoryRequestDto.setVat(BigDecimal.valueOf(Long.valueOf(vatPercentage)));
                         }
                         categoryRequestDto.setParentCategory(category);
-                        categoryRequestDto.setStoreType(category.getStoreType());
+                        // categoryRequestDto.setStoreType(category.getStoreType());
                         categoryRequestDto.setBrands(brands);
                         categoryRequestDto.setAttributes(
                                 attributes.stream().map(attr->{

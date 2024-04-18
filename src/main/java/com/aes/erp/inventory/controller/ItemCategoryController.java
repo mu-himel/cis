@@ -33,9 +33,8 @@ public class ItemCategoryController {
             @RequestParam("code") Optional<String> code
     ){
         return new ResponseEntity<>(
-                categoryService.getSubCategoriesFilteredByStoreTypeAndParentCategory(page,size,
-                        storeTypeId, parentCategoryId,
-                        name,code),
+                categoryService.getSubCategoriesFilteredByParentCategory(page,size,
+                        parentCategoryId,name,code),
                 HttpStatus.OK
         );
     }
@@ -134,7 +133,7 @@ public class ItemCategoryController {
         subCategory.put("name", itemCategory.getName());
         subCategory.put("code", itemCategory.getCode());
         subCategory.put("parentCategory",parentCategory);
-        subCategory.put("storeType", itemCategory.getStoreType());
+        // subCategory.put("storeType", itemCategory.getStoreType());
         subCategory.put("budgets", itemCategory.getBudgets());
         subCategory.put("attributes", itemCategory.getAttributes());
         subCategory.put("active", itemCategory.getActive());

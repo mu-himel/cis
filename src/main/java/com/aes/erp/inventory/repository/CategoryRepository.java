@@ -19,7 +19,9 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
 
 
-    @Query(value = findAllByItemCategoryWithSubCategoryCount,
+
+
+@Query(value = findAllByItemCategoryWithSubCategoryCount,
             countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
             @Param("storeTypeId") Long storeTypeId,@Param("name") String name,@Param("code") String code, Pageable pageable);
@@ -46,6 +48,20 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             @Param("name") String name,
             @Param("code") String code
             );
+
+        @Query(value = findAllBySubCategoryFilteredByParentCategory,
+            countQuery = countQueryForSubCategoryFilteredByParentCategory,
+            nativeQuery = true)
+        Page<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByParentCategory(
+                @Param("parent_category") Long parent_category,
+                @Param("name") String name, @Param("code") String code,
+                Pageable pageable);
+
+        @Query(value = findAllBySubCategoryFilteredByParentCategory, nativeQuery = true)
+        List<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByParentCategory(
+                @Param("parent_category") Long parent_category,
+                @Param("name") String name,
+                @Param("code") String code);
 
     Optional<ItemCategory> findByCode(String code);
 

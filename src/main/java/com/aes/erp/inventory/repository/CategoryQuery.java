@@ -121,6 +121,24 @@ public interface CategoryQuery {
             " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code) || '%' )" +
             "AND c.active = true";
 
+    String findAllBySubCategoryFilteredByParentCategory = """
+        SELECT 
+        c.id AS subCategoryId,
+        c.name AS subCategoryName, c.code as subCategoryCode,
+        par.id AS parentCategoryId, 
+        par.code AS parentCategoryCode, 
+        par.name AS parentCategoryName,
+        (SELECT COUNT(i.id)  FROM items i WHERE i.item_category_id = c.id) as products, 
+        (SELECT COUNT(pb.id) FROM pending_brands pb WHERE pb.sub_category_id = c.id) as pendingBrands, 
+        (SELECT COUNT(pa.id) FROM pending_attributes pa WHERE pa.sub_category_id = c.id) as pendingAttributes
+        FROM item_categories c
+        LEFT JOIN item_categories par ON par.id = c.parent_category_id 
+        WHERE c.parent_category_id IS NOT NULL AND (:parent_category IS NULL OR par.id = :parent_category) 
+        AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name)||'%') 
+        AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code)||'%') 
+        AND c.active = true 
+        GROUP BY c.id
+        """;
 
     String findAllBySubCategoryFilteredByStoreTypeAndParentCategory = """
             SELECT 
@@ -148,7 +166,7 @@ public interface CategoryQuery {
             "FROM ("+findAllBySubCategoryFilteredByStoreTypeAndParentCategory+") c";
 
 
-    String findAllBySubCategoryFilteredByStoreTypeAndParentCategoryCount="SELECT COUNT(*) FROM ("+
-            findAllBySubCategoryFilteredByStoreTypeAndParentCategory+") c";
+    String countQueryForSubCategoryFilteredByParentCategory="SELECT COUNT(*) FROM ("+
+                findAllBySubCategoryFilteredByParentCategory+") c";
 
 }

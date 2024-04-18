@@ -97,7 +97,15 @@ public class UserService {
 
         UserCredentialToRole userCredentialToRole = new UserCredentialToRole();
         userCredentialToRole.setUserCredential(userCredential);
-        String role = (userDto.getEmployeeId()!=null)? "EMPLOYEE" : "USER";
+        String role = "EMPLOYEE";
+        
+        if(userDto.getEmployeeType().equals(EmployeeType.AUDITOR)){
+            role = EmployeeType.AUDITOR.toString();
+        }else if(userDto.getEmployeeType().equals(EmployeeType.ENLISTER)){
+            role = EmployeeType.ENLISTER.toString();
+        }else if(userDto.getEmployeeType().equals(EmployeeType.INVENTORY_CONTROLLER)){
+            role = EmployeeType.INVENTORY_CONTROLLER.toString().replace("_", " ");
+        }
         userCredentialToRole.setRole((Role) roleService.read(role));
         userCredentialToRoleRepository.save(userCredentialToRole);
         user = userRepository.save(user);
@@ -108,8 +116,8 @@ public class UserService {
                 user
         );
         employee.setEmployeeType(userDto.getEmployeeType());
-        employee.setDepartment(null);
-        employee.setRoleNode(null);
+        employee.setDepartment(new Department(1L));
+        employee.setRoleNode(new RoleNode(5L));
         employee.setReportingManager(null);
 //        userAssignmentOps.assignUser(new UserAssignmentDTO(
 //                user.getId(),
@@ -238,7 +246,7 @@ public class UserService {
     ) {
 
         Pageable pageable = PageRequest.of(page,size);
-        Page<?> existingUsers = userRepository.findAllByRoleName(roleName,
+        Page<?> existingUsers = userRepository.findAllEmployee(
                 employeeId.orElse(null),
                 name.orElse(null),
                 email.orElse(null),phone.orElse(null),employeeType.orElse(null),pageable

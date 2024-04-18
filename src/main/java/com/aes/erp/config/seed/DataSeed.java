@@ -3,7 +3,6 @@ package com.aes.erp.config.seed;
 
 import com.aes.erp.inventory.entity.AttributeUnit;
 import com.aes.erp.inventory.repository.AttributeUnitRepository;
-import com.aes.erp.inventory.service.CategoryAttributeService;
 import com.aes.erp.module_access.service.ModuleAccessPermissionService;
 import com.aes.erp.module_access.service.ModuleAccessService;
 import com.aes.erp.organogram_system.entity.Department;
@@ -17,8 +16,6 @@ import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.RoleService;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.VendorTypeCreateDto;
-import com.aes.erp.vendor.entity.VendorType;
-import com.aes.erp.vendor.service.VendorServiceImpl;
 import com.aes.erp.vendor.service.VendorTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +69,7 @@ public class DataSeed implements CommandLineRunner {
         this.createEnlisterRoleNode();
         this.createAuditorRoleNode();
         this.createVendorRoleNode();
+        this.createInventoryControllerRoleNode();
         this.initUserAccounts();
         this.assignUserToRole();
         this.initModules();
@@ -81,16 +79,35 @@ public class DataSeed implements CommandLineRunner {
 
     private void initRoles(){
         List<String> roleNames = new ArrayList<>();
-        roleNames.add("SYS_ADMIN");
-        roleNames.add("VENDOR");
-        roleNames.add("EMPLOYEE");
-        roleNames.add("ENLISTER");
-        roleNames.add("AUDITOR");
-        roleNames.add("ORGANIZATION");
-        List<Role> roles = roleService.getRoleByRoleNames(roleNames);
-        if(roles.size()==0){
-            roleService.createRoles(roleNames);
+        Role sysAdminRole = roleService.getRoleByRoleName("SYS_ADMIN"); 
+        if(sysAdminRole==null){
+            roleNames.add("SYS_ADMIN");
         }
+        Role vendorRole = roleService.getRoleByRoleName("VENDOR");
+        if(vendorRole==null){
+            roleNames.add("VENDOR");
+        }
+        Role employeeRole = roleService.getRoleByRoleName("EMPLOYEE");
+        if(employeeRole==null){
+            roleNames.add("EMPLOYEE");
+        }
+        Role enlisterRole = roleService.getRoleByRoleName("ENLISTER");
+        if(enlisterRole==null){
+            roleNames.add("ENLISTER");
+        }
+        Role auditorRole = roleService.getRoleByRoleName("AUDITOR");
+        if(auditorRole==null){
+            roleNames.add("AUDITOR");
+        }
+        Role orgRole = roleService.getRoleByRoleName("ORGANIZATION");
+        if(orgRole==null){
+            roleNames.add("ORGANIZATION");
+        }
+        Role icRole = roleService.getRoleByRoleName("INVENTORY CONTROLLER");
+        if(icRole==null){
+            roleNames.add("INVENTORY CONTROLLER");
+        }
+        roleService.createRoles(roleNames);
     }
 
     private void createRoleNode(){
@@ -125,6 +142,13 @@ public class DataSeed implements CommandLineRunner {
         Optional<RoleNode> roleNodeOptional = designationService.findByName("VENDOR");
         if(roleNodeOptional.isEmpty()){
             designationService.createVendorRoleNode();
+        }
+    }
+
+    private void createInventoryControllerRoleNode(){
+        Optional<RoleNode> roleNodeOptional = designationService.findByName("INVENTORY CONTROLLER");
+        if(roleNodeOptional.isEmpty()){
+            designationService.createInventoryControllerRoleNode();
         }
     }
 

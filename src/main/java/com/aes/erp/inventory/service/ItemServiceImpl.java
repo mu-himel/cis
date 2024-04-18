@@ -269,7 +269,7 @@ public class ItemServiceImpl implements ItemService {
         Optional<Item> itemOptional = itemRepository.findById(id);
         if(itemOptional.isPresent()) {
             Item item = itemOptional.get();
-            if(item.getIsSyncronized()){
+            if(item.getIsSyncronized() != null && item.getIsSyncronized()){
                 throw new AesException("Sorry! Not possible to delete this item is syncronized with erp system");
             }
             item.setActive(false);

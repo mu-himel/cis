@@ -78,8 +78,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             inventoryControl.setId(5L);
             inventoryControl.setDisplayOrder(4);
             inventoryControl.setName("Inventory Control");
-            inventoryControl.setRoute("control-panel/inventory-control");
-            inventoryControl.setUri("control-panel/inventory-control");
+            inventoryControl.setRoute("control-panel/category");
+            inventoryControl.setUri("control-panel/category");
             inventoryControl.setModuleType(ModuleType.CHILD);
             inventoryControl.setShowInMenu(true);
             inventoryControl.setParentModuleAccess(controlPanel);
@@ -270,6 +270,17 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             closedPo.setModuleType(ModuleType.CHILD);
             closedPo.setShowInMenu(true);
             closedPo.setParentModuleAccess(tenderModule);
+            tenderModule.addChildModule(closedPo);
+
+            ModuleAccess product = new ModuleAccess();
+            product.setId(23L);
+            product.setDisplayOrder(8);
+            product.setName("Prdouct");
+            product.setRoute("control-panel/prdouct");
+            product.setUri("control-panel/product");
+            product.setModuleType(ModuleType.CHILD);
+            product.setShowInMenu(false);
+            product.setParentModuleAccess(controlPanel);
             tenderModule.addChildModule(closedPo);
             
             moduleAccessRepository.save(tenderModule);

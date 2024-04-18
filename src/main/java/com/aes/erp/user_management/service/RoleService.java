@@ -4,8 +4,6 @@ import com.aes.erp.user_management.dto.RoleDTO;
 import com.aes.erp.user_management.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

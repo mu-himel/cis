@@ -36,6 +36,7 @@ public class ItemCategory {
   private Set<SubCategoryBrand> subcategoryBrands = new HashSet<>();
   @ManyToOne
   private ItemCategory parentCategory;
+
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "store_type_id")
   private StoreType storeType;

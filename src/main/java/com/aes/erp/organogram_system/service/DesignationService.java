@@ -20,4 +20,6 @@ public interface DesignationService {
     void createAuditorRoleNode();
 
     void createVendorRoleNode();
+
+    void createInventoryControllerRoleNode();
 }

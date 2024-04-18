@@ -1,5 +1,5 @@
 package com.aes.erp.employee.enums;
 
 public enum EmployeeType {
-    AUDITOR,ENLISTER
+    AUDITOR,ENLISTER,INVENTORY_CONTROLLER
 }

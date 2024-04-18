@@ -4,12 +4,10 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.repository.*;
-import com.aes.erp.vendor.entity.VendorSubCategory;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -84,10 +82,11 @@ public class CategoryServiceImpl implements CategoryService {
             Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(categoryRequestDto.getParentCategory().getId());
             if(itemCategoryOptional.isPresent()) category.setParentCategory(itemCategoryOptional.get());
         }
-        if(categoryRequestDto.getStoreType()!=null && categoryRequestDto.getStoreType().getId() != null){
-            Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
-            if(storeType.isPresent())category.setStoreType(storeType.get());
-        }
+        
+        // if(categoryRequestDto.getStoreType()!=null && categoryRequestDto.getStoreType().getId() != null){
+        //     Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
+        //     if(storeType.isPresent())category.setStoreType(storeType.get());
+        // }
 
 
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
@@ -133,10 +132,10 @@ public class CategoryServiceImpl implements CategoryService {
             itemCategory.setName(categoryRequestDto.getName());
         }
 
-        if(categoryRequestDto.getStoreType()!=null && categoryRequestDto.getStoreType().getId() != null){
-            Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
-            if(storeType.isPresent())itemCategory.setStoreType(storeType.get());
-        }
+        // if(categoryRequestDto.getStoreType()!=null && categoryRequestDto.getStoreType().getId() != null){
+        //     Optional<StoreType> storeType = storeTypeRepository.findById(categoryRequestDto.getStoreType().getId());
+        //     if(storeType.isPresent())itemCategory.setStoreType(storeType.get());
+        // }
 
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalItemCategory = itemCategory;
@@ -182,6 +181,28 @@ public class CategoryServiceImpl implements CategoryService {
     public Optional<ItemCategory> getItemCategory(Long id) {
         Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
         return itemCategoryOptional;
+    }
+
+    
+
+
+    @Override
+    public Page<?> getSubCategoriesFilteredByParentCategory(Optional<Integer> page, Optional<Integer> size,
+            Optional<Long> parentCategoryId, Optional<String> name, Optional<String> code) {
+
+                Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10));
+
+        return categoryRepository.findAllBySubCategoryFilteredByParentCategory(
+                parentCategoryId.orElse(null),
+                name.orElse(null),code.orElse(null),
+                pageable);
+    }
+
+    @Override
+    public List<?> getSubCategoryListFilteredByParentCategory(Optional<Long> parentCategoryId, Optional<String> name,
+            Optional<String> code) {
+                return categoryRepository.findAllBySubCategoryFilteredByParentCategory(parentCategoryId.orElse(null),
+                name.orElse(null), code.orElse(null));
     }
 
     @Override
