@@ -1,19 +1,28 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.dto.request.BulkCategoryRequestDto;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.repository.*;
+import com.aes.erp.network.NetworkService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +48,9 @@ public class CategoryServiceImpl implements CategoryService {
     private final SubcategoryBrandRepository subcategoryBrandRepository;
     @Autowired
     private CategoryAttributeRepository categoryAttributeRepository;
+
+    @Autowired
+    private NetworkService networkService;
 
     public CategoryServiceImpl(BrandRepository brandRepository, GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository) {
         this.brandRepository = brandRepository;
@@ -368,6 +380,81 @@ public class CategoryServiceImpl implements CategoryService {
                 return    categoryAttributeRepository.findByCategoryIdAndAttributeType(subCatId,attributeType);
         
     }
+
+    @Override
+    public void bulkImport(Organization org, Long userId, Long warehouseId, Long storeId,
+    Long parentCategoryId, List<Long> ids) {
+        List<CategoryRequestDto> categoryList = new ArrayList<>();
+        for(Long catId : ids){
+            Optional<ItemCategory> itemCatOps = categoryRepository.findById(catId);
+            if(itemCatOps.isPresent()){
+                ItemCategory itemCategory = itemCatOps.get();
+                CategoryRequestDto catReqDto = new CategoryRequestDto();
+                catReqDto.setAttributes(itemCategory.getAttributes().stream().map(ica->{
+                    CategoryAttribute ca = new CategoryAttribute();
+                    ca.setAttributeType(ica.getAttributeType());
+                    ca.setAttributeValue(ica.getAttributeValue());
+                    ca.setAttributeUnit(ica.getAttributeUnit());
+                    return ca;
+                }).collect(Collectors.toList()));
+                catReqDto.setCode(itemCategory.getCode());
+                catReqDto.setName(itemCategory.getName());
+                if(parentCategoryId==null){
+                    catReqDto.setParentCategory(null);
+                }else{
+                    catReqDto.setParentCategory(new ItemCategory(parentCategoryId));
+                }
+                catReqDto.setVat(itemCategory.getVat());
+                catReqDto.setWarehouse(new ReferenceObjectDto(warehouseId));
+                catReqDto.setWarehouseStore(new ReferenceObjectDto(storeId));
+                catReqDto.setBrands(itemCategory.getSubcategoryBrands().stream().map(sb->{
+                    return sb.getBrand().getName();
+                }).toList());
+                catReqDto.setCpsCategoryId(itemCategory.getId());
+                categoryList.add(catReqDto);
+            }
+        }
+
+        if(categoryList.size()>0){
+            
+            String authToken = login(org);
+            sentItemCategoryTransfer(authToken, userId, org, categoryList);
+
+        }
+    }
+
+    private void sentItemCategoryTransfer(String authToken, Long userId, Organization org,List<CategoryRequestDto> categoryList){
+        StringBuilder sb = new StringBuilder("/item-categories");
+                
+        sb.append("/bulk-create");
+    
+        String itemCategoryTransferEndpoint = org.getServiceIpAddress().concat(sb.toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        BulkCategoryRequestDto bcr = new BulkCategoryRequestDto();
+        bcr.setUserId(userId);
+        bcr.setCategories(categoryList);
+        HttpEntity<BulkCategoryRequestDto> pqPayload = new HttpEntity<>(bcr, headers);
+        ResponseEntity<Void> response = networkService.post(itemCategoryTransferEndpoint,pqPayload,Void.class);
+        if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
+            !response.getStatusCode().equals(HttpStatus.CREATED)){
+            throw new AesException("Something wrong");
+        }
+    }
+
+    private String login(Organization organization){
+       
+            String url = organization.getServiceIpAddress().replace("/api/v1","")
+                                .concat("/authenticate");
+            String username = organization.getServiceUsername();
+            String password = organization.getServicePassword();
+        return networkService.getAuthToken(url,username,password);
+    }
+
+    
+
 
     
 }

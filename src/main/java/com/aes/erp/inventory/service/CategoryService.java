@@ -4,6 +4,8 @@ import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
+
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
@@ -74,4 +76,5 @@ public interface CategoryService {
     List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name);
 
     Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId, String attributeType);
+    void bulkImport(Organization org, Long userId, Long warehouseId, Long storeId,Long parentCategoryId, List<Long> id);
 }

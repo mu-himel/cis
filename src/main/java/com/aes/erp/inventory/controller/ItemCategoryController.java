@@ -2,7 +2,9 @@ package com.aes.erp.inventory.controller;
 
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.request.ErpBulkImportDto;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.service.CategoryService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -141,6 +143,15 @@ public class ItemCategoryController {
         subCategory.put("createdAt", itemCategory.getCreatedAt());
         subCategory.put("subcategoryBrands", subcategoryBrands);
         return subCategory;
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<?> importToErp(
+        @RequestAttribute Organization organization,
+        @RequestBody ErpBulkImportDto erpImportDto){
+        categoryService.bulkImport(organization, erpImportDto.getUserId(), erpImportDto.getWarehouseId(),
+        erpImportDto.getWarehouseStoreId(),erpImportDto.getParentCategoryId(),erpImportDto.getId());
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping

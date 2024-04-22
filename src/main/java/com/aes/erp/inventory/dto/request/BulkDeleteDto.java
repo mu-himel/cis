@@ -6,6 +6,6 @@ import lombok.Data;
 
 @Data
 public class BulkDeleteDto {
-    List<Long> id;
+    private List<Long> id;
     
 }

@@ -36,6 +36,11 @@ public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
 
     private BigDecimal vat;
 
+    private ReferenceObjectDto warehouse;
+    private ReferenceObjectDto warehouseStore;
+
+    private Long cpsCategoryId;
+
     @Override
     @ApiModelProperty(hidden = true)
     public ItemCategory getEntity() {
