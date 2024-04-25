@@ -14,6 +14,9 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    Optional<User> findByEmailAddressIgnoreCaseStartingWith(String email);    
+
     Optional<User> findByEmailAddress(String emailAddress);
     @Query(value = "SELECT * FROM user,user_credential, role, user_to_team, team WHERE \n" +
             "user_credential.id =user.user_credential_id\n" +

@@ -64,5 +64,8 @@ public class PurchaseOrder {
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
     private List<PurchaseOrderDetail> orderDetails;
 
+    @OneToMany(mappedBy = "purchaseOrder")
+    private List<PoQcDetail> qcDetails;
+
 
 }

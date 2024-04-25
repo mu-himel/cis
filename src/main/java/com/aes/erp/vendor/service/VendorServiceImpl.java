@@ -95,6 +95,7 @@ public class VendorServiceImpl implements VendorService {
                 throw new AesException("phone number should not contain alphabets");
             }
         }
+        
         User user = userService.createVendorUserAccount(vendorDto);
         Vendor vendor = vendorDto.getEntity();
         vendor.setStatus(VendorStatus.CREATED);
@@ -123,6 +124,13 @@ public class VendorServiceImpl implements VendorService {
         vendor = vendorRepository.save(vendor);
         //Notify user Through a mail
         VendorRegistrationMailSender senderBody = new VendorRegistrationMailSender(vendor.getEmail());
+        
+        // send superadmin a copy of vendor registration credential's mail
+        User superAdminUser = userService.findByEmailAddressIgnoreCaseStartingWith("superadmin@");
+        if(superAdminUser!=null){
+            senderBody.addReceipent(superAdminUser.getEmailAddress());
+        }
+
         senderBody.setContent(senderBody.getContent() +  "Email: " + vendorDto.getEmail() + "\n" + "Password: " + vendorDto.getPassword());
         emailSenderUtil.sendMail(senderBody);
     }

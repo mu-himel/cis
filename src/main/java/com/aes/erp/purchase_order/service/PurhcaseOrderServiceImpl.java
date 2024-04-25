@@ -32,6 +32,7 @@ import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
 import com.aes.erp.purchase_order.dto.request.QcResultDto;
+import com.aes.erp.purchase_order.entity.PoQcDetail;
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
 import com.aes.erp.purchase_order.repository.PoRepository;
@@ -244,6 +245,17 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setQcDeclineNote(null);
             po.setPoStatus(qcResultDto.getStatus());
             po.setQcResult(qcResultDto.getQcResult());
+            po.setQcDetails(qcResultDto.getQcDetails().stream().map(qcDetail->{
+                PoQcDetail poQcDetail = new PoQcDetail();
+                poQcDetail.setPoId(qcDetail.getPoId());
+                poQcDetail.setDate(qcDetail.getDate());
+                poQcDetail.setItemAttributeName(qcDetail.getItemAttributeName());
+                poQcDetail.setBrandName(qcDetail.getBrandName());
+                poQcDetail.setTotalApprovedQty(qcDetail.getTotalApprovedQty());
+                poQcDetail.setTotalDeclinedQty(qcDetail.getTotalDeclinedQty());
+                poQcDetail.setPurchaseOrder(po);
+                return poQcDetail;
+            }).collect(Collectors.toList()));
         }
     }
 

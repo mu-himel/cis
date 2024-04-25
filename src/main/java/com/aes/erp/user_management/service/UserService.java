@@ -316,4 +316,9 @@ public class UserService {
         User user = userRepository.findByEmailAddress(s).orElse(null);
         return user;
     }
+
+    public User findByEmailAddressIgnoreCaseStartingWith(String email) {
+        User user = userRepository.findByEmailAddressIgnoreCaseStartingWith(email).orElse(null);
+        return user;
+    }
 }

@@ -407,9 +407,11 @@ public class CategoryServiceImpl implements CategoryService {
                 catReqDto.setVat(itemCategory.getVat());
                 catReqDto.setWarehouse(new ReferenceObjectDto(warehouseId));
                 catReqDto.setWarehouseStore(new ReferenceObjectDto(storeId));
-                catReqDto.setBrands(itemCategory.getSubcategoryBrands().stream().map(sb->{
-                    return sb.getBrand().getName();
-                }).toList());
+                if(itemCategory.getSubcategoryBrands().size()>0){
+                    catReqDto.setBrands(itemCategory.getSubcategoryBrands().stream().map(sb->{
+                        return sb.getBrand().getName();
+                    }).toList());
+                }
                 catReqDto.setCpsCategoryId(itemCategory.getId());
                 categoryList.add(catReqDto);
             }

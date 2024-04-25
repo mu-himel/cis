@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.aes.erp.purchase_order.entity.PoQcDetail;
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.scm.Entities.PriceQuotation;
 import com.aes.erp.scm.Entities.TenderDeliveryDetail;
@@ -52,6 +53,7 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
         String getQcResult();
         Boolean getIsQcPass();
         String getQcDeclineNote();
+        List<PoQcDetail> getQcDetails(); 
         List<PurchaseOrderDetailInfo> getOrderDetails();
         VendorInfo getVendor();
     }

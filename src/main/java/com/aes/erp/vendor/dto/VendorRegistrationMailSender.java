@@ -18,4 +18,7 @@ public class VendorRegistrationMailSender {
     public VendorRegistrationMailSender(String to) {
         this.to.add(to);
     }
+    public void addReceipent(String to){
+        this.to.add(to);
+    }
 }
