@@ -57,6 +57,6 @@ public interface PendingItemRequestRepository extends JpaRepository<PendingItemR
     <T> Optional<T> findById(Long id, Class<T> classType);
 
     @Query("SELECT max(pir.id) FROM PendingItemRequest pir")
-    Optional<PendingItemRequest> findMaxOrderById();
+    Optional<Long> findMaxOrderById();
     
 }

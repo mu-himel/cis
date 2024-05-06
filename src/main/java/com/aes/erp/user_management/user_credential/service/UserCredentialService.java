@@ -108,13 +108,13 @@ public class UserCredentialService {
 //        emailSender.send(email, messageBody);
     }
 
-    public String generatePassword(Integer length) {
+    // public String generatePassword(Integer length) {
 
-        Long min = (long) Math.pow(10, length - 1);
-        Long max = (long) Math.pow(10, length) - 1;
+    //     Long min = (long) Math.pow(10, length - 1);
+    //     Long max = (long) Math.pow(10, length) - 1;
 
-        Random random = new Random();
-        String password = Long.toString(random.nextLong(max - min) + min);
-        return password;
-    }
+    //     Random random = new Random();
+    //     String password = Long.toString(random.nextLong(max - min) + min);
+    //     return password;
+    // }
 }

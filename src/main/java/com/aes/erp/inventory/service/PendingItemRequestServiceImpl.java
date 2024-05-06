@@ -80,10 +80,10 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     }
 
     private String getNextItemCode() {
-        Optional<PendingItemRequest> pirOp = pendingItemRequestRepository.findMaxOrderById();
+        Optional<Long> pirOp = pendingItemRequestRepository.findMaxOrderById();
         if(pirOp.isPresent()){
-            PendingItemRequest pir = pirOp.get();
-            Long newProductId = pir.getId() + 1;
+            Long pir = pirOp.get();
+            Long newProductId = pir + 1;
             return String.format("%05d",newProductId);
         }
         return String.format("%05d",1);

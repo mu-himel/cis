@@ -89,20 +89,29 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setOrg(organization);
             po.setPoStatus("PENDING");
             po.setCategoryCode(poDto.getCategoryCode());
-            po.setOrderDetails(poDto.getOrderDetails().stream().map(od->{
+            List<PurchaseOrderDetail> poOrderDetails = new ArrayList<>();
+            poDto.getOrderDetails().stream().forEach(od->{
                 Optional<OfferItem> offerItemOp = offer.getOfferItems().stream()
-                        .filter(oi->oi.getProductDescription().equals(od.getItemName()))
+                        .filter(oi->{
+                            String oiStr = oi.getProductDescription().concat(" - "+oi.getExtendedAttributes());
+                            String odStr =od.getItemName();
+                            return oiStr.equals(odStr);
+                        })
                         .findFirst();
-                if(offerItemOp.isEmpty()){
-                    throw new AesException("Sorry! Offer Item not found");
+                if(offerItemOp.isPresent()){
+                    // throw new AesException("Sorry! Offer Item not found");
+               
+                    PurchaseOrderDetail pod = new PurchaseOrderDetail();
+                    pod.setItemName(od.getItemName());
+                    pod.setItemQty(od.getItemQty());
+                    pod.setOfferItem(offerItemOp.get());
+                    pod.setPurchaseOrder(po);
+                    poOrderDetails.add(pod);
+                    
                 }
-               PurchaseOrderDetail pod = new PurchaseOrderDetail();
-               pod.setItemName(od.getItemName());
-               pod.setItemQty(od.getItemQty());
-               pod.setOfferItem(offerItemOp.get());
-               pod.setPurchaseOrder(po);
-               return pod; 
-            }).collect(Collectors.toList()));
+                
+            });
+            po.setOrderDetails(poOrderDetails);
             poRepository.save(po);
         });
         

@@ -137,40 +137,57 @@ public class ItemServiceImpl implements ItemService {
         Long brandId = (itemRequestDto.getBrand()!=null)? itemRequestDto.getBrand().getId() : null;
         List<?> itemExistByAttr = this.getByAttributes(brandId,itemAttributeName);
         if(itemExistByAttr.size()>0){
-            throw new AesException("Sorry! Item Already exist with same attributes for this brand");
+            if(itemRequestDto.getOrgId() != null){
+                Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
+                Optional<Item> itemOp = itemRepository.findByCode(itemRequestDto.getCode());
+                if(itemOp.isPresent()){
+                    sentItem(org,itemOp.get(),itemRequestDto.getWarehouseId());
+                }
+                
+            }else{
+                throw new AesException("Sorry! "+itemExistByAttr.size()+" Items Already exist with same attributes for this brand");
+            }
+            
         }
         item.setItemAttributeName(itemAttributeName);
 
         if(itemRepository.existsByCode(item.getCode())){
-            throw new AesException("Item code already exist");
-        }
+            if(itemRequestDto.getOrgId() != null){
+                Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
+                sentItem(org,item,itemRequestDto.getWarehouseId());
+            }else{
+                throw new AesException("Sorry! Item Code should be unique");
+            }
+        }else{
 
-        if(item.getItemParentCategory()==null && item.getItemCategory()==null){
-            throw new AesException("Item Sub Category Missing");
-        }
+            item.setCode(itemRequestDto.getCode());
 
-        if(item.getItemParentCategory()==null){
-            throw new AesException("Item Main Category Missing");
-        }
+            if(item.getItemParentCategory()==null && item.getItemCategory()==null){
+                throw new AesException("Item Sub Category Missing");
+            }
 
-        if(itemRequestDto.getBrand()!=null && itemRequestDto.getBrand().getId()!=null){
-            item.setBrand(new Brand(itemRequestDto.getBrand().getId()));
-        }
+            if(item.getItemParentCategory()==null){
+                throw new AesException("Item Main Category Missing");
+            }
 
-        if(itemRequestDto.getAttributes()!=null && itemRequestDto.getAttributes().size()>0) {
+            if(itemRequestDto.getBrand()!=null && itemRequestDto.getBrand().getId()!=null){
+                item.setBrand(new Brand(itemRequestDto.getBrand().getId()));
+            }
 
-            item.setAttributes(itemRequestDto.getAttributes().stream().map(itemAttribute -> {
-                itemAttribute.setItem(item);
-                return itemAttribute;
-            }).collect(Collectors.toList()));
-        }
-        itemRepository.save(item);
+            if(itemRequestDto.getAttributes()!=null && itemRequestDto.getAttributes().size()>0) {
 
-        if(itemRequestDto.getOrgId() != null){
-            Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
-            sentItem(org,item,itemRequestDto.getWarehouseId());
+                item.setAttributes(itemRequestDto.getAttributes().stream().map(itemAttribute -> {
+                    itemAttribute.setItem(item);
+                    return itemAttribute;
+                }).collect(Collectors.toList()));
+            }
+            itemRepository.save(item);
+
+            if(itemRequestDto.getOrgId() != null){
+                Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
+                sentItem(org,item,itemRequestDto.getWarehouseId());
+            }
         }
-        
 
     }
 
@@ -204,6 +221,7 @@ public class ItemServiceImpl implements ItemService {
         RemoteItemRequestDto remoteItemRequestDto = new RemoteItemRequestDto();
         remoteItemRequestDto.setAttributes(item.getAttributes());
         remoteItemRequestDto.setBrandName(item.getName());
+        remoteItemRequestDto.setCode(item.getCode());
         Optional<ItemCategory> cateOp = categoryService.getItemCategory(item.getItemCategory().getId());
         if(cateOp.isEmpty()){
             throw new AesException("Sorry! Sub Category not found");

@@ -6,7 +6,7 @@ public interface PurchaseQuery {
             po.id as id,
             po.po_no as poNo, po.tender_no as tenderNo, po.po_date as poDate,
             o.name as orgName,
-            (SELECT CONCAT(ipc.name,'-',ic.name) FROM tenders t 
+            (SELECT DISTINCT CONCAT(ipc.name,'-',ic.name) FROM tenders t 
             LEFT JOIN item_categories ic ON ic.id = t.item_category_id
             LEFT JOIN item_categories ipc ON ipc.id = ic.parent_category_id
             WHERE t.rfq_no = po.tender_no) as productType,
