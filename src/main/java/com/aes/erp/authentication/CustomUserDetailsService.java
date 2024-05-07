@@ -59,7 +59,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         Set<GrantedAuthority> authorities = new HashSet<>();
         for(UserCredentialToRole userCredentialToRole:user.getUserCredential().getUserCredentialToRoles()) {
             String roleName = userCredentialToRole.getRole().getRoleName();
-            if(roleName.equals("EMPLOYEE")){
+            if(roleName.equals("EMPLOYEE")||roleName.equals("INVENTORY CONTROLLER")
+            ||roleName.equals("AUDITOR") || roleName.equals("ENLISTER")){
                Optional<Employee> employeeOptional = employeeService.getEmployeeByUserId(user.getId());
                if(employeeOptional.isPresent()){
                     customUserDetails.setEmployee(employeeOptional.get());
