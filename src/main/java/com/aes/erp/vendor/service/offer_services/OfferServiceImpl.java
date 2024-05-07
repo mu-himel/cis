@@ -94,6 +94,8 @@ public class OfferServiceImpl implements OfferService{
         offer.setIsFinal(createDTO.getIsFinal());
         offer.setOfferItems(createDTO.getOfferItems().stream().map(oi->{
             OfferItem offerItem = new OfferItem();
+            offerItem.setWarrantyDuration(oi.getWarrantyDuration());
+            offerItem.setWarrantyUnit(oi.getWarrantyUnit());
             offerItem.setEstimatedDeliveryDays(oi.getEstimatedDeliveryDays());
             offerItem.setItemQuantity(oi.getItemQuantity());
             PriceQuotation pq = new PriceQuotation();
@@ -123,6 +125,8 @@ public class OfferServiceImpl implements OfferService{
             odd.setOffer(offer);
             return odd;
         }).collect(Collectors.toList()));
+
+        
         // for(OfferItem item : offer.getOfferItems()){
         //     PriceQuotation priceQuotation = item.getPriceQuotation();
         //     priceQuotation = priceQuotationRepository.save(priceQuotation);
@@ -141,19 +145,32 @@ public class OfferServiceImpl implements OfferService{
     @Override
     public void createInitialOffer(ClaimResponseDto loggedInUser, OfferCreateDTO createDTO, Long tenderId) {
         Map<String,Object> vendor = loggedInUser.getUserInfoDto();
+        Long vendorId = Long.parseLong(vendor.get("vendorId").toString());
         if(vendor==null){
             throw new AesException("Logged-in User is not vendor");
         }
         Offer offer = new Offer();
         
         createOfferItemsFromTenderItems(offer, createDTO);
-        offer = offerRepository.save(offer);
+        offerRepository.save(offer);
         Tender parentTender = tenderService.getTenderById(tenderId);
 
         
 
+
         NegotiationHistory negotiationHistory = new NegotiationHistory();
         Tender t = new Tender(parentTender.getId());
+
+        if(createDTO.getTermsAndConditions().size()>0){
+            offer.setTermsAndConditions(createDTO.getTermsAndConditions().stream().map(termCondition->{
+                OfferTermsAndCondition offerTermsAndCondition = new OfferTermsAndCondition();
+                offerTermsAndCondition.setOffer(offer);
+                offerTermsAndCondition.setVendor(new Vendor(vendorId));
+                offerTermsAndCondition.setTender(t);
+                offerTermsAndCondition.setTermAndCondition(termCondition.getTermsAndCondition());
+                return offerTermsAndCondition;
+            }).collect(Collectors.toList()));
+        }
         
         negotiationHistory.setTender(t);
         offer.setTender(t);
@@ -162,7 +179,7 @@ public class OfferServiceImpl implements OfferService{
         //Set Owner Parties
         Negotiator creator = new Negotiator();
         creator.setPartyType(NegotiationPartyType.NEGOTIATION_CREATOR);
-        Long vendorId = Long.parseLong(vendor.get("vendorId").toString());
+        
         creator.setVendor(new Vendor(vendorId));
         creator = negotiatorService.saveNegotiator(creator);
         negotiationHistory.addNegotiators(creator);
@@ -223,6 +240,7 @@ public class OfferServiceImpl implements OfferService{
         String VendorName = (String)vendorInfo.get("name");
         String vendorEmail = (String)vendorInfo.get("vendorEmail");
         String vendorPhoneNo = (String)vendorInfo.get("vendorPhoneNo");
+        String vendorType = (String) vendorInfo.get("vendorType");
         priceQuotationReqDto.setRemoteOfferId(offer.getId());
         priceQuotationReqDto.setCode(tender.getCode());
         priceQuotationReqDto.setPaymentMethod(offer.getCreditType().name());
@@ -230,9 +248,16 @@ public class OfferServiceImpl implements OfferService{
         priceQuotationReqDto.setVendorName(VendorName);
         priceQuotationReqDto.setVendorEmail(vendorEmail);
         priceQuotationReqDto.setVendorPhoneNo(vendorPhoneNo);
+        priceQuotationReqDto.setVendorType(vendorType);
         priceQuotationReqDto.setScore(score);
         priceQuotationReqDto.setNegotiationHistoryId(offer.getNegotiationHistory().getId());
         priceQuotationReqDto.setIsFinal(offer.getIsFinal());
+        if(offer.getTermsAndConditions().size()>0){
+            priceQuotationReqDto.setTermsAndConditions(offer.getTermsAndConditions().stream().map(otc->{
+                return otc.getTermAndCondition();
+            }).collect(Collectors.toList()));
+        }
+
         Map<String,Object>  deliveryChargeType = new HashMap<>();
         priceQuotationReqDto.setDetails(offer.getOfferItems().stream().map(o->{
            
@@ -245,6 +270,8 @@ public class OfferServiceImpl implements OfferService{
                 throw new AesException("Sorry! Tender Item not found");
             }
             TenderItem tenderItem = tenderItemOp.get();
+            pqdrd.setWarrantyDuration(o.getWarrantyDuration());
+            pqdrd.setWarrantyUnit(o.getWarrantyUnit());
             pqdrd.setEstDeliveryDays(Integer.parseInt(o.getEstimatedDeliveryDays().toString()));
             pqdrd.setDeliveryDetails(tenderItem.getDeliveryDetails().stream().map(tdd->{
                 
@@ -328,12 +355,13 @@ public class OfferServiceImpl implements OfferService{
     @Transactional
     @Override
     public void createCounterOffer(ClaimResponseDto loggedInUser, OfferCreateDTO createDTO, Long tenderId) {
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
         Tender parentTender = tenderService.getTenderById(tenderId);
         NegotiationHistory negotiationHistory = negotiationHistoryService.getHistoryById(createDTO.getNegotiationHistoryId());
 
         Offer offer = new Offer();
         createOfferItemsFromTenderItems(offer,createDTO);
-        offer = offerRepository.save(offer);
+        offerRepository.save(offer);
 
         offer.setTender(parentTender);
         offer.setNegotiationHistory(negotiationHistory);
@@ -367,7 +395,18 @@ public class OfferServiceImpl implements OfferService{
         offer.setOfferStage(OfferStage.COUNTER_TO_COMPANY);
         offerRepository.save(offer);
 
-        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        
+
+        if(createDTO.getTermsAndConditions().size()>0){
+            offer.setTermsAndConditions(createDTO.getTermsAndConditions().stream().map(termCondition->{
+                OfferTermsAndCondition offerTermsAndCondition = new OfferTermsAndCondition();
+                offerTermsAndCondition.setOffer(offer);
+                offerTermsAndCondition.setVendor(new Vendor(vendorId));
+                offerTermsAndCondition.setTender(parentTender);
+                offerTermsAndCondition.setTermAndCondition(termCondition.getTermsAndCondition());
+                return offerTermsAndCondition;
+            }).collect(Collectors.toList()));
+        }
 
         TenderParticipator tp = new TenderParticipator();
         tp.setStatus(TenderStatus.COUNTERED);
@@ -387,7 +426,8 @@ public class OfferServiceImpl implements OfferService{
         NegotiationHistory negotiationHistory = negotiationHistoryService.getHistoryById(offerCreateDTO.getNegotiationHistoryId());
         Offer offer = new Offer();
         createOfferItemsFromTenderItems(offer,offerCreateDTO);
-        offer = offerRepository.save(offer);
+        offerRepository.save(offer);
+        
         
 
         offer.setTender(parentTender);
@@ -404,6 +444,8 @@ public class OfferServiceImpl implements OfferService{
             }
         }
 
+        Vendor vendor = negotiationCounterPart.getVendor();
+
         OfferNegotiator newOfferParticipatorEntry = new OfferNegotiator();
         if(negotiationCreator != null) newOfferParticipatorEntry.setNegotiator(negotiationCreator);
         newOfferParticipatorEntry.setPartyType(OfferPartyType.OFFER_CREATOR);
@@ -417,6 +459,18 @@ public class OfferServiceImpl implements OfferService{
         newOfferParticipatorEntry.setOffer(offer);
         newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
         offer.addParticipator(newOfferParticipatorEntry);
+
+        if(offerCreateDTO.getTermsAndConditions().size()>0){
+            offer.setTermsAndConditions(offerCreateDTO.getTermsAndConditions().stream().map(tnc->{
+                OfferTermsAndCondition offerTermsAndCondition = new OfferTermsAndCondition();
+                offerTermsAndCondition.setOffer(offer);
+                offerTermsAndCondition.setTender(parentTender);
+                offerTermsAndCondition.setTermAndCondition(tnc.getTermsAndCondition());
+                offerTermsAndCondition.setVendor(vendor);
+                return offerTermsAndCondition;
+            }).collect(Collectors.toList()));
+        }
+        
 
         offer.setOfferStage(OfferStage.COUNTER_TO_VENDOR);
         offerRepository.save(offer);

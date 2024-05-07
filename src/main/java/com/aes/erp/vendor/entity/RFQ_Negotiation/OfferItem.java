@@ -26,6 +26,8 @@ public class OfferItem {
     private String extendedAttributes;
     private String specification;
     private Long estimatedDeliveryDays;
+    private Integer warrantyDuration;
+    private String warrantyUnit;
     private Long itemQuantity;
     @OneToOne(cascade = CascadeType.ALL)
     private PriceQuotation priceQuotation;

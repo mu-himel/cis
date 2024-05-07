@@ -13,9 +13,11 @@ public class PriceQuotationReqDto {
     private String vendorName;
     private String vendorEmail;
     private String vendorPhoneNo;
+    private String vendorType;
     private Integer score;
     private Long negotiationHistoryId;
     private Boolean isFinal;
     private List<PriceQuotationDetailReqDto> details;
     private PriceQuotationSummaryDto priceQuotationSummary;
+    private List<String> termsAndConditions;
 }

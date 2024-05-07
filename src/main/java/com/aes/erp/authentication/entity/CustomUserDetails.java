@@ -77,6 +77,7 @@ public class CustomUserDetails implements UserDetails {
         vendorInfoDto.setVendorPhoneNo(vendor.getPhone());
         vendorInfoDto.setVendorId(vendor.getId());
         vendorInfoDto.setVendorStatus(vendor.getStatus());
+        vendorInfoDto.setVendorType(vendor.getVendorType().toString());
         vendorInfoDto.setVendorDocumentVerificationStatus(vendor.getVerificationStatus());
         this.userInfoDto = vendorInfoDto;
     }

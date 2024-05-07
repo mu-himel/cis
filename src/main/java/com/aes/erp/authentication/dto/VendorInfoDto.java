@@ -14,5 +14,6 @@ public class VendorInfoDto extends UserInfoDto{
     private VendorStatus vendorStatus;
     private String vendorEmail;
     private String vendorPhoneNo;
+    private String vendorType;
     private VendorDocumentVerificationStatus vendorDocumentVerificationStatus;
 }

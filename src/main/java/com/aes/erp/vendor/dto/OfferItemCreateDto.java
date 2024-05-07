@@ -11,5 +11,7 @@ public class OfferItemCreateDto {
     private String location;
     private Long itemQuantity;
     private Long estimatedDeliveryDays;
+    private Integer warrantyDuration;
+    private String warrantyUnit;
     private PriceQuotationCreateDto priceQuotation;
 }
