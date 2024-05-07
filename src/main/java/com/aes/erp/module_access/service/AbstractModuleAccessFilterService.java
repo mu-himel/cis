@@ -55,6 +55,12 @@ public class AbstractModuleAccessFilterService {
             if(roleNodeOptional.isPresent()){
                 roleNode = roleNodeOptional.get();
             }
+        }
+        else if(roles.contains("ROLE_INVENTORY CONTROLLER")){
+            Optional<RoleNode> roleNodeOptional = designationService.findByName((String)claimResponseDto.getUserInfoDto().get("employeeType").toString().replace("_"," "));
+            if(roleNodeOptional.isPresent()){
+                roleNode = roleNodeOptional.get();
+            }
         }else if(roles.contains("ROLE_VENDOR")){
             Optional<RoleNode> roleNodeOptional = designationService.findByName("VENDOR");
             if(roleNodeOptional.isPresent()){
