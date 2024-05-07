@@ -1,17 +1,24 @@
-FROM openjdk:17-oracle
+FROM maven:3.6.3-openjdk-17-slim as BUILDER
 
-#ADD src/main/resources/db src/main/resources/db
+WORKDIR /app
 
-#COPY THE JAR FILE
-ADD target/cwh-vms-backend.jar app.jar
+COPY . .
 
-# Create a new user named "appuser"
+COPY ./src/main/resources/application.prod.properties ./src/main/resources/application.properties
+
+RUN mvn clean install -DskipTests
+
+
+FROM openjdk:17-oracle as PROD
+
+WORKDIR /app
+
+COPY --from=BUILDER /app/target/*.jar app.jar
+
 RUN useradd -ms /bin/bash appuser
 
-# Switch to the newly created user
 USER appuser
 
-# set the startup command to execute the jar
 EXPOSE 8082
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "./app.jar"]
