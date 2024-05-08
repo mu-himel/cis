@@ -2,7 +2,6 @@ package com.aes.erp.vendor.service.offer_services;
 
 import com.aes.erp.authentication.CustomUserDetailsService;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
-import com.aes.erp.authentication.dto.VendorInfoDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.network.NetworkService;
@@ -35,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,7 +165,7 @@ public class OfferServiceImpl implements OfferService{
                 offerTermsAndCondition.setOffer(offer);
                 offerTermsAndCondition.setVendor(new Vendor(vendorId));
                 offerTermsAndCondition.setTender(t);
-                offerTermsAndCondition.setTermAndCondition(termCondition.getTermsAndCondition());
+                offerTermsAndCondition.setTermsAndCondition(termCondition.getTermsAndCondition());
                 return offerTermsAndCondition;
             }).collect(Collectors.toList()));
         }
@@ -190,6 +188,7 @@ public class OfferServiceImpl implements OfferService{
         newOfferParticipatorEntry.setPartyType(OfferPartyType.OFFER_CREATOR);
         newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
         offer.addParticipator(newOfferParticipatorEntry);
+
 //
 //        //Set Counter Parties
         Negotiator counterParty = new Negotiator();
@@ -204,6 +203,8 @@ public class OfferServiceImpl implements OfferService{
         newOfferParticipatorEntry.setOffer(offer);
         newOfferParticipatorEntry = offerNegotiatorRepository.save(newOfferParticipatorEntry);
         offer.addParticipator(newOfferParticipatorEntry);
+
+        offerRepository.save(offer);
 //
 
         TenderParticipator tp = new TenderParticipator();
@@ -254,7 +255,7 @@ public class OfferServiceImpl implements OfferService{
         priceQuotationReqDto.setIsFinal(offer.getIsFinal());
         if(offer.getTermsAndConditions().size()>0){
             priceQuotationReqDto.setTermsAndConditions(offer.getTermsAndConditions().stream().map(otc->{
-                return otc.getTermAndCondition();
+                return otc.getTermsAndCondition();
             }).collect(Collectors.toList()));
         }
 
@@ -403,7 +404,7 @@ public class OfferServiceImpl implements OfferService{
                 offerTermsAndCondition.setOffer(offer);
                 offerTermsAndCondition.setVendor(new Vendor(vendorId));
                 offerTermsAndCondition.setTender(parentTender);
-                offerTermsAndCondition.setTermAndCondition(termCondition.getTermsAndCondition());
+                offerTermsAndCondition.setTermsAndCondition(termCondition.getTermsAndCondition());
                 return offerTermsAndCondition;
             }).collect(Collectors.toList()));
         }
@@ -465,7 +466,7 @@ public class OfferServiceImpl implements OfferService{
                 OfferTermsAndCondition offerTermsAndCondition = new OfferTermsAndCondition();
                 offerTermsAndCondition.setOffer(offer);
                 offerTermsAndCondition.setTender(parentTender);
-                offerTermsAndCondition.setTermAndCondition(tnc.getTermsAndCondition());
+                offerTermsAndCondition.setTermsAndCondition(tnc.getTermsAndCondition());
                 offerTermsAndCondition.setVendor(vendor);
                 return offerTermsAndCondition;
             }).collect(Collectors.toList()));
