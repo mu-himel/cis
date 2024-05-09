@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +37,7 @@ public class NegotiationHistory {
 
     @JsonIgnore
     @OneToMany(mappedBy = "negotiationHistory", cascade = CascadeType.ALL)
-    private Set<Negotiator> negotiators = new HashSet<>();
+    private List<Negotiator> negotiators = new ArrayList<>();
 
     public void addNegotiators(Negotiator negotiator) {
         if (negotiator != null) {

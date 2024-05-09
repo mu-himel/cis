@@ -35,7 +35,8 @@ public class BulkUploadServiceImpl implements BulkUploadService{
     @Autowired
     private CategoryService categoryService;
 
-    public void categoryBulkUpload(Optional<StoreType> storeTypeOp,
+    public void categoryBulkUpload(
+        // Optional<StoreType> storeTypeOp,
                                    Optional<MultipartFile> file
     ) throws IOException {
         Path path = Path.of("./uploads/inventory-control");
@@ -53,7 +54,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                     CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                     categoryRequestDto.setName(catName);
                     categoryRequestDto.setCode(code);
-                    categoryRequestDto.setStoreType(storeTypeOp.get());
+                    // categoryRequestDto.setStoreType(storeTypeOp.get());
                     categoryService.addCategory(categoryRequestDto);
                 }
             }

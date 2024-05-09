@@ -9,6 +9,7 @@ import javax.persistence.Table;
 
 import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.vendor.entity.Vendor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -22,13 +23,16 @@ public class OfferTermsAndCondition {
     private Long id;
     
     @ManyToOne
+    @JsonIgnore
     private Vendor vendor;
 
     @ManyToOne
+    @JsonIgnore
     private Offer offer;
 
     @ManyToOne
+    @JsonIgnore
     private Tender tender;
 
-    private String termAndCondition;
+    private String termsAndCondition;
 }

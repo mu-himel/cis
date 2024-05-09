@@ -18,7 +18,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"negotiationHistory", "tender", "offerParticipators"})
+// @EqualsAndHashCode(exclude = {"negotiationHistory", "tender", "offerParticipators"})
 @Table(name = "offers")
 public class Offer {
     @Id
@@ -68,7 +68,7 @@ public class Offer {
 
     @JsonIgnore
     @OneToMany(mappedBy = "offer", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private Set<OfferNegotiator> offerParticipators = new HashSet<>();;
+    private List<OfferNegotiator> offerParticipators = new ArrayList<>();
 
     public void addParticipator(OfferNegotiator participator) {
         if (participator != null) {
