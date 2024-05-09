@@ -3,6 +3,7 @@ package com.aes.erp.purchase_order.service;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,12 +39,16 @@ import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
 import com.aes.erp.purchase_order.repository.PoRepository;
 import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderDetailInfo;
 import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderInfo;
+import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.remote.GoodReceiveItemDetailDto;
 import com.aes.erp.scm.dto.remote.GoodReceiveNoteCreateDto;
+import com.aes.erp.scm.services.TenderService;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferItem;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferTermsAndCondition;
+import com.aes.erp.vendor.repository.OfferTermsAndConditionRepository;
 import com.aes.erp.vendor.service.offer_services.OfferService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +71,11 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     @Autowired
     private NetworkService networkService;
 
-    
+    @Autowired
+    private TenderService tenderService;
+
+    @Autowired
+    private OfferTermsAndConditionRepository offerTermsAndConditionRepository;
 
     @Override
     @Transactional
@@ -138,6 +147,9 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
       
         var detailOp = poRepository.findById(id,t);
 
+        Map<String,Object> result = new HashMap<>();
+        List<OfferTermsAndCondition> termsAndConditions = new ArrayList<>();
+
         if(detailOp.isPresent()){
             var detail = detailOp.get();
             if (detail  instanceof PurchaseOrderInfo){
@@ -145,10 +157,20 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                 if(!((PurchaseOrderInfo)detail).getVendor().getId().equals(vendorId)){
                     throw new AesException("Sorry! po not for this user");
                 }
+                String tenderNo = ((PurchaseOrderInfo)detail).getTenderNo();
+
+                Tender tender = tenderService.getTenderByRfqNo(tenderNo);
+                if(tender!=null){
+                    // tender.getId();
+                    // vendorId
+                    termsAndConditions = offerTermsAndConditionRepository.findAllByTenderIdAndVendorId(tender.getId(),vendorId);
+
+                }
             }
         }
-
-        return detailOp;
+        result.put("detail", detailOp);
+        result.put("termsAndConditions",termsAndConditions);
+        return (Optional<T>)Optional.ofNullable(result);
         
     }
 

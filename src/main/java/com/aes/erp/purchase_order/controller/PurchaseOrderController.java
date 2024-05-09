@@ -1,5 +1,6 @@
 package com.aes.erp.purchase_order.controller;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class PurchaseOrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getDetailById(@RequestAttribute ClaimResponseDto loggedInUser, @PathVariable("id") Long id){
-        return new ResponseEntity<>(poService.getDetailById(loggedInUser, id,PurchaseOrderInfo.class).orElse(null),
+        return new ResponseEntity<>(poService.getDetailById(loggedInUser, id,Map.class).orElse(null),
             HttpStatus.OK
         );
     }
