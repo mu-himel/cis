@@ -27,15 +27,17 @@ public class UploadController {
 
     @PostMapping("/category")
     public ResponseEntity<?> uploadCategory(
-            @RequestParam("storeTypeId") Long storeTypeId,
+            // @RequestParam("storeTypeId") Long storeTypeId,
             @RequestPart("file") Optional<MultipartFile> file
     ) throws IOException {
 
-        Optional<StoreType> storeTypeOp = Optional.ofNullable(storeTypeService.getById(storeTypeId));
-        if(storeTypeOp.isEmpty()){
-            throw new AesException("Store Type not found");
-        }
-        bulkUploadService.categoryBulkUpload(storeTypeOp,file);
+        // Optional<StoreType> storeTypeOp = Optional.ofNullable(storeTypeService.getById(storeTypeId));
+        // if(storeTypeOp.isEmpty()){
+        //     throw new AesException("Store Type not found");
+        // }
+        bulkUploadService.categoryBulkUpload(
+            // storeTypeOp,
+            file);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
