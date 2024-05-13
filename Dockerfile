@@ -15,9 +15,10 @@ WORKDIR /app
 
 COPY --from=BUILDER /app/target/*.jar app.jar
 
-RUN useradd -ms /bin/bash appuser
+### couldnt upload to uploads folder due to specific user but not root
 
-USER appuser
+# RUN useradd -ms /bin/bash appuser
+# USER appuser
 
 EXPOSE 8082
 
