@@ -145,7 +145,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     @Override
     public <T> Optional<T> getDetailById(ClaimResponseDto loggedInUser, Long id, Class<T> t) {
       
-        var detailOp = poRepository.findById(id,t);
+        Optional<PurchaseOrderInfo> detailOp = poRepository.findById(id,PurchaseOrderInfo.class);
 
         Map<String,Object> result = new HashMap<>();
         List<OfferTermsAndCondition> termsAndConditions = new ArrayList<>();
@@ -168,7 +168,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                 }
             }
         }
-        result.put("detail", detailOp);
+        result.put("detail", detailOp.get());
         result.put("termsAndConditions",termsAndConditions);
         return (Optional<T>)Optional.ofNullable(result);
         

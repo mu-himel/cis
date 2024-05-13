@@ -82,6 +82,9 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
         String getSpecification();
         Long getEstimatedDeliveryDays();
         Long getItemQuantity();
+
+        Integer getWarrantyDuration();
+        String getWarrantyUnit();
      
         PriceQuotation getPriceQuotation();
      
