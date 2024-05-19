@@ -189,6 +189,9 @@ public class TenderServiceImpl implements TenderService{
         if(loggedInUser.getUserInfoDto()==null && loggedInUser.getUserInfoDto().get("vendorId") == null){
             return Page.empty();
         }
+        if(loggedInUser.getUserInfoDto().get("vendorId")==null){
+            throw new AesException("Sorry! user is not a vendor profile");
+        }
         Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
         Vendor vendor = vendorService.getById(vendorId);
 
