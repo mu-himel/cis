@@ -53,6 +53,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 "/api/v1/vendors/images/**",
                 "/webjars/**","/swagger-ui.html",
                 "/v2/api-docs","/swagger-resources/**",
+                "/api/v1/items/permutted-items",
                 "/authenticate", "/users-credential", "/forgot-password", "/hello", "/api/v1/organizations/register"};
 
                 http.cors().and().csrf().disable()
