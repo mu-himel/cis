@@ -3,10 +3,14 @@ package com.aes.erp.inventory.service;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.entity.Item;
+import com.aes.erp.inventory.entity.ItemCategory;
+
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ItemService {
 
@@ -35,4 +39,9 @@ public interface ItemService {
     String getNextItemCode();
 
     List<?> getSubCategoryWiseItemListWithAttribute(String subCatcode);
+
+    CategoryService getCategoryService();
+
+    List<Map<String,Object>> getPermuttedItems(List<ItemCategory> categories);
+
 }

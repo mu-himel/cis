@@ -455,6 +455,15 @@ public class CategoryServiceImpl implements CategoryService {
         return networkService.getAuthToken(url,username,password);
     }
 
+    @Override
+    public List<ItemCategory> getAllSubCategories() {
+        return categoryRepository.findAllSubCategories();
+        // .stream().filter(sc->sc.getId()<10).toList();
+    }
+
+
+    
+
     
 
 

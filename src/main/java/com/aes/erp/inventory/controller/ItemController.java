@@ -1,8 +1,15 @@
 package com.aes.erp.inventory.controller;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.Item;
+import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.service.ItemService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +18,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/v1/items")
@@ -21,6 +36,8 @@ public class ItemController {
 
     @Autowired
     private ItemService itemService;
+
+
 
     @PostMapping
     @ApiOperation(value = "Create Item")
@@ -109,4 +126,16 @@ public class ItemController {
             HttpStatus.OK
         );
     }
+
+    @GetMapping("/permutted-items")
+    public ResponseEntity<?> getMethodName() {
+
+        List<ItemCategory> categories = itemService.getCategoryService().getAllSubCategories();  
+        return new ResponseEntity<>( itemService.getPermuttedItems(categories), HttpStatus.OK);
+    }
+
+    
+
+    
+    
 }

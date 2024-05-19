@@ -193,4 +193,9 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
         String getMainCategoryName();
         String getMainCategoryCode();
     }
+
+    @Query(value="""
+        SELECT ic from ItemCategory ic WHERE ic.parentCategory.id IS NOT NULL 
+    """)
+    List<ItemCategory> findAllSubCategories();
 }

@@ -6,6 +6,7 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.dto.request.RemoteItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
+import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
@@ -14,6 +15,8 @@ import com.aes.erp.inventory.repository.ItemRepository;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,9 +34,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,7 +57,10 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private OrganizationService organizationService;
 
-    
+    @Override
+    public CategoryService getCategoryService() {
+        return this.categoryService;
+    }
 
     @Override
     public Optional<Item> getItemDetail(Long id) {
@@ -312,6 +321,51 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemRepository.findAllByItemCategoryIdAndActive(subCatcode,true);
         return items;
     }
+
+    @Override
+    public List<Map<String,Object>> getPermuttedItems(List<ItemCategory> categories) {
+        
+        List<Map<String,Object>> products = new ArrayList<>();
+        for(ItemCategory cat : categories){
+            List<List<String>> attributes = new ArrayList<>();
+            int i=0;
+            for(CategoryAttribute catAttr : cat.getAttributes()){
+                String attrType = catAttr.getAttributeType();
+                List<String>  attrValues = List.of(catAttr.getAttributeValue().split(","));
+                List<String> _attrValues  = attrValues = attrValues.stream().map(attrV->{
+                    return attrType.trim() + " " + attrV.trim() + " " + catAttr.getAttributeUnit().trim();
+                }).collect(Collectors.toList());
+                // map.put(i,_attrValues);
+                attributes.add(_attrValues);
+                i++;
+            }
+
+            List<ImmutableList<String>> immutableElements = makeListofImmutable(attributes);
+            List<List<String>> cartesianProduct = Lists.cartesianProduct(immutableElements);
+            Map<String,Object> catMap = new HashMap<>();
+            catMap.put("cat",cat);
+            catMap.put("attr",cartesianProduct.stream().map(cp->{
+                return String.join(",",cp);
+            }).collect(Collectors.toList()));
+            products.add(catMap);
+        }
+        
+
+        
+        return products;
+    }
+
+    
+
+    private static List<ImmutableList<String>> makeListofImmutable(List<List<String>> values) {
+        List<ImmutableList<String>> converted = new LinkedList<>();
+            values.forEach(array -> {
+                converted.add(ImmutableList.copyOf(array));
+            });
+        return converted;
+    }
+
+    
 
     
 }
