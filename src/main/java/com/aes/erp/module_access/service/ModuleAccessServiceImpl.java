@@ -213,7 +213,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             rfq.setRoute("tenders/rfq/pending");
             rfq.setUri("tenders/rfq/pending");
             rfq.setModuleType(ModuleType.CHILD);
-            rfq.setShowInMenu(false);
+            rfq.setShowInMenu(true);
             rfq.setParentModuleAccess(tenderModule);
             tenderModule.addChildModule(rfq);
 
@@ -257,7 +257,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             pendingPo.setRoute("tenders/po/pending");
             pendingPo.setUri("tenders/po/pending");
             pendingPo.setModuleType(ModuleType.CHILD);
-            pendingPo.setShowInMenu(true);
+            pendingPo.setShowInMenu(false);
             pendingPo.setParentModuleAccess(tenderModule);
             tenderModule.addChildModule(pendingPo);
 
@@ -268,7 +268,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             closedPo.setRoute("tenders/po/closed");
             closedPo.setUri("tenders/po/closed");
             closedPo.setModuleType(ModuleType.CHILD);
-            closedPo.setShowInMenu(true);
+            closedPo.setShowInMenu(false);
             closedPo.setParentModuleAccess(tenderModule);
             tenderModule.addChildModule(closedPo);
 
@@ -281,7 +281,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             product.setModuleType(ModuleType.CHILD);
             product.setShowInMenu(false);
             product.setParentModuleAccess(controlPanel);
-            tenderModule.addChildModule(closedPo);
+            controlPanel.addChildModule(product);
             
             moduleAccessRepository.save(tenderModule);
 
