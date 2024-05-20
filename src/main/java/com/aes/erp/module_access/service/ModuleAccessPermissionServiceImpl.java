@@ -709,6 +709,7 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
     }
 
     private void addPermission(Long departmentId, Long roleNodeId, Long moduleId,Boolean permission){
+        System.out.println("trying for module: "+ moduleId);
         ModuleAccessPermission mapDashboard = new ModuleAccessPermission();
         mapDashboard.setDepartment(new Department(departmentId));
         mapDashboard.setDesignation(new RoleNode(roleNodeId));
