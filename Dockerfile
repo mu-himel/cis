@@ -1,17 +1,25 @@
-FROM openjdk:17-oracle
+FROM maven:3.6.3-openjdk-17-slim as BUILDER
 
-#ADD src/main/resources/db src/main/resources/db
+WORKDIR /app
 
-#COPY THE JAR FILE
-ADD target/cwh-vms-backend.jar app.jar
+COPY . .
 
-# Create a new user named "appuser"
-RUN useradd -ms /bin/bash appuser
+COPY ./src/main/resources/application.prod.properties ./src/main/resources/application.properties
 
-# Switch to the newly created user
-USER appuser
+RUN mvn clean install -DskipTests
 
-# set the startup command to execute the jar
+
+FROM openjdk:17-oracle as PROD
+
+WORKDIR /app
+
+COPY --from=BUILDER /app/target/*.jar app.jar
+
+### couldnt upload to uploads folder due to specific user but not root
+
+# RUN useradd -ms /bin/bash appuser
+# USER appuser
+
 EXPOSE 8082
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "./app.jar"]
