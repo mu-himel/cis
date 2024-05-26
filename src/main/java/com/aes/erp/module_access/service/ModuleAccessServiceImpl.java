@@ -200,7 +200,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             tenderModule.setId(16L);
             tenderModule.setDisplayOrder(15);
             tenderModule.setName("Tender");
-            tenderModule.setIcon("tender.svg");
+            tenderModule.setIcon("tenders.svg");
             tenderModule.setRoute("tenders");
             tenderModule.setUri("tenders");
             tenderModule.setModuleType(ModuleType.PARENT);
@@ -284,6 +284,17 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             controlPanel.addChildModule(product);
             
             moduleAccessRepository.save(tenderModule);
+
+            ModuleAccess pendingProductRequest = new ModuleAccess();
+            pendingProductRequest.setId(24L);
+            pendingProductRequest.setDisplayOrder(9);
+            pendingProductRequest.setName("Pending Prdouct Request");
+            pendingProductRequest.setRoute("control-panel/pending-product-request");
+            pendingProductRequest.setUri("control-panel/pending-product-request");
+            pendingProductRequest.setModuleType(ModuleType.CHILD);
+            pendingProductRequest.setShowInMenu(false);
+            pendingProductRequest.setParentModuleAccess(controlPanel);
+            controlPanel.addChildModule(pendingProductRequest);
 
         }
         return count;
