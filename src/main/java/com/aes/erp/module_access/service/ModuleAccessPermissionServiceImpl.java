@@ -704,6 +704,7 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
             addPermission(1L,5L,6L,true);
             addPermission(1L,5L,7L,true);
             addPermission(1L,5L,23L,true);
+            addPermission(1L,5L,24L,true);
         
         }
     }
