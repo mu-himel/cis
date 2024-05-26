@@ -130,6 +130,9 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     public Page<?> getPendingPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size) {
         
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
+        if(loggedInUser.getUserInfoDto().get("vendorId")==null){
+            throw new AesException("Sorry! user is not a vendor profile");
+        }
         Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
         return poRepository.findAllPendingPOs(vendorId,pageable);
     }
