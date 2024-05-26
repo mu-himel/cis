@@ -24,7 +24,7 @@ public class CategoryAttribute {
     @Column(length = 500)
     private String attributeValue;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore
     private ItemCategory category;
 }

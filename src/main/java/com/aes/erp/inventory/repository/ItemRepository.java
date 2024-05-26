@@ -76,6 +76,17 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
             """,nativeQuery = true)
         List<ItemInfoByAttribute> findByAttributes(Long brandId, String attribute);
 
+        @Query(value = """
+            SELECT * FROM (SELECT i.id, i.brand_id ,i.active,
+                    GROUP_CONCAT(DISTINCT ia.attribute_type,' ',ia.attribute_value , ' ',
+                    ia.attribute_unit order by ia.id asc separator ' - ') itemAttributes
+            FROM item_attributes ia
+            LEFT JOIN items i on i.id=ia.item_id
+            GROUP BY i.id) p
+            WHERE p.brand_id=:brandId AND itemAttributes = :attribute
+            """,nativeQuery = true)
+        List<ItemInfoByAttribute> findByAttributesNotActive(Long brandId, String attribute);
+
         interface ItemInfoByAttribute{
                 Long getBrandId();
                 Long getId();
@@ -89,5 +100,10 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
 
 
         Optional<Item> findByCode(String code);
+
+        @Query("SELECT i FROM Item i LEFT JOIN FETCH i.itemCategory ic " +
+        "LEFT JOIN FETCH i.itemParentCategory ipc " +
+        "LEFT JOIN FETCH ic.parentCategory pc WHERE i.active=false AND i.code IS NULL")
+        List<Item> findAllInactiveItems();
 
 }

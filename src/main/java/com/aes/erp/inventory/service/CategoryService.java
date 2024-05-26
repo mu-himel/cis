@@ -5,6 +5,7 @@ import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.inventory.entity.SubCategoryBrand;
 
 import org.springframework.data.domain.Page;
 
@@ -77,5 +78,7 @@ public interface CategoryService {
 
     Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId, String attributeType);
     void bulkImport(Organization org, Long userId, Long warehouseId, Long storeId,Long parentCategoryId, List<Long> id);
-    List<ItemCategory> getAllSubCategories();
+    List<ItemCategory> getAllSubCategories(Long categoryId, Long subCategoryId);
+
+    List<SubCategoryBrand> getBrandsByCategoryId(Long id);
 }
