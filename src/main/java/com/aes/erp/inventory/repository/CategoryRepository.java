@@ -195,7 +195,11 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     }
 
     @Query(value="""
-        SELECT ic from ItemCategory ic WHERE ic.parentCategory.id IS NOT NULL 
+        SELECT ic from ItemCategory ic WHERE 
+        ic.parentCategory.id IS NOT NULL AND ic.active=true
+        AND (:categoryId IS NULL OR ic.parentCategory.id = :categoryId) AND 
+        (:subCategoryId IS NULL OR ic.id=:subCategoryId)
     """)
-    List<ItemCategory> findAllSubCategories();
+    List<ItemCategory> findAllSubCategories(@Param("categoryId") Long categoryId,
+    @Param("subCategoryId") Long subCategoryId);
 }

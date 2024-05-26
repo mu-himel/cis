@@ -3,14 +3,20 @@ package com.aes.erp.inventory.service;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
+import com.aes.erp.inventory.dto.request.ActivateItemDetailDto;
+import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.dto.request.RemoteItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
+import com.aes.erp.inventory.entity.BulkProcessLog;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.inventory.entity.SubCategoryBrand;
+import com.aes.erp.inventory.entity.BulkProcessLog.BulkItemStatus;
+import com.aes.erp.inventory.repository.BulkProcessLogRepository;
 import com.aes.erp.inventory.repository.ItemRepository;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
@@ -28,7 +34,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -40,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +66,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private OrganizationService organizationService;
+
+    @Autowired
+    private BulkItemGenerationService bulkItemGenerationService;
+
+    @Autowired
+    private BulkProcessLogRepository bulkItemRepository;
 
     @Override
     public CategoryService getCategoryService() {
@@ -322,10 +338,11 @@ public class ItemServiceImpl implements ItemService {
         return items;
     }
 
+    
     @Override
-    public List<Map<String,Object>> getPermuttedItems(List<ItemCategory> categories) {
+    public void getPermuttedItems(List<ItemCategory> categories) {
         
-        List<Map<String,Object>> products = new ArrayList<>();
+        List<Item> products = new ArrayList<>();
         for(ItemCategory cat : categories){
             List<List<String>> attributes = new ArrayList<>();
             int i=0;
@@ -342,21 +359,70 @@ public class ItemServiceImpl implements ItemService {
 
             List<ImmutableList<String>> immutableElements = makeListofImmutable(attributes);
             List<List<String>> cartesianProduct = Lists.cartesianProduct(immutableElements);
-            Map<String,Object> catMap = new HashMap<>();
-            catMap.put("cat",cat);
-            catMap.put("attr",cartesianProduct.stream().map(cp->{
-                return String.join(",",cp);
-            }).collect(Collectors.toList()));
-            products.add(catMap);
+            prepareProducts(cat,  cartesianProduct, products);
+            
+            // products
         }
         
-
+        BulkProcessLog bulkProcess = new BulkProcessLog();
+        bulkProcess.setStatus(BulkItemStatus.PROCESSING);
+        bulkProcess.setProcessName("ITEM");
+        bulkItemRepository.saveAndFlush(bulkProcess);
+        bulkItemGenerationService.saveProducts(products,bulkProcess);
+        System.out.println("Here");
         
+    }
+
+
+    private List<Item> prepareProducts(ItemCategory cat, List<List<String>> cartesianProduct,List<Item> products){
+        
+        List<SubCategoryBrand> brands = categoryService.getBrandsByCategoryId(cat.getId());
+
+        for(SubCategoryBrand brand : brands){
+            ItemCategory parentCategory = cat.getParentCategory();
+            
+            cartesianProduct.stream().forEach(cp->{
+                Item item = new Item();
+                item.setItemCategory(cat);
+                item.setName(brand.getBrand().getName().trim());
+                item.setItemParentCategory(parentCategory);
+                item.setBrand(brand.getBrand());
+                item.setActive(false);
+                item.setItemAttributeName(String.join(" - ",cp));
+                item.setAttributes(extractAttributesFromItemAttributeName(cat, item.getItemAttributeName()));
+                products.add(item);
+            });
+        }
+
         return products;
     }
 
+    private List<ItemAttribute> extractAttributesFromItemAttributeName(ItemCategory cat, String itemAttributeName){
+        String[] attrs = itemAttributeName.split(" - ");
+        List<ItemAttribute> pendingItemAttrList = new ArrayList<>();
+        
+        
+        for(String attr : attrs){
+            String _attr="";
+            Optional<CategoryAttribute> catAttrOp = cat.getAttributes().stream().filter(c->{
+               return attr.contains(c.getAttributeType());
+              
+            }).findFirst();
+            
+            if(catAttrOp.isPresent()){
+                _attr = attr.replace(catAttrOp.get().getAttributeType(),"");
+            
+                // String[] args = _attr.trim().split(" ");
+                ItemAttribute pia = new ItemAttribute();
+                pia.setAttributeType(catAttrOp.get().getAttributeType());
+                pia.setAttributeValue(_attr.trim().replaceAll(catAttrOp.get().getAttributeUnit(), "").trim());
+                pia.setAttributeUnit(catAttrOp.get().getAttributeUnit());
+                pendingItemAttrList.add(pia);
+            }
+        }
+        return pendingItemAttrList;
+    }
     
-
     private static List<ImmutableList<String>> makeListofImmutable(List<List<String>> values) {
         List<ImmutableList<String>> converted = new LinkedList<>();
             values.forEach(array -> {
@@ -364,6 +430,20 @@ public class ItemServiceImpl implements ItemService {
             });
         return converted;
     }
+
+    @Override
+    public List<?> getAllInactiveItems() {
+        return itemRepository.findAllInactiveItems();
+    }
+
+    @Override
+    public void activateItems(ActivateItemDto activateItemDto) {
+        bulkItemGenerationService.activateItems(activateItemDto);
+        
+        
+    }
+
+    
 
     
 

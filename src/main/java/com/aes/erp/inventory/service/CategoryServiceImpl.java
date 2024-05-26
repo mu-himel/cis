@@ -456,11 +456,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<ItemCategory> getAllSubCategories() {
-        return categoryRepository.findAllSubCategories();
-        // .stream().filter(sc->sc.getId()<10).toList();
+    public List<ItemCategory> getAllSubCategories(Long categoryId, Long subCategoryId) {
+        return categoryRepository.findAllSubCategories(categoryId,subCategoryId);
     }
 
+    @Override
+    public List<SubCategoryBrand> getBrandsByCategoryId(Long id) {
+        return subcategoryBrandRepository.findAllBySubcategoryId(id);
+    }
+
+    
 
     
 
