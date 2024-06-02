@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.controller;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.BulkItemGenerateDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
@@ -126,6 +127,9 @@ public class ItemController {
         @RequestBody BulkItemGenerateDto bulkItemGenerateDto
     ) {
 
+        if(bulkItemGenerateDto.getSubCategoryId() == null){
+            throw new AesException("Sorry! Sub Category Required");
+        }
         List<ItemCategory> categories = itemService.getCategoryService().getAllSubCategories(
             bulkItemGenerateDto.getCategoryId(),
             bulkItemGenerateDto.getSubCategoryId()

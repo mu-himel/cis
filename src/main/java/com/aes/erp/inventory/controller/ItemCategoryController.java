@@ -147,9 +147,10 @@ public class ItemCategoryController {
 
     @PostMapping("/bulk")
     public ResponseEntity<?> importToErp(
+        @RequestAttribute String token,
         @RequestAttribute Organization organization,
         @RequestBody ErpBulkImportDto erpImportDto){
-        categoryService.bulkImport(organization, erpImportDto.getUserId(), erpImportDto.getWarehouseId(),
+        categoryService.bulkImport(token,organization, erpImportDto.getUserId(), erpImportDto.getWarehouseId(),
         erpImportDto.getWarehouseStoreId(),erpImportDto.getParentCategoryId(),erpImportDto.getId());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
