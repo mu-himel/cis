@@ -14,6 +14,7 @@ import com.aes.erp.inventory.repository.*;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +52,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private NetworkService networkService;
+
+    @Value("${scm.apiEndpoint}")
+    private String scmApiEndpoint;
 
     public CategoryServiceImpl(BrandRepository brandRepository, GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository) {
         this.brandRepository = brandRepository;
@@ -382,7 +386,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void bulkImport(Organization org, Long userId, Long warehouseId, Long storeId,
+    public void bulkImport(String token, Organization org, Long userId, Long warehouseId, Long storeId,
     Long parentCategoryId, List<Long> ids) {
         List<CategoryRequestDto> categoryList = new ArrayList<>();
         for(Long catId : ids){
@@ -419,8 +423,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         if(categoryList.size()>0){
             
-            String authToken = login(org);
-            sentItemCategoryTransfer(authToken, userId, org, categoryList);
+            // String authToken = login(org);
+            sentItemCategoryTransfer(token, userId, org, categoryList);
 
         }
     }
@@ -430,7 +434,7 @@ public class CategoryServiceImpl implements CategoryService {
                 
         sb.append("/bulk-create");
     
-        String itemCategoryTransferEndpoint = org.getServiceIpAddress().concat(sb.toString());
+        String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);

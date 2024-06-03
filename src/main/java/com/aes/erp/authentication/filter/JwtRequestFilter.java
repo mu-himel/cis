@@ -61,12 +61,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwt = null;
         ClaimResponseDto claimResponseDto = null;
         try {
-            if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            if(organization == null && authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7);
                 username = jwtUtil.extractUsername(jwt);
                 claimResponseDto = jwtUtil.extractId(jwt);
             }
-            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if(organization == null &&  username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(username);
                 if(jwtUtil.validateToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
@@ -90,6 +90,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         new OrganizationPrincipal(orgId, organization.getName()), null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 request.setAttribute("organization", organization);
+                if(authorizationHeader!=null){
+                    jwt = authorizationHeader.substring(7);
+                    request.setAttribute("token", jwt);
+                    // username = jwtUtil.extractUsername(jwt);
+                    // claimResponseDto = jwtUtil.extractId(jwt);
+                }
             }
             if(claimResponseDto !=null){
                 request.setAttribute("loggedInUser",claimResponseDto);
