@@ -26,6 +26,7 @@ public class Document {
     private byte[] file;
     private String fileName;
     private String contentType;
+    private String filePath;
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "document_holder_id")

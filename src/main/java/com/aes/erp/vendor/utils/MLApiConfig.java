@@ -13,4 +13,5 @@ public class MLApiConfig {
     public String nid;
     public String solvency;
     public String trade;
+    public String apiEndpoint;
 }
