@@ -10,5 +10,7 @@ import com.aes.erp.inventory.entity.BulkProcessLog;
 @Repository
 public interface BulkProcessLogRepository extends JpaRepository<BulkProcessLog,Long>{
 
-    Optional<BulkProcessLog> findFirstByProcessNameOrderByIdDesc(String name);    
+    Optional<BulkProcessLog> findFirstByProcessNameOrderByIdDesc(String name);
+
+    Optional<BulkProcessLog> findByBulkItemGenConfigId(Long id);    
 }

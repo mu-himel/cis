@@ -7,26 +7,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class NidResponseDto {
-    @JsonProperty("Date of Birth")
-    @JsonFormat(pattern = "dd MMM yyyy")
-    private Date dateOfBirth;
-    @JsonProperty("Full Name")
+    // @JsonFormat(pattern = "dd MMM yyyy")
+    private String dateOfBirth;
     private String eName;
-    @JsonProperty("NID Number")
     private String nid;
-    @JsonProperty("Error")
-    private String error;
 
     public NIDDocument dtoToEntityMapping(NidResponseDto dto, NIDDocument nidDocument){
         if(!dto.getNid().isEmpty())nidDocument.setNid(dto.getNid());
         if(!dto.getEName().isEmpty())nidDocument.setEName(dto.getEName());
-        if(dto.getDateOfBirth() != null)nidDocument.setDateOfBirth(dto.getDateOfBirth());
+        if(dto.getDateOfBirth() != null)nidDocument.setDateOfBirth(new Timestamp(Instant.parse(dto.getDateOfBirth()).getEpochSecond()));
         return nidDocument;
     }
 }

@@ -43,7 +43,7 @@ public interface ItemService {
 
     CategoryService getCategoryService();
 
-    void getPermuttedItems(List<ItemCategory> categories);
+   
 
     List<?> getAllInactiveItems();
 

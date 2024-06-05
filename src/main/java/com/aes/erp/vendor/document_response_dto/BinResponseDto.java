@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -16,42 +17,28 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BinResponseDto {
-    @JsonProperty("ID")
     @JsonIgnore
-    private String ID;
-    @JsonIgnore()
-    private String secret_key;
-    @JsonProperty("Address")
+    private String id;
+    @JsonIgnore
+    private String secretKey;
     private String address;
-    @JsonProperty("BIN Number")
-    private String bin;
-
-    @JsonProperty("Effective Date")
+    private String binNumber;
     private String effectiveDate;
 
-    @JsonProperty("Issue Date")
-    @JsonFormat(pattern = "dd/MM/yyyy")
-    private Date issueDate;
-
-    @JsonProperty("Name of Company")
+    private String issueDate;
     private String companyName;
-    @JsonProperty("Old BIN Number")
-    private String oldBin;
-    @JsonProperty("TIN")
-    private String tin;
-    @JsonProperty("Ownership Type")
+    private String oldBinNumber;
+    private String tinNumber;
     private String ownershipType;
-    @JsonProperty("Error")
-    private String error;
 
     public BINDocument dtoToEntityMapping(BinResponseDto dto, BINDocument document){
         if(!dto.getAddress().isEmpty())document.setAddress(dto.getAddress());
-        if(!dto.getBin().isEmpty())document.setBin(dto.getBin());
-        if(!dto.getOldBin().isEmpty())document.setOldBin(dto.getOldBin());
-        if(!dto.getTin().isEmpty())document.setTin(dto.getTin());
+        if(!dto.getBinNumber().isEmpty())document.setBin(dto.getBinNumber());
+        if(!dto.getOldBinNumber().isEmpty())document.setOldBin(dto.getOldBinNumber());
+        if(!dto.getTinNumber().isEmpty())document.setTin(dto.getTinNumber());
         if(!dto.getCompanyName().isEmpty())document.setCompanyName(dto.getCompanyName());
         if(dto.getEffectiveDate() != null)document.setEffectiveDate(dto.getEffectiveDate());
-        if(dto.getIssueDate() != null)document.setIssueDate(new Timestamp(dto.getIssueDate().getTime()));
+        if(dto.getIssueDate() != null)document.setIssueDate(new Timestamp(Instant.parse(dto.getIssueDate()).getEpochSecond()));
         if(!dto.getOwnershipType().isEmpty())document.setOwnershipType(dto.getOwnershipType());
         return document;
     }

@@ -4,8 +4,9 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.BulkItemGenerateDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.dto.request.bulk_gen.BulkGenConfigDto;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.service.BulkItemGenerationService;
+import com.aes.erp.inventory.service.BulkItemGenerationProcessService;
 import com.aes.erp.inventory.service.ItemService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,7 +31,7 @@ public class ItemController {
     private ItemService itemService;
 
     @Autowired
-    private BulkItemGenerationService bulkItemGenerationService;
+    private BulkItemGenerationProcessService bulkItemGenerationService;
 
 
 
@@ -122,25 +123,27 @@ public class ItemController {
         );
     }
 
-    @PostMapping("/permutted-items")
-    public ResponseEntity<?> getMethodName(
-        @RequestBody BulkItemGenerateDto bulkItemGenerateDto
-    ) {
+    
 
-        if(bulkItemGenerateDto.getSubCategoryId() == null){
-            throw new AesException("Sorry! Sub Category Required");
-        }
-        List<ItemCategory> categories = itemService.getCategoryService().getAllSubCategories(
-            bulkItemGenerateDto.getCategoryId(),
-            bulkItemGenerateDto.getSubCategoryId()
-        ); 
-        itemService.getPermuttedItems(categories); 
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
+    // @PostMapping("/permutted-items")
+    // public ResponseEntity<?> getMethodName(
+    //     @RequestBody BulkItemGenerateDto bulkItemGenerateDto
+    // ) {
 
-    @GetMapping("/bulk-generation-status")
-    public ResponseEntity<?> getBulkGenerationStatus(){
-        return new ResponseEntity<>(bulkItemGenerationService.getLastLog("ITEM").orElse(null),HttpStatus.OK);
+    //     if(bulkItemGenerateDto.getSubCategoryId() == null){
+    //         throw new AesException("Sorry! Sub Category Required");
+    //     }
+    //     List<ItemCategory> categories = itemService.getCategoryService().getAllSubCategories(
+    //         bulkItemGenerateDto.getCategoryId(),
+    //         bulkItemGenerateDto.getSubCategoryId()
+    //     ); 
+    //     itemService.getPermuttedItems(categories); 
+    //     return new ResponseEntity<>(HttpStatus.CREATED);
+    // }
+
+    @GetMapping("/bulk-generation-status/{id}")
+    public ResponseEntity<?> getBulkGenerationStatus(@PathVariable("id") Long id){
+        return new ResponseEntity<>(bulkItemGenerationService.getLogByBulkProceessId(id).orElse(null),HttpStatus.OK);
     }
 
     @GetMapping("/inactive")
