@@ -5,9 +5,12 @@ import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.BulkItemGenerateDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.dto.request.bulk_gen.BulkGenConfigDto;
+import com.aes.erp.inventory.dto.request.bulk_gen.SearchInactiveProduct;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.service.BulkItemGenerationProcessService;
 import com.aes.erp.inventory.service.ItemService;
+import com.aes.erp.inventory.service.TempItemService;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,9 @@ public class ItemController {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private TempItemService tempItemService;
 
     @Autowired
     private BulkItemGenerationProcessService bulkItemGenerationService;
@@ -149,6 +155,12 @@ public class ItemController {
     @GetMapping("/inactive")
     public ResponseEntity<?> getInactiveProducts(){
         return new ResponseEntity<>(itemService.getAllInactiveItems(),HttpStatus.OK);
+    }
+
+    @PostMapping("/search-inactive-products")
+    public ResponseEntity<?> searchInactiveProducts(@RequestBody SearchInactiveProduct searchInactiveProduct){
+        System.out.println(searchInactiveProduct);
+        return new ResponseEntity<>(tempItemService.searchInactiveItems(searchInactiveProduct),HttpStatus.OK);
     }
 
     @PutMapping("/activate")

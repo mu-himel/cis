@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.entity;
 
+import com.aes.erp.inventory.dto.response.TempItemResponse;
 import com.aes.erp.inventory.enums.ItemUnit;
 import com.aes.erp.user_management.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -20,6 +21,22 @@ import java.util.List;
 
 @Data
 @Entity
+@SqlResultSetMapping(name = "TempItemRes",
+ classes =  @ConstructorResult(
+    targetClass = TempItemResponse.class,
+    columns = {
+            @ColumnResult(name = "id",type = Long.class),
+            @ColumnResult(name = "itemAttributeName",type = String.class),
+            @ColumnResult(name = "brandName",type = String.class),
+            @ColumnResult(name = "categoryName",type = String.class),
+            @ColumnResult(name = "parentCategoryName",type = String.class),
+            @ColumnResult(name = "categoryCode",type = String.class),
+            @ColumnResult(name = "parentCategoryCode",type = String.class),
+            @ColumnResult(name = "productCode",type = String.class)
+            
+    }
+ )
+)
 @Table(name = "temp_items")
 @NoArgsConstructor
 @AllArgsConstructor
