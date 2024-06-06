@@ -19,6 +19,10 @@ import java.io.IOException;
 @Service
 public class RestTemplateService {
     private final RestTemplate restTemplate;
+
+    @Autowired
+    private MLApiConfig mlApiConfig;
+
     @Autowired
     public RestTemplateService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -33,10 +37,16 @@ public class RestTemplateService {
                 return file.getOriginalFilename();
             }
         });
-        body.add("docType", docType);
-        // body.add("fileName", fileName);
-        // body.add("documentHolderId", documentHolderId);
-        // body.add("secret_key", "secret_key");
+    
+        if(url.contains(mlApiConfig.getTrade()) || url.contains(mlApiConfig.getSolvency())){
+            body.add("secret_key", "secret_key");
+            body.add("documentHolderId", documentHolderId);
+            body.add("org_name", org_name);
+        }else{
+            body.add("docType", docType);
+        }
+        
+
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, httpHeaders);
         try {

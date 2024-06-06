@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.service;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -182,7 +183,7 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
         Optional<TempItem> tiOp = tempItemRepository.findMaxOrderById();
         if(tiOp.isPresent()){
             TempItem ti = tiOp.get();
-            Long newProductId = ti.getId() + i.getAndIncrement();
+            Long newProductId = (ti.getId()+i.getAndIncrement());
             return String.format("%05d",newProductId);
         }
         return String.format("%05d",i.getAndIncrement());

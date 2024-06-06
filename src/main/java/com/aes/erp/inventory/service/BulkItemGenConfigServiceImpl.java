@@ -38,11 +38,11 @@ public class BulkItemGenConfigServiceImpl implements BulkItemGenConfigService{
         BulkItemGenConfig bulkItemGenConfig = bulkGenConfigDto.getEntity();
         Optional<BulkItemGenConfig> configOp = bulkItemGenConfigRepository.findByConfigHash(bulkItemGenConfig.getConfigHash());
         if(configOp.isEmpty()){
-            Optional<ItemCategory> seleectedCategoryOp = categoryService.getItemCategory(bulkGenConfigDto.getItemCategory().getId());
-            if(seleectedCategoryOp.isEmpty()){
+            Optional<ItemCategory> selectedCategoryOp = categoryService.getItemCategory(bulkGenConfigDto.getItemCategory().getId());
+            if(selectedCategoryOp.isEmpty()){
                 throw new RuntimeException("Sorry! Category not found");
             }
-            ItemCategory seleectedCategory = seleectedCategoryOp.get();
+            ItemCategory selectedCategory = selectedCategoryOp.get();
             List<CategoryAttribute> categoryAttributes = new ArrayList<>();
             bulkItemGenConfig.setAttributes(bulkGenConfigDto.getAttributes().stream().map(attr->{
                 BulkGenAttribute bulkGenAttribute = new BulkGenAttribute();
@@ -59,7 +59,7 @@ public class BulkItemGenConfigServiceImpl implements BulkItemGenConfigService{
                 categoryAttributes.add(categoryAttribute);
                 return bulkGenAttribute;
             }).collect(Collectors.toList()));
-            seleectedCategory.setAttributes(categoryAttributes);
+            selectedCategory.setAttributes(categoryAttributes);
             bulkItemGenConfig.setBrands(bulkGenConfigDto.getBrands().stream().map(b->{
                 BulkGenBrand bulkGenBrand = new BulkGenBrand();
                 Brand brand = new Brand(b.getId(), b.getName());
@@ -71,7 +71,7 @@ public class BulkItemGenConfigServiceImpl implements BulkItemGenConfigService{
 
             List<ItemCategory> categories = new ArrayList<>();
             
-            categories.add(seleectedCategory);
+            categories.add(selectedCategory);
             
             bulkItemGenerationProcessService.getPermuttedItems(bulkItemGenConfig,categories);
 

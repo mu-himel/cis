@@ -63,41 +63,42 @@ public class VendorDocumentValidationService {
         try {
             document.setFile(file.getBytes());
         
-        document.setFilePath(path.toString());
-        String url = mlApiConfig.getApiEndpoint();
-        String result = "";
-        if(docType.equals("TIN")){
-            // url = mlApiConfig.getTin();
-            document.setDocumentType(DocumentType.TIN);
-        }
-        else if(docType.equals("BIN")){
-            // url = mlApiConfig.getBin();
-            document.setDocumentType(DocumentType.BIN);
-        }
-        else if(docType.equals("NID")){
-            // url = mlApiConfig.getNid();
-            document.setDocumentType(DocumentType.NID);
-        }
-        else if(docType.equals("BANK")){
-            // url = mlApiConfig.getSolvency();
-            document.setDocumentType(DocumentType.BANK_SOLVENCY);
-        }
-        else if(docType.equals("TRADE")){
-            // url = mlApiConfig.getTrade();
-            document.setDocumentType(DocumentType.TRADE);
-        }
-        
+            document.setFilePath(path.toString());
+            String url = "";
+            String result = "";
+            if(docType.equals("TIN")){
+                url = mlApiConfig.getApiEndpoint();
+                document.setDocumentType(DocumentType.TIN);
+            }
+            else if(docType.equals("BIN")){
+                url = mlApiConfig.getApiEndpoint();
+                document.setDocumentType(DocumentType.BIN);
+            }
+            else if(docType.equals("NID")){
+                url = mlApiConfig.getApiEndpoint();
+                document.setDocumentType(DocumentType.NID);
+            }
+            else if(docType.equals("BANK")){
+                url = mlApiConfig.getSolvency();
+                document.setDocumentType(DocumentType.BANK_SOLVENCY);
+            }
+            else if(docType.equals("TRADE")){
+                url = mlApiConfig.getTrade();
+                document.setDocumentType(DocumentType.TRADE);
+            }
+            
             result = restClient.postPdfFile(documentHolderId, docType, file, orgName, url);
             document.setResultFromMachineLearning(result);
             documentService.create(document);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(result);
+            
             if(result == null || jsonNode.has("Error")){
-               throw new AesException("Wrong document uploaded");
+                throw new AesException("Wrong document uploaded");
             }
             else{
-               //Finishing The asynchronous task
-               return mapToDto(result, docType);
+                //Finishing The asynchronous task
+                return mapToDto(result, docType);
             }
         }catch(Error | IOException e){
             System.out.println(e.getMessage());

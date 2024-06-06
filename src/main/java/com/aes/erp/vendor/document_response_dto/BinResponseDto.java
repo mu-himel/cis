@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -21,15 +23,19 @@ public class BinResponseDto {
     private String id;
     @JsonIgnore
     private String secretKey;
+    @JsonProperty(value = "address")
     private String address;
     private String binNumber;
     private String effectiveDate;
-
+    @JsonProperty(value = "eTin")
+    private String eTin;
     private String issueDate;
     private String companyName;
     private String oldBinNumber;
     private String tinNumber;
     private String ownershipType;
+    private String tradingBrandName;
+    private String majorAreaofEcoAct;
 
     public BINDocument dtoToEntityMapping(BinResponseDto dto, BINDocument document){
         if(!dto.getAddress().isEmpty())document.setAddress(dto.getAddress());
@@ -38,8 +44,14 @@ public class BinResponseDto {
         if(!dto.getTinNumber().isEmpty())document.setTin(dto.getTinNumber());
         if(!dto.getCompanyName().isEmpty())document.setCompanyName(dto.getCompanyName());
         if(dto.getEffectiveDate() != null)document.setEffectiveDate(dto.getEffectiveDate());
-        if(dto.getIssueDate() != null)document.setIssueDate(new Timestamp(Instant.parse(dto.getIssueDate()).getEpochSecond()));
+        if(dto.getIssueDate() != null)document.setIssueDate(getTimestamp(dto.getIssueDate(), "dd/MM/yyyy"));
         if(!dto.getOwnershipType().isEmpty())document.setOwnershipType(dto.getOwnershipType());
         return document;
+    }
+
+    private Timestamp getTimestamp(String date,String format){
+		DateTimeFormatter df = DateTimeFormatter.ofPattern(format);
+        LocalDate ld = LocalDate.parse(date,df);
+        return Timestamp.valueOf(ld.atStartOfDay());
     }
 }
