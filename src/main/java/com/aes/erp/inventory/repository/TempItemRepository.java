@@ -28,8 +28,29 @@ public interface TempItemRepository extends JpaRepository<TempItem,Long>{
     @Query("SELECT max(ti.id) from TempItem ti")
     Optional<TempItem> findMaxOrderById();
 
-    @Query("SELECT i FROM TempItem i LEFT JOIN FETCH i.itemCategory ic " +
-        "LEFT JOIN FETCH i.itemParentCategory ipc " +
-        "LEFT JOIN FETCH ic.parentCategory pc WHERE i.active=false")
-        List<TempItem> findAllInactiveItems();
+    @Query(value="""
+        SELECT ti.id as id, ti.item_attribute_name as itemAttributeName,
+        b.name as brandName, ic.name as categoryName, ic.code as categoryCode, ipc.name as parentCategoryName, ipc.code as parentCategoryCode,
+        ti.code as productCode
+        FROM temp_items ti 
+        LEFT JOIN item_categories ic ON ic.id = ti.item_category_id
+        LEFT JOIN item_categories ipc ON ipc.id = ti.item_parent_category_id
+        LEFT JOIN brands b ON b.id = ti.brand_id
+        WHERE ti.active=false""",nativeQuery = true)
+        List<TempItemResponseInfo> findAllInactiveItems();
+
+        /**
+         * TempItemResponseInfo
+         */
+        public interface TempItemResponseInfo {
+                Long getId();
+                String getItemAttributeName();
+                String getBrandName();
+                String getCategoryName();
+                String getCategoryCode();
+                String getParentCategoryName();
+                String getParentCategoryCode();
+                String getProductCode();
+                
+        }
 }
