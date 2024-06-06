@@ -164,7 +164,7 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
                 item.setItemCategory(cat);
 
                 item.setName(brand.getBrand().getName().trim());
-                item.setCode("C"+cat.getId()+"S"+cat.getParentCategory().getId()+"-"+
+                item.setCode("C"+cat.getId()+"S"+cat.getParentCategory().getId()+"B"+brand.getId()+
                                 localDate.getYear()+month+day+getCode(i));
                 item.setItemParentCategory(parentCategory);
                 item.setBrand(brand.getBrand());
