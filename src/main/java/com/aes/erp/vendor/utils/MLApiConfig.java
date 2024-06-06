@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "ml.api")
 public class MLApiConfig {
-    public String tin;
-    public String bin;
-    public String nid;
+    // public String tin;
+    // public String bin;
+    // public String nid;
     public String solvency;
     public String trade;
     public String apiEndpoint;
