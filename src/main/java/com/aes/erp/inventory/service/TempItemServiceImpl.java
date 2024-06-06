@@ -30,7 +30,7 @@ public class TempItemServiceImpl implements TempItemService{
                 LEFT JOIN brands b ON ti.brand_id = b.id
                 LEFT JOIN item_categories as ic ON ic.id = ti.item_category_id
                 LEFT JOIN item_categories as ipc ON ipc.id = ti.item_parent_category_id
-                WHERE 
+               
                 """;
                 List<String> attrTypes = new ArrayList<>();
                 List<String> attrValues = new ArrayList<>();
@@ -38,8 +38,10 @@ public class TempItemServiceImpl implements TempItemService{
                     attrTypes.add("\""+attribute.getAttributeType()+"\"");
                     attrValues.addAll(attribute.getAttributeValue().stream().map(av->av+ " "+attribute.getAttributeUnit()).toList());
                 }
+        if(attrTypes.size()>0){
+            sql += " WHERE  (attribute_type IN ("+String.join(",", attrTypes)+"))";
+        }
         
-        sql += "(attribute_type IN ("+String.join(",", attrTypes)+"))";
         sql += " GROUP BY ti.id"; 
         Query q = entityManager.createNativeQuery(sql, "TempItemRes");
         List<TempItemResponse>  tempItemResponses = q.getResultList();
