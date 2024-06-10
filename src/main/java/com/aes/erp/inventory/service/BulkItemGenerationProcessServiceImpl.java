@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,9 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
     
     @Autowired
     private TempItemRepository tempItemRepository;
+
+    @Autowired
+    private ItemRepository itemRepository;
 
     @Autowired
     private BulkProcessLogRepository bulkProcessLogRepository;
@@ -82,17 +87,39 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
     }
 
 
-    
+    @Transactional
     public void activateItems(ActivateItemDto activateItemDto) {
         for(ActivateItemDetailDto itemDetailDto : activateItemDto.getItemIdList()){
             Optional<TempItem> itemOp = tempItemRepository.findById(itemDetailDto.getId());
             if(itemOp.isPresent()){
-                TempItem item = itemOp.get();
-                item.setActive(true);
-                item.setCode(itemDetailDto.getCode());
-                tempItemRepository.save(item);
+                TempItem tempItem = itemOp.get();
+                Item item = copyItemFromTempItem(tempItem);
+                itemRepository.save(item);
+                tempItem.setActive(true);
             }
         }
+    }
+
+    private Item copyItemFromTempItem(TempItem tempItem){
+        Item item = new Item();
+        item.setCode(tempItem.getCode());
+        item.setItemAttributeName(tempItem.getItemAttributeName());
+        item.setActive(true);
+        item.setItemCategory(tempItem.getItemCategory());
+        item.setItemParentCategory(tempItem.getItemParentCategory());
+        item.setBrand(tempItem.getBrand());
+        item.setName(tempItem.getName());
+        item.setAttributes(tempItem.getAttributes().stream().map(tia->{
+            ItemAttribute itemAttribute = new ItemAttribute();
+            itemAttribute.setAttributeType(tia.getAttributeType());
+            itemAttribute.setAttributeUnit(tia.getAttributeUnit());
+            itemAttribute.setAttributeValue(tia.getAttributeValue());
+            itemAttribute.setItem(item);
+            return itemAttribute;
+        }).collect(Collectors.toList()));
+
+        
+        return item;
     }
 
     @Override

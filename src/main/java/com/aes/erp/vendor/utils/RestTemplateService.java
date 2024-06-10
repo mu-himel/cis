@@ -38,13 +38,13 @@ public class RestTemplateService {
             }
         });
     
-        if(url.contains(mlApiConfig.getTrade()) || url.contains(mlApiConfig.getSolvency())){
-            body.add("secret_key", "secret_key");
-            body.add("documentHolderId", documentHolderId);
-            body.add("org_name", org_name);
-        }else{
+        // if(url.contains(mlApiConfig.getTrade()) || url.contains(mlApiConfig.getSolvency())){
+        //     body.add("secret_key", "secret_key");
+        //     body.add("documentHolderId", documentHolderId);
+        //     body.add("org_name", org_name);
+        // }else{
             body.add("docType", docType);
-        }
+        // }
         
 
 

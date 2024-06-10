@@ -38,32 +38,43 @@ public class VendorProfileServiceImpl implements VendorProfileService{
             DocumentHolder documentHolder = vendor.getDocumentHolder();
             Document binDocument = documentHolder.getBinDocument().getDocument();
             if(binDocument != null){
-                identificationDto.setBinFile(binDocument.getFile());
+                // identificationDto.setBinFile(binDocument.getFile());
+                identificationDto.setBinFilePath(binDocument.getFilePath().substring(1)+"/"+binDocument.getFileName());
                 identificationDto.setBinContentType(binDocument.getContentType());
                 identificationDto.setBin(documentHolder.getBinDocument().getBin());
             }
             Document nidDocument = documentHolder.getNidDocument().getDocument();
             if(nidDocument != null){
-                identificationDto.setNidFile(nidDocument.getFile());
+                // identificationDto.setNidFile(nidDocument.getFile());
+                if(nidDocument.getFilePath()!=null)
+                    identificationDto.setNidFilePath(nidDocument.getFilePath().substring(1)+"/"+nidDocument.getFileName());
                 identificationDto.setNidContentType(nidDocument.getContentType());
                 identificationDto.setNid(documentHolder.getNidDocument().getNid());
-                identificationDto.setOwnerName(documentHolder.getNidDocument().getEName());
+                identificationDto.setOwnerName(documentHolder.getNidDocument().getName());
             }
             Document tinDocument = documentHolder.getTinDocument().getDocument();
             if(tinDocument != null){
                 identificationDto.setTin(documentHolder.getTinDocument().getTin());
-                identificationDto.setTinFile(tinDocument.getFile());
+                if(tinDocument.getFilePath()!=null)
+                    identificationDto.setTinFilePath(tinDocument.getFilePath().substring(1)+"/"+tinDocument.getFileName());
+                // identificationDto.setTinFile(tinDocument.getFile());
                 identificationDto.setTinContentType(tinDocument.getContentType());
             }
             Document bankSolvencyDocument = documentHolder.getBankSolvencyDocument().getDocument();
             if(bankSolvencyDocument != null){
                 identificationDto.setSolvency(documentHolder.getBankSolvencyDocument().getAccount());
-                identificationDto.setSolvencyFile(bankSolvencyDocument.getFile());
+                if(bankSolvencyDocument.getFilePath()!=null)
+                    identificationDto.setSolvencyFilePath(bankSolvencyDocument.getFilePath().substring(1)+"/"+bankSolvencyDocument.getFileName());
+                // identificationDto.setSolvencyFile(bankSolvencyDocument.getFile());
                 identificationDto.setSolvencyContentType(bankSolvencyDocument.getContentType());
             }
             Document tradeDocument = documentHolder.getTradeDocument().getDocument();
             if(tradeDocument != null){
-                identificationDto.setTradeFile(tradeDocument.getFile());
+                // identificationDto.setTradeFile(tradeDocument.getFile());
+                if(tradeDocument.getFilePath()!=null){
+                    identificationDto.setTradeFilePath(tradeDocument.getFilePath().substring(1)+"/"+tradeDocument.getFileName());
+                }
+                
                 identificationDto.setTradeContentType(tradeDocument.getContentType());
                 identificationDto.setTrade(documentHolder.getTradeDocument().getTradeLicenseNumber());
             }

@@ -36,6 +36,8 @@ public class BinResponseDto {
     private String ownershipType;
     private String tradingBrandName;
     private String majorAreaofEcoAct;
+    @JsonProperty("Error")
+    private String error;
 
     public BINDocument dtoToEntityMapping(BinResponseDto dto, BINDocument document){
         if(!dto.getAddress().isEmpty())document.setAddress(dto.getAddress());

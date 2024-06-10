@@ -55,35 +55,35 @@ public class VendorDocumentValidationService {
         DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
         document.setDocumentHolder(documentHolder);
         document.setContentType(file.getContentType());
-        Path path = Path.of("./uploads/vendor/doc/"+documentHolderId+"/"+docType+"/"+file.getOriginalFilename());
+        Path path = Path.of("./uploads/vendor/doc/"+documentHolderId+"/"+docType);
         fileUploadService.uploadFile(path, file);
         // multipartFileToBytes(file, document);
         document.setName(docType);
         document.setFileName(file.getOriginalFilename());
         try {
-            document.setFile(file.getBytes());
+            // document.setFile(file.getBytes());
         
             document.setFilePath(path.toString());
-            String url = "";
+            String url = mlApiConfig.getApiEndpoint();;
             String result = "";
             if(docType.equals("TIN")){
-                url = mlApiConfig.getApiEndpoint();
+                // url = mlApiConfig.getApiEndpoint();
                 document.setDocumentType(DocumentType.TIN);
             }
             else if(docType.equals("BIN")){
-                url = mlApiConfig.getApiEndpoint();
+                // url = mlApiConfig.getApiEndpoint();
                 document.setDocumentType(DocumentType.BIN);
             }
             else if(docType.equals("NID")){
-                url = mlApiConfig.getApiEndpoint();
+                // url = mlApiConfig.getApiEndpoint();
                 document.setDocumentType(DocumentType.NID);
             }
-            else if(docType.equals("BANK")){
-                url = mlApiConfig.getSolvency();
+            else if(docType.toLowerCase().equals("solvency")){
+                // url = mlApiConfig.getSolvency();
                 document.setDocumentType(DocumentType.BANK_SOLVENCY);
             }
             else if(docType.equals("TRADE")){
-                url = mlApiConfig.getTrade();
+                // url = mlApiConfig.getTrade();
                 document.setDocumentType(DocumentType.TRADE);
             }
             
@@ -122,7 +122,7 @@ public class VendorDocumentValidationService {
             case "BIN" -> (Class<T>) BinResponseDto.class;
             case "NID" -> (Class<T>) NidResponseDto.class;
             case "TRADE" -> (Class<T>) TradeLicenseDto.class;
-            case "BANK" -> (Class<T>) BankSolvencyDto.class;
+            case "SOLVENCY" -> (Class<T>) BankSolvencyDto.class;
 
             default -> null;
         };
