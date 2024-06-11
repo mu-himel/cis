@@ -3,6 +3,7 @@ package com.aes.erp.vendor.document_response_dto;
 import com.aes.erp.vendor.entity.DocmentEntities.BankSolvencyDocument;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,27 +12,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BankSolvencyDto {
-    @JsonProperty("ID")
+
     @JsonIgnore
     private String ID;
-    @JsonIgnore()
+    @JsonIgnore
     private String secret_key;
-    @JsonProperty("Account No")
-    private String account;
-    @JsonProperty("Branch")
+    @JsonProperty("accountNumber")
+    private String accountNumber;
+    @JsonProperty("branchName")
     private String branchName;
-    @JsonProperty("Name of Bank")
+    @JsonProperty("bankName")
     private String bankName;
-    @JsonProperty("Routing No")
-    private String routingNo;
+    @JsonProperty("routingNumber")
+    private String routingNumber;
     @JsonProperty("Error")
     private String error;
 
 
     public BankSolvencyDocument dtoToEntityMapping(BankSolvencyDto dto, BankSolvencyDocument bankSolvencyDocument){
-        if(!dto.getAccount().isEmpty())bankSolvencyDocument.setAccount(dto.getAccount());
-        if(!dto.getBankName().isEmpty())bankSolvencyDocument.setBankName(dto.getAccount());
-        if(!dto.getBranchName().isEmpty())bankSolvencyDocument.setBranchName(dto.getAccount());
+        if(!dto.getAccountNumber().isEmpty())bankSolvencyDocument.setAccount(dto.getAccountNumber());
+        if(!dto.getBankName().isEmpty())bankSolvencyDocument.setBankName(dto.getBankName());
+        if(!dto.getBranchName().isEmpty())bankSolvencyDocument.setBranchName(dto.getBranchName());
         return bankSolvencyDocument;
     }
 }

@@ -18,6 +18,7 @@ import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.entity.BulkProcessLog.BulkItemStatus;
 import com.aes.erp.inventory.repository.BulkProcessLogRepository;
 import com.aes.erp.inventory.repository.ItemRepository;
+import com.aes.erp.inventory.repository.TempItemRepository;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
@@ -59,6 +60,9 @@ public class ItemServiceImpl implements ItemService {
     private ItemRepository itemRepository;
 
     @Autowired
+    private TempItemRepository tempItemRepository;
+
+    @Autowired
     private CategoryService categoryService;
 
     @Autowired
@@ -68,7 +72,7 @@ public class ItemServiceImpl implements ItemService {
     private OrganizationService organizationService;
 
     @Autowired
-    private BulkItemGenerationService bulkItemGenerationService;
+    private BulkItemGenerationProcessService bulkItemGenerationProcessService;
 
     @Autowired
     private BulkProcessLogRepository bulkItemRepository;
@@ -339,63 +343,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     
-    @Override
-    public void getPermuttedItems(List<ItemCategory> categories) {
-        
-        List<Item> products = new ArrayList<>();
-        for(ItemCategory cat : categories){
-            List<List<String>> attributes = new ArrayList<>();
-            int i=0;
-            for(CategoryAttribute catAttr : cat.getAttributes()){
-                String attrType = catAttr.getAttributeType();
-                List<String>  attrValues = List.of(catAttr.getAttributeValue().split(","));
-                List<String> _attrValues  = attrValues = attrValues.stream().map(attrV->{
-                    return attrType.trim() + " " + attrV.trim() + " " + catAttr.getAttributeUnit().trim();
-                }).collect(Collectors.toList());
-                // map.put(i,_attrValues);
-                attributes.add(_attrValues);
-                i++;
-            }
-
-            List<ImmutableList<String>> immutableElements = makeListofImmutable(attributes);
-            List<List<String>> cartesianProduct = Lists.cartesianProduct(immutableElements);
-            prepareProducts(cat,  cartesianProduct, products);
-            
-            // products
-        }
-        
-        BulkProcessLog bulkProcess = new BulkProcessLog();
-        bulkProcess.setStatus(BulkItemStatus.PROCESSING);
-        bulkProcess.setProcessName("ITEM");
-        bulkItemRepository.saveAndFlush(bulkProcess);
-        bulkItemGenerationService.saveProducts(products,bulkProcess);
-        System.out.println("Here");
-        
-    }
+    
 
 
-    private List<Item> prepareProducts(ItemCategory cat, List<List<String>> cartesianProduct,List<Item> products){
-        
-        List<SubCategoryBrand> brands = categoryService.getBrandsByCategoryId(cat.getId());
-
-        for(SubCategoryBrand brand : brands){
-            ItemCategory parentCategory = cat.getParentCategory();
-            
-            cartesianProduct.stream().forEach(cp->{
-                Item item = new Item();
-                item.setItemCategory(cat);
-                item.setName(brand.getBrand().getName().trim());
-                item.setItemParentCategory(parentCategory);
-                item.setBrand(brand.getBrand());
-                item.setActive(false);
-                item.setItemAttributeName(String.join(" - ",cp));
-                item.setAttributes(extractAttributesFromItemAttributeName(cat, item.getItemAttributeName()));
-                products.add(item);
-            });
-        }
-
-        return products;
-    }
+    
 
     private List<ItemAttribute> extractAttributesFromItemAttributeName(ItemCategory cat, String itemAttributeName){
         String[] attrs = itemAttributeName.split(" - ");
@@ -423,22 +374,16 @@ public class ItemServiceImpl implements ItemService {
         return pendingItemAttrList;
     }
     
-    private static List<ImmutableList<String>> makeListofImmutable(List<List<String>> values) {
-        List<ImmutableList<String>> converted = new LinkedList<>();
-            values.forEach(array -> {
-                converted.add(ImmutableList.copyOf(array));
-            });
-        return converted;
-    }
+    
 
     @Override
     public List<?> getAllInactiveItems() {
-        return itemRepository.findAllInactiveItems();
+        return tempItemRepository.findAllInactiveItems();
     }
 
     @Override
     public void activateItems(ActivateItemDto activateItemDto) {
-        bulkItemGenerationService.activateItems(activateItemDto);
+        bulkItemGenerationProcessService.activateItems(activateItemDto);
         
         
     }

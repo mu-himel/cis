@@ -153,7 +153,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
         if(!misMatchDto.isFullName()){
             Map<String, String> map = new HashMap<>();
-            if(!documentHolder.getNidDocument().getEName().isEmpty())map.put("nid", documentHolder.getNidDocument().getEName());
+            if(!documentHolder.getNidDocument().getName().isEmpty())map.put("nid", documentHolder.getNidDocument().getName());
             if(!documentHolder.getTinDocument().getName().isEmpty())map.put("tin", documentHolder.getTinDocument().getName());
             misMatchResponseDto.setFullName(map);
         }

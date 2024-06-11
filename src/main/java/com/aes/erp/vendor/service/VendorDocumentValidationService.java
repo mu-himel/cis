@@ -1,6 +1,8 @@
 package com.aes.erp.vendor.service;
 
 import com.aes.erp.exception.AesException;
+import com.aes.erp.fileupload.dto.FileUploadResponse;
+import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.vendor.document_response_dto.*;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 @Service
 public class VendorDocumentValidationService {
@@ -25,13 +28,16 @@ public class VendorDocumentValidationService {
     private final DocumentHolderRepository documentHolderRepository;
     private final DocumentService documentService;
     private final MLApiConfig mlApiConfig;
+    private final FileUploadService fileUploadService;
 
-    public VendorDocumentValidationService(RestTemplateService restClient, GenericObjectMapper genericMapper, DocumentHolderRepository documentHolderRepository, DocumentService documentService, MLApiConfig mlApiConfig) {
+    public VendorDocumentValidationService(RestTemplateService restClient, GenericObjectMapper genericMapper, DocumentHolderRepository documentHolderRepository,
+    DocumentService documentService,  MLApiConfig mlApiConfig, FileUploadService fileUploadService) {
         this.restClient = restClient;
         this.documentHolderRepository = documentHolderRepository;
         this.documentService = documentService;
         this.genericMapper = genericMapper;
         this.mlApiConfig = mlApiConfig;
+        this.fileUploadService = fileUploadService;
     }
     public void multipartFileToBytes(MultipartFile file, Document document){
         try{
@@ -41,51 +47,58 @@ public class VendorDocumentValidationService {
         }
     }
 
-    @Async
-    public Object validateDocument(Long documentHolderId, String fileName, MultipartFile file, String orgName){
+    
+    public Object validateDocument(Long documentHolderId, String docType, MultipartFile file, String orgName){
         //Starting an Asynchronous Task
         //Creating a document Entity first
         Document document = new Document();
         DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
         document.setDocumentHolder(documentHolder);
         document.setContentType(file.getContentType());
-        multipartFileToBytes(file, document);
-        document.setName(fileName);
+        Path path = Path.of("./uploads/vendor/doc/"+documentHolderId+"/"+docType);
+        fileUploadService.uploadFile(path, file);
+        // multipartFileToBytes(file, document);
+        document.setName(docType);
         document.setFileName(file.getOriginalFilename());
-        String url = "";
-        String result = "";
-        if(fileName.equals("TIN")){
-            url = mlApiConfig.getTin();
-            document.setDocumentType(DocumentType.TIN);
-        }
-        else if(fileName.equals("BIN")){
-            url = mlApiConfig.getBin();
-            document.setDocumentType(DocumentType.BIN);
-        }
-        else if(fileName.equals("NID")){
-            url = mlApiConfig.getNid();
-            document.setDocumentType(DocumentType.NID);
-        }
-        else if(fileName.equals("BANK")){
-            url = mlApiConfig.getSolvency();
-            document.setDocumentType(DocumentType.BANK_SOLVENCY);
-        }
-        else if(fileName.equals("TRADE")){
-            url = mlApiConfig.getTrade();
-            document.setDocumentType(DocumentType.TRADE);
-        }
-        try{
-            result = restClient.postPdfFile(documentHolderId, fileName, file, orgName, url);
+        try {
+            // document.setFile(file.getBytes());
+        
+            document.setFilePath(path.toString());
+            String url = mlApiConfig.getApiEndpoint();;
+            String result = "";
+            if(docType.toUpperCase().equals("TIN")){
+                // url = mlApiConfig.getApiEndpoint();
+                document.setDocumentType(DocumentType.TIN);
+            }
+            else if(docType.toUpperCase().equals("BIN")){
+                // url = mlApiConfig.getApiEndpoint();
+                document.setDocumentType(DocumentType.BIN);
+            }
+            else if(docType.toUpperCase().equals("NID")){
+                // url = mlApiConfig.getApiEndpoint();
+                document.setDocumentType(DocumentType.NID);
+            }
+            else if(docType.toUpperCase().contains("SOLVENCY")){
+                // url = mlApiConfig.getSolvency();
+                document.setDocumentType(DocumentType.BANK_SOLVENCY);
+            }
+            else if(docType.toUpperCase().contains("TRADE")){
+                // url = mlApiConfig.getTrade();
+                document.setDocumentType(DocumentType.TRADE);
+            }
+            
+            result = restClient.postPdfFile(documentHolderId, docType.toLowerCase(), file, orgName, url);
             document.setResultFromMachineLearning(result);
             documentService.create(document);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(result);
+            
             if(result == null || jsonNode.has("Error")){
-               throw new AesException("Wrong document uploaded");
+                throw new AesException("Wrong document uploaded");
             }
             else{
-               //Finishing The asynchronous task
-               return mapToDto(result, fileName);
+                //Finishing The asynchronous task
+                return mapToDto(result, docType);
             }
         }catch(Error | IOException e){
             System.out.println(e.getMessage());
@@ -104,13 +117,13 @@ public class VendorDocumentValidationService {
     }
     @SuppressWarnings("unchecked")
     private <T> Class<T> getDtoClassForFileName(String fileName) {
-        return switch (fileName) {
+        return switch (fileName.toUpperCase()) {
             case "TIN" -> (Class<T>) TinResponseDto.class;
             case "BIN" -> (Class<T>) BinResponseDto.class;
             case "NID" -> (Class<T>) NidResponseDto.class;
             case "TRADE" -> (Class<T>) TradeLicenseDto.class;
-            case "BANK" -> (Class<T>) BankSolvencyDto.class;
-
+            case "SOLVENCY" -> (Class<T>) BankSolvencyDto.class;
+            case "BANK_SOLVENCY" -> (Class<T>) BankSolvencyDto.class;
             default -> null;
         };
     }

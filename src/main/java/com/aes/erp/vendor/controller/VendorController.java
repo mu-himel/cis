@@ -8,6 +8,9 @@ import com.aes.erp.vendor.dto.VendorScoreDto;
 import com.aes.erp.vendor.entity.VendorFile;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.service.VendorService;
+
+import antlr.StringUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -15,11 +18,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerMapping;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -205,6 +211,24 @@ public class VendorController {
             }
     }
 
+    private ByteArrayResource getUploadedFile(String filename){
+        filename = filename.replaceAll("/api/v1/vendors/docs/","./");
+        Path path = Path.of(filename);
+        try {
+            ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
     @GetMapping(value = "/images/{id}/{businessDetailId}/{filename:.+}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<?> getImage(
             @PathVariable("id") Long id,
@@ -215,6 +239,29 @@ public class VendorController {
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(
                     load(id,filename)
+                );
+
+    }
+
+    @GetMapping(value = "/docs/**",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<?> getUploadedDoc(
+            HttpServletRequest req) {
+                String filename = String.valueOf(req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
+        
+
+        MediaType mimeType = MediaType.ALL;
+        if(filename.contains(".jpeg") || filename.contains(".jpg")){
+            mimeType = MediaType.IMAGE_JPEG;
+        } else if (filename.contains(".png")){
+            mimeType = MediaType.IMAGE_PNG;
+        } else if (filename.contains(".pdf")) {
+            mimeType = MediaType.APPLICATION_PDF;
+        }      
+        return ResponseEntity
+                .ok()
+                .contentType(mimeType)
+                .body(
+                    getUploadedFile(filename)
                 );
 
     }

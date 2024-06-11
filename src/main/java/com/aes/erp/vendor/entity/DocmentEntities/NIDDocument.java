@@ -18,8 +18,11 @@ public class NIDDocument {
     @Column(name = "id", nullable = false)
     private Long id;
     private Date dateOfBirth;
-    private String eName;
+    private String name;
     private String nid;
+    private String fatherName;
+    private String motherName;
+    private String banglaName;
 
     @OneToOne
     private DocumentHolder documentHolder;

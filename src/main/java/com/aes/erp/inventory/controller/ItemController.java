@@ -4,9 +4,13 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.BulkItemGenerateDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.dto.request.bulk_gen.BulkGenConfigDto;
+import com.aes.erp.inventory.dto.request.bulk_gen.SearchInactiveProduct;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.service.BulkItemGenerationService;
+import com.aes.erp.inventory.service.BulkItemGenerationProcessService;
 import com.aes.erp.inventory.service.ItemService;
+import com.aes.erp.inventory.service.TempItemService;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +34,10 @@ public class ItemController {
     private ItemService itemService;
 
     @Autowired
-    private BulkItemGenerationService bulkItemGenerationService;
+    private TempItemService tempItemService;
+
+    @Autowired
+    private BulkItemGenerationProcessService bulkItemGenerationService;
 
 
 
@@ -122,30 +129,38 @@ public class ItemController {
         );
     }
 
-    @PostMapping("/permutted-items")
-    public ResponseEntity<?> getMethodName(
-        @RequestBody BulkItemGenerateDto bulkItemGenerateDto
-    ) {
+    
 
-        if(bulkItemGenerateDto.getSubCategoryId() == null){
-            throw new AesException("Sorry! Sub Category Required");
-        }
-        List<ItemCategory> categories = itemService.getCategoryService().getAllSubCategories(
-            bulkItemGenerateDto.getCategoryId(),
-            bulkItemGenerateDto.getSubCategoryId()
-        ); 
-        itemService.getPermuttedItems(categories); 
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
+    // @PostMapping("/permutted-items")
+    // public ResponseEntity<?> getMethodName(
+    //     @RequestBody BulkItemGenerateDto bulkItemGenerateDto
+    // ) {
 
-    @GetMapping("/bulk-generation-status")
-    public ResponseEntity<?> getBulkGenerationStatus(){
-        return new ResponseEntity<>(bulkItemGenerationService.getLastLog("ITEM").orElse(null),HttpStatus.OK);
+    //     if(bulkItemGenerateDto.getSubCategoryId() == null){
+    //         throw new AesException("Sorry! Sub Category Required");
+    //     }
+    //     List<ItemCategory> categories = itemService.getCategoryService().getAllSubCategories(
+    //         bulkItemGenerateDto.getCategoryId(),
+    //         bulkItemGenerateDto.getSubCategoryId()
+    //     ); 
+    //     itemService.getPermuttedItems(categories); 
+    //     return new ResponseEntity<>(HttpStatus.CREATED);
+    // }
+
+    @GetMapping("/bulk-generation-status/{id}")
+    public ResponseEntity<?> getBulkGenerationStatus(@PathVariable("id") Long id){
+        return new ResponseEntity<>(bulkItemGenerationService.getLogByBulkProceessId(id).orElse(null),HttpStatus.OK);
     }
 
     @GetMapping("/inactive")
     public ResponseEntity<?> getInactiveProducts(){
         return new ResponseEntity<>(itemService.getAllInactiveItems(),HttpStatus.OK);
+    }
+
+    @PostMapping("/search-inactive-products")
+    public ResponseEntity<?> searchInactiveProducts(@RequestBody SearchInactiveProduct searchInactiveProduct){
+        System.out.println(searchInactiveProduct);
+        return new ResponseEntity<>(tempItemService.searchInactiveItems(searchInactiveProduct),HttpStatus.OK);
     }
 
     @PutMapping("/activate")
