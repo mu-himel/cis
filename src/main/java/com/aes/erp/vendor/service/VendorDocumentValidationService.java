@@ -66,28 +66,28 @@ public class VendorDocumentValidationService {
             document.setFilePath(path.toString());
             String url = mlApiConfig.getApiEndpoint();;
             String result = "";
-            if(docType.equals("TIN")){
+            if(docType.toUpperCase().equals("TIN")){
                 // url = mlApiConfig.getApiEndpoint();
                 document.setDocumentType(DocumentType.TIN);
             }
-            else if(docType.equals("BIN")){
+            else if(docType.toUpperCase().equals("BIN")){
                 // url = mlApiConfig.getApiEndpoint();
                 document.setDocumentType(DocumentType.BIN);
             }
-            else if(docType.equals("NID")){
+            else if(docType.toUpperCase().equals("NID")){
                 // url = mlApiConfig.getApiEndpoint();
                 document.setDocumentType(DocumentType.NID);
             }
-            else if(docType.toLowerCase().equals("solvency")){
+            else if(docType.toUpperCase().contains("SOLVENCY")){
                 // url = mlApiConfig.getSolvency();
                 document.setDocumentType(DocumentType.BANK_SOLVENCY);
             }
-            else if(docType.equals("TRADE")){
+            else if(docType.toUpperCase().contains("TRADE")){
                 // url = mlApiConfig.getTrade();
                 document.setDocumentType(DocumentType.TRADE);
             }
             
-            result = restClient.postPdfFile(documentHolderId, docType, file, orgName, url);
+            result = restClient.postPdfFile(documentHolderId, docType.toLowerCase(), file, orgName, url);
             document.setResultFromMachineLearning(result);
             documentService.create(document);
             ObjectMapper objectMapper = new ObjectMapper();
@@ -117,13 +117,13 @@ public class VendorDocumentValidationService {
     }
     @SuppressWarnings("unchecked")
     private <T> Class<T> getDtoClassForFileName(String fileName) {
-        return switch (fileName) {
+        return switch (fileName.toUpperCase()) {
             case "TIN" -> (Class<T>) TinResponseDto.class;
             case "BIN" -> (Class<T>) BinResponseDto.class;
             case "NID" -> (Class<T>) NidResponseDto.class;
             case "TRADE" -> (Class<T>) TradeLicenseDto.class;
             case "SOLVENCY" -> (Class<T>) BankSolvencyDto.class;
-
+            case "BANK_SOLVENCY" -> (Class<T>) BankSolvencyDto.class;
             default -> null;
         };
     }

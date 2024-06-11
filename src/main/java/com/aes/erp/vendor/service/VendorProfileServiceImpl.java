@@ -39,7 +39,8 @@ public class VendorProfileServiceImpl implements VendorProfileService{
             Document binDocument = documentHolder.getBinDocument().getDocument();
             if(binDocument != null){
                 // identificationDto.setBinFile(binDocument.getFile());
-                identificationDto.setBinFilePath(binDocument.getFilePath().substring(1)+"/"+binDocument.getFileName());
+                if(binDocument.getFilePath()!=null)
+                    identificationDto.setBinFilePath(binDocument.getFilePath().substring(1)+"/"+binDocument.getFileName());
                 identificationDto.setBinContentType(binDocument.getContentType());
                 identificationDto.setBin(documentHolder.getBinDocument().getBin());
             }
