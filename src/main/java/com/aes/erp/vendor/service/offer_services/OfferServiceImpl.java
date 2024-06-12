@@ -22,12 +22,17 @@ import com.aes.erp.scm.services.TenderService;
 import com.aes.erp.vendor.dto.OfferCreateDTO;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.*;
 import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.repository.OfferNegotiatorRepository;
 import com.aes.erp.vendor.repository.OfferRepository;
 import com.aes.erp.vendor.repository.VendorScoreRepository;
 import com.aes.erp.vendor.service.negotiation_history.NegotiationHistoryService;
 import com.aes.erp.vendor.service.participator.NegotiatorService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -237,11 +242,12 @@ public class OfferServiceImpl implements OfferService{
         if(scoreOp.isPresent()){
             score = scoreOp.get();
         }
-        
+        String vendorType = vendorInfo.get("vendorType").toString();
+       
         String VendorName = (String)vendorInfo.get("name");
         String vendorEmail = (String)vendorInfo.get("vendorEmail");
         String vendorPhoneNo = (String)vendorInfo.get("vendorPhoneNo");
-        String vendorType = (String) vendorInfo.get("vendorType");
+        //  (VendorType) vendorInfo.get("vendorType");
         priceQuotationReqDto.setRemoteOfferId(offer.getId());
         priceQuotationReqDto.setCode(tender.getCode());
         priceQuotationReqDto.setPaymentMethod(offer.getCreditType().name());
