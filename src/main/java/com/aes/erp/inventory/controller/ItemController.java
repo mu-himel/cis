@@ -152,9 +152,12 @@ public class ItemController {
         return new ResponseEntity<>(bulkItemGenerationService.getLogByBulkProceessId(id).orElse(null),HttpStatus.OK);
     }
 
-    @GetMapping("/inactive")
-    public ResponseEntity<?> getInactiveProducts(){
-        return new ResponseEntity<>(itemService.getAllInactiveItems(),HttpStatus.OK);
+    @GetMapping("/inactive/{parentCategoryId}/{categoryId}")
+    public ResponseEntity<?> getInactiveProducts(
+        @PathVariable("parentCategoryId") Long parentCategoryId,
+        @PathVariable("categoryId") Long categoryId
+    ){
+        return new ResponseEntity<>(itemService.getAllInactiveItems(parentCategoryId, categoryId),HttpStatus.OK);
     }
 
     @PostMapping("/search-inactive-products")

@@ -36,8 +36,8 @@ public interface TempItemRepository extends JpaRepository<TempItem,Long>{
         LEFT JOIN item_categories ic ON ic.id = ti.item_category_id
         LEFT JOIN item_categories ipc ON ipc.id = ti.item_parent_category_id
         LEFT JOIN brands b ON b.id = ti.brand_id
-        WHERE ti.active=false""",nativeQuery = true)
-        List<TempItemResponseInfo> findAllInactiveItems();
+        WHERE ti.active=false AND ipc.id=:parentCategoryId AND ic.id=:categoryId""",nativeQuery = true)
+        List<TempItemResponseInfo> findAllInactiveItems(Long parentCategoryId, Long categoryId);
 
         /**
          * TempItemResponseInfo

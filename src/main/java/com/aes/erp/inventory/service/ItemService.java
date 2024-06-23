@@ -45,7 +45,7 @@ public interface ItemService {
 
    
 
-    List<?> getAllInactiveItems();
+    List<?> getAllInactiveItems(Long parentCategoryId, Long categoryId);
 
     void activateItems(ActivateItemDto activateItemDto);
 
