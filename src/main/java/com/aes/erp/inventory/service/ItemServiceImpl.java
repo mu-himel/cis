@@ -377,8 +377,8 @@ public class ItemServiceImpl implements ItemService {
     
 
     @Override
-    public List<?> getAllInactiveItems() {
-        return tempItemRepository.findAllInactiveItems();
+    public List<?> getAllInactiveItems(Long parentCategoryId, Long categoryId) {
+        return tempItemRepository.findAllInactiveItems(parentCategoryId, categoryId);
     }
 
     @Override
