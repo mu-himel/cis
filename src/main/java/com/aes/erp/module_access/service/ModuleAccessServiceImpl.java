@@ -129,17 +129,18 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             registration.setParentModuleAccess(controlPanel);
             controlPanel.addChildModule(registration);
 
-            ModuleAccess employee = new ModuleAccess();
-            employee.setId(10L);
-            employee.setDisplayOrder(9);
-            employee.setName("Employee");
-            employee.setRoute("vendor-panel/registration/employee");
-            employee.setUri("vendor-panel/registration/employee");
-            employee.setModuleType(ModuleType.CHILD);
-            employee.setShowInMenu(true);
-            employee.setParentModuleAccess(controlPanel);
-            controlPanel.addChildModule(employee);
-            moduleAccessRepository.save(controlPanel);
+            // TODO remove by 2024-06-24
+            // ModuleAccess employee = new ModuleAccess();
+            // employee.setId(10L);
+            // employee.setDisplayOrder(9);
+            // employee.setName("Employee");
+            // employee.setRoute("vendor-panel/registration/employee");
+            // employee.setUri("vendor-panel/registration/employee");
+            // employee.setModuleType(ModuleType.CHILD);
+            // employee.setShowInMenu(true);
+            // employee.setParentModuleAccess(controlPanel);
+            // controlPanel.addChildModule(employee);
+            // moduleAccessRepository.save(controlPanel);
 
             ModuleAccess vendorManagement = new ModuleAccess();
             vendorManagement.setId(11L);

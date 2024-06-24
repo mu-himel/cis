@@ -5,16 +5,23 @@ import com.aes.erp.employee.repository.EmployeeRepository;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.user_management.dto.EmployeeUserDto;
 import com.aes.erp.user_management.entity.User;
+import com.aes.erp.user_management.user_credential.entity.UserCredential;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public void createEmployee(Employee employee) {
@@ -42,6 +49,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     @Override
+    @Transactional
     public void updateEmployee(Long id, EmployeeUserDto employee) {
         Optional<Employee> employeeOptional = employeeRepository.findById(id);
         if(employeeOptional.isPresent()){
@@ -59,6 +67,12 @@ public class EmployeeServiceImpl implements EmployeeService{
             }
             if(employee.getEmployeeType() !=null ){
                 _employee.setEmployeeType(employee.getEmployeeType());
+            }
+
+            if(employee.getPassword()!=null){
+                User user = _employee.getUser();
+                UserCredential userCredential = user.getUserCredential();
+                userCredential.setPassword(passwordEncoder.encode(employee.getPassword()));
             }
 //            if(employee.getWarehouse()!=null && employee.getWarehouse().getId()!=null){
 //                _employee.setWarehouse(new Warehouse(employee.getWarehouse().getId()));
