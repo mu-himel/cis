@@ -116,6 +116,7 @@ public class VendorServiceImpl implements VendorService {
             }
             vendor.setVendorSubCategories(newSubcategorySet);
         }
+        vendor.setCategories(vendorDto.getCategories());
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
         vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorType().getId()));
         vendor.setUser(user);
@@ -150,6 +151,9 @@ public class VendorServiceImpl implements VendorService {
         }
         if(vendorDto.getEmail()!=null && !vendorDto.getEmail().isEmpty()) {
             vendor.setEmail(vendorDto.getEmail());
+        }
+        if(vendorDto.getCategories() !=null && !vendorDto.getCategories().isEmpty()){
+            vendor.setCategories(vendorDto.getCategories());
         }
         if(vendorDto.getPhone()!=null && !vendorDto.getPhone().isEmpty()) {
             vendor.setPhone(vendorDto.getPhone());
@@ -480,6 +484,7 @@ public class VendorServiceImpl implements VendorService {
         profileDto.setVendorFileList(vendor.getFiles());
         profileDto.setVendorType(vendor.getVendorType());
         profileDto.setAitPercentage(vendor.getAitPercentage());
+        profileDto.setCategories(vendor.getCategories());
         if(!vendor.getName().isEmpty())profileDto.setName(vendor.getName());
         profileDto.setStartedAt(vendor.getStartedAt());
         if(vendor.getVendorSubCategories() != null){

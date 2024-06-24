@@ -48,6 +48,8 @@ public class VendorDto implements Serializable, EntityConvertable<Vendor> {
     private String password;
     private ReferenceObjectDto category;
 
+    private String categories;
+
     private List<Long> subCategory;
 
     private List<ReferenceObjectDto> items;
