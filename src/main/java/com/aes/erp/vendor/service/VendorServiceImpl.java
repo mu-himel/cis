@@ -99,7 +99,7 @@ public class VendorServiceImpl implements VendorService {
         User user = userService.createVendorUserAccount(vendorDto);
         Vendor vendor = vendorDto.getEntity();
         vendor.setStatus(VendorStatus.CREATED);
-        vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
+        // vendor.setCategory(new ItemCategory(vendorDto.getCategory().getId()));
         //Create SubCategory List For Vendor
         if(vendorDto.getSubCategory() != null && !vendorDto.getSubCategory().isEmpty()){
             Set<VendorSubCategory> newSubcategorySet = new HashSet<>();

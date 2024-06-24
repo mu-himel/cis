@@ -153,7 +153,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         Long getId();
         String getName();
         ReferenceObjectDto getVendorType();
-
+        String getCategories();
         String getPhone();
 
         String getEmail();
