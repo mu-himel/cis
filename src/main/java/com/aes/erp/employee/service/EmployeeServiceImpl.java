@@ -69,7 +69,7 @@ public class EmployeeServiceImpl implements EmployeeService{
                 _employee.setEmployeeType(employee.getEmployeeType());
             }
 
-            if(employee.getPassword()!=null){
+            if(employee.getPassword()!=null && !employee.getPassword().isEmpty()){
                 User user = _employee.getUser();
                 UserCredential userCredential = user.getUserCredential();
                 userCredential.setPassword(passwordEncoder.encode(employee.getPassword()));

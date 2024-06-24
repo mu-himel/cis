@@ -51,14 +51,16 @@ public class AbstractModuleAccessFilterService {
                 .collect(Collectors.toList());
         RoleNode roleNode = null;
         System.out.println(roles);
-        if(roles.contains("ROLE_EMPLOYEE")||roles.contains("ROLE_AUDITOR")||roles.contains("ROLE_ENLISTER")){
-            Optional<RoleNode> roleNodeOptional = designationService.findByName((String)claimResponseDto.getUserInfoDto().get("employeeType"));
+        String employeeType = (String)claimResponseDto.getUserInfoDto().get("employeeType");
+        if(employeeType!=null && (employeeType.contains("EMPLOYEE")||employeeType.contains("AUDITOR")||employeeType.contains("ENLISTER"))){
+            System.out.println();
+            Optional<RoleNode> roleNodeOptional = designationService.findByName(employeeType);
             if(roleNodeOptional.isPresent()){
                 roleNode = roleNodeOptional.get();
             }
         }
-        else if(roles.contains("ROLE_INVENTORY CONTROLLER")){
-            Optional<RoleNode> roleNodeOptional = designationService.findByName((String)claimResponseDto.getUserInfoDto().get("employeeType").toString().replace("_"," "));
+        else if(employeeType!=null && employeeType.contains("INVENTORY_CONTROLLER")){
+            Optional<RoleNode> roleNodeOptional = designationService.findByName(employeeType.toString().replace("_"," "));
             if(roleNodeOptional.isPresent()){
                 roleNode = roleNodeOptional.get();
             }

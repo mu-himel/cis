@@ -107,9 +107,20 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             subCategory.setParentModuleAccess(controlPanel);
             controlPanel.addChildModule(subCategory);
 
+            ModuleAccess product = new ModuleAccess();
+            product.setId(8L);
+            product.setDisplayOrder(7);
+            product.setName("Prdouct");
+            product.setRoute("control-panel/prdouct");
+            product.setUri("control-panel/product");
+            product.setModuleType(ModuleType.CHILD);
+            product.setShowInMenu(false);
+            product.setParentModuleAccess(controlPanel);
+            controlPanel.addChildModule(product);
+
             ModuleAccess allPartner = new ModuleAccess();
-            allPartner.setId(8L);
-            allPartner.setDisplayOrder(7);
+            allPartner.setId(9L);
+            allPartner.setDisplayOrder(8);
             allPartner.setName("All Partner");
             allPartner.setRoute("vendor-panel/all-partners/approved-vendor");
             allPartner.setUri("vendor-panel/all-partners/approved-vendor");
@@ -119,8 +130,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             controlPanel.addChildModule(allPartner);
 
             ModuleAccess registration = new ModuleAccess();
-            registration.setId(9L);
-            registration.setDisplayOrder(8);
+            registration.setId(10L);
+            registration.setDisplayOrder(9);
             registration.setName("Registration");
             registration.setRoute("vendor-panel/registration/vendor");
             registration.setUri("vendor-panel/registration/vendor");
@@ -128,6 +139,17 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             registration.setShowInMenu(true);
             registration.setParentModuleAccess(controlPanel);
             controlPanel.addChildModule(registration);
+
+            ModuleAccess pendingProductRequest = new ModuleAccess();
+            pendingProductRequest.setId(11L);
+            pendingProductRequest.setDisplayOrder(10);
+            pendingProductRequest.setName("Pending Prdouct Request");
+            pendingProductRequest.setRoute("control-panel/pending-product-request");
+            pendingProductRequest.setUri("control-panel/pending-product-request");
+            pendingProductRequest.setModuleType(ModuleType.CHILD);
+            pendingProductRequest.setShowInMenu(true);
+            pendingProductRequest.setParentModuleAccess(controlPanel);
+            controlPanel.addChildModule(pendingProductRequest);
 
             // TODO remove by 2024-06-24
             // ModuleAccess employee = new ModuleAccess();
@@ -140,11 +162,11 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             // employee.setShowInMenu(true);
             // employee.setParentModuleAccess(controlPanel);
             // controlPanel.addChildModule(employee);
-            // moduleAccessRepository.save(controlPanel);
+            moduleAccessRepository.save(controlPanel);
 
             ModuleAccess vendorManagement = new ModuleAccess();
-            vendorManagement.setId(11L);
-            vendorManagement.setDisplayOrder(10);
+            vendorManagement.setId(12L);
+            vendorManagement.setDisplayOrder(11);
             vendorManagement.setName("Vendor Management");
             vendorManagement.setIcon("vendor_management.svg");
             vendorManagement.setRoute("vendor-management");
@@ -153,8 +175,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             vendorManagement.setShowInMenu(true);
 
             ModuleAccess pendingVendors = new ModuleAccess();
-            pendingVendors.setId(12L);
-            pendingVendors.setDisplayOrder(11);
+            pendingVendors.setId(13L);
+            pendingVendors.setDisplayOrder(12);
             pendingVendors.setName("Pending Vendors");
             pendingVendors.setRoute("vendor-panel/pending-vendors");
             pendingVendors.setUri("vendor-panel/pending-vendors");
@@ -164,8 +186,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             vendorManagement.addChildModule(pendingVendors);
 
             ModuleAccess pendingVerification = new ModuleAccess();
-            pendingVerification.setId(13L);
-            pendingVerification.setDisplayOrder(12);
+            pendingVerification.setId(14L);
+            pendingVerification.setDisplayOrder(13);
             pendingVerification.setName("Pending Verification");
             pendingVerification.setRoute("vendor-panel/pending-vendors/pending-verification");
             pendingVerification.setUri("vendor-panel/pending-vendors/pending-verification");
@@ -175,8 +197,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             vendorManagement.addChildModule(pendingVerification);
 
             ModuleAccess pendingApproval = new ModuleAccess();
-            pendingApproval.setId(14L);
-            pendingApproval.setDisplayOrder(13);
+            pendingApproval.setId(15L);
+            pendingApproval.setDisplayOrder(14);
             pendingApproval.setName("Pending Approval");
             pendingApproval.setRoute("vendor-panel/pending-vendors/pending-approval");
             pendingApproval.setUri("vendor-panel/pending-vendors/pending-approval");
@@ -186,8 +208,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             vendorManagement.addChildModule(pendingApproval);
 
             ModuleAccess approvedVendor = new ModuleAccess();
-            approvedVendor.setId(15L);
-            approvedVendor.setDisplayOrder(14);
+            approvedVendor.setId(16L);
+            approvedVendor.setDisplayOrder(15);
             approvedVendor.setName("Complete");
             approvedVendor.setRoute("vendor-panel/pending-vendors/completed");
             approvedVendor.setUri("vendor-panel/pending-vendors/completed");
@@ -198,18 +220,19 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             moduleAccessRepository.save(vendorManagement);
 
             ModuleAccess tenderModule = new ModuleAccess();
-            tenderModule.setId(16L);
-            tenderModule.setDisplayOrder(15);
+            tenderModule.setId(17L);
+            tenderModule.setDisplayOrder(16);
             tenderModule.setName("Tender");
             tenderModule.setIcon("tenders.svg");
             tenderModule.setRoute("tenders");
             tenderModule.setUri("tenders");
             tenderModule.setModuleType(ModuleType.PARENT);
             tenderModule.setShowInMenu(true);
+            
 
             ModuleAccess rfq = new ModuleAccess();
-            rfq.setId(17L);
-            rfq.setDisplayOrder(16);
+            rfq.setId(18L);
+            rfq.setDisplayOrder(17);
             rfq.setName("Rfq");
             rfq.setRoute("tenders/rfq/pending");
             rfq.setUri("tenders/rfq/pending");
@@ -219,8 +242,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             tenderModule.addChildModule(rfq);
 
             ModuleAccess pendingRfq = new ModuleAccess();
-            pendingRfq.setId(18L);
-            pendingRfq.setDisplayOrder(17);
+            pendingRfq.setId(19L);
+            pendingRfq.setDisplayOrder(18);
             pendingRfq.setName("Pending Rfq");
             pendingRfq.setRoute("tenders/rfq/pending");
             pendingRfq.setUri("tenders/rfq/pending");
@@ -230,8 +253,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             tenderModule.addChildModule(pendingRfq);
 
             ModuleAccess closedRfq = new ModuleAccess();
-            closedRfq.setId(19L);
-            closedRfq.setDisplayOrder(18);
+            closedRfq.setId(20L);
+            closedRfq.setDisplayOrder(19);
             closedRfq.setName("Closed Rfq");
             closedRfq.setRoute("tenders/rfq/closed");
             closedRfq.setUri("tenders/rfq/closed");
@@ -239,10 +262,11 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             closedRfq.setShowInMenu(false);
             closedRfq.setParentModuleAccess(tenderModule);
             tenderModule.addChildModule(closedRfq);
+            
 
             ModuleAccess po = new ModuleAccess();
-            po.setId(20L);
-            po.setDisplayOrder(19);
+            po.setId(21L);
+            po.setDisplayOrder(20);
             po.setName("PO");
             po.setRoute("tenders/po");
             po.setUri("tenders/po");
@@ -252,8 +276,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             tenderModule.addChildModule(po);
 
             ModuleAccess pendingPo = new ModuleAccess();
-            pendingPo.setId(21L);
-            pendingPo.setDisplayOrder(20);
+            pendingPo.setId(22L);
+            pendingPo.setDisplayOrder(21);
             pendingPo.setName("Pending PO");
             pendingPo.setRoute("tenders/po/pending");
             pendingPo.setUri("tenders/po/pending");
@@ -263,8 +287,8 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             tenderModule.addChildModule(pendingPo);
 
             ModuleAccess closedPo = new ModuleAccess();
-            closedPo.setId(22L);
-            closedPo.setDisplayOrder(21);
+            closedPo.setId(23L);
+            closedPo.setDisplayOrder(22);
             closedPo.setName("Closed PO");
             closedPo.setRoute("tenders/po/closed");
             closedPo.setUri("tenders/po/closed");
@@ -272,30 +296,11 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             closedPo.setShowInMenu(false);
             closedPo.setParentModuleAccess(tenderModule);
             tenderModule.addChildModule(closedPo);
-
-            ModuleAccess product = new ModuleAccess();
-            product.setId(23L);
-            product.setDisplayOrder(8);
-            product.setName("Prdouct");
-            product.setRoute("control-panel/prdouct");
-            product.setUri("control-panel/product");
-            product.setModuleType(ModuleType.CHILD);
-            product.setShowInMenu(false);
-            product.setParentModuleAccess(controlPanel);
-            controlPanel.addChildModule(product);
-            
             moduleAccessRepository.save(tenderModule);
 
-            ModuleAccess pendingProductRequest = new ModuleAccess();
-            pendingProductRequest.setId(24L);
-            pendingProductRequest.setDisplayOrder(9);
-            pendingProductRequest.setName("Pending Prdouct Request");
-            pendingProductRequest.setRoute("control-panel/pending-product-request");
-            pendingProductRequest.setUri("control-panel/pending-product-request");
-            pendingProductRequest.setModuleType(ModuleType.CHILD);
-            pendingProductRequest.setShowInMenu(false);
-            pendingProductRequest.setParentModuleAccess(controlPanel);
-            controlPanel.addChildModule(pendingProductRequest);
+            
+
+            
 
         }
         return count;
