@@ -74,6 +74,9 @@ public class Vendor implements DtoConvertable<VendorDto> {
     @OneToOne
     private ItemCategory category;
 
+    @Column(length = 500)
+    private String categories;
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<VendorItem> vendorItems;
 

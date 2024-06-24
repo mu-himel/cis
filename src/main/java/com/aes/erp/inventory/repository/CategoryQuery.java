@@ -110,7 +110,7 @@ public interface CategoryQuery {
             " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name) || '%' ) " +
             " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code) || '%' )" +
             "AND c.active = true " +
-            "GROUP BY c.id";
+            "GROUP BY c.id ORDER BY c.name asc";
 
     String countQueryForFindAllByItemCategoryWithSubCategoryCount = "SELECT COUNT(DISTINCT c.id) AS categoryCount " +
             "FROM ItemCategory c " +

@@ -50,7 +50,8 @@ public class AbstractModuleAccessFilterService {
                 .map(dto->dto.getAuthority())
                 .collect(Collectors.toList());
         RoleNode roleNode = null;
-        if(roles.contains("ROLE_EMPLOYEE")){
+        System.out.println(roles);
+        if(roles.contains("ROLE_EMPLOYEE")||roles.contains("ROLE_AUDITOR")||roles.contains("ROLE_ENLISTER")){
             Optional<RoleNode> roleNodeOptional = designationService.findByName((String)claimResponseDto.getUserInfoDto().get("employeeType"));
             if(roleNodeOptional.isPresent()){
                 roleNode = roleNodeOptional.get();

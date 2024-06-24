@@ -22,6 +22,7 @@ public class VendorProfileDto {
     private VendorIdentificationDto identification;
     private VendorBasicInformationDto basicInformation;
     private VendorAddressDto address;
+    private String categories;
     private List<String> permittedProducts = new ArrayList<>();
     private GeneralDetails generalDetails;
     private List<BusinessDetails> businessDetails;

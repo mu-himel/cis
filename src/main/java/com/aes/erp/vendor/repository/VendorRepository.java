@@ -115,7 +115,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
             "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
             "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
-            "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)",
+            "   AND (:vendorStatus IS NULL OR v.verificationStatus IN ('APPROVED'))",
             countQuery =  "SELECT count(v) FROM Vendor v " +
                     " LEFT JOIN v.vendorType vt " +
                     " LEFT JOIN v.category c " +
@@ -124,7 +124,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                     "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
                     "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
                     "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
-                    "   AND (:vendorStatus IS NULL OR v.verificationStatus = :vendorStatus)"
+                    "   AND (:vendorStatus IS NULL OR v.verificationStatus IN ('APPROVED'))"
     )
     Page<VendorInfo> findAllVendorForComplete(
                                             @Param("name") String name,
@@ -153,7 +153,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         Long getId();
         String getName();
         ReferenceObjectDto getVendorType();
-
+        String getCategories();
         String getPhone();
 
         String getEmail();
