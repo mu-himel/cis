@@ -180,7 +180,7 @@ public class ItemServiceImpl implements ItemService {
         }
         item.setItemAttributeName(itemAttributeName);
 
-        if(itemRepository.existsByCodeActive(item.getCode(),true)){
+        if(itemRepository.existsByCodeAndActive(item.getCode(),true)){
             if(itemRequestDto.getOrgId() != null){
                 Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
                 sentItem(org,item,itemRequestDto.getWarehouseId());
