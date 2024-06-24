@@ -36,7 +36,7 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     private ItemCategory itemParentCategory;
 
-    @Column(unique = true, name = "code")
+    @Column(name = "code")
     private String code;
 
     private String name;
