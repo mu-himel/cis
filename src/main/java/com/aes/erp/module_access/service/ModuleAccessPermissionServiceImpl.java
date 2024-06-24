@@ -83,7 +83,8 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
                 .collect(Collectors.toList());
 
         if(roles.contains("ROLE_SYS_ADMIN")){
-            return moduleAccessService.getAllModules();
+            List<?> menus = moduleAccessService.getAllModules();
+            return menus;
         }
 //        else if(roles.contains("ROLE_VENDOR")){
 //            List<ModuleAccessRepository.ModuleAccessInfo> allModules = (List<ModuleAccessRepository.ModuleAccessInfo>) moduleAccessService.getAllModules();
@@ -674,37 +675,38 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
         if(count==0){
         // ADD PERMISSION FOR VENDOR ROLE_NODE
             addPermission(1L,4L,2L,true);
-            addPermission(1L,4L,16L,true);
             addPermission(1L,4L,17L,true);
             addPermission(1L,4L,18L,true);
             addPermission(1L,4L,19L,true);
             addPermission(1L,4L,20L,true);
             addPermission(1L,4L,21L,true);
             addPermission(1L,4L,22L,true);
+            addPermission(1L,4L,23L,true);
 
             // ADD PERMISSION FOR ENLISTER ROLE_NODE
-            addPermission(1L,2L,11L,true);
-            addPermission(1L,2L,12L,true);
-            addPermission(1L,2L,13L,true);
-            addPermission(1L,2L,14L,false);
-            addPermission(1L,2L,15L,true);
             addPermission(1L,2L,3L,true);
             addPermission(1L,2L,9L,true);
+            addPermission(1L,2L,12L,true);
+            addPermission(1L,2L,13L,true);
+            addPermission(1L,2L,14L,true);
+            addPermission(1L,2L,15L,false);
+            addPermission(1L,2L,16L,true);
+            
 
             // ADD PERMISSION FOR AUDITOR ROLE_NODE
-            addPermission(1L,3L,11L,true);
             addPermission(1L,3L,12L,true);
-            addPermission(1L,3L,13L,false);
-            addPermission(1L,3L,14L,true);
-            addPermission(1L,2L,15L,true);
+            addPermission(1L,3L,13L,true);
+            addPermission(1L,3L,14L,false);
+            addPermission(1L,3L,15L,true);
+            addPermission(1L,2L,16L,true);
 
             // ADD PERMISSION FOR INVENTORY CONTROLLER
             addPermission(1L,5L,3L,true);
             addPermission(1L,5L,5L,true);
             addPermission(1L,5L,6L,true);
             addPermission(1L,5L,7L,true);
-            addPermission(1L,5L,23L,true);
-            addPermission(1L,5L,24L,true);
+            addPermission(1L,5L,8L,true);
+            addPermission(1L,5L,11L,true);
         
         }
     }
