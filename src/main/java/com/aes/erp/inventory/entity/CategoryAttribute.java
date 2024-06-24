@@ -21,7 +21,7 @@ public class CategoryAttribute {
     // @Enumerated(EnumType.STRING)
     private String attributeUnit;
 
-    @Column(length = 500)
+    @Column(length = 5000)
     private String attributeValue;
 
     @ManyToOne(fetch = FetchType.EAGER)
