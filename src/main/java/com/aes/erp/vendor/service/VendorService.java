@@ -67,12 +67,13 @@ public interface VendorService {
     Vendor getById(Long id);
 
 
-    Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size,
+    Page<?> getVendors(Optional<Integer> page, Optional<Integer> size,
                                Optional<String> name,
                                Optional<String> email,
                                Optional<String> phone,
                                Optional<String> vendorType,
-                               Optional<String> vendorStatus
+                               Optional<String> vendorStatus,
+                               String vStatus
                                );
 
     VendorDetailsDto getAllDetailsOfVendor(Long vendorId);

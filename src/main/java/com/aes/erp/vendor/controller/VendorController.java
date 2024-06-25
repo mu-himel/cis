@@ -108,7 +108,7 @@ public class VendorController {
         );
     }
 
-    @GetMapping("/complete")
+    @GetMapping("/approved")
     public ResponseEntity<?> getApprovedVendors(
             @RequestParam("page") Optional<Integer> page,
             @RequestParam("size") Optional<Integer> size,
@@ -119,7 +119,23 @@ public class VendorController {
             @RequestParam("vendorStatus") Optional<String> vendorStatus
     ){
         return new ResponseEntity<>(
-                vendorService.getApprovedVendors(page,size,name,email,phone,vendorType,vendorStatus),
+                vendorService.getVendors(page,size,name,email,phone,vendorType,vendorStatus,"APPROVED"),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/complete")
+    public ResponseEntity<?> getCompleteVendors(
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("name") Optional<String> name,
+            @RequestParam("email") Optional<String> email,
+            @RequestParam("phone") Optional<String> phone,
+            @RequestParam("vendorType") Optional<String> vendorType,
+            @RequestParam("vendorStatus") Optional<String> vendorStatus
+    ){
+        return new ResponseEntity<>(
+                vendorService.getVendors(page,size,name,email,phone,vendorType,vendorStatus,"REJECTED"),
                 HttpStatus.OK
         );
     }
