@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.aes.erp.inventory.dto.request.bulk_gen.SearchAttributeDto;
 import com.aes.erp.inventory.dto.request.bulk_gen.SearchInactiveProduct;
 import com.aes.erp.inventory.dto.response.TempItemResponse;
+import com.aes.erp.inventory.entity.Brand;
 
 @Service
 public class TempItemServiceImpl implements TempItemService{
@@ -46,6 +47,7 @@ public class TempItemServiceImpl implements TempItemService{
         Query q = entityManager.createNativeQuery(sql, "TempItemRes");
         List<TempItemResponse>  tempItemResponses = q.getResultList();
         List<TempItemResponse> filteredTempItems = new ArrayList<>();
+        List<TempItemResponse> brandFilteredTempItems = new ArrayList<>();
         for(TempItemResponse itemResponse : tempItemResponses){
             String itemName = itemResponse.getItemAttributeName();
             int matchCount = 0;
@@ -59,7 +61,19 @@ public class TempItemServiceImpl implements TempItemService{
                 filteredTempItems.add(itemResponse);
             }
         }
-        return filteredTempItems;
+
+        if(searchInactiveProduct.getBrands()!=null && searchInactiveProduct.getBrands().size()>0){
+            for(Brand b : searchInactiveProduct.getBrands()){
+                for(TempItemResponse fi : filteredTempItems){
+                    if(fi.getBrandName().equals(b.getName())){
+                        brandFilteredTempItems.add(fi);
+                    }
+                }
+            }
+        }
+        
+        
+        return brandFilteredTempItems;
 
 
     }
