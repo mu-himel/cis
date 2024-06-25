@@ -278,11 +278,11 @@ public class VendorServiceImpl implements VendorService {
                                       Optional<String> phone,
                                       Optional<String> vendorType,
                                       Optional<String> vendorStatus,
-                                      String vStatus
+                                      VendorDocumentVerificationStatus vStatus
                                       ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
-        List<String> verificationStatus = new ArrayList<>();
+        List<VendorDocumentVerificationStatus> verificationStatus = new ArrayList<>();
         verificationStatus.add(vStatus);
         return vendorRepository.findAllVendorForComplete(
                 name.orElse(null),

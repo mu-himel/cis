@@ -9,6 +9,7 @@ import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorFile;
+import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
@@ -73,7 +74,7 @@ public interface VendorService {
                                Optional<String> phone,
                                Optional<String> vendorType,
                                Optional<String> vendorStatus,
-                               String vStatus
+                               VendorDocumentVerificationStatus vStatus
                                );
 
     VendorDetailsDto getAllDetailsOfVendor(Long vendorId);

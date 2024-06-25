@@ -6,6 +6,7 @@ import com.aes.erp.vendor.dto.VendorDto;
 import com.aes.erp.vendor.dto.VendorProfileDto;
 import com.aes.erp.vendor.dto.VendorScoreDto;
 import com.aes.erp.vendor.entity.VendorFile;
+import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.service.VendorService;
 
@@ -119,7 +120,8 @@ public class VendorController {
             @RequestParam("vendorStatus") Optional<String> vendorStatus
     ){
         return new ResponseEntity<>(
-                vendorService.getVendors(page,size,name,email,phone,vendorType,vendorStatus,"APPROVED"),
+                vendorService.getVendors(page,size,name,email,phone,vendorType,vendorStatus,
+                VendorDocumentVerificationStatus.APPROVED),
                 HttpStatus.OK
         );
     }
@@ -135,7 +137,8 @@ public class VendorController {
             @RequestParam("vendorStatus") Optional<String> vendorStatus
     ){
         return new ResponseEntity<>(
-                vendorService.getVendors(page,size,name,email,phone,vendorType,vendorStatus,"REJECTED"),
+                vendorService.getVendors(page,size,name,email,phone,vendorType,vendorStatus,
+                VendorDocumentVerificationStatus.REJECTED),
                 HttpStatus.OK
         );
     }
