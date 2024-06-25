@@ -1,7 +1,5 @@
 package com.aes.erp.inventory.controller;
 
-import com.aes.erp.inventory.entity.CategoryAttribute;
-import com.aes.erp.inventory.enums.AttributeUnit;
 import com.aes.erp.inventory.repository.AttributeUnitRepository;
 import com.aes.erp.inventory.service.CategoryAttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +34,8 @@ public class AttributeController {
 
     @GetMapping("/units")
     public ResponseEntity<?> getAttributeUnits(){
-        List<String> attributes = attributeUnitRepository.findAll().stream().map(attributeUnit -> {
+        
+        List<String> attributes = attributeUnitRepository.findAllByOrderByNameAsc().stream().map(attributeUnit -> {
             return attributeUnit.getName();
         }).collect(Collectors.toList());
         return new ResponseEntity<>(
