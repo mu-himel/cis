@@ -132,7 +132,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                                             @Param("phone") String phone,
                                             @Param("vendorType") String vendorType,
                                             @Param("vendorStatus") String vendorStatus,
-                                            @Param("verificationStatus") List<String> verificationStatus,
+                                            @Param("verificationStatus") List<VendorDocumentVerificationStatus> verificationStatus,
                                             Pageable pageable);
 
 
