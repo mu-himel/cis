@@ -272,21 +272,25 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public Page<?> getApprovedVendors(Optional<Integer> page, Optional<Integer> size,
+    public Page<?> getVendors(Optional<Integer> page, Optional<Integer> size,
                                       Optional<String> name,
                                       Optional<String> email,
                                       Optional<String> phone,
                                       Optional<String> vendorType,
-                                      Optional<String> vendorStatus
+                                      Optional<String> vendorStatus,
+                                      String vStatus
                                       ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
+        List<String> verificationStatus = new ArrayList<>();
+        verificationStatus.add(vStatus);
         return vendorRepository.findAllVendorForComplete(
                 name.orElse(null),
                 email.orElse(null),
                 phone.orElse(null),
                 vendorType.orElse(null),
                 vendorStatus.orElse(null),
+                verificationStatus,
                 pageable);
     }
 

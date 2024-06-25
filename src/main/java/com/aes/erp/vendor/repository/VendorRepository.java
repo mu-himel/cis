@@ -110,21 +110,21 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
     @Query(value = "SELECT v FROM Vendor v " +
             " LEFT JOIN FETCH v.vendorType vt " +
             " LEFT JOIN FETCH v.category c " +
-            " WHERE v.verificationStatus IN ('APPROVED','REJECTED')" +
+            " WHERE v.verificationStatus IN (:verificationStatus)" +
             "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
             "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
             "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
             "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
-            "   AND (:vendorStatus IS NULL OR v.verificationStatus IN ('APPROVED'))",
+            "   AND (:vendorStatus IS NULL OR v.verificationStatus IN (:vendorStatus))",
             countQuery =  "SELECT count(v) FROM Vendor v " +
                     " LEFT JOIN v.vendorType vt " +
                     " LEFT JOIN v.category c " +
-                    " WHERE v.verificationStatus IN ('APPROVED','REJECTED')" +
+                    " WHERE v.verificationStatus IN (:verificationStatus)" +
                     "   AND (:name IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
                     "   AND (:phone IS NULL OR LOWER(v.phone) LIKE LOWER(CONCAT('%', :phone, '%'))) " +
                     "   AND (:email IS NULL OR LOWER(v.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
                     "   AND (:vendorType IS NULL OR vt.name = :vendorType) " +
-                    "   AND (:vendorStatus IS NULL OR v.verificationStatus IN ('APPROVED'))"
+                    "   AND (:vendorStatus IS NULL OR v.verificationStatus IN (:vendorStatus))"
     )
     Page<VendorInfo> findAllVendorForComplete(
                                             @Param("name") String name,
@@ -132,6 +132,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                                             @Param("phone") String phone,
                                             @Param("vendorType") String vendorType,
                                             @Param("vendorStatus") String vendorStatus,
+                                            @Param("verificationStatus") List<String> verificationStatus,
                                             Pageable pageable);
 
 
