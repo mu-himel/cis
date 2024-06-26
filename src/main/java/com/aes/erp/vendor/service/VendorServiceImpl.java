@@ -23,6 +23,7 @@ import com.aes.erp.vendor.service.DocumentHolderServices.DocumentHolderService;
 import com.aes.erp.vendor.utils.EmailSenderUtil;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -68,6 +69,8 @@ public class VendorServiceImpl implements VendorService {
     private final CategoryService categoryService;
     private final GeneralDetailsRepository generalDetailsRepository;
 
+    @Value("${cps.frontend}")
+    private String cpsFrontendLink;
 
 
     public VendorServiceImpl(EmailSenderUtil emailSenderUtil, VendorSubCategoryRepository vendorSubCategoryRepository, GenericModelMapper modelMapper, VendorTypeService vendorTypeService, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
@@ -93,6 +96,10 @@ public class VendorServiceImpl implements VendorService {
         if(!vendorDto.getPhone().isEmpty()){
             if(vendorDto.getPhone().matches("[a-zA-Z]")){
                 throw new AesException("phone number should not contain alphabets");
+            }
+
+            if(vendorRepository.existsByPhone(vendorDto.getPhone())){
+                throw new AesException("Sorry! Vendor exist with this phone number");
             }
         }
         
@@ -131,8 +138,9 @@ public class VendorServiceImpl implements VendorService {
         if(superAdminUser!=null){
             senderBody.addReceipent(superAdminUser.getEmailAddress());
         }
-
-        senderBody.setContent(senderBody.getContent() +  "Email: " + vendorDto.getEmail() + "\n" + "Password: " + vendorDto.getPassword());
+   
+        
+        senderBody.setContent("<p>"+senderBody.getContent()+"</p><p>" +  "Email: " + vendorDto.getEmail() +" " + "Password: " + vendorDto.getPassword()+"</p><p>Please visit <a href=\""+cpsFrontendLink+"\">here</a> to login");
         emailSenderUtil.sendMail(senderBody);
     }
 

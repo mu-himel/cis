@@ -686,6 +686,7 @@ public class ModuleAccessPermissionServiceImpl extends AbstractModuleAccessFilte
             // ADD PERMISSION FOR ENLISTER ROLE_NODE
             addPermission(1L,2L,3L,true);
             addPermission(1L,2L,9L,true);
+            addPermission(1L,2L,10L,true);
             addPermission(1L,2L,12L,true);
             addPermission(1L,2L,13L,true);
             addPermission(1L,2L,14L,true);

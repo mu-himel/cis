@@ -8,10 +8,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +28,8 @@ public class EmailSenderUtil {
     private final RestTemplate restTemplate;
     private final String emailUrl = "/mail/send-email";
 
+    
+
     @Autowired
     private EmailConfig emailConfig;
 
@@ -33,6 +37,8 @@ public class EmailSenderUtil {
     public EmailSenderUtil(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
+
+    @Async
     public void sendMail(VendorRegistrationMailSender mailBody){
         ObjectMapper objectMapper = new ObjectMapper();
         EmailLoginDto dto = new EmailLoginDto();
@@ -56,6 +62,8 @@ public class EmailSenderUtil {
             HttpEntity<VendorRegistrationMailSender> requestEntity = new HttpEntity<>(mailBody, headers);
             ResponseEntity<String> responseMail = restTemplate.postForEntity(
                     emailConfig.getAddress().concat(emailUrl), requestEntity, String.class);
+                    System.out.println(responseMail.getStatusCode());
+                    System.out.println(responseMail.getBody());
         }catch (Exception e){
             e.printStackTrace();
             throw new AesException("Error occurred while sending the confirmation mail to created vendor");

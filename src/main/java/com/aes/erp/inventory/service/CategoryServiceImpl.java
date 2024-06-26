@@ -94,6 +94,11 @@ public class CategoryServiceImpl implements CategoryService {
         if(categoryRepository.existsByCode(category.getCode())){
             throw new AesException("Category code already exist");
         }
+
+        if(categoryRepository.existsByNameAndActive(category.getName(),true)){
+            throw new AesException("Sorry! Category Name already exist");
+        }
+
         if(categoryRequestDto.getParentCategory() != null){
             Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(categoryRequestDto.getParentCategory().getId());
             if(itemCategoryOptional.isPresent()) category.setParentCategory(itemCategoryOptional.get());

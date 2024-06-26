@@ -143,7 +143,7 @@ public class ModuleAccessServiceImpl implements ModuleAccessService{
             ModuleAccess pendingProductRequest = new ModuleAccess();
             pendingProductRequest.setId(11L);
             pendingProductRequest.setDisplayOrder(10);
-            pendingProductRequest.setName("Pending Prdouct Request");
+            pendingProductRequest.setName("Pending Product Request");
             pendingProductRequest.setRoute("control-panel/pending-product-request");
             pendingProductRequest.setUri("control-panel/pending-product-request");
             pendingProductRequest.setModuleType(ModuleType.CHILD);
