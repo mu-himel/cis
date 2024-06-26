@@ -70,10 +70,11 @@ public class TempItemServiceImpl implements TempItemService{
                     }
                 }
             }
+            return brandFilteredTempItems;
         }
         
         
-        return brandFilteredTempItems;
+        return filteredTempItems;
 
 
     }

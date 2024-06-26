@@ -238,6 +238,8 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         CategoryInfo getCategory();
 //        List<VendorSubCategory> getVendorSubCategories();
     }
+    
+    Boolean existsByPhone(String phone);
 
 
 }

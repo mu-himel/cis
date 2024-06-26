@@ -25,8 +25,10 @@ public class NidResponseDto {
     private String fatherName;
     private String motherName;
     private String banglaName;
-    @JsonProperty("Error")
+    @JsonProperty("message")
     private String error;
+    @JsonProperty("status")
+    private String status;
 
     public NIDDocument dtoToEntityMapping(NidResponseDto dto, NIDDocument nidDocument){
         if(!dto.getNidNumber().isEmpty())nidDocument.setNid(dto.getNidNumber());

@@ -186,9 +186,11 @@ public class DataSeed implements CommandLineRunner {
         Long count = vendorTypeService.getVendorTypeCount();
         if(count == 0){
             vendorTypeService.createVendorType(new VendorTypeCreateDto("MANUFACTURER"));
-            vendorTypeService.createVendorType(new VendorTypeCreateDto("SUPPLIER"));
-            vendorTypeService.createVendorType(new VendorTypeCreateDto("GENERAL"));
-            vendorTypeService.createVendorType(new VendorTypeCreateDto("TRADER"));
+            // vendorTypeService.createVendorType(new VendorTypeCreateDto("SUPPLIER"));
+            // vendorTypeService.createVendorType(new VendorTypeCreateDto("GENERAL"));
+            // vendorTypeService.createVendorType(new VendorTypeCreateDto("TRADER"));
+            vendorTypeService.createVendorType(new VendorTypeCreateDto("DISTRIBUTOR"));
+            vendorTypeService.createVendorType(new VendorTypeCreateDto("DEALER"));
             vendorTypeService.createVendorType(new VendorTypeCreateDto("SERVICE PROVIDER"));
             vendorTypeService.createVendorType(new VendorTypeCreateDto("CONTRACTOR"));
         }

@@ -93,7 +93,8 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
     Optional<Long> countAllByParentCategoryAndActive(ItemCategory itemCategory,Boolean active);
 
-    boolean existsByCode(String code);
+    Boolean existsByCode(String code);
+    Boolean existsByNameAndActive(String name, Boolean active);
 
     @Query(value = "SELECT ic.id as id, ic.name as name, ic.code as code FROM ItemCategory ic " +
             "WHERE ic.active = 1 AND ic.parentCategory IS NULL " +
@@ -202,4 +203,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     """)
     List<ItemCategory> findAllSubCategories(@Param("categoryId") Long categoryId,
     @Param("subCategoryId") Long subCategoryId);
+
+
+    
 }
