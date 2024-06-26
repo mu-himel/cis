@@ -23,6 +23,8 @@ public class TinResponseDto {
     private String permanentAddress;
     private String previousTin;
     private String tinNumber;
+    @JsonProperty(value = "date")
+    private String date;
     private String tinStatus;
     @JsonProperty("Error")
     private String error;
