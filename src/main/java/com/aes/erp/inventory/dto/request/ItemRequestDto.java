@@ -41,7 +41,7 @@ public class ItemRequestDto implements EntityConvertable<Item> {
     private ItemCategory itemCategory;
     private ItemCategory itemParentCategory;
 
-    private ItemUnit itemUnit;
+    private String itemUnit;
 
     private Integer stockThresholdQty;
 
