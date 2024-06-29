@@ -2,6 +2,7 @@ package com.aes.erp.vendor.document_response_dto;
 
 import com.aes.erp.vendor.entity.DocmentEntities.NIDDocument;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,8 +26,10 @@ public class NidResponseDto {
     private String fatherName;
     private String motherName;
     private String banglaName;
+    // @JsonIgnore
     @JsonProperty("message")
     private String error;
+    // @JsonIgnore
     @JsonProperty("status")
     private String status;
 

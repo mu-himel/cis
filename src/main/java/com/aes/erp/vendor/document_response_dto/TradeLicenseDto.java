@@ -84,8 +84,11 @@ public class TradeLicenseDto {
     private String error;
 
     public TradeDocument dtoToEntityMapping(TradeLicenseDto dto, TradeDocument tradeDocument){
-        if(dto.getIssueDate() != null)tradeDocument.setIssueDate(getTimestamp(dto.getIssueDate(), "dd MMM yyyy"));
-        if(!dto.getNidPassportNo().isEmpty())tradeDocument.setNid(dto.getNidPassportNo());
+        if(dto.getIssueDate() != null && !(dto.getIssueDate().equals("null") || dto.getIssueDate().equals("")))
+        {
+            tradeDocument.setIssueDate(getTimestamp(dto.getIssueDate(), "dd MMM yyyy"));
+        }
+        if(dto.getNidPassportNo()!=null && !dto.getNidPassportNo().isEmpty())tradeDocument.setNid(dto.getNidPassportNo());
         // if(!dto.getMobileNo().isEmpty())tradeDocument.setMobileNo(dto.getMobileNo());
         if(!dto.getPhone().isEmpty())tradeDocument.setMobileNo(dto.getPhone());
         if(!dto.getTradeLicenseNo().isEmpty())tradeDocument.setTradeLicenseNumber(dto.getTradeLicenseNo());
