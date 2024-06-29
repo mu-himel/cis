@@ -1,7 +1,6 @@
 package com.aes.erp.inventory.repository;
 
 import com.aes.erp.inventory.entity.Item;
-import com.aes.erp.inventory.entity.ItemCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
