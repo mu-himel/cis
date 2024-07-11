@@ -45,6 +45,11 @@ public class Item {
 
     private Boolean isSyncronized;
 
+    @ManyToOne
+    private Organization organization;
+
+    private Long scmItemId;
+
     public Item(Long id) {
         this.id = id;
     }

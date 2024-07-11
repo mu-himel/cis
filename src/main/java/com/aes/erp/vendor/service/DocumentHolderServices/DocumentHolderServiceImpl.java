@@ -80,12 +80,14 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             responseDto.setId(documentHolder.getId());
             responseDto.setMsg("Document Holder Created");
             responseDto.setDocumentHolderStatus(documentHolder.getDocumentHolderStatus());
+            responseDto.setCategory(vendor.getCategories());
             return responseDto;
         }
         else{
             DocumentHolder documentHolder = vendorOptional.get().getDocumentHolder();
             responseDto.setMsg("Document Holder Already Exists");
             responseDto.setId(documentHolder.getId());
+            responseDto.setCategory(vendorOptional.get().getCategories());
             responseDto.setDocumentHolderStatus(documentHolder.getDocumentHolderStatus());
 //            if (documentHolder.getDocumentList() != null && !documentHolder.getDocumentList().isEmpty()) {
 //                responseDto.setDocumentsList(new HashSet<>(documentHolder.getDocumentList()));
@@ -285,6 +287,9 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         vendorRepository.save(vendor);
     }
 
+
+    
+
     private DocumentHolderResponseDto mapEntityToDTO(DocumentHolder documentHolder, Vendor vendor) {
         DocumentHolderResponseDto responseDto = new DocumentHolderResponseDto();
         responseDto.setDocumentHolderStatus(documentHolder.getDocumentHolderStatus());
@@ -313,8 +318,8 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         Optional<GeneralDetails> generalDetails = generalDetailsRepository.findByDocumentHolderId(documentHolder.getId());
         generalDetails.ifPresent(responseDto::setGeneralDetails);
         if(vendor != null){
-            if(vendor.getCategory() != null){
-                responseDto.setCategory(vendor.getCategory().getName());
+            if(vendor.getCategories() != null){
+                responseDto.setCategory(vendor.getCategories());
             }
             if(vendor.getVendorType() != null){
                 responseDto.setVendorType(vendor.getVendorType().getName());

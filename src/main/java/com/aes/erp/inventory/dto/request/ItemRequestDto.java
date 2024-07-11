@@ -28,6 +28,7 @@ public class ItemRequestDto implements EntityConvertable<Item> {
 
     private Long orgId;
     private Long warehouseId;
+    private Long scmItemId;
 
     @NotBlank(message = "name is required")
     @ApiModelProperty(required = true)

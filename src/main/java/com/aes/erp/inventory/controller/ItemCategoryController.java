@@ -9,6 +9,7 @@ import com.aes.erp.inventory.service.CategoryService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -157,9 +158,16 @@ public class ItemCategoryController {
 
     @PostMapping
     @ApiOperation(value = "Create a new Item Category")
-    public ResponseEntity<?> createItemCategory(@RequestBody @Valid CategoryRequestDto categoryRequestDto){
-        categoryService.addCategory(categoryRequestDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<?> createItemCategory(
+        @RequestAttribute("organization") Organization organization,
+        @RequestBody @Valid CategoryRequestDto categoryRequestDto){
+            if(organization!=null){
+                categoryRequestDto.setOrganization(organization);
+            }
+        Long id = categoryService.addCategory(categoryRequestDto);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("id",id.toString());
+        return new ResponseEntity<>(headers,HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

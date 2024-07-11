@@ -3,6 +3,8 @@ package com.aes.erp.inventory.dto.request;
 import com.aes.erp.common.EntityConvertable;
 import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +19,7 @@ import java.util.Optional;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(value = {"currentYearBudget","budgetId","requestedBy","entity"})
 public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
 
     private Long id;
@@ -36,10 +39,14 @@ public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
 
     private BigDecimal vat;
 
+    private Organization organization;
+
     private ReferenceObjectDto warehouse;
     private ReferenceObjectDto warehouseStore;
 
     private Long cpsCategoryId;
+
+    private Long scmCategoryId;
 
     @Override
     @ApiModelProperty(hidden = true)

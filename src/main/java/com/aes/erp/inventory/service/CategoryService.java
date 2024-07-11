@@ -15,7 +15,9 @@ import java.util.Optional;
 
 public interface CategoryService {
 
-    void addCategory(CategoryRequestDto categoryRequestDto);
+    
+
+    Long addCategory(CategoryRequestDto categoryRequestDto);
     ItemCategory addCategoryFromCategoryEntity(ItemCategory itemCategory);
 
     void updateCategory(Long id,CategoryRequestDto categoryRequestDto);

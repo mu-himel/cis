@@ -89,8 +89,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
     @Override
     @Transactional
-    public void addCategory(CategoryRequestDto categoryRequestDto) {
+    public Long addCategory(CategoryRequestDto categoryRequestDto) {
         ItemCategory category = categoryRequestDto.getEntity();
+
+        if(categoryRequestDto.getOrganization()!=null){
+            category.setOrganization(categoryRequestDto.getOrganization());
+        }
         if(categoryRepository.existsByCode(category.getCode())){
             throw new AesException("Category code already exist");
         }
@@ -120,9 +124,15 @@ public class CategoryServiceImpl implements CategoryService {
                 return categoryAttribute;
             }).collect(Collectors.toList()));
         }
+        if(categoryRequestDto.getScmCategoryId()!=null){
+            category.setScmCategoryId(categoryRequestDto.getScmCategoryId());
+        }
+
+
         category.setCreatedAt(Instant.now().toEpochMilli());
         categoryRepository.save(category);
         addBrandToSubCategory(categoryRequestDto, category);
+        return category.getId();
     }
 
     @Override

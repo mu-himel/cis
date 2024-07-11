@@ -51,6 +51,11 @@ public class ItemCategory {
 
   private BigDecimal vat;
 
+  @ManyToOne
+  private Organization organization;
+
+  private Long scmCategoryId;
+
   @Column(updatable = false)
   private Long createdAt;
 
