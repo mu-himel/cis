@@ -159,10 +159,10 @@ public class ItemCategoryController {
     @PostMapping
     @ApiOperation(value = "Create a new Item Category")
     public ResponseEntity<?> createItemCategory(
-        @RequestAttribute("organization") Organization organization,
+        @RequestAttribute("organization") Optional<Organization> organization,
         @RequestBody @Valid CategoryRequestDto categoryRequestDto){
-            if(organization!=null){
-                categoryRequestDto.setOrganization(organization);
+            if(organization!=null && organization.isPresent()){
+                categoryRequestDto.setOrganization(organization.get());
             }
         Long id = categoryService.addCategory(categoryRequestDto);
         HttpHeaders headers = new HttpHeaders();

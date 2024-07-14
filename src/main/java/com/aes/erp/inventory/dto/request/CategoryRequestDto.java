@@ -5,6 +5,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,12 +35,15 @@ public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
     private ItemCategory parentCategory;
 
     private List<CategoryAttribute> attributes;
+
+    @JsonProperty(value = "brands")
     private List<String> brands;
+
     private StoreType storeType;
 
     private BigDecimal vat;
 
-    private Organization organization;
+    private Organization organization = null;
 
     private ReferenceObjectDto warehouse;
     private ReferenceObjectDto warehouseStore;
