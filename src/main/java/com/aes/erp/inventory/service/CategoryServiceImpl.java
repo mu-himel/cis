@@ -416,6 +416,7 @@ public class CategoryServiceImpl implements CategoryService {
                     ca.setAttributeUnit(ica.getAttributeUnit());
                     return ca;
                 }).collect(Collectors.toList()));
+                catReqDto.setIsForCps(false);
                 catReqDto.setCode(itemCategory.getCode());
                 catReqDto.setName(itemCategory.getName());
                 if(parentCategoryId==null){
@@ -431,6 +432,7 @@ public class CategoryServiceImpl implements CategoryService {
                         return sb.getBrand().getName();
                     }).toList());
                 }
+
                 catReqDto.setCpsCategoryId(itemCategory.getId());
                 categoryList.add(catReqDto);
             }

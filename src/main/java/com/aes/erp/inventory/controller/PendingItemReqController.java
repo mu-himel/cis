@@ -41,7 +41,7 @@ public class PendingItemReqController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getPendingItemReqeusts(
+    public ResponseEntity<?> getPendingItemRequests(
         @RequestParam("page") Optional<Integer> page,
         @RequestParam("size") Optional<Integer> size 
     ){

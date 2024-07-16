@@ -79,7 +79,8 @@ public interface CategoryService {
     List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name);
 
     Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId, String attributeType);
-    void bulkImport(String token, Organization org, Long userId, Long warehouseId, Long storeId,Long parentCategoryId, List<Long> id);
+    void bulkImport(String token, Organization org, Long userId, Long warehouseId, Long storeId,Long parentCategoryId,
+                    List<Long> id);
     List<ItemCategory> getAllSubCategories(Long categoryId, Long subCategoryId);
 
     List<SubCategoryBrand> getBrandsByCategoryId(Long id);
