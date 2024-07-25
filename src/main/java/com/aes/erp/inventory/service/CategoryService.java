@@ -95,4 +95,5 @@ public interface CategoryService {
 
     Integer getProductQtyByCategoryAndSubCategory(Long catId, Long subCatId);
     void mergePendingCategory(Long id, MergePendingCategoryDto mergePendingCategoryDto);
+    public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code);
 }

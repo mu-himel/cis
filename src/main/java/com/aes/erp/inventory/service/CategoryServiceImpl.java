@@ -289,6 +289,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code) {
+        return categoryRepository.findAllItemCategory(name.orElse(null),code.orElse(null));
+    }
+
+    @Override
     public Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
                                       Optional<String> name, Optional<String> code,
                                       Optional<BigDecimal> currentYearBudget, Optional<Long> productCount,

@@ -261,4 +261,15 @@ public class ItemCategoryController {
     public ResponseEntity<?> mergePendingCategory(@PathVariable Long id, @RequestBody MergePendingCategoryDto mergePendingCategoryDto){
         return new ResponseEntity<>(null);
     }
+
+    @GetMapping("/main-categories/all")
+    public ResponseEntity<?> getAllMainCategoryList(
+                                                 @RequestParam("name") Optional<String> name,
+                                                 @RequestParam("code") Optional<String> code
+                                                 ){
+        return new ResponseEntity<>(
+                categoryService.getAllItemCategoryList(name,code),
+                HttpStatus.OK
+        );
+    }
 }
