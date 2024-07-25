@@ -171,12 +171,14 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     Page<PendingItemCategoryListInfo> findAllPendingItemCategories(String name, String code, Pageable pageable);
 
     @Query(value = """
-            SELECT ic.id as id, ic.created_at as createdAt, ic.requester_name as requestedBy, o.name as organization, ic.name as category,
+            SELECT ic.id as id, ic.created_at as createdAt, ic.requester_name as requestedBy, 
+            o.name as organization, ic.name as category, ipc.name as parentCategory,
             0 as subCategoryQty, 
             (SELECT count(*) FROM pending_item_requests pir 
             WHERE pir.sub_category_id = ic.id) as productQty
             FROM item_categories ic
             LEFT JOIN organizations o ON o.id = ic.organization_id
+            LEFT JOIN item_categories ipc ON ipc.id = ic.parent_category_id
             WHERE ic.category_status IN ('PENDING')
             AND ic.parent_category_id IS NOT NULL
             AND (:parentId IS NULL OR ic.parent_category_id = :parentId)
@@ -204,6 +206,8 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
         String getRequestedBy();
         String getOrganization();
         String getCategory();
+
+        String getParentCategory();
         Integer getSubCategoryQty();
         Integer getProductQty();
     }
