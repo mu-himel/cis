@@ -4,6 +4,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.BulkCategoryRequestDto;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
@@ -26,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -517,5 +519,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Integer getProductQtyByCategoryAndSubCategory(Long catId, Long subCatId) {
         return categoryRepository.findProductCountByCategoryId(catId, subCatId);
+    }
+
+    @Override
+    public void mergePendingCategory(Long id, MergePendingCategoryDto mergePendingCategoryDto) {
+        ItemCategory getItemCategory = categoryRepository.findById(id).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
+        categoryRepository.delete(getItemCategory);
     }
 }

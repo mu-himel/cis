@@ -3,6 +3,7 @@ package com.aes.erp.inventory.controller;
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.ErpBulkImportDto;
+import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.service.CategoryService;
@@ -254,5 +255,10 @@ public class ItemCategoryController {
                 response,
                 HttpStatus.OK
         );
+    }
+
+    @PutMapping("/merge-pending-category/{id}")
+    public ResponseEntity<?> mergePendingCategory(@PathVariable Long id, @RequestBody MergePendingCategoryDto mergePendingCategoryDto){
+        return new ResponseEntity<>(null);
     }
 }
