@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PendingItemRequestDto implements EntityConvertable<PendingItemRequest>{
     private String subCategoryCode;
+    private Long scmItemId;
     private String brand;
     private String requestedBy;
     private String employeeId;

@@ -71,6 +71,7 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
         pir.setCategory(subCat.getParentCategory());
         pir.setBrand(brandOp.get());
         pir.setAttributes(pRequestDto.getAttributes().stream().map(pia->{
+            pia.setId(null);
             pia.setPendingItemRequest(pir);
             return pia;
         }).collect(Collectors.toList()));

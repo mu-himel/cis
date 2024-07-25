@@ -41,6 +41,22 @@ public class ItemCategoryController {
                 HttpStatus.OK
         );
     }
+
+    @GetMapping("/subcategories/pending")
+    @ApiOperation(value = "Get Pending SubCategories  With Pagination")
+    public ResponseEntity<?> getPendingSubCategoriesFilteredByStoreTypeAndParentCategory(
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("parentCategoryId")  Optional<Long> parentCategoryId,
+            @RequestParam("name") Optional<String> name,
+            @RequestParam("code") Optional<String> code
+    ){
+        return new ResponseEntity<>(
+                categoryService.getPendingSubCategoryList(
+                        parentCategoryId,name,code,page,size),
+                HttpStatus.OK
+        );
+    }
     @GetMapping
     @ApiOperation(value = "Get Item Categories Filtered By Store Type ID, With Pagination")
     public ResponseEntity<?> getItemCategoriesForStoreType(@RequestParam("page") Optional<Integer> page,
@@ -83,6 +99,20 @@ public class ItemCategoryController {
                 HttpStatus.OK
         );
     }
+
+    @GetMapping("/main-categories/pending")
+    public ResponseEntity<?> getPendingMainCategoryList(
+                                                @RequestParam("page") Optional<Integer> page,
+                                                @RequestParam("size") Optional<Integer> size,
+                                                 @RequestParam("name") Optional<String> name,
+                                                 @RequestParam("code") Optional<String> code
+    ){
+        return new ResponseEntity<>(
+                categoryService.getPendingItemCategoryList(name,code,page,size),
+                HttpStatus.OK
+        );
+    }
+
     @GetMapping("/list")
     public ResponseEntity<?> getCategoryList(
             @RequestParam("categoryId")  Optional<Long> categoryId,
@@ -116,8 +146,8 @@ public class ItemCategoryController {
         );
     }
 
-    private static Map<String, Object> entityToMap(ItemCategory itemCategory) {
-        Map<String,Object> subCategory  = new HashMap<>();
+    private  Map<String, Object> entityToMap(ItemCategory itemCategory) {
+        Map<String,Object> catDetail  = new HashMap<>();
         Map<String,Object> parentCategory =null;
         if(itemCategory.getParentCategory()!=null){
             parentCategory = new HashMap<>();
@@ -132,18 +162,36 @@ public class ItemCategoryController {
             sbmap.put("brand",sb.getBrand());
             return sbmap;
         }).collect(Collectors.toList());
-        subCategory.put("id", itemCategory.getId());
-        subCategory.put("name", itemCategory.getName());
-        subCategory.put("code", itemCategory.getCode());
-        subCategory.put("parentCategory",parentCategory);
-        // subCategory.put("storeType", itemCategory.getStoreType());
-        subCategory.put("budgets", itemCategory.getBudgets());
-        subCategory.put("attributes", itemCategory.getAttributes());
-        subCategory.put("active", itemCategory.getActive());
-        subCategory.put("vat", itemCategory.getVat());
-        subCategory.put("createdAt", itemCategory.getCreatedAt());
-        subCategory.put("subcategoryBrands", subcategoryBrands);
-        return subCategory;
+        catDetail.put("id", itemCategory.getId());
+        catDetail.put("name", itemCategory.getName());
+        catDetail.put("categoryStatus",itemCategory.getCategoryStatus());
+        catDetail.put("employee", itemCategory.getRequesterName());
+        catDetail.put("organization", itemCategory.getOrganization());
+        catDetail.put("code", itemCategory.getCode());
+        Long subCatId=null;
+        Long catId=null;
+        if(itemCategory.getParentCategory()==null){
+            catId = itemCategory.getId();
+            catDetail.put("subCategoryQty",categoryService.getSubCategoryCount(itemCategory.getId()));
+        }
+
+        if(itemCategory.getParentCategory()!=null){
+            subCatId = itemCategory.getId();
+            catId = itemCategory.getParentCategory().getId();
+        }
+
+
+
+        catDetail.put("productQty", categoryService.getProductQtyByCategoryAndSubCategory(catId,subCatId));
+        catDetail.put("parentCategory",parentCategory);
+        catDetail.put("storeType", itemCategory.getStoreType());
+        catDetail.put("budgets", itemCategory.getBudgets());
+        catDetail.put("attributes", itemCategory.getAttributes());
+        catDetail.put("active", itemCategory.getActive());
+        catDetail.put("vat", itemCategory.getVat());
+        catDetail.put("createdAt", itemCategory.getCreatedAt());
+        catDetail.put("subcategoryBrands", subcategoryBrands);
+        return catDetail;
     }
 
     @PostMapping("/bulk")

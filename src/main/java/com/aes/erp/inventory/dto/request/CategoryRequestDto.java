@@ -3,6 +3,7 @@ package com.aes.erp.inventory.dto.request;
 import com.aes.erp.common.EntityConvertable;
 import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.inventory.entity.*;
+import com.aes.erp.inventory.enums.CategoryStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -53,6 +54,12 @@ public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
     private Long cpsCategoryId;
 
     private Long scmCategoryId;
+
+    @JsonProperty(value = "createdBy")
+    private String requestedBy;
+
+    @JsonProperty(value = "categoryStatus")
+    private CategoryStatus categoryStatus;
 
     @Override
     @ApiModelProperty(hidden = true)

@@ -2,6 +2,11 @@ package com.aes.erp.inventory.repository;
 
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -149,6 +155,58 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             " AND LOWER(c.name) = :name")
     List<ItemCategory> findCategoryBySubCatNameIgnoreCase(@Param("name") String name);
 
+    @Query(value = """
+            SELECT ic.id as id, ic.created_at as createdAt, ic.requester_name as requestedBy, o.name as organization, ic.name as category,
+            (select count(*) from item_categories sic WHERE sic.parent_category_id = ic.id 
+            AND sic.category_status IN ('PENDING')) as subCategoryQty, 
+            (SELECT count(*) FROM pending_item_requests pir 
+            WHERE pir.category_id = ic.id) as productQty
+            FROM item_categories ic
+            LEFT JOIN organizations o ON o.id = ic.organization_id
+            WHERE ic.category_status IN ('PENDING')
+            AND ic.parent_category_id IS NULL
+            AND (:name IS NULL OR ic.name LIKE concat(:name,'%')) 
+            AND (:code IS NULL OR ic.code LIKE concat(:code,'%'))
+            """,nativeQuery = true)
+    Page<PendingItemCategoryListInfo> findAllPendingItemCategories(String name, String code, Pageable pageable);
+
+    @Query(value = """
+            SELECT ic.id as id, ic.created_at as createdAt, ic.requester_name as requestedBy, o.name as organization, ic.name as category,
+            0 as subCategoryQty, 
+            (SELECT count(*) FROM pending_item_requests pir 
+            WHERE pir.sub_category_id = ic.id) as productQty
+            FROM item_categories ic
+            LEFT JOIN organizations o ON o.id = ic.organization_id
+            WHERE ic.category_status IN ('PENDING')
+            AND ic.parent_category_id IS NOT NULL
+            AND (:parentId IS NULL OR ic.parent_category_id = :parentId)
+            AND (:name IS NULL OR ic.name LIKE concat(:name,'%')) 
+            AND (:code IS NULL OR ic.code LIKE concat(:code,'%'))
+            """,nativeQuery = true)
+    Page<PendingItemCategoryListInfo> findAllPendingSubCategories(Long parentId,String name, String code, Pageable pageable);
+
+
+    @Query(value = """
+        SELECT COUNT(*) as total FROM Item i 
+        LEFT JOIN i.itemParentCategory ipc
+        LEFT JOIN i.itemCategory ic 
+            WHERE ipc.id=:id AND (:subCatId IS NULL OR ic.id=:subCatId)
+            """)
+    Integer findProductCountByCategoryId(Long id,Long subCatId);
+    @Query(value = "SELECT COUNT(*) as total FROM ItemCategory ic " +
+            "LEFT JOIN ic.parentCategory pc WHERE pc.id=:id")
+    Integer findSubCategoryCountByCategoryId(Long id);
+
+    interface PendingItemCategoryListInfo{
+
+        Long getId();
+        String getCreatedAt();
+        String getRequestedBy();
+        String getOrganization();
+        String getCategory();
+        Integer getSubCategoryQty();
+        Integer getProductQty();
+    }
     interface ItemCategoryInfo {
 
 

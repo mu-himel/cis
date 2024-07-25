@@ -84,4 +84,13 @@ public interface CategoryService {
     List<ItemCategory> getAllSubCategories(Long categoryId, Long subCategoryId);
 
     List<SubCategoryBrand> getBrandsByCategoryId(Long id);
+
+    Page<?> getPendingItemCategoryList(Optional<String> name, Optional<String> code,
+                                       Optional<Integer> page, Optional<Integer> size);
+    Page<?> getPendingSubCategoryList(Optional<Long> parentId,Optional<String> name, Optional<String> code,
+                                       Optional<Integer> page, Optional<Integer> size);
+
+    Integer getSubCategoryCount(Long id);
+
+    Integer getProductQtyByCategoryAndSubCategory(Long catId, Long subCatId);
 }

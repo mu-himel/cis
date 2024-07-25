@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
+    private static final Integer PAGE_SIZE = 10;
     @Autowired
     private CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
@@ -113,6 +114,11 @@ public class CategoryServiceImpl implements CategoryService {
         //     if(storeType.isPresent())category.setStoreType(storeType.get());
         // }
 
+        if(categoryRequestDto.getRequestedBy()!=null){
+            category.setRequesterName(categoryRequestDto.getRequestedBy());
+        }
+
+        category.setCategoryStatus(categoryRequestDto.getCategoryStatus());
 
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalCategory = category;
@@ -486,12 +492,30 @@ public class CategoryServiceImpl implements CategoryService {
         return subcategoryBrandRepository.findAllBySubcategoryId(id);
     }
 
-    
+    @Override
+    public Page<?> getPendingItemCategoryList(Optional<String> name, Optional<String> code,
+                                              Optional<Integer> page, Optional<Integer> size) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(PAGE_SIZE),sort);
+        return categoryRepository.findAllPendingItemCategories(name.orElse(null),code.orElse(null),pageable);
+    }
 
-    
+    @Override
+    public Page<?> getPendingSubCategoryList(Optional<Long>parentId,Optional<String> name, Optional<String> code, Optional<Integer> page, Optional<Integer> size) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(PAGE_SIZE),sort);
+        return categoryRepository.findAllPendingSubCategories(parentId.orElse(null),
+                name.orElse(null),code.orElse(null),
+                pageable);
+    }
 
-    
+    @Override
+    public Integer getSubCategoryCount(Long id) {
+        return categoryRepository.findSubCategoryCountByCategoryId(id);
+    }
 
-
-    
+    @Override
+    public Integer getProductQtyByCategoryAndSubCategory(Long catId, Long subCatId) {
+        return categoryRepository.findProductCountByCategoryId(catId, subCatId);
+    }
 }

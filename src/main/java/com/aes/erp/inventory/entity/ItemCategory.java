@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.entity;
 
 
+import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.vendor.entity.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -53,6 +54,12 @@ public class ItemCategory {
 
   @ManyToOne
   private Organization organization;
+
+  @Column(length = 2000)
+  private String requesterName;
+
+  @Enumerated(EnumType.STRING)
+  private CategoryStatus categoryStatus;
 
   private Long scmCategoryId;
 
