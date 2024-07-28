@@ -11,9 +11,12 @@ import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
+import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.repository.*;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
+
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -288,10 +291,7 @@ public class CategoryServiceImpl implements CategoryService {
                 name.orElse(null),code.orElse(null));
     }
 
-    @Override
-    public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code) {
-        return categoryRepository.findAllItemCategory(name.orElse(null),code.orElse(null));
-    }
+    
 
     @Override
     public Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
@@ -527,8 +527,35 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code) {
+        return categoryRepository.findAllItemCategory(name.orElse(null),code.orElse(null));
+    }
+
+    @Override
+    public List<?> getAllItemSubCategoryList(Optional<String> name, Optional<String> code) {
+        return categoryRepository.findAllItemSubCategory(name.orElse(null),code.orElse(null));
+    }
+
+    @Override
     public void mergePendingCategory(Long id, MergePendingCategoryDto mergePendingCategoryDto) {
+        StringBuilder sb = new StringBuilder("/item-categories");
+        String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
         ItemCategory getItemCategory = categoryRepository.findById(id).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
-        categoryRepository.delete(getItemCategory);
+        if(mergePendingCategoryDto.getMargeCategoryId() == null){
+            getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
+        }else{
+            //send post request to SCM with categoryname and code using networkservice
+            ItemCategory deleteCategory = categoryRepository.findById(mergePendingCategoryDto.getMargeCategoryId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
+            // ResponseEntity<Void> response = networkService.post(itemCategoryTransferEndpoint,deleteCategory.getName(),Void.class);
+            // if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
+            //     !response.getStatusCode().equals(HttpStatus.CREATED)){
+            //     throw new AesException("Something wrong");
+            // }else{
+            //     deleteCategory.setActive(false);
+
+            // }
+        }
+        categoryRepository.save(getItemCategory);
+
     }
 }
