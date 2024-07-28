@@ -71,6 +71,7 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
         pir.setCategory(subCat.getParentCategory());
         pir.setBrand(brandOp.get());
         pir.setAttributes(pRequestDto.getAttributes().stream().map(pia->{
+            pia.setId(null);
             pia.setPendingItemRequest(pir);
             return pia;
         }).collect(Collectors.toList()));
@@ -95,9 +96,10 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     }
 
     @Override
-    public Page<?> getPage(Optional<Integer> page, Optional<Integer> size) {
+    public Page<?> getPage(Optional<Long> categoryId, Optional<Long> subCategoryId, Optional<Integer> page, Optional<Integer> size) {
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
-        return pendingItemRequestRepository.findAllPendingItemRequests(pageable);
+        return pendingItemRequestRepository.findAllPendingItemRequests(categoryId.orElse(null)
+                , subCategoryId.orElse(null) ,pageable);
     }
 
     @Override

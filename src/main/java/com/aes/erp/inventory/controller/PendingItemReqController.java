@@ -41,12 +41,15 @@ public class PendingItemReqController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getPendingItemReqeusts(
+    public ResponseEntity<?> getPendingItemRequests(
+        @RequestParam("categoryId") Optional<Long> categoryId,
+        @RequestParam("subCategoryId") Optional<Long> subCategoryId,
         @RequestParam("page") Optional<Integer> page,
-        @RequestParam("size") Optional<Integer> size 
+        @RequestParam("size") Optional<Integer> size
+
     ){
         return new ResponseEntity<>(
-            pendingItemRequestService.getPage(page, size),
+            pendingItemRequestService.getPage(categoryId, subCategoryId,page, size),
             HttpStatus.OK
         );
     }

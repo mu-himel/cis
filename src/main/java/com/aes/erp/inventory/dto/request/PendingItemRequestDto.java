@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PendingItemRequestDto implements EntityConvertable<PendingItemRequest>{
     private String subCategoryCode;
+    private Long scmItemId;
     private String brand;
     private String requestedBy;
     private String employeeId;
@@ -22,8 +23,14 @@ public class PendingItemRequestDto implements EntityConvertable<PendingItemReque
     private String designation;
     private String department;
     private Long warehouseId;
+
+    private String itemUnit;
+
     private String warehouseName;
     private Long organizationId;
+
+    private String code;
+    private String itemAttributeName;
     private String warehouseLocation;
     private String extendedAttributes;
     private List<PendingItemAttribute> attributes;
@@ -39,8 +46,11 @@ public class PendingItemRequestDto implements EntityConvertable<PendingItemReque
         pir.setDepartment(this.department);
         pir.setWarehouseId(this.warehouseId);
         pir.setWarehouseName(this.warehouseName);
+        pir.setItemAttributeName(this.itemAttributeName);
         pir.setExtendedAttributes(this.extendedAttributes);
         pir.setWarehouseLocation(this.warehouseLocation);
+        pir.setItemUnit(this.itemUnit);
+        pir.setCode(this.code);
         return pir;
     }
 

@@ -109,7 +109,7 @@ public interface CategoryQuery {
             "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
             " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name) || '%' ) " +
             " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code) || '%' )" +
-            "AND c.active = true " +
+            "AND c.active = true AND c.categoryStatus IN ('APPROVED') " +
             "GROUP BY c.id ORDER BY c.name asc";
 
     String countQueryForFindAllByItemCategoryWithSubCategoryCount = "SELECT COUNT(DISTINCT c.id) AS categoryCount " +
@@ -119,7 +119,7 @@ public interface CategoryQuery {
             "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
             " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name) || '%' ) " +
             " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code) || '%' )" +
-            "AND c.active = true";
+            "AND c.active = true AND c.categoryStatus IN ('APPROVED')";
 
     String findAllBySubCategoryFilteredByParentCategory = """
         SELECT 

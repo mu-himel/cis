@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.service;
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
@@ -15,7 +16,9 @@ import java.util.Optional;
 
 public interface CategoryService {
 
-    void addCategory(CategoryRequestDto categoryRequestDto);
+    
+
+    Long addCategory(CategoryRequestDto categoryRequestDto);
     ItemCategory addCategoryFromCategoryEntity(ItemCategory itemCategory);
 
     void updateCategory(Long id,CategoryRequestDto categoryRequestDto);
@@ -77,8 +80,22 @@ public interface CategoryService {
     List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name);
 
     Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId, String attributeType);
-    void bulkImport(String token, Organization org, Long userId, Long warehouseId, Long storeId,Long parentCategoryId, List<Long> id);
+    void bulkImport(String token, Organization org, Long userId, Long warehouseId, Long storeId,Long parentCategoryId,
+                    List<Long> id);
     List<ItemCategory> getAllSubCategories(Long categoryId, Long subCategoryId);
 
     List<SubCategoryBrand> getBrandsByCategoryId(Long id);
+
+    Page<?> getPendingItemCategoryList(Optional<String> name, Optional<String> code,
+                                       Optional<Integer> page, Optional<Integer> size);
+    Page<?> getPendingSubCategoryList(Optional<Long> parentId,Optional<String> name, Optional<String> code,
+                                       Optional<Integer> page, Optional<Integer> size);
+
+    Integer getSubCategoryCount(Long id);
+
+    Integer getProductQtyByCategoryAndSubCategory(Long catId, Long subCatId);
+    void mergePendingCategory(Long id, MergePendingCategoryDto mergePendingCategoryDto);
+    public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code);
+
+    List<?> getSubCategoryListFilteredByParentCategoryNameOrCode(Optional<Long> categoryId, Optional<String> name, Optional<String> code);
 }

@@ -212,9 +212,15 @@ public class ItemServiceImpl implements ItemService {
             }
             itemRepository.save(item);
 
-            if(itemRequestDto.getOrgId() != null){
+            if(itemRequestDto.getOrgId() != null && itemRequestDto.getScmItemId()==null){
                 Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
                 sentItem(org,item,itemRequestDto.getWarehouseId());
+            }
+            if(itemRequestDto.getOrgId()!=null && itemRequestDto.getScmItemId()!=null){
+                Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
+                item.setScmItemId(itemRequestDto.getScmItemId());
+                item.setOrganization(org);
+                item.setActive(false);
             }
         }
 

@@ -4,6 +4,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.BulkCategoryRequestDto;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
@@ -26,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -36,6 +38,7 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
+    private static final Integer PAGE_SIZE = 10;
     @Autowired
     private CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
@@ -89,8 +92,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
     @Override
     @Transactional
-    public void addCategory(CategoryRequestDto categoryRequestDto) {
+    public Long addCategory(CategoryRequestDto categoryRequestDto) {
         ItemCategory category = categoryRequestDto.getEntity();
+
+        if(categoryRequestDto.getOrganization()!=null){
+            category.setOrganization(categoryRequestDto.getOrganization());
+        }
         if(categoryRepository.existsByCode(category.getCode())){
             throw new AesException("Category code already exist");
         }
@@ -109,6 +116,11 @@ public class CategoryServiceImpl implements CategoryService {
         //     if(storeType.isPresent())category.setStoreType(storeType.get());
         // }
 
+        if(categoryRequestDto.getRequestedBy()!=null){
+            category.setRequesterName(categoryRequestDto.getRequestedBy());
+        }
+
+        category.setCategoryStatus(categoryRequestDto.getCategoryStatus());
 
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalCategory = category;
@@ -120,9 +132,15 @@ public class CategoryServiceImpl implements CategoryService {
                 return categoryAttribute;
             }).collect(Collectors.toList()));
         }
+        if(categoryRequestDto.getScmCategoryId()!=null){
+            category.setScmCategoryId(categoryRequestDto.getScmCategoryId());
+        }
+
+
         category.setCreatedAt(Instant.now().toEpochMilli());
         categoryRepository.save(category);
         addBrandToSubCategory(categoryRequestDto, category);
+        return category.getId();
     }
 
     @Override
@@ -271,6 +289,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code) {
+        return categoryRepository.findAllItemCategory(name.orElse(null),code.orElse(null));
+    }
+
+    @Override
+    public List<?> getSubCategoryListFilteredByParentCategoryNameOrCode(Optional<Long> categoryId, Optional<String> name, Optional<String> code) {
+        return categoryRepository.findAllSubCategory(categoryId.orElse(null),
+                name.orElse(null),code.orElse(null));
+    }
+
+    @Override
     public Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
                                       Optional<String> name, Optional<String> code,
                                       Optional<BigDecimal> currentYearBudget, Optional<Long> productCount,
@@ -406,6 +435,7 @@ public class CategoryServiceImpl implements CategoryService {
                     ca.setAttributeUnit(ica.getAttributeUnit());
                     return ca;
                 }).collect(Collectors.toList()));
+                catReqDto.setIsForCps(false);
                 catReqDto.setCode(itemCategory.getCode());
                 catReqDto.setName(itemCategory.getName());
                 if(parentCategoryId==null){
@@ -421,6 +451,7 @@ public class CategoryServiceImpl implements CategoryService {
                         return sb.getBrand().getName();
                     }).toList());
                 }
+
                 catReqDto.setCpsCategoryId(itemCategory.getId());
                 categoryList.add(catReqDto);
             }
@@ -474,12 +505,36 @@ public class CategoryServiceImpl implements CategoryService {
         return subcategoryBrandRepository.findAllBySubcategoryId(id);
     }
 
-    
+    @Override
+    public Page<?> getPendingItemCategoryList(Optional<String> name, Optional<String> code,
+                                              Optional<Integer> page, Optional<Integer> size) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(PAGE_SIZE),sort);
+        return categoryRepository.findAllPendingItemCategories(name.orElse(null),code.orElse(null),pageable);
+    }
 
-    
+    @Override
+    public Page<?> getPendingSubCategoryList(Optional<Long>parentId,Optional<String> name, Optional<String> code, Optional<Integer> page, Optional<Integer> size) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(PAGE_SIZE),sort);
+        return categoryRepository.findAllPendingSubCategories(parentId.orElse(null),
+                name.orElse(null),code.orElse(null),
+                pageable);
+    }
 
-    
+    @Override
+    public Integer getSubCategoryCount(Long id) {
+        return categoryRepository.findSubCategoryCountByCategoryId(id);
+    }
 
+    @Override
+    public Integer getProductQtyByCategoryAndSubCategory(Long catId, Long subCatId) {
+        return categoryRepository.findProductCountByCategoryId(catId, subCatId);
+    }
 
-    
+    @Override
+    public void mergePendingCategory(Long id, MergePendingCategoryDto mergePendingCategoryDto) {
+        ItemCategory getItemCategory = categoryRepository.findById(id).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
+        categoryRepository.delete(getItemCategory);
+    }
 }
