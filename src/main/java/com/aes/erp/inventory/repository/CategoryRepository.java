@@ -206,6 +206,17 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     List<ItemCategory> findAllItemCategory(
              @Param("name") String name, @Param("code") String code);
 
+    @Query(value = """
+        SELECT ic FROM ItemCategory ic 
+        LEFT JOIN ic.parentCategory pc
+        WHERE pc IS NOT NULL AND ic.active=true 
+        AND (:categoryId IS NULL OR pc.id=:categoryId)
+        AND (:name IS NULL OR ic.name LIKE concat(:name,'%'))
+        AND (:code IS NULL OR ic.code LIKE concat(:code,'%'))""")
+    List<ItemCategory> findAllSubCategory(
+            @Param("categoryId") Long categoryId,
+            @Param("name") String name, @Param("code") String code);
+
     interface PendingItemCategoryListInfo{
 
         Long getId();

@@ -294,6 +294,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<?> getSubCategoryListFilteredByParentCategoryNameOrCode(Optional<Long> categoryId, Optional<String> name, Optional<String> code) {
+        return categoryRepository.findAllSubCategory(categoryId.orElse(null),
+                name.orElse(null),code.orElse(null));
+    }
+
+    @Override
     public Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
                                       Optional<String> name, Optional<String> code,
                                       Optional<BigDecimal> currentYearBudget, Optional<Long> productCount,

@@ -272,4 +272,15 @@ public class ItemCategoryController {
                 HttpStatus.OK
         );
     }
+
+    @GetMapping("/subcategories/all")
+    public ResponseEntity<?> getAllSubCategories(
+            @RequestParam("categoryId")  Optional<Long> categoryId,
+            @RequestParam("name")  Optional<String> name,
+            @RequestParam("code") Optional<String> code){
+        return new ResponseEntity<>(
+                categoryService.getSubCategoryListFilteredByParentCategoryNameOrCode(categoryId,name,code),
+                HttpStatus.OK
+        );
+    }
 }

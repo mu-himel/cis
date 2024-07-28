@@ -12,7 +12,7 @@ import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
 
 public interface PendingItemRequestService {
     void createPendingItemRequest(PendingItemRequestDto pRequestDto);
-    Page<?> getPage(Optional<Integer>page, Optional<Integer> size);
+    Page<?> getPage(Optional<Long>categoryId, Optional<Long> subCategoryId, Optional<Integer>page, Optional<Integer> size);
     Optional<?> getDetail(Long id);
     List<?> getPendingBrands(Long subCatId);
     void createPendingBrand(PendingBrandDto pendingBrandDto);

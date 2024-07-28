@@ -27,18 +27,26 @@ public interface PendingItemRequestRepository extends JpaRepository<PendingItemR
         pir.created_at as createdAt,
         requested_by as requestedBy,
         c.name as categoryName,
+        org.name as orgName,
         sc.name as subCategoryName,
-        b.name as product
+        CASE WHEN b.name IS NOT NULL THEN
+         concat(b.name,' - ', pir.item_attribute_name)
+          ELSE pir.item_attribute_name
+         end as product
         FROM pending_item_requests pir
+        LEFT JOIN organizations org ON org.id = pir.organization_id
         LEFT JOIN item_categories c ON c.id = pir.category_id
         LEFT JOIN item_categories sc ON sc.id = pir.sub_category_id
         LEFT JOIN brands b ON b.id = pir.brand_id
+        WHERE (:categoryId IS NULL OR pir.category_id=:categoryId)
+        AND (:subCategoryId IS NULL OR pir.sub_category_id=:subCategoryId)
     """;
 
     String countPendingItemReq="SELECT count(*) FROM ("+pendingItemReq+") c";
 
     @Query(value = pendingItemReq, countQuery = countPendingItemReq ,nativeQuery = true)
-    Page<PendingItemReqInfo> findAllPendingItemRequests(Pageable pageable);
+    Page<PendingItemReqInfo> findAllPendingItemRequests(
+            Long categoryId, Long subCategoryId, Pageable pageable);
 
     interface PendingItemReqInfo{
         Long getId();
@@ -51,6 +59,7 @@ public interface PendingItemRequestRepository extends JpaRepository<PendingItemR
         String getRequestedBy();
         String getCategoryName();
         String getSubCategoryName();
+        String getOrgName();
         String getProduct();
     }
 
