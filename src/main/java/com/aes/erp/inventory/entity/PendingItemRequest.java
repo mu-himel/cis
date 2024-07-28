@@ -57,6 +57,10 @@ public class PendingItemRequest {
     private String itemAttributeName;
     private String extendedAttributes;
 
+    private String itemUnit;
+
+    private String code;
+
     @ManyToOne
     private Organization organization;
 

@@ -23,9 +23,13 @@ public class PendingItemRequestDto implements EntityConvertable<PendingItemReque
     private String designation;
     private String department;
     private Long warehouseId;
+
+    private String itemUnit;
+
     private String warehouseName;
     private Long organizationId;
 
+    private String code;
     private String itemAttributeName;
     private String warehouseLocation;
     private String extendedAttributes;
@@ -45,6 +49,8 @@ public class PendingItemRequestDto implements EntityConvertable<PendingItemReque
         pir.setItemAttributeName(this.itemAttributeName);
         pir.setExtendedAttributes(this.extendedAttributes);
         pir.setWarehouseLocation(this.warehouseLocation);
+        pir.setItemUnit(this.itemUnit);
+        pir.setCode(this.code);
         return pir;
     }
 
