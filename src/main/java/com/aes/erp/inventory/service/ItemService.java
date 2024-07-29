@@ -3,6 +3,7 @@ package com.aes.erp.inventory.service;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemCategory;
 
@@ -48,5 +49,8 @@ public interface ItemService {
     List<?> getAllInactiveItems(Long parentCategoryId, Long categoryId);
 
     void activateItems(ActivateItemDto activateItemDto);
+
+    void mergePendingItems(Long id, MergePendingItemsDto mergePendingItemsDto);
+
 
 }

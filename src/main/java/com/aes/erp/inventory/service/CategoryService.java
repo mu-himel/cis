@@ -2,6 +2,7 @@ package com.aes.erp.inventory.service;
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
