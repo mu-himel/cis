@@ -3,8 +3,7 @@ package com.aes.erp.inventory.dto.request;
 import lombok.Data;
 
 @Data
-public class MergePendingCategoryDto {
-    private String name;
+public class MergePendingItemsPostDto {
     private String code;
-    private Long mergeCategoryId;
+    private String approveStatus;
 }

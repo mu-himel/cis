@@ -35,6 +35,7 @@ public class PendingItemRequest {
 
     private String requestNo;
 
+    @Column(length = 2000)
     private String requestedBy;
 
     @ManyToOne
@@ -53,11 +54,8 @@ public class PendingItemRequest {
     private Long warehouseId;
     private String warehouseName;
     private String warehouseLocation;
-
+    private String itemAttributeName;
     private String extendedAttributes;
-
-    @Column(length = 2000)
-    private String requesterName;
 
     @ManyToOne
     private Organization organization;

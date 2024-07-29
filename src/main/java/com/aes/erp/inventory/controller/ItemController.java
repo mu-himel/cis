@@ -4,6 +4,7 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.BulkItemGenerateDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
 import com.aes.erp.inventory.dto.request.bulk_gen.BulkGenConfigDto;
 import com.aes.erp.inventory.dto.request.bulk_gen.SearchInactiveProduct;
 import com.aes.erp.inventory.entity.ItemCategory;
@@ -172,6 +173,11 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+     @PutMapping("/merge-pending-items/{id}")
+    public ResponseEntity<?> mergePendingItems(@PathVariable Long id, @RequestBody MergePendingItemsDto mergePendingItemsDto){
+        itemService.mergePendingItems(id,mergePendingItemsDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
     
     
 }

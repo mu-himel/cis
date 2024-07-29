@@ -81,6 +81,9 @@ public class Item {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ItemAttribute> attributes;
 
+    @Column(length = 2000)
+    private String requesterName;
+
     private Boolean active=true;
 
     @CreationTimestamp

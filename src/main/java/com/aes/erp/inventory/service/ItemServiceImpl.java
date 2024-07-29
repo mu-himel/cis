@@ -6,6 +6,9 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDetailDto;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsPostDto;
 import com.aes.erp.inventory.dto.request.RemoteItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.BulkProcessLog;
@@ -15,6 +18,7 @@ import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
+import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.entity.BulkProcessLog.BulkItemStatus;
 import com.aes.erp.inventory.repository.BulkProcessLogRepository;
 import com.aes.erp.inventory.repository.ItemRepository;
@@ -26,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +45,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -67,6 +73,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private NetworkService networkService;
+
+    @Value("${scm.apiEndpoint}")
+    private String scmApiEndpoint;
 
     @Autowired
     private OrganizationService organizationService;
@@ -394,7 +403,50 @@ public class ItemServiceImpl implements ItemService {
         
     }
 
-    
+    @Override
+    public void mergePendingItems(Long id, MergePendingItemsDto mergePendingItemsDto) {
+        Item getItem = itemRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"No Such Entry Found"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(networkService.getKeycloakAccessToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        MergePendingItemsPostDto postDto = new MergePendingItemsPostDto();
+
+        HttpEntity<MergePendingItemsPostDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
+
+        StringBuilder sb = new StringBuilder("/item");
+        sb.append("/approve/category/");
+        // sb.append(getItem.getScmCategoryId());
+
+        String itemTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+        System.out.println(itemTransferEndpoint);
+        if (mergePendingItemsDto.getMergeItemId().equals(null)){
+            //No Merge
+            // postDto.setApproveStatus(CategoryStatus.APPROVED);
+            // postDto.setCode(null);
+
+            ResponseEntity<Void> response = networkService.post(itemTransferEndpoint,mPCDtoPayload,Void.class);
+            if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                // getItem.set(CategoryStatus.APPROVED);
+            }else{
+                throw new AesException("Something wrong");
+            }
+
+        }else{
+            //Merge with existing item 
+            Item existingItemCategory = itemRepository.findById(mergePendingItemsDto.getMergeItemId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
+
+            // postDto.setApproveStatus(CategoryStatus.REJECTED);
+            // postDto.setCode(existingItemCategory.getCode());
+
+            ResponseEntity<Void> response = networkService.post(itemTransferEndpoint,mPCDtoPayload,Void.class);
+            if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                getItem.setActive(false);
+            }else{
+                throw new AesException("Something wrong");
+            }
+        }
+        itemRepository.save(getItem);
+    }
 
     
 
