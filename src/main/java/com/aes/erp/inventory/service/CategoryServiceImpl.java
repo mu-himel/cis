@@ -11,6 +11,7 @@ import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
+import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.repository.*;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
@@ -120,8 +121,15 @@ public class CategoryServiceImpl implements CategoryService {
             category.setRequesterName(categoryRequestDto.getRequestedBy());
         }
 
-        category.setCategoryStatus(categoryRequestDto.getCategoryStatus());
-
+        if(categoryRequestDto.getOrganization()!=null){
+            category.setCategoryStatus(CategoryStatus.PENDING);
+            category.setActive(true);
+        }
+        if(categoryRequestDto.getOrganization()==null) {
+//            category.setCategoryStatus(categoryRequestDto.getCategoryStatus());
+            category.setCategoryStatus(CategoryStatus.APPROVED);
+            category.setActive(true);
+        }
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalCategory = category;
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {

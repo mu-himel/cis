@@ -131,10 +131,10 @@ public class ItemServiceImpl implements ItemService {
 
         if(name.isPresent() && code.isEmpty()){
             System.out.println(name.get());
-            return itemRepository.findAllByActiveAndNameLikeIgnoreCase(true,name.get()+"%");
+            return itemRepository.findAllByActiveAndNameLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(true,name.get()+"%","%"+name.get()+"%");
         }
         if(name.isEmpty() && code.isPresent()){
-            return  itemRepository.findAllByActiveAndCodeLikeIgnoreCase(true, code.get()+"%");
+            return  itemRepository.findAllByActiveAndCodeLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(true, code.get()+"%",name.get()+"%");
         }
         return new ArrayList<>();
     }
