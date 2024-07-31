@@ -6,6 +6,7 @@ import java.util.List;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
 
 import lombok.Data;
 
@@ -18,4 +19,5 @@ public class MergePendingCategoryDto {
     private List<CategoryAttribute> attributes;
     private List<String> brands;
     private BigDecimal vat;
+    private Organization organization;
 }
