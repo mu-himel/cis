@@ -270,6 +270,13 @@ public class ItemCategoryController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping("/reject-pending/{id}")
+    public ResponseEntity<?> rejectPendingCategory(@PathVariable Long id){
+        categoryService.rejectPendingCategory(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
    
 
     @GetMapping("/main-categories/all")

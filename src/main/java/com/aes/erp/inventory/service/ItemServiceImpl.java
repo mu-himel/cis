@@ -17,11 +17,14 @@ import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.inventory.entity.PendingItemRequest;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.entity.BulkProcessLog.BulkItemStatus;
+import com.aes.erp.inventory.repository.BrandRepository;
 import com.aes.erp.inventory.repository.BulkProcessLogRepository;
 import com.aes.erp.inventory.repository.ItemRepository;
+import com.aes.erp.inventory.repository.PendingItemRequestRepository;
 import com.aes.erp.inventory.repository.TempItemRepository;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
@@ -85,6 +88,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private BulkProcessLogRepository bulkItemRepository;
+
+    @Autowired
+    private PendingItemRequestRepository pendingItemRequestRepository;
+
+    @Autowired
+    private BrandRepository brandRepository;
 
     @Override
     public CategoryService getCategoryService() {
@@ -405,28 +414,44 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void mergePendingItems(Long id, MergePendingItemsDto mergePendingItemsDto) {
-        Item getItem = itemRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"No Such Entry Found"));
+        PendingItemRequest pendingItem = pendingItemRequestRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"No Such Entry Found"));
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(networkService.getKeycloakAccessToken());
+        headers.setBearerAuth(networkService.getKeycloakAccessToken(pendingItem.getOrganization()));
         headers.setContentType(MediaType.APPLICATION_JSON);
         MergePendingItemsPostDto postDto = new MergePendingItemsPostDto();
 
         HttpEntity<MergePendingItemsPostDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
 
-        StringBuilder sb = new StringBuilder("/item");
-        sb.append("/approve/category/");
-        // sb.append(getItem.getScmCategoryId());
+        StringBuilder sb = new StringBuilder("/items");
+        sb.append("/approve/");
+        sb.append(pendingItem.getScmItemId());
 
         String itemTransferEndpoint = scmApiEndpoint.concat(sb.toString());
         System.out.println(itemTransferEndpoint);
-        if (mergePendingItemsDto.getMergeItemId().equals(null)){
+        if (mergePendingItemsDto.getMergeItemId() == null){
             //No Merge
-            // postDto.setApproveStatus(CategoryStatus.APPROVED);
-            // postDto.setCode(null);
+            postDto.setApproveStatus("APPROVED");
+            postDto.setCode(null);
+            
 
-            ResponseEntity<Void> response = networkService.post(itemTransferEndpoint,mPCDtoPayload,Void.class);
+            ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-                // getItem.set(CategoryStatus.APPROVED);
+                Item approvedItem = new Item();
+                approvedItem.setCode(pendingItem.getCode());
+                approvedItem.setActive(true);
+                approvedItem.setItemUnit(pendingItem.getItemUnit());
+                approvedItem.setItemCategory(pendingItem.getSubCategory());
+                approvedItem.setItemParentCategory(pendingItem.getCategory());
+                approvedItem.setBrand(pendingItem.getBrand());
+                approvedItem.setItemAttributeName(pendingItem.getItemAttributeName());
+                approvedItem.setScmItemId(pendingItem.getScmItemId());
+                approvedItem.setOrganization(pendingItem.getOrganization());
+                Brand brandId = pendingItem.getBrand();
+                approvedItem.setName(brandId.getName());
+                itemRepository.save(approvedItem);
+
+                pendingItemRequestRepository.deleteById(pendingItem.getId());
+
             }else{
                 throw new AesException("Something wrong");
             }
@@ -435,19 +460,17 @@ public class ItemServiceImpl implements ItemService {
             //Merge with existing item 
             Item existingItemCategory = itemRepository.findById(mergePendingItemsDto.getMergeItemId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
 
-            // postDto.setApproveStatus(CategoryStatus.REJECTED);
-            // postDto.setCode(existingItemCategory.getCode());
+            postDto.setApproveStatus("REJECTED");
+            postDto.setCode(existingItemCategory.getCode());
 
-            ResponseEntity<Void> response = networkService.post(itemTransferEndpoint,mPCDtoPayload,Void.class);
+            ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-                getItem.setActive(false);
+                pendingItemRequestRepository.deleteById(pendingItem.getId());
             }else{
                 throw new AesException("Something wrong");
             }
         }
-        itemRepository.save(getItem);
     }
-
     
 
     

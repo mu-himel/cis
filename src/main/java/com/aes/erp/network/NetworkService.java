@@ -1,6 +1,7 @@
 package com.aes.erp.network;
 
 import com.aes.erp.inventory.dto.response.KeycloakOauth2Dto;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.network.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -17,6 +18,7 @@ public class NetworkService {
 
     @Autowired
     private RestTemplate restTemplate;
+
 
     public String getAuthToken(String url, String username, String password){
         HttpHeaders headers = new HttpHeaders();
@@ -45,7 +47,7 @@ public class NetworkService {
         return restTemplate.getForEntity(url,returnType);
     }
 
-    public String getKeycloakAccessToken(){
+    public String getKeycloakAccessToken(Organization organization){
         System.out.println("Keycloak Access Token ");
         String AUTH_SERVER_URI = "http://172.17.17.254:8080/realms/aesl/protocol/openid-connect/token";
         RestTemplate restTemplate = new RestTemplate();
@@ -56,8 +58,8 @@ public class NetworkService {
         MultiValueMap<String, String> mapForm = new LinkedMultiValueMap<>();
         mapForm.add("grant_type", "password");
         mapForm.add("client_id", "erpnext");
-        mapForm.add("username", "superadmin@anwargroup.com");
-        mapForm.add("password", "1234");
+        mapForm.add("username", organization.getServiceUsername());
+        mapForm.add("password", organization.getServicePassword());
         mapForm.add("client_secret", "dByixNrHgm3NIQnLpd7mbEePgajyN873");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(mapForm, headers);
 

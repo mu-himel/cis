@@ -173,7 +173,7 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-     @PutMapping("/merge-pending-items/{id}")
+    @PutMapping("/merge-pending-items/{id}")
     public ResponseEntity<?> mergePendingItems(@PathVariable Long id, @RequestBody MergePendingItemsDto mergePendingItemsDto){
         itemService.mergePendingItems(id,mergePendingItemsDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
