@@ -577,38 +577,47 @@ public class CategoryServiceImpl implements CategoryService {
             //no merge, send with actual item ID in the URL
             postDto.setApproveStatus(CategoryStatus.APPROVED);
             postDto.setCode(null);
+            postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
 
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-                if(getItemCategory.getParentCategory() == null){
-                    //It is a Category
-                    getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
-                    getItemCategory.setActive(true);
-                }else{
-                    //It is a subcategory
-                    getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
-                    getItemCategory.setName(mergePendingCategoryDto.getName());
-                    getItemCategory.setCode(mergePendingCategoryDto.getCode());
-                    getItemCategory.setVat(mergePendingCategoryDto.getVat());
-                    for (CategoryAttribute iterable_element : mergePendingCategoryDto.getAttributes()) {
-                        CategoryAttribute categoryAttribute = categoryAttributeRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
-                        categoryAttribute.setAttributeType(iterable_element.getAttributeType());
-                        categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
-                        categoryAttribute.setAttributeValue(iterable_element.getAttributeValue());
-                        categoryAttributeRepository.save(categoryAttribute);
-                    }
-                    for(String iterable_element : mergePendingCategoryDto.getBrands()) {
-                        Brand brand = brandRepository.findByName(iterable_element).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
-                        Optional<SubCategoryBrand> scbrand = subcategoryBrandRepository.findAllByBrandIdAndSubcategoryId(brand.getId(),getItemCategory.getId());
-                        if(scbrand.isPresent()){
-                            SubCategoryBrand scb = new SubCategoryBrand();
-                            scb.setBrand(brand);
-                            scb.setSubcategory(getItemCategory);
-                            subcategoryBrandRepository.save(scb);
+                if(mergePendingCategoryDto.getCode() != null){
+                    //body is not empty so update category
+                    if(getItemCategory.getParentCategory() == null){
+                        //It is a Category
+                        getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
+                        getItemCategory.setName(mergePendingCategoryDto.getName());
+                        getItemCategory.setActive(true);
+                    }else{
+                        //It is a subcategory
+                        getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
+                        getItemCategory.setName(mergePendingCategoryDto.getName());
+                        getItemCategory.setCode(mergePendingCategoryDto.getCode());
+                        getItemCategory.setVat(mergePendingCategoryDto.getVat());
+                        for (CategoryAttribute iterable_element : mergePendingCategoryDto.getAttributes()) {
+                            CategoryAttribute categoryAttribute = categoryAttributeRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                            categoryAttribute.setAttributeType(iterable_element.getAttributeType());
+                            categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                            categoryAttribute.setAttributeValue(iterable_element.getAttributeValue());
+                            categoryAttributeRepository.save(categoryAttribute);
                         }
-                    }
-                    getItemCategory.setActive(true);
+                        for(String iterable_element : mergePendingCategoryDto.getBrands()) {
+                            Brand brand = brandRepository.findByName(iterable_element).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                            Optional<SubCategoryBrand> scbrand = subcategoryBrandRepository.findAllByBrandIdAndSubcategoryId(brand.getId(),getItemCategory.getId());
+                            if(scbrand.isPresent()){
+                                SubCategoryBrand scb = new SubCategoryBrand();
+                                scb.setBrand(brand);
+                                scb.setSubcategory(getItemCategory);
+                                subcategoryBrandRepository.save(scb);
+                            }
+                        }
+                        getItemCategory.setActive(true);
 
+                    }
+                }else{
+                    //approve without edit
+                    getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
+                    getItemCategory.setActive(true);
                 }
             }else{
                 throw new AesException("Something wrong");
