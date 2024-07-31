@@ -580,19 +580,29 @@ public class CategoryServiceImpl implements CategoryService {
 
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-                if(getItemCategory.getParentCategory() != null){
+                if(getItemCategory.getParentCategory() == null){
                     //It is a Category
                     getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
-                    getItemCategory.setName(mergePendingCategoryDto.getName());
+                    getItemCategory.setActive(true);
                 }else{
                     //It is a subcategory
                     getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
-                    getItemCategory.setName(itemCategoryTransferEndpoint);
-                    getItemCategory.setCode(itemCategoryTransferEndpoint);
+                    getItemCategory.setName(mergePendingCategoryDto.getName());
+                    getItemCategory.setCode(mergePendingCategoryDto.getCode());
                     for (CategoryAttribute iterable_element : mergePendingCategoryDto.getAttributes()) {
-                        
+                        CategoryAttribute categoryAttribute = categoryAttributeRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                        categoryAttribute.setAttributeType(iterable_element.getAttributeType());
+                        categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                        categoryAttribute.setAttributeValue(iterable_element.getAttributeValue());
+                        categoryAttributeRepository.save(categoryAttribute);
                     }
-                    // mergePendingCategoryDto.
+                    for(Brand iterable_element : mergePendingCategoryDto.getBrands()) {
+                        Brand brand = brandRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                        brand.setName(iterable_element.getName());
+                        brandRepository.save(brand);
+                    }
+                    getItemCategory.setActive(true);
+
                 }
             }else{
                 throw new AesException("Something wrong");
@@ -646,5 +656,4 @@ public class CategoryServiceImpl implements CategoryService {
 
     }
 
-    
 }
