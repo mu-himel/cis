@@ -589,6 +589,7 @@ public class CategoryServiceImpl implements CategoryService {
                     getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
                     getItemCategory.setName(mergePendingCategoryDto.getName());
                     getItemCategory.setCode(mergePendingCategoryDto.getCode());
+                    getItemCategory.setVat(mergePendingCategoryDto.getVat());
                     for (CategoryAttribute iterable_element : mergePendingCategoryDto.getAttributes()) {
                         CategoryAttribute categoryAttribute = categoryAttributeRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
                         categoryAttribute.setAttributeType(iterable_element.getAttributeType());
