@@ -16,6 +16,6 @@ public class MergePendingCategoryDto {
     private ItemCategory parentCategory;
     private Long mergeCategoryId;
     private List<CategoryAttribute> attributes;
-    private List<Brand> brands;
+    private List<String> brands;
     private BigDecimal vat;
 }

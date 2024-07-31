@@ -17,4 +17,7 @@ public interface SubcategoryBrandRepository extends JpaRepository<SubCategoryBra
     Optional<SubCategoryBrand> getBrandByNameAndSubCategoryId(@Param("name") String name, @Param("subcategoryId") Long subcategoryId);
 
     List<SubCategoryBrand> findAllBySubcategoryId(Long id);
+
+    Optional<SubCategoryBrand> findAllByBrandIdAndSubcategoryId(Long brandId,Long subcategoryId);
+
 }

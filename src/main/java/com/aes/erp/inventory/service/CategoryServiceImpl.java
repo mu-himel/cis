@@ -597,10 +597,15 @@ public class CategoryServiceImpl implements CategoryService {
                         categoryAttribute.setAttributeValue(iterable_element.getAttributeValue());
                         categoryAttributeRepository.save(categoryAttribute);
                     }
-                    for(Brand iterable_element : mergePendingCategoryDto.getBrands()) {
-                        Brand brand = brandRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
-                        brand.setName(iterable_element.getName());
-                        brandRepository.save(brand);
+                    for(String iterable_element : mergePendingCategoryDto.getBrands()) {
+                        Brand brand = brandRepository.findByName(iterable_element).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                        Optional<SubCategoryBrand> scbrand = subcategoryBrandRepository.findAllByBrandIdAndSubcategoryId(brand.getId(),getItemCategory.getId());
+                        if(scbrand.isPresent()){
+                            SubCategoryBrand scb = new SubCategoryBrand();
+                            scb.setBrand(brand);
+                            scb.setSubcategory(getItemCategory);
+                            subcategoryBrandRepository.save(scb);
+                        }
                     }
                     getItemCategory.setActive(true);
 
