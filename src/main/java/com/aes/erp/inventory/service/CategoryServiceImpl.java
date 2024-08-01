@@ -577,12 +577,18 @@ public class CategoryServiceImpl implements CategoryService {
             //no merge, send with actual item ID in the URL
             postDto.setApproveStatus(CategoryStatus.APPROVED);
             postDto.setCode(null);
+            
+            ItemCategory getItemParentCategory = categoryRepository.findById(mergePendingCategoryDto.getParentCategory().getId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
+            mergePendingCategoryDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getScmCategoryId()));
             postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
+            
+            // postDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getParentCategory().getScmCategoryId()));
 
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
                 if(mergePendingCategoryDto.getCode() != null){
                     //body is not empty so update category
+
                     if(getItemCategory.getParentCategory() == null){
                         //It is a Category
                         getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
@@ -594,6 +600,7 @@ public class CategoryServiceImpl implements CategoryService {
                         getItemCategory.setName(mergePendingCategoryDto.getName());
                         getItemCategory.setCode(mergePendingCategoryDto.getCode());
                         getItemCategory.setVat(mergePendingCategoryDto.getVat());
+                        
                         for (CategoryAttribute iterable_element : mergePendingCategoryDto.getAttributes()) {
                             CategoryAttribute categoryAttribute = categoryAttributeRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
                             categoryAttribute.setAttributeType(iterable_element.getAttributeType());
@@ -605,6 +612,11 @@ public class CategoryServiceImpl implements CategoryService {
                             Brand brand = brandRepository.findByName(iterable_element).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
                             Optional<SubCategoryBrand> scbrand = subcategoryBrandRepository.findAllByBrandIdAndSubcategoryId(brand.getId(),getItemCategory.getId());
                             if(scbrand.isPresent()){
+                                SubCategoryBrand scb = scbrand.get();
+                                scb.setBrand(brand);
+                                scb.setSubcategory(getItemCategory);
+                                subcategoryBrandRepository.save(scb);
+                            }else{
                                 SubCategoryBrand scb = new SubCategoryBrand();
                                 scb.setBrand(brand);
                                 scb.setSubcategory(getItemCategory);
@@ -629,6 +641,21 @@ public class CategoryServiceImpl implements CategoryService {
 
             postDto.setApproveStatus(CategoryStatus.REJECTED);
             postDto.setCode(existingItemCategory.getCode());
+            MergePendingCategoryDto mpcDto = new MergePendingCategoryDto();
+            mpcDto.setCode(existingItemCategory.getCode());
+            mpcDto.setName(existingItemCategory.getName());
+            mpcDto.setVat(existingItemCategory.getVat());
+            mpcDto.setParentCategory(new ReferenceObjectDto(existingItemCategory.getParentCategory().getScmCategoryId()));
+            mpcDto.setOrganization(existingItemCategory.getOrganization());
+            List<SubCategoryBrand> scbPost = subcategoryBrandRepository.findAllBySubcategoryId(existingItemCategory.getId());
+            List<String> bPost = new ArrayList<>();
+            for (SubCategoryBrand iterable_element : scbPost) {
+                bPost.add(iterable_element.getBrand().getName());
+            }
+            mpcDto.setBrands(bPost);
+            List<CategoryAttribute> categoryAttributesPost =categoryAttributeRepository.findAllByCategoryId(existingItemCategory.getId());
+            mpcDto.setAttributes(categoryAttributesPost);
+            postDto.setMergePendingCategoryDto(mpcDto);
 
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {

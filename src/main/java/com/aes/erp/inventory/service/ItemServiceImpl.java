@@ -23,6 +23,7 @@ import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.entity.BulkProcessLog.BulkItemStatus;
 import com.aes.erp.inventory.repository.BrandRepository;
 import com.aes.erp.inventory.repository.BulkProcessLogRepository;
+import com.aes.erp.inventory.repository.ItemAttributeRepository;
 import com.aes.erp.inventory.repository.ItemRepository;
 import com.aes.erp.inventory.repository.PendingItemRequestRepository;
 import com.aes.erp.inventory.repository.TempItemRepository;
@@ -94,6 +95,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private BrandRepository brandRepository;
+
+    @Autowired
+    private ItemAttributeRepository itemAttributeRepository;
 
     @Override
     public CategoryService getCategoryService() {
@@ -412,6 +416,7 @@ public class ItemServiceImpl implements ItemService {
         
     }
 
+
     @Override
     public void mergePendingItems(Long id, MergePendingItemsDto mergePendingItemsDto) {
         PendingItemRequest pendingItem = pendingItemRequestRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"No Such Entry Found"));
@@ -437,17 +442,51 @@ public class ItemServiceImpl implements ItemService {
             ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
                 Item approvedItem = new Item();
-                approvedItem.setCode(pendingItem.getCode());
                 approvedItem.setActive(true);
-                approvedItem.setItemUnit(pendingItem.getItemUnit());
-                approvedItem.setItemCategory(pendingItem.getSubCategory());
-                approvedItem.setItemParentCategory(pendingItem.getCategory());
-                approvedItem.setBrand(pendingItem.getBrand());
-                approvedItem.setItemAttributeName(pendingItem.getItemAttributeName());
                 approvedItem.setScmItemId(pendingItem.getScmItemId());
                 approvedItem.setOrganization(pendingItem.getOrganization());
-                Brand brandId = pendingItem.getBrand();
-                approvedItem.setName(brandId.getName());
+                
+                if(mergePendingItemsDto.getCode() == null){
+                    //without body
+                    approvedItem.setCode(pendingItem.getCode());
+                    approvedItem.setItemUnit(pendingItem.getItemUnit());
+                    approvedItem.setItemCategory(pendingItem.getSubCategory());
+                    approvedItem.setItemParentCategory(pendingItem.getCategory());
+                    approvedItem.setBrand(pendingItem.getBrand());
+                    approvedItem.setItemAttributeName(pendingItem.getItemAttributeName());
+                    Brand brandId = pendingItem.getBrand();
+                    approvedItem.setName(brandId.getName());
+                }else{
+                    //with body
+                    String atrName = "";
+                    approvedItem.setCode(mergePendingItemsDto.getCode());
+                    approvedItem.setName(mergePendingItemsDto.getName());
+                    approvedItem.setItemUnit(mergePendingItemsDto.getItemUnit());
+                    approvedItem.setItemCategory(mergePendingItemsDto.getItemCategory());
+                    approvedItem.setItemParentCategory(mergePendingItemsDto.getItemParentCategory());
+                    for (ItemAttribute iterable_element : mergePendingItemsDto.getAttributes()) {
+                        // Optional<ItemAttribute> pendingItemAtr = itemAttributeRepository.findById(iterable_element.getId());
+                        // if(pendingItemAtr.isPresent()){
+                        //     ItemAttribute approvItemAtr = pendingItemAtr.get();
+                        //     approvItemAtr.setAttributeType(iterable_element.getAttributeType());
+                        //     approvItemAtr.setAttributeUnit(iterable_element.getAttributeUnit());
+                        //     approvItemAtr.setAttributeValue(iterable_element.getAttributeValue());
+                        //     approvItemAtr.setItem(approvedItem);
+                        //     itemAttributeRepository.save(approvItemAtr);
+                        // }else{
+
+                        ItemAttribute itemAttribute = new ItemAttribute();
+                        itemAttribute.setAttributeType(iterable_element.getAttributeType());
+                        itemAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                        itemAttribute.setAttributeValue(iterable_element.getAttributeValue());
+                        atrName = iterable_element.getAttributeType() +" "+ iterable_element.getAttributeValue() +" "+ iterable_element.getAttributeUnit();
+                        itemAttribute.setItem(approvedItem);
+                        itemAttributeRepository.save(itemAttribute);
+                        // }
+                    }
+                    approvedItem.setItemAttributeName(atrName);
+                    approvedItem.setBrand(mergePendingItemsDto.getBrand());
+                }
                 itemRepository.save(approvedItem);
 
                 pendingItemRequestRepository.deleteById(pendingItem.getId());

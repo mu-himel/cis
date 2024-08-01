@@ -21,7 +21,7 @@ public class ItemAttribute {
     @Column(length = 500)
     private String attributeValue;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnore
     private Item item;
 }
