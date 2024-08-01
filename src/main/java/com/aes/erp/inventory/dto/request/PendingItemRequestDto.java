@@ -51,9 +51,8 @@ public class PendingItemRequestDto implements EntityConvertable<PendingItemReque
         pir.setWarehouseLocation(this.warehouseLocation);
         pir.setItemUnit(this.itemUnit);
         pir.setCode(this.code);
+        pir.setScmItemId(this.scmItemId);
         return pir;
     }
-
-    
 
 }

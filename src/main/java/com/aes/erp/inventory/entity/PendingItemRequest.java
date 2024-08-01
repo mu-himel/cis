@@ -60,6 +60,7 @@ public class PendingItemRequest {
     private String itemUnit;
 
     private String code;
+    private Long scmItemId;
 
     @ManyToOne
     private Organization organization;

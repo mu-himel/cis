@@ -46,9 +46,14 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
             Boolean active,
             Optional<Long> categoryId, Optional<Long> categoryId1, String name, String code);
 
+    List<ItemInfo> findAllByActiveAndNameLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(boolean b, String s, String s1);
+
+    List<ItemInfo> findAllByActiveAndCodeLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(boolean b, String s, String s1);
+
     interface ItemInfo{
         Long getId();
         String getName();
+        String getItemAttributeName();
         String getCode();
     }
 

@@ -8,13 +8,22 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.controller.PendingItemReqController.PendingAttributesDto;
+import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsPostDto;
 import com.aes.erp.inventory.dto.request.PendingAttributeDto;
 import com.aes.erp.inventory.dto.request.PendingBrandDto;
 import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
@@ -25,10 +34,12 @@ import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.PendingAttribute;
 import com.aes.erp.inventory.entity.PendingBrand;
 import com.aes.erp.inventory.entity.PendingItemRequest;
+import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.repository.BrandRepository;
 import com.aes.erp.inventory.repository.PendingAttributeRepository;
 import com.aes.erp.inventory.repository.PendingBrandRepository;
 import com.aes.erp.inventory.repository.PendingItemRequestRepository;
+import com.aes.erp.network.NetworkService;
 
 @Service
 public class PendingItemRequestServiceImpl implements PendingItemRequestService{
@@ -49,6 +60,12 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private NetworkService networkService;
+
+    @Value("${scm.apiEndpoint}")
+    private String scmApiEndpoint;
 
     @Override
     @Transactional
@@ -202,6 +219,35 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
             pendingAttributeRepository.delete(pendingAttribute);
         }
         
+    }
+
+
+    @Override
+    public void rejectPendingItem(Long id) {
+        PendingItemRequest getPendingItem = pendingItemRequestRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Content not exist"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(networkService.getKeycloakAccessToken(getPendingItem.getOrganization()));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        MergePendingItemsPostDto mpcpDTO = new MergePendingItemsPostDto();
+        mpcpDTO.setApproveStatus("REJECTED");
+
+
+        HttpEntity<MergePendingItemsPostDto> mPCDtoPayload = new HttpEntity<>(mpcpDTO, headers);
+
+        StringBuilder sb = new StringBuilder("/items");
+        sb.append("/approve/");
+        sb.append(getPendingItem.getScmItemId());
+        String itemTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+
+        ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
+        if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+            pendingAttributeRepository.deleteById(getPendingItem.getId());
+        }else{
+            throw new AesException("Something wrong");
+        }
+
     }
 
     

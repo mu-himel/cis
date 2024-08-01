@@ -5,15 +5,23 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.BulkCategoryRequestDto;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
+import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
+import com.aes.erp.inventory.dto.response.KeycloakOauth2Dto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.CategoryAttribute;
+import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
+import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.repository.*;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
+import io.swagger.models.HttpMethod;
+
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -27,6 +35,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -120,8 +131,15 @@ public class CategoryServiceImpl implements CategoryService {
             category.setRequesterName(categoryRequestDto.getRequestedBy());
         }
 
-        category.setCategoryStatus(categoryRequestDto.getCategoryStatus());
-
+        if(categoryRequestDto.getOrganization()!=null){
+            category.setCategoryStatus(CategoryStatus.PENDING);
+            category.setActive(true);
+        }
+        if(categoryRequestDto.getOrganization()==null) {
+//            category.setCategoryStatus(categoryRequestDto.getCategoryStatus());
+            category.setCategoryStatus(CategoryStatus.APPROVED);
+            category.setActive(true);
+        }
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalCategory = category;
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
@@ -288,10 +306,7 @@ public class CategoryServiceImpl implements CategoryService {
                 name.orElse(null),code.orElse(null));
     }
 
-    @Override
-    public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code) {
-        return categoryRepository.findAllItemCategory(name.orElse(null),code.orElse(null));
-    }
+    
 
     @Override
     public List<?> getSubCategoryListFilteredByParentCategoryNameOrCode(Optional<Long> categoryId, Optional<String> name, Optional<String> code) {
@@ -533,8 +548,154 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code) {
+        return categoryRepository.findAllItemCategory(name.orElse(null),code.orElse(null));
+    }
+
+
+    @Override
+    @Transactional
     public void mergePendingCategory(Long id, MergePendingCategoryDto mergePendingCategoryDto) {
         ItemCategory getItemCategory = categoryRepository.findById(id).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
-        categoryRepository.delete(getItemCategory);
+        
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(networkService.getKeycloakAccessToken(getItemCategory.getOrganization()));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        MergePendingCategoryPostDto postDto = new MergePendingCategoryPostDto();
+
+        HttpEntity<MergePendingCategoryPostDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
+
+        StringBuilder sb = new StringBuilder("/item-categories");
+        sb.append("/approve/category/");
+        sb.append(getItemCategory.getScmCategoryId());
+        String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+        System.out.println(itemCategoryTransferEndpoint);
+
+
+        if(mergePendingCategoryDto.getMergeCategoryId() == null){
+            //no merge, send with actual item ID in the URL
+            postDto.setApproveStatus(CategoryStatus.APPROVED);
+            postDto.setCode(null);
+            
+            ItemCategory getItemParentCategory = categoryRepository.findById(mergePendingCategoryDto.getParentCategory().getId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
+            mergePendingCategoryDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getScmCategoryId()));
+            postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
+            
+            // postDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getParentCategory().getScmCategoryId()));
+
+            ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
+            if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                if(mergePendingCategoryDto.getCode() != null){
+                    //body is not empty so update category
+
+                    if(getItemCategory.getParentCategory() == null){
+                        //It is a Category
+                        getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
+                        getItemCategory.setName(mergePendingCategoryDto.getName());
+                        getItemCategory.setActive(true);
+                    }else{
+                        //It is a subcategory
+                        getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
+                        getItemCategory.setName(mergePendingCategoryDto.getName());
+                        getItemCategory.setCode(mergePendingCategoryDto.getCode());
+                        getItemCategory.setVat(mergePendingCategoryDto.getVat());
+                        
+                        for (CategoryAttribute iterable_element : mergePendingCategoryDto.getAttributes()) {
+                            CategoryAttribute categoryAttribute = categoryAttributeRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                            categoryAttribute.setAttributeType(iterable_element.getAttributeType());
+                            categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                            categoryAttribute.setAttributeValue(iterable_element.getAttributeValue());
+                            categoryAttributeRepository.save(categoryAttribute);
+                        }
+                        for(String iterable_element : mergePendingCategoryDto.getBrands()) {
+                            Brand brand = brandRepository.findByName(iterable_element).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                            Optional<SubCategoryBrand> scbrand = subcategoryBrandRepository.findAllByBrandIdAndSubcategoryId(brand.getId(),getItemCategory.getId());
+                            if(scbrand.isPresent()){
+                                SubCategoryBrand scb = scbrand.get();
+                                scb.setBrand(brand);
+                                scb.setSubcategory(getItemCategory);
+                                subcategoryBrandRepository.save(scb);
+                            }else{
+                                SubCategoryBrand scb = new SubCategoryBrand();
+                                scb.setBrand(brand);
+                                scb.setSubcategory(getItemCategory);
+                                subcategoryBrandRepository.save(scb);
+                            }
+                        }
+                        getItemCategory.setActive(true);
+
+                    }
+                }else{
+                    //approve without edit
+                    getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
+                    getItemCategory.setActive(true);
+                }
+            }else{
+                throw new AesException("Something wrong");
+            }
+
+        }else{
+            //send post request to SCM with categoryname and code using networkservice
+            ItemCategory existingItemCategory = categoryRepository.findById(mergePendingCategoryDto.getMergeCategoryId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
+
+            postDto.setApproveStatus(CategoryStatus.REJECTED);
+            postDto.setCode(existingItemCategory.getCode());
+            MergePendingCategoryDto mpcDto = new MergePendingCategoryDto();
+            mpcDto.setCode(existingItemCategory.getCode());
+            mpcDto.setName(existingItemCategory.getName());
+            mpcDto.setVat(existingItemCategory.getVat());
+            mpcDto.setParentCategory(new ReferenceObjectDto(existingItemCategory.getParentCategory().getScmCategoryId()));
+            mpcDto.setOrganization(existingItemCategory.getOrganization());
+            List<SubCategoryBrand> scbPost = subcategoryBrandRepository.findAllBySubcategoryId(existingItemCategory.getId());
+            List<String> bPost = new ArrayList<>();
+            for (SubCategoryBrand iterable_element : scbPost) {
+                bPost.add(iterable_element.getBrand().getName());
+            }
+            mpcDto.setBrands(bPost);
+            List<CategoryAttribute> categoryAttributesPost =categoryAttributeRepository.findAllByCategoryId(existingItemCategory.getId());
+            mpcDto.setAttributes(categoryAttributesPost);
+            postDto.setMergePendingCategoryDto(mpcDto);
+
+            ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
+            if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                getItemCategory.setActive(false);
+                getItemCategory.setCategoryStatus(CategoryStatus.REJECTED);
+            }else{
+                throw new AesException("Something wrong");
+            }
+        }
+        categoryRepository.save(getItemCategory);
     }
+
+    @Override
+    public void rejectPendingCategory(Long id) {
+        ItemCategory getItemCategory = categoryRepository.findById(id).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(networkService.getKeycloakAccessToken(getItemCategory.getOrganization()));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        MergePendingCategoryPostDto mpcpDTO = new MergePendingCategoryPostDto();
+        mpcpDTO.setApproveStatus(CategoryStatus.REJECTED);
+
+
+        HttpEntity<MergePendingCategoryPostDto> mPCDtoPayload = new HttpEntity<>(mpcpDTO, headers);
+
+        StringBuilder sb = new StringBuilder("/item-categories");
+        sb.append("/approve/category/");
+        sb.append(getItemCategory.getScmCategoryId());
+        String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+
+        ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
+        if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+            getItemCategory.setCategoryStatus(CategoryStatus.REJECTED);
+            getItemCategory.setActive(false);
+            categoryRepository.save(getItemCategory);
+        }else{
+            throw new AesException("Something wrong");
+        }
+
+    }
+
 }

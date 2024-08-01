@@ -23,4 +23,5 @@ public interface PendingItemRequestService {
     void deletePendingBrands(List<Long> id);
     void deletePendingAttributes(List<Long> id);
     void deletePendingItemRequest(Long id);
+    void rejectPendingItem(Long id);
 }

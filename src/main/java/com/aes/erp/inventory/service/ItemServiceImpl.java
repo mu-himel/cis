@@ -6,6 +6,9 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDetailDto;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
+import com.aes.erp.inventory.dto.request.MergePendingItemsPostDto;
 import com.aes.erp.inventory.dto.request.RemoteItemRequestDto;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.BulkProcessLog;
@@ -14,10 +17,15 @@ import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.inventory.entity.PendingItemRequest;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
+import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.entity.BulkProcessLog.BulkItemStatus;
+import com.aes.erp.inventory.repository.BrandRepository;
 import com.aes.erp.inventory.repository.BulkProcessLogRepository;
+import com.aes.erp.inventory.repository.ItemAttributeRepository;
 import com.aes.erp.inventory.repository.ItemRepository;
+import com.aes.erp.inventory.repository.PendingItemRequestRepository;
 import com.aes.erp.inventory.repository.TempItemRepository;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
@@ -26,6 +34,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +49,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -68,6 +78,9 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private NetworkService networkService;
 
+    @Value("${scm.apiEndpoint}")
+    private String scmApiEndpoint;
+
     @Autowired
     private OrganizationService organizationService;
 
@@ -76,6 +89,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private BulkProcessLogRepository bulkItemRepository;
+
+    @Autowired
+    private PendingItemRequestRepository pendingItemRequestRepository;
+
+    @Autowired
+    private BrandRepository brandRepository;
+
+    @Autowired
+    private ItemAttributeRepository itemAttributeRepository;
 
     @Override
     public CategoryService getCategoryService() {
@@ -131,10 +153,10 @@ public class ItemServiceImpl implements ItemService {
 
         if(name.isPresent() && code.isEmpty()){
             System.out.println(name.get());
-            return itemRepository.findAllByActiveAndNameLikeIgnoreCase(true,name.get()+"%");
+            return itemRepository.findAllByActiveAndNameLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(true,name.get()+"%","%"+name.get()+"%");
         }
         if(name.isEmpty() && code.isPresent()){
-            return  itemRepository.findAllByActiveAndCodeLikeIgnoreCase(true, code.get()+"%");
+            return  itemRepository.findAllByActiveAndCodeLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(true, code.get()+"%",name.get()+"%");
         }
         return new ArrayList<>();
     }
@@ -394,8 +416,100 @@ public class ItemServiceImpl implements ItemService {
         
     }
 
-    
 
+    @Override
+    public void mergePendingItems(Long id, MergePendingItemsDto mergePendingItemsDto) {
+        PendingItemRequest pendingItem = pendingItemRequestRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"No Such Entry Found"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(networkService.getKeycloakAccessToken(pendingItem.getOrganization()));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        MergePendingItemsPostDto postDto = new MergePendingItemsPostDto();
+
+        HttpEntity<MergePendingItemsPostDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
+
+        StringBuilder sb = new StringBuilder("/items");
+        sb.append("/approve/");
+        sb.append(pendingItem.getScmItemId());
+
+        String itemTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+        System.out.println(itemTransferEndpoint);
+        if (mergePendingItemsDto.getMergeItemId() == null){
+            //No Merge
+            postDto.setApproveStatus("APPROVED");
+            postDto.setCode(null);
+            
+
+            ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
+            if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                Item approvedItem = new Item();
+                approvedItem.setActive(true);
+                approvedItem.setScmItemId(pendingItem.getScmItemId());
+                approvedItem.setOrganization(pendingItem.getOrganization());
+                
+                if(mergePendingItemsDto.getCode() == null){
+                    //without body
+                    approvedItem.setCode(pendingItem.getCode());
+                    approvedItem.setItemUnit(pendingItem.getItemUnit());
+                    approvedItem.setItemCategory(pendingItem.getSubCategory());
+                    approvedItem.setItemParentCategory(pendingItem.getCategory());
+                    approvedItem.setBrand(pendingItem.getBrand());
+                    approvedItem.setItemAttributeName(pendingItem.getItemAttributeName());
+                    Brand brandId = pendingItem.getBrand();
+                    approvedItem.setName(brandId.getName());
+                }else{
+                    //with body
+                    String atrName = "";
+                    approvedItem.setCode(mergePendingItemsDto.getCode());
+                    approvedItem.setName(mergePendingItemsDto.getName());
+                    approvedItem.setItemUnit(mergePendingItemsDto.getItemUnit());
+                    approvedItem.setItemCategory(mergePendingItemsDto.getItemCategory());
+                    approvedItem.setItemParentCategory(mergePendingItemsDto.getItemParentCategory());
+                    for (ItemAttribute iterable_element : mergePendingItemsDto.getAttributes()) {
+                        // Optional<ItemAttribute> pendingItemAtr = itemAttributeRepository.findById(iterable_element.getId());
+                        // if(pendingItemAtr.isPresent()){
+                        //     ItemAttribute approvItemAtr = pendingItemAtr.get();
+                        //     approvItemAtr.setAttributeType(iterable_element.getAttributeType());
+                        //     approvItemAtr.setAttributeUnit(iterable_element.getAttributeUnit());
+                        //     approvItemAtr.setAttributeValue(iterable_element.getAttributeValue());
+                        //     approvItemAtr.setItem(approvedItem);
+                        //     itemAttributeRepository.save(approvItemAtr);
+                        // }else{
+
+                        ItemAttribute itemAttribute = new ItemAttribute();
+                        itemAttribute.setAttributeType(iterable_element.getAttributeType());
+                        itemAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                        itemAttribute.setAttributeValue(iterable_element.getAttributeValue());
+                        atrName = iterable_element.getAttributeType() +" "+ iterable_element.getAttributeValue() +" "+ iterable_element.getAttributeUnit();
+                        itemAttribute.setItem(approvedItem);
+                        itemAttributeRepository.save(itemAttribute);
+                        // }
+                    }
+                    approvedItem.setItemAttributeName(atrName);
+                    approvedItem.setBrand(mergePendingItemsDto.getBrand());
+                }
+                itemRepository.save(approvedItem);
+
+                pendingItemRequestRepository.deleteById(pendingItem.getId());
+
+            }else{
+                throw new AesException("Something wrong");
+            }
+
+        }else{
+            //Merge with existing item 
+            Item existingItemCategory = itemRepository.findById(mergePendingItemsDto.getMergeItemId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
+
+            postDto.setApproveStatus("REJECTED");
+            postDto.setCode(existingItemCategory.getCode());
+
+            ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
+            if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                pendingItemRequestRepository.deleteById(pendingItem.getId());
+            }else{
+                throw new AesException("Something wrong");
+            }
+        }
+    }
     
 
     
