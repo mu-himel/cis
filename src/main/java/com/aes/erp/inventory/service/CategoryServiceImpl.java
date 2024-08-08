@@ -577,10 +577,11 @@ public class CategoryServiceImpl implements CategoryService {
             //no merge, send with actual item ID in the URL
             postDto.setApproveStatus(CategoryStatus.APPROVED);
             postDto.setCode(null);
-            
-            ItemCategory getItemParentCategory = categoryRepository.findById(mergePendingCategoryDto.getParentCategory().getId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
-            mergePendingCategoryDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getScmCategoryId()));
-            postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
+            if(getItemCategory.getParentCategory() != null){
+                ItemCategory getItemParentCategory = categoryRepository.findById(mergePendingCategoryDto.getParentCategory().getId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
+                mergePendingCategoryDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getScmCategoryId()));
+                postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
+            }
             
             // postDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getParentCategory().getScmCategoryId()));
 

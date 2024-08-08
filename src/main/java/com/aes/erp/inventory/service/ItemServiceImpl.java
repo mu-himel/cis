@@ -5,6 +5,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDetailDto;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
+import com.aes.erp.inventory.dto.request.ItemMergeRequestDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
 import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
@@ -23,6 +24,7 @@ import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.entity.BulkProcessLog.BulkItemStatus;
 import com.aes.erp.inventory.repository.BrandRepository;
 import com.aes.erp.inventory.repository.BulkProcessLogRepository;
+import com.aes.erp.inventory.repository.CategoryRepository;
 import com.aes.erp.inventory.repository.ItemAttributeRepository;
 import com.aes.erp.inventory.repository.ItemRepository;
 import com.aes.erp.inventory.repository.PendingItemRequestRepository;
@@ -95,6 +97,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private BrandRepository brandRepository;
+
+    @Autowired
+    private CategoryRepository itemCategoryRepo;
 
     @Autowired
     private ItemAttributeRepository itemAttributeRepository;
@@ -424,7 +429,7 @@ public class ItemServiceImpl implements ItemService {
         headers.setBearerAuth(networkService.getKeycloakAccessToken(pendingItem.getOrganization()));
         headers.setContentType(MediaType.APPLICATION_JSON);
         MergePendingItemsPostDto postDto = new MergePendingItemsPostDto();
-
+        ItemMergeRequestDto itemMergeRequestDto = new ItemMergeRequestDto();
         HttpEntity<MergePendingItemsPostDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
 
         StringBuilder sb = new StringBuilder("/items");
@@ -437,71 +442,110 @@ public class ItemServiceImpl implements ItemService {
             //No Merge
             postDto.setApproveStatus("APPROVED");
             postDto.setCode(null);
+            ItemCategory itemCat =  itemCategoryRepo.findById(pendingItem.getCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));
+            itemMergeRequestDto.setItemParentCategory(new ItemCategory(itemCat.getScmCategoryId()));
+            ItemCategory itemSubCat =  itemCategoryRepo.findById(pendingItem.getSubCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));
+            itemMergeRequestDto.setItemCategory(new ItemCategory(itemSubCat.getScmCategoryId()));
+            itemMergeRequestDto.setAttributes(mergePendingItemsDto.getAttributes());
+            itemMergeRequestDto.setCode(mergePendingItemsDto.getCode());
+            itemMergeRequestDto.setItemUnit(mergePendingItemsDto.getItemUnit());
+            itemMergeRequestDto.setName(mergePendingItemsDto.getName());
+            String atrName = "";
             
-
-            ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
-            if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-                Item approvedItem = new Item();
-                approvedItem.setActive(true);
-                approvedItem.setScmItemId(pendingItem.getScmItemId());
-                approvedItem.setOrganization(pendingItem.getOrganization());
+            ItemAttribute itemAttribute = new ItemAttribute();
+            Item approvedItem = new Item();
+            approvedItem.setActive(true);
+            approvedItem.setScmItemId(pendingItem.getScmItemId());
+            approvedItem.setOrganization(pendingItem.getOrganization());
+            Brand brandId = pendingItem.getBrand();
+            if(mergePendingItemsDto.getCode() == null){
+                //without body
+                approvedItem.setCode(pendingItem.getCode());
+                approvedItem.setItemUnit(pendingItem.getItemUnit());
+                approvedItem.setItemCategory(pendingItem.getSubCategory());
+                approvedItem.setItemParentCategory(pendingItem.getCategory());
+                approvedItem.setBrand(pendingItem.getBrand());
+                approvedItem.setItemAttributeName(pendingItem.getItemAttributeName());
+                approvedItem.setName(brandId.getName());
                 
-                if(mergePendingItemsDto.getCode() == null){
-                    //without body
-                    approvedItem.setCode(pendingItem.getCode());
-                    approvedItem.setItemUnit(pendingItem.getItemUnit());
-                    approvedItem.setItemCategory(pendingItem.getSubCategory());
-                    approvedItem.setItemParentCategory(pendingItem.getCategory());
-                    approvedItem.setBrand(pendingItem.getBrand());
-                    approvedItem.setItemAttributeName(pendingItem.getItemAttributeName());
-                    Brand brandId = pendingItem.getBrand();
-                    approvedItem.setName(brandId.getName());
+
+                itemMergeRequestDto.setItemAttributeName(atrName);
+                itemMergeRequestDto.setBrand(brandId.getName());
+                postDto.setItemMergeRequestDto(itemMergeRequestDto);
+                ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
+                if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                    
+                    itemRepository.save(approvedItem);
+                    pendingItemRequestRepository.deleteById(pendingItem.getId());
+
                 }else{
-                    //with body
-                    String atrName = "";
-                    approvedItem.setCode(mergePendingItemsDto.getCode());
-                    approvedItem.setName(mergePendingItemsDto.getName());
-                    approvedItem.setItemUnit(mergePendingItemsDto.getItemUnit());
-                    approvedItem.setItemCategory(mergePendingItemsDto.getItemCategory());
-                    approvedItem.setItemParentCategory(mergePendingItemsDto.getItemParentCategory());
-                    for (ItemAttribute iterable_element : mergePendingItemsDto.getAttributes()) {
-                        // Optional<ItemAttribute> pendingItemAtr = itemAttributeRepository.findById(iterable_element.getId());
-                        // if(pendingItemAtr.isPresent()){
-                        //     ItemAttribute approvItemAtr = pendingItemAtr.get();
-                        //     approvItemAtr.setAttributeType(iterable_element.getAttributeType());
-                        //     approvItemAtr.setAttributeUnit(iterable_element.getAttributeUnit());
-                        //     approvItemAtr.setAttributeValue(iterable_element.getAttributeValue());
-                        //     approvItemAtr.setItem(approvedItem);
-                        //     itemAttributeRepository.save(approvItemAtr);
-                        // }else{
-
-                        ItemAttribute itemAttribute = new ItemAttribute();
-                        itemAttribute.setAttributeType(iterable_element.getAttributeType());
-                        itemAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
-                        itemAttribute.setAttributeValue(iterable_element.getAttributeValue());
-                        atrName = iterable_element.getAttributeType() +" "+ iterable_element.getAttributeValue() +" "+ iterable_element.getAttributeUnit();
-                        itemAttribute.setItem(approvedItem);
-                        itemAttributeRepository.save(itemAttribute);
-                        // }
-                    }
-                    approvedItem.setItemAttributeName(atrName);
-                    approvedItem.setBrand(mergePendingItemsDto.getBrand());
+                    throw new AesException("Something wrong");
                 }
-                itemRepository.save(approvedItem);
-
-                pendingItemRequestRepository.deleteById(pendingItem.getId());
-
             }else{
-                throw new AesException("Something wrong");
+                //with body
+                
+                approvedItem.setCode(mergePendingItemsDto.getCode());
+                approvedItem.setName(mergePendingItemsDto.getName());
+                approvedItem.setItemUnit(mergePendingItemsDto.getItemUnit());
+                approvedItem.setItemCategory(mergePendingItemsDto.getItemCategory());
+                approvedItem.setItemParentCategory(mergePendingItemsDto.getItemParentCategory());
+                for (ItemAttribute iterable_element : mergePendingItemsDto.getAttributes()) {
+                    // Optional<ItemAttribute> pendingItemAtr = itemAttributeRepository.findById(iterable_element.getId());
+                    // if(pendingItemAtr.isPresent()){
+                    //     ItemAttribute approvItemAtr = pendingItemAtr.get();
+                    //     approvItemAtr.setAttributeType(iterable_element.getAttributeType());
+                    //     approvItemAtr.setAttributeUnit(iterable_element.getAttributeUnit());
+                    //     approvItemAtr.setAttributeValue(iterable_element.getAttributeValue());
+                    //     approvItemAtr.setItem(approvedItem);
+                    //     itemAttributeRepository.save(approvItemAtr);
+                    // }else{
+
+                    
+                    itemAttribute.setAttributeType(iterable_element.getAttributeType());
+                    itemAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                    itemAttribute.setAttributeValue(iterable_element.getAttributeValue());
+                    atrName = iterable_element.getAttributeType() +" "+ iterable_element.getAttributeValue() +" "+ iterable_element.getAttributeUnit();
+                    itemAttribute.setItem(approvedItem);
+                    
+                    // }
+                }
+                approvedItem.setItemAttributeName(atrName);
+                approvedItem.setBrand(mergePendingItemsDto.getBrand());
+
+                itemMergeRequestDto.setItemAttributeName(atrName);
+                itemMergeRequestDto.setBrand(brandId.getName());
+                postDto.setItemMergeRequestDto(itemMergeRequestDto);
+                
+                ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
+                if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                    itemRepository.save(approvedItem);
+                    itemAttributeRepository.save(itemAttribute);
+                    pendingItemRequestRepository.deleteById(pendingItem.getId());
+
+                }else{
+                    throw new AesException("Something wrong");
+                }
             }
 
         }else{
             //Merge with existing item 
-            Item existingItemCategory = itemRepository.findById(mergePendingItemsDto.getMergeItemId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
+            Item existingItem = itemRepository.findById(mergePendingItemsDto.getMergeItemId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
 
             postDto.setApproveStatus("REJECTED");
-            postDto.setCode(existingItemCategory.getCode());
+            postDto.setCode(existingItem.getCode());
+            itemMergeRequestDto.setName(existingItem.getName());
+            itemMergeRequestDto.setCode(existingItem.getCode());
+            ItemCategory itemCat =  itemCategoryRepo.findById(existingItem.getItemParentCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));
+            itemMergeRequestDto.setItemParentCategory(new ItemCategory(itemCat.getScmCategoryId()));
+            ItemCategory itemSubCat =  itemCategoryRepo.findById(existingItem.getItemCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));
+            itemMergeRequestDto.setItemCategory(new ItemCategory(itemSubCat.getScmCategoryId()));
+            itemMergeRequestDto.setItemUnit(existingItem.getItemUnit());
+            itemMergeRequestDto.setBrand(existingItem.getBrand().getName());
+            itemMergeRequestDto.setItemAttributeName(existingItem.getItemAttributeName());
+            List<ItemAttribute> itemAttributesPost =itemAttributeRepository.findAllByItemId(existingItem.getId());
+            itemMergeRequestDto.setAttributes(itemAttributesPost);
 
+            postDto.setItemMergeRequestDto(itemMergeRequestDto);
             ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
                 pendingItemRequestRepository.deleteById(pendingItem.getId());
