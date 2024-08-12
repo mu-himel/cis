@@ -583,13 +583,15 @@ public class CategoryServiceImpl implements CategoryService {
             mergePendingCategoryDto.setCode(getItemCategory.getCode());
 
             if(getItemCategory.getParentCategory() != null){
-                if (mergePendingCategoryDto.getParentCategory().getId() != null){
+                if (mergePendingCategoryDto.getParentCategory() != null){
                     Optional<ItemCategory> getItemParentCategoryOp = categoryRepository.findById(mergePendingCategoryDto.getParentCategory().getId());
                     if(getItemParentCategoryOp.isPresent()){
                         ItemCategory getItemParentCategory = getItemParentCategoryOp.get();
                         mergePendingCategoryDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getScmCategoryId()));
                         postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
                     }
+                }else{
+                    postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
                 }
                
             }else{
@@ -600,7 +602,7 @@ public class CategoryServiceImpl implements CategoryService {
             // System.out.println(mPCDtoPayload);
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-                if(mergePendingCategoryDto.getCode() != null){
+                if(mergePendingCategoryDto != null){
                     //body is not empty so update category
 
                     if(getItemCategory.getParentCategory() == null){
@@ -624,7 +626,7 @@ public class CategoryServiceImpl implements CategoryService {
                                 categoryAttribute = categoryAttributeOP.get();
                             }
                             categoryAttribute.setAttributeType(iterable_element.getAttributeType());
-                            categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                            mergePendingCategoryDto         categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
                             categoryAttribute.setAttributeValue(iterable_element.getAttributeValue());
                             categoryAttributeRepository.save(categoryAttribute);
                         }
