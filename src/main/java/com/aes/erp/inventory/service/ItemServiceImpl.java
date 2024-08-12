@@ -5,6 +5,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDetailDto;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
+import com.aes.erp.inventory.dto.request.ImportItemScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.ItemMergeRequestDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
@@ -550,6 +551,18 @@ public class ItemServiceImpl implements ItemService {
                 pendingItemRequestRepository.deleteById(pendingItem.getId());
             }else{
                 throw new AesException("Something wrong");
+            }
+        }
+    }
+
+    @Override
+    public void updateItemScmId(List<ImportItemScmIdUpdateDto> itemScmIdList) {
+        for (ImportItemScmIdUpdateDto getItem : itemScmIdList) {
+            Optional<Item> getItemOp = itemRepository.findById(getItem.getItemIdCps());
+            if(getItemOp.isPresent()){
+                Item pickItem = getItemOp.get();
+                pickItem.setScmItemId(getItem.getItemIdScm());
+                itemRepository.save(pickItem);
             }
         }
     }
