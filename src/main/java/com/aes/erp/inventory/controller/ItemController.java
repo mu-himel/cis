@@ -3,6 +3,7 @@ import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
 import com.aes.erp.inventory.dto.request.BulkItemGenerateDto;
+import com.aes.erp.inventory.dto.request.ImportItemScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
 import com.aes.erp.inventory.dto.request.bulk_gen.BulkGenConfigDto;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 
 
 @RestController
@@ -90,6 +92,8 @@ public class ItemController {
                 HttpStatus.OK
         );
     }
+
+    
 
     @GetMapping("/{id}")
     @ApiOperation(value = "Get Item Detail")
@@ -176,6 +180,12 @@ public class ItemController {
     @PutMapping("/merge-pending-items/{id}")
     public ResponseEntity<?> mergePendingItems(@PathVariable Long id, @RequestBody MergePendingItemsDto mergePendingItemsDto){
         itemService.mergePendingItems(id,mergePendingItemsDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/update-scm-id")
+    public ResponseEntity<?> putMethodName(@RequestBody List<ImportItemScmIdUpdateDto> scmIdList) {
+        itemService.updateItemScmId(scmIdList);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     

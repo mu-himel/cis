@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class BulkCategoryRequestDto {
     private List<CategoryRequestDto> categories;
-    private Long userId;
+    private String userId;
     private Long warehouseId;
     private Long warehouseStoreId;
 }

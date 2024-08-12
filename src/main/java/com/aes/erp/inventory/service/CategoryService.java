@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.service;
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
@@ -81,7 +82,7 @@ public interface CategoryService {
     List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name);
 
     Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId, String attributeType);
-    void bulkImport(String token, Organization org, Long userId, Long warehouseId, Long storeId,Long parentCategoryId,
+    void bulkImport(String token, Organization org, String userId, Long warehouseId, Long storeId,Long parentCategoryId,
                     List<Long> id);
     List<ItemCategory> getAllSubCategories(Long categoryId, Long subCategoryId);
 
@@ -100,4 +101,7 @@ public interface CategoryService {
     public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code);
 
     List<?> getSubCategoryListFilteredByParentCategoryNameOrCode(Optional<Long> categoryId, Optional<String> name, Optional<String> code);
+
+    void updateCategoryScmId(List<ImportCategoryScmIdUpdateDto> scmIdList);
+
 }

@@ -4,6 +4,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.BulkCategoryRequestDto;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
 import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
@@ -113,9 +114,9 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AesException("Category code already exist");
         }
 
-        if(categoryRepository.existsByNameAndActive(category.getName(),true)){
-            throw new AesException("Sorry! Category Name already exist");
-        }
+        // if(categoryRepository.existsByNameAndActive(category.getName(),true)){
+        //     throw new AesException("Sorry! Category Name already exist");
+        // }
 
         if(categoryRequestDto.getParentCategory() != null){
             Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(categoryRequestDto.getParentCategory().getId());
@@ -435,7 +436,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void bulkImport(String token, Organization org, Long userId, Long warehouseId, Long storeId,
+    public void bulkImport(String token, Organization org, String userId, Long warehouseId, Long storeId,
     Long parentCategoryId, List<Long> ids) {
         List<CategoryRequestDto> categoryList = new ArrayList<>();
         for(Long catId : ids){
@@ -480,7 +481,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private void sentItemCategoryTransfer(String authToken, Long userId, Organization org,List<CategoryRequestDto> categoryList){
+    private void sentItemCategoryTransfer(String authToken, String userId, Organization org,List<CategoryRequestDto> categoryList){
         StringBuilder sb = new StringBuilder("/item-categories");
                 
         sb.append("/bulk-create");
@@ -571,22 +572,37 @@ public class CategoryServiceImpl implements CategoryService {
         sb.append(getItemCategory.getScmCategoryId());
         String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
         System.out.println(itemCategoryTransferEndpoint);
-
+        
 
         if(mergePendingCategoryDto.getMergeCategoryId() == null){
             //no merge, send with actual item ID in the URL
+
+            
             postDto.setApproveStatus(CategoryStatus.APPROVED);
             postDto.setCode(null);
-            
-            ItemCategory getItemParentCategory = categoryRepository.findById(mergePendingCategoryDto.getParentCategory().getId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
-            mergePendingCategoryDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getScmCategoryId()));
-            postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
+            mergePendingCategoryDto.setCode(getItemCategory.getCode());
+
+            if(getItemCategory.getParentCategory() != null){
+                if (mergePendingCategoryDto.getParentCategory() != null){
+                    Optional<ItemCategory> getItemParentCategoryOp = categoryRepository.findById(mergePendingCategoryDto.getParentCategory().getId());
+                    if(getItemParentCategoryOp.isPresent()){
+                        ItemCategory getItemParentCategory = getItemParentCategoryOp.get();
+                        mergePendingCategoryDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getScmCategoryId()));
+                        postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
+                    }
+                }else{
+                    postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
+                }
+               
+            }else{
+                postDto.setMergePendingCategoryDto(mergePendingCategoryDto);
+            }
             
             // postDto.setParentCategory(new ReferenceObjectDto(getItemParentCategory.getParentCategory().getScmCategoryId()));
-
+            // System.out.println(mPCDtoPayload);
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-                if(mergePendingCategoryDto.getCode() != null){
+                if(mergePendingCategoryDto != null){
                     //body is not empty so update category
 
                     if(getItemCategory.getParentCategory() == null){
@@ -598,18 +614,34 @@ public class CategoryServiceImpl implements CategoryService {
                         //It is a subcategory
                         getItemCategory.setCategoryStatus(CategoryStatus.APPROVED);
                         getItemCategory.setName(mergePendingCategoryDto.getName());
-                        getItemCategory.setCode(mergePendingCategoryDto.getCode());
+                        // getItemCategory.setCode(mergePendingCategoryDto.getCode());
                         getItemCategory.setVat(mergePendingCategoryDto.getVat());
                         
                         for (CategoryAttribute iterable_element : mergePendingCategoryDto.getAttributes()) {
-                            CategoryAttribute categoryAttribute = categoryAttributeRepository.findById(iterable_element.getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                            CategoryAttribute categoryAttribute;
+                            Optional<CategoryAttribute> categoryAttributeOP = categoryAttributeRepository.findById(iterable_element.getId());
+                            if(categoryAttributeOP.isEmpty()){
+                                categoryAttribute = new CategoryAttribute();
+                            }else{
+                                categoryAttribute = categoryAttributeOP.get();
+                            }
                             categoryAttribute.setAttributeType(iterable_element.getAttributeType());
                             categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
                             categoryAttribute.setAttributeValue(iterable_element.getAttributeValue());
                             categoryAttributeRepository.save(categoryAttribute);
                         }
                         for(String iterable_element : mergePendingCategoryDto.getBrands()) {
-                            Brand brand = brandRepository.findByName(iterable_element).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,""));
+                            Brand brand;
+                            Optional<Brand> get_brand = brandRepository.findByName(iterable_element);
+                            //if brand not found, create brand
+                            if(!get_brand.isPresent()){
+                                brand = new Brand();
+                                brand.setName(iterable_element);
+                                brandRepository.save(brand);
+                            }else{
+                                brand = get_brand.get();
+                            }
+                             
                             Optional<SubCategoryBrand> scbrand = subcategoryBrandRepository.findAllByBrandIdAndSubcategoryId(brand.getId(),getItemCategory.getId());
                             if(scbrand.isPresent()){
                                 SubCategoryBrand scb = scbrand.get();
@@ -640,12 +672,14 @@ public class CategoryServiceImpl implements CategoryService {
             ItemCategory existingItemCategory = categoryRepository.findById(mergePendingCategoryDto.getMergeCategoryId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
 
             postDto.setApproveStatus(CategoryStatus.REJECTED);
-            postDto.setCode(existingItemCategory.getCode());
+            postDto.setCode(getItemCategory.getCode());
             MergePendingCategoryDto mpcDto = new MergePendingCategoryDto();
             mpcDto.setCode(existingItemCategory.getCode());
             mpcDto.setName(existingItemCategory.getName());
             mpcDto.setVat(existingItemCategory.getVat());
-            mpcDto.setParentCategory(new ReferenceObjectDto(existingItemCategory.getParentCategory().getScmCategoryId()));
+            if(existingItemCategory.getParentCategory() != null){
+                mpcDto.setParentCategory(new ReferenceObjectDto(existingItemCategory.getParentCategory().getScmCategoryId()));
+            }
             mpcDto.setOrganization(existingItemCategory.getOrganization());
             List<SubCategoryBrand> scbPost = subcategoryBrandRepository.findAllBySubcategoryId(existingItemCategory.getId());
             List<String> bPost = new ArrayList<>();
@@ -655,8 +689,9 @@ public class CategoryServiceImpl implements CategoryService {
             mpcDto.setBrands(bPost);
             List<CategoryAttribute> categoryAttributesPost =categoryAttributeRepository.findAllByCategoryId(existingItemCategory.getId());
             mpcDto.setAttributes(categoryAttributesPost);
+            mpcDto.setMergeCategoryId(existingItemCategory.getId());
             postDto.setMergePendingCategoryDto(mpcDto);
-
+            // System.out.println(postDto);
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
                 getItemCategory.setActive(false);
@@ -696,6 +731,18 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AesException("Something wrong");
         }
 
+    }
+
+    @Override
+    public void updateCategoryScmId(List<ImportCategoryScmIdUpdateDto> scmIdList) {
+        for (ImportCategoryScmIdUpdateDto id : scmIdList) {
+            Optional<ItemCategory> itemCatOp = categoryRepository.findById(id.getCategoryIdCps());
+            if(itemCatOp.isPresent()){
+                ItemCategory iitemCat = itemCatOp.get();
+                iitemCat.setScmCategoryId(id.getCategoryIdScm());
+                categoryRepository.save(iitemCat);
+            }
+        }
     }
 
 }
