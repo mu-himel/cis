@@ -144,7 +144,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<?> getAllItems(Optional<Long> categoryId, Optional<String> name, Optional<String> code) {
-
         if(categoryId.isPresent()){
             List<?> result = new ArrayList<>();
             if(name.isPresent()){

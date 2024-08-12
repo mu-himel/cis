@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class ErpBulkImportDto extends BulkDeleteDto{
-    private Long userId;
+    private String userId;
     private Long warehouseId;
     private Long warehouseStoreId;
     private Long parentCategoryId;

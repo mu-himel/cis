@@ -60,9 +60,14 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                 v.email as email, 
                 v.phone as phone, 
                 v.verification_status as verificationStatus,
-                (total_score*100/1000) as score 
+                vt.name as vendorTypeName,
+                (vs.total_score*100/1000) as score,
+                b.address as addressLine1
             FROM vendor v
+            LEFT JOIN vendor_types vt ON v.vendor_type_id = vt.id
             LEFT JOIN vendor_score vs ON v.vendor_score_id = vs.id
+            LEFT JOIN document_holders dh ON v.document_holder_id = dh.id
+            LEFT JOIN bin b ON dh.bin_document_id = b.id
             WHERE v.verification_status IN ('PENDING_DOCUMENT_VERIFICATION','PENDING_VERIFICATION','VERIFIED','APPROVED') 
                 AND (:name IS NULL OR LOWER(v.name) LIKE CONCAT('%',LOWER(:name),'%')) 
             """, nativeQuery = true)
@@ -78,6 +83,8 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         String getPhone();
         Integer getScore();
         String getVerificationStatus();
+        String getVendorTypeName();
+        String getAddressLine1();
     }
     @Query(value = "SELECT v FROM Vendor v " +
             " LEFT JOIN FETCH v.vendorType vt " +
