@@ -4,6 +4,7 @@ import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.BulkCategoryRequestDto;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
+import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
 import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
@@ -722,6 +723,18 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AesException("Something wrong");
         }
 
+    }
+
+    @Override
+    public void updateCategoryScmId(List<ImportCategoryScmIdUpdateDto> scmIdList) {
+        for (ImportCategoryScmIdUpdateDto id : scmIdList) {
+            Optional<ItemCategory> itemCatOp = categoryRepository.findById(id.getCategoryIdCps());
+            if(itemCatOp.isPresent()){
+                ItemCategory iitemCat = itemCatOp.get();
+                iitemCat.setScmCategoryId(id.getCategoryIdScm());
+                categoryRepository.save(iitemCat);
+            }
+        }
     }
 
 }

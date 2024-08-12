@@ -3,6 +3,7 @@ package com.aes.erp.inventory.controller;
 
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.ErpBulkImportDto;
+import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
 import com.aes.erp.inventory.entity.ItemCategory;
@@ -11,6 +12,7 @@ import com.aes.erp.inventory.service.CategoryService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
 @RequestMapping("/api/v1/item-categories")
@@ -226,6 +232,12 @@ public class ItemCategoryController {
                                                 example = "1", required = true) @PathVariable("id") Long id,
                                                 @RequestBody CategoryRequestDto categoryRequestDto){
         categoryService.updateCategory(id,categoryRequestDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/update-scm-id")
+    public ResponseEntity<?> updateScmCategotyId(@RequestBody List<ImportCategoryScmIdUpdateDto> scmIdList) {
+        categoryService.updateCategoryScmId(scmIdList);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
