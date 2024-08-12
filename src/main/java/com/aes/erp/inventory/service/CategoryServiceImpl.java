@@ -626,7 +626,7 @@ public class CategoryServiceImpl implements CategoryService {
                                 categoryAttribute = categoryAttributeOP.get();
                             }
                             categoryAttribute.setAttributeType(iterable_element.getAttributeType());
-                            mergePendingCategoryDto         categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                            categoryAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
                             categoryAttribute.setAttributeValue(iterable_element.getAttributeValue());
                             categoryAttributeRepository.save(categoryAttribute);
                         }
