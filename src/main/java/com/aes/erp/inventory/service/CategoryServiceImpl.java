@@ -682,6 +682,7 @@ public class CategoryServiceImpl implements CategoryService {
             mpcDto.setBrands(bPost);
             List<CategoryAttribute> categoryAttributesPost =categoryAttributeRepository.findAllByCategoryId(existingItemCategory.getId());
             mpcDto.setAttributes(categoryAttributesPost);
+            mpcDto.setMergeCategoryId(existingItemCategory.getId());
             postDto.setMergePendingCategoryDto(mpcDto);
             // System.out.println(postDto);
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
