@@ -471,7 +471,7 @@ public class ItemServiceImpl implements ItemService {
 
                 itemMergeRequestDto.setItemAttributeName(atrName);
                 itemMergeRequestDto.setBrand(brandId.getName());
-                postDto.setItemMergeRequestDto(itemMergeRequestDto);
+                // postDto.setItemMergeRequestDto(itemMergeRequestDto);
                 ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
                 if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
                     
