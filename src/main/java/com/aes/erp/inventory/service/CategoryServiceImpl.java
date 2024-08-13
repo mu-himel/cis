@@ -558,7 +558,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void mergePendingCategory(Long id, MergePendingCategoryDto mergePendingCategoryDto) {
         ItemCategory getItemCategory = categoryRepository.findById(id).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));
-        
+        // boolean emptyDto = false;
+        // if(mergePendingCategoryDto.getCode() == null){
+        //     emptyDto = true;
+        // }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(networkService.getKeycloakAccessToken(getItemCategory.getOrganization()));
@@ -580,7 +583,7 @@ public class CategoryServiceImpl implements CategoryService {
             
             postDto.setApproveStatus(CategoryStatus.APPROVED);
             postDto.setCode(null);
-            mergePendingCategoryDto.setCode(getItemCategory.getCode());
+            // mergePendingCategoryDto.setCode(getItemCategory.getCode());
 
             if(getItemCategory.getParentCategory() != null){
                 if (mergePendingCategoryDto.getParentCategory() != null){
@@ -602,7 +605,8 @@ public class CategoryServiceImpl implements CategoryService {
             // System.out.println(mPCDtoPayload);
             ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
             if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-                if(mergePendingCategoryDto != null){
+                // if(!emptyDto){
+                if(mergePendingCategoryDto.getCode() != null){
                     //body is not empty so update category
 
                     if(getItemCategory.getParentCategory() == null){
