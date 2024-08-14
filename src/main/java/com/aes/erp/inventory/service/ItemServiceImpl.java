@@ -365,9 +365,16 @@ public class ItemServiceImpl implements ItemService {
         if(itemOp.isPresent()){
             Item item = itemOp.get();
             Long newProductId = item.getId() + 1;
-            return String.format("%05d",newProductId);
+            return String.format("%05d",newProductId)+"-"+generateRandomNumber(5);
         }
         return String.format("%05d",1);
+    }
+    public String generateRandomNumber(int limit){
+        StringBuilder sb = new StringBuilder();
+        for(int i=0;i<limit;i++){
+            sb.append(((int)Math.floor(Math.random()*9))+1);
+        }
+        return sb.toString();
     }
 
     @Override
