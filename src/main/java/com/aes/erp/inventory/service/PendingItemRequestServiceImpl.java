@@ -223,6 +223,7 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
 
     @Override
+    @Transactional
     public void rejectPendingItem(Long id) {
         PendingItemRequest getPendingItem = pendingItemRequestRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Content not exist"));
 
@@ -232,7 +233,7 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
         MergePendingItemsPostDto mpcpDTO = new MergePendingItemsPostDto();
         mpcpDTO.setApproveStatus("REJECTED");
-
+        mpcpDTO.setWarehouseId(getPendingItem.getWarehouseId());
 
         HttpEntity<MergePendingItemsPostDto> mPCDtoPayload = new HttpEntity<>(mpcpDTO, headers);
 
@@ -243,7 +244,7 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
         ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
         if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
-            pendingAttributeRepository.deleteById(getPendingItem.getId());
+            pendingItemRequestRepository.deleteById(getPendingItem.getId());
         }else{
             throw new AesException("Something wrong");
         }
