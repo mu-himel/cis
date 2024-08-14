@@ -554,6 +554,7 @@ public class ItemServiceImpl implements ItemService {
 
             postDto.setApproveStatus("REJECTED");
             postDto.setCode(existingItem.getCode());
+            postDto.setWarehouseId(pendingItem.getWarehouseId());
             itemMergeRequestDto.setName(existingItem.getName());
             itemMergeRequestDto.setCode(existingItem.getCode());
             ItemCategory itemCat =  itemCategoryRepo.findById(existingItem.getItemParentCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));
