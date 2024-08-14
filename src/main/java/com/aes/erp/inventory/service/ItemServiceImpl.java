@@ -462,7 +462,7 @@ public class ItemServiceImpl implements ItemService {
             itemMergeRequestDto.setName(mergePendingItemsDto.getName());
             String atrName = "";
             
-            ItemAttribute itemAttribute = new ItemAttribute();
+            
             Item approvedItem = new Item();
             approvedItem.setActive(true);
             approvedItem.setScmItemId(pendingItem.getScmItemId());
@@ -478,15 +478,7 @@ public class ItemServiceImpl implements ItemService {
                 approvedItem.setItemAttributeName(pendingItem.getItemAttributeName());
                 approvedItem.setName(brandId.getName());
                 
-                List<PendingItemAttribute> pattrs= pendingItem.getAttributes();
-                for (PendingItemAttribute pendingItemAttribute : pattrs) {
-                    ItemAttribute approvItemAtr = new ItemAttribute();
-                    approvItemAtr.setAttributeType(pendingItemAttribute.getAttributeType());
-                    approvItemAtr.setAttributeUnit(pendingItemAttribute.getAttributeUnit());
-                    approvItemAtr.setAttributeValue(pendingItemAttribute.getAttributeValue());
-                    approvItemAtr.setItem(approvedItem);
-                    itemAttributeRepository.save(approvItemAtr);
-                }
+                
                 // Optional<PendingItemAttribute> pendingItemAtr = pendingItemRequestRepository.findById(pendingItem.getId());
                 // if(pendingItemAtr.isPresent()){
                 //     ItemAttribute approvItemAtr = pendingItemAtr.get();
@@ -504,6 +496,16 @@ public class ItemServiceImpl implements ItemService {
                 if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
                     
                     itemRepository.save(approvedItem);
+
+                    List<PendingItemAttribute> pattrs= pendingItem.getAttributes();
+                    for (PendingItemAttribute pendingItemAttribute : pattrs) {
+                        ItemAttribute approvItemAtr = new ItemAttribute();
+                        approvItemAtr.setAttributeType(pendingItemAttribute.getAttributeType());
+                        approvItemAtr.setAttributeUnit(pendingItemAttribute.getAttributeUnit());
+                        approvItemAtr.setAttributeValue(pendingItemAttribute.getAttributeValue());
+                        approvItemAtr.setItem(approvedItem);
+                        itemAttributeRepository.save(approvItemAtr);
+                    }
                     pendingItemRequestRepository.deleteById(pendingItem.getId());
 
                 }else{
@@ -517,26 +519,11 @@ public class ItemServiceImpl implements ItemService {
                 approvedItem.setItemUnit(mergePendingItemsDto.getItemUnit());
                 approvedItem.setItemCategory(mergePendingItemsDto.getItemCategory());
                 approvedItem.setItemParentCategory(mergePendingItemsDto.getItemParentCategory());
+                // List<ItemAttribute> itemAtrList = new ArrayList<>();
                 for (ItemAttribute iterable_element : mergePendingItemsDto.getAttributes()) {
-                    // Optional<ItemAttribute> pendingItemAtr = itemAttributeRepository.findById(iterable_element.getId());
-                    // if(pendingItemAtr.isPresent()){
-                    //     ItemAttribute approvItemAtr = pendingItemAtr.get();
-                    //     approvItemAtr.setAttributeType(iterable_element.getAttributeType());
-                    //     approvItemAtr.setAttributeUnit(iterable_element.getAttributeUnit());
-                    //     approvItemAtr.setAttributeValue(iterable_element.getAttributeValue());
-                    //     approvItemAtr.setItem(approvedItem);
-                    //     itemAttributeRepository.save(approvItemAtr);
-                    // }else{
-
-                    
-                    itemAttribute.setAttributeType(iterable_element.getAttributeType());
-                    itemAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
-                    itemAttribute.setAttributeValue(iterable_element.getAttributeValue());
-                    atrName = iterable_element.getAttributeType() +" "+ iterable_element.getAttributeValue() +" "+ iterable_element.getAttributeUnit();
-                    itemAttribute.setItem(approvedItem);
-                    
-                    // }
+                    atrName = atrName +" "+iterable_element.getAttributeType() +" "+ iterable_element.getAttributeValue() +" "+ iterable_element.getAttributeUnit();
                 }
+                // approvedItem.setAttributes(itemAtrList);
                 approvedItem.setItemAttributeName(atrName);
                 approvedItem.setBrand(mergePendingItemsDto.getBrand());
 
@@ -546,8 +533,19 @@ public class ItemServiceImpl implements ItemService {
                 
                 ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
                 if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+                    // for (ItemAttribute itemAttribute2 : itemAtrList) {
+                    //     itemAttributeRepository.save(itemAttribute2);
+                    // }
+                    
                     itemRepository.save(approvedItem);
-                    itemAttributeRepository.save(itemAttribute);
+                    for (ItemAttribute iterable_element : mergePendingItemsDto.getAttributes()) {
+                        ItemAttribute itemAttribute = new ItemAttribute();
+                        itemAttribute.setAttributeType(iterable_element.getAttributeType());
+                        itemAttribute.setAttributeUnit(iterable_element.getAttributeUnit());
+                        itemAttribute.setAttributeValue(iterable_element.getAttributeValue());
+                        itemAttribute.setItem(approvedItem);
+                        itemAttributeRepository.save(itemAttribute);
+                    }
                     pendingItemRequestRepository.deleteById(pendingItem.getId());
 
                 }else{
