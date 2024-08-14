@@ -19,6 +19,7 @@ import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.inventory.entity.PendingItemAttribute;
 import com.aes.erp.inventory.entity.PendingItemRequest;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.enums.CategoryStatus;
@@ -423,6 +424,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
+    @Transactional
     public void mergePendingItems(Long id, MergePendingItemsDto mergePendingItemsDto) {
         PendingItemRequest pendingItem = pendingItemRequestRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"No Such Entry Found"));
         HttpHeaders headers = new HttpHeaders();
@@ -469,6 +471,24 @@ public class ItemServiceImpl implements ItemService {
                 approvedItem.setItemAttributeName(pendingItem.getItemAttributeName());
                 approvedItem.setName(brandId.getName());
                 
+                List<PendingItemAttribute> pattrs= pendingItem.getAttributes();
+                for (PendingItemAttribute pendingItemAttribute : pattrs) {
+                    ItemAttribute approvItemAtr = new ItemAttribute();
+                    approvItemAtr.setAttributeType(pendingItemAttribute.getAttributeType());
+                    approvItemAtr.setAttributeUnit(pendingItemAttribute.getAttributeUnit());
+                    approvItemAtr.setAttributeValue(pendingItemAttribute.getAttributeValue());
+                    approvItemAtr.setItem(approvedItem);
+                    itemAttributeRepository.save(approvItemAtr);
+                }
+                // Optional<PendingItemAttribute> pendingItemAtr = pendingItemRequestRepository.findById(pendingItem.getId());
+                // if(pendingItemAtr.isPresent()){
+                //     ItemAttribute approvItemAtr = pendingItemAtr.get();
+                //     approvItemAtr.setAttributeType(iterable_element.getAttributeType());
+                //     approvItemAtr.setAttributeUnit(iterable_element.getAttributeUnit());
+                //     approvItemAtr.setAttributeValue(iterable_element.getAttributeValue());
+                //     approvItemAtr.setItem(approvedItem);
+                //     itemAttributeRepository.save(approvItemAtr);
+                // }
 
                 itemMergeRequestDto.setItemAttributeName(atrName);
                 itemMergeRequestDto.setBrand(brandId.getName());
