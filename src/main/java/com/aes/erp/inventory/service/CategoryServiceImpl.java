@@ -375,6 +375,11 @@ public class CategoryServiceImpl implements CategoryService {
                 throw new AesException("Sorry! Unable to delete, Category already used in Child Category");
             }
 
+            List<Long> getItem = categoryRepository.findAllExistingItemsForSubcategory(itemCategoryOptional.get().getId());
+            if(!getItem.isEmpty()){
+                throw new AesException("Sorry! This Subcategory has existing Item");
+            }
+
             ItemCategory itemCategory = itemCategoryOptional.get();
             itemCategory.setActive(false);
             categoryRepository.save(itemCategory);
