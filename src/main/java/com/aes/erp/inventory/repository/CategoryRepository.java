@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.repository;
 
 import com.aes.erp.inventory.dto.response.SubCategory;
+import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -95,6 +96,9 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             "GROUP BY ic.id",nativeQuery = true)
     Page<SubCategoryInfoExt> findAllSubCategories(@Param("parentCategoryId") Long id,
                                                    @Param("year") Integer year, Pageable pageable);
+
+    @Query(value = "SELECT i.id FROM items i WHERE i.item_category_id = :catId AND i.active = true",nativeQuery = true)
+    List<Long> findAllExistingItemsForSubcategory(@Param("catId") Long id);
 
 
     Optional<Long> countAllByParentCategoryAndActive(ItemCategory itemCategory,Boolean active);
