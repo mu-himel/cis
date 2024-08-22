@@ -128,7 +128,7 @@ public interface CategoryQuery {
         par.id AS parentCategoryId, 
         par.code AS parentCategoryCode, 
         par.name AS parentCategoryName,
-        (SELECT COUNT(i.id)  FROM items i WHERE i.item_category_id = c.id and i.active=1 and i.) as products, 
+        (SELECT COUNT(i.id)  FROM items i WHERE i.item_category_id = c.id and i.active=1) as products, 
         (SELECT COUNT(pb.id) FROM pending_brands pb WHERE pb.sub_category_id = c.id) as pendingBrands, 
         (SELECT COUNT(pa.id) FROM pending_attributes pa WHERE pa.sub_category_id = c.id) as pendingAttributes
         FROM item_categories c
