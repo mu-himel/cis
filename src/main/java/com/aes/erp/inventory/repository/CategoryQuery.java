@@ -104,7 +104,7 @@ public interface CategoryQuery {
     String findAllByItemCategoryWithSubCategoryCount = "SELECT c.id AS categoryId, c.name AS categoryName, " +
             "c.code AS categoryCode, COUNT(sub.id) AS subcategoryCount,st.id as storeTypeId, st.name AS storeTypeName " +
             "FROM ItemCategory c " +
-            "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id  AND sub.active = true " +
+            "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id  AND sub.active = true AND sub.categoryStatus = 'APPROVED' " +
             "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
             "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
             " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name) || '%' ) " +
@@ -128,7 +128,7 @@ public interface CategoryQuery {
         par.id AS parentCategoryId, 
         par.code AS parentCategoryCode, 
         par.name AS parentCategoryName,
-        (SELECT COUNT(i.id)  FROM items i WHERE i.item_category_id = c.id) as products, 
+        (SELECT COUNT(i.id)  FROM items i WHERE i.item_category_id = c.id and i.active=1 and i.) as products, 
         (SELECT COUNT(pb.id) FROM pending_brands pb WHERE pb.sub_category_id = c.id) as pendingBrands, 
         (SELECT COUNT(pa.id) FROM pending_attributes pa WHERE pa.sub_category_id = c.id) as pendingAttributes
         FROM item_categories c
