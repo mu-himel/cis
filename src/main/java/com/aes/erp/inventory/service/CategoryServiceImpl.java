@@ -114,9 +114,10 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AesException("Category code already exist");
         }
 
-        // if(categoryRepository.existsByNameAndActive(category.getName(),true)){
-        //     throw new AesException("Sorry! Category Name already exist");
-        // }
+        //uncomment this to fix bug SDOERP-1223
+        if(categoryRepository.existsByNameAndActive(category.getName(),true)){
+            throw new AesException("Sorry! Category Name already exist");
+        }
 
         if(categoryRequestDto.getParentCategory() != null){
             Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(categoryRequestDto.getParentCategory().getId());
