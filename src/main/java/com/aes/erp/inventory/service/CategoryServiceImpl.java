@@ -181,6 +181,13 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AesException("Category Code should be unique");
         }
 
+        Optional<ItemCategory> itemCatOp = categoryRepository.findByNameAndActive(categoryRequestDto.getName(),true);
+        if(itemCatOp.isPresent()){
+            if(!itemCatOp.get().getId().equals(id)){
+                throw new AesException("Sorry! Category exist with this name with #ID:"+itemCatOp.get().getId());
+            }
+        }
+
         if(itemCategory.getParentCategory()!=null){
             if(categoryRequestDto.getParentCategory()==null || categoryRequestDto.getParentCategory().getId()==null){
                 throw new AesException("Parent Category Id missing");
