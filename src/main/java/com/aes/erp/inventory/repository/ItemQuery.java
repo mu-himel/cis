@@ -8,7 +8,8 @@ public interface ItemQuery {
             ipc.id as categoryId, ipc.name as categoryName, ipc.code as categoryCode, 
             SUM(s.stockQty) as qty,
             i.stockThresholdQty as stockThresholdQty,
-            i.reorderPercentage as reorderPercentage 
+            i.reorderPercentage as reorderPercentage ,
+            i.itemAttributeName as itemAttributeName
             FROM Item i 
             LEFT JOIN i.stocks s 
             LEFT JOIN i.itemCategory ic 
