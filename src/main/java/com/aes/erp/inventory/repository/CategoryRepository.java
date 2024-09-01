@@ -221,6 +221,10 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             @Param("categoryId") Long categoryId,
             @Param("name") String name, @Param("code") String code);
 
+    Optional<ItemCategory> findByName(String name);
+
+    Optional<ItemCategory> findByNameAndActive(String name, Boolean b);
+
     interface PendingItemCategoryListInfo{
 
         Long getId();
