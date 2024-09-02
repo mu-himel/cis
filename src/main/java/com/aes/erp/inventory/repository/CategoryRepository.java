@@ -106,6 +106,13 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     Boolean existsByCode(String code);
     Boolean existsByNameAndActive(String name, Boolean active);
 
+    @Query(value = "SELECT ic.id FROM item_categories ic WHERE ic.parent_category_id IS null AND ic.active = true AND ic.name = :catName" ,nativeQuery = true)
+    List<Long> findDuplicateCategoryId(String catName);
+
+    @Query(value = "SELECT ic.id FROM item_categories ic WHERE ic.parent_category_id IS NOT null AND ic.active = true AND ic.name = :subcatName" ,nativeQuery = true)
+    List<Long> findDuplicateSubCategoryId(String subcatName);
+
+
     @Query(value = "SELECT ic.id as id, ic.name as name, ic.code as code FROM ItemCategory ic " +
             "WHERE ic.active = 1 AND ic.parentCategory IS NULL " +
             " AND (:name IS NULL OR ic.name LIKE concat(:name,'%')) " +

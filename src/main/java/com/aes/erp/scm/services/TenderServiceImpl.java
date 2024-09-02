@@ -198,6 +198,11 @@ public class TenderServiceImpl implements TenderService{
         if(!vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.APPROVED)){
             return Page.empty();
         }
+
+        //added to give manual entry in tender deadline field
+        Instant instant = Instant.parse("2024-09-01T10:15:30.00Z");
+        System.out.println(instant.toEpochMilli());
+
         return tenderRepository.findAllTenderProjection(
                 vendorId,
                 searchFilter.orElse(""),
