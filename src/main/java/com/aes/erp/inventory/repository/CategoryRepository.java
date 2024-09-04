@@ -158,12 +158,12 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     
     @Query("SELECT c FROM ItemCategory c " +
             "WHERE c.parentCategory IS NULL " +
-            " AND LOWER(c.name) = :name")
+            " AND LOWER(c.name) = :name AND c.categoryStatus = 'APPROVED' AND c.active=true")
     List<ItemCategory> findCategoryByNameIgnoreCase(@Param("name") String name);
 
     @Query("SELECT c FROM ItemCategory c " +
             "WHERE c.parentCategory IS NOT NULL " +
-            " AND LOWER(c.name) = :name")
+            " AND LOWER(c.name) = :name AND c.categoryStatus = 'APPROVED' AND c.active=true")
     List<ItemCategory> findCategoryBySubCatNameIgnoreCase(@Param("name") String name);
 
     @Query(value = getPendingCategories, countQuery =countPendingCategories, nativeQuery = true)

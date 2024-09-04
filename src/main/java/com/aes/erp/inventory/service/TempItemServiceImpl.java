@@ -53,22 +53,31 @@ public class TempItemServiceImpl implements TempItemService{
             int matchCount = 0;
             int size = attrValues.size();
             for(String av : attrValues){
-                if(itemName.contains(av)){
-                    matchCount++;
+                if(itemName.toLowerCase().contains(av.toLowerCase())){
+                    filteredTempItems.add(itemResponse);
                 }
             }
-            if((matchCount>1 && size>1) || matchCount==size){
-                filteredTempItems.add(itemResponse);
-            }
+//            if((matchCount>1 && size>1) || matchCount==size){
+//
+//            }
         }
 
         if(searchInactiveProduct.getBrands()!=null && searchInactiveProduct.getBrands().size()>0){
             for(Brand b : searchInactiveProduct.getBrands()){
-                for(TempItemResponse fi : filteredTempItems){
-                    if(fi.getBrandName().equals(b.getName())){
-                        brandFilteredTempItems.add(fi);
+                if(!filteredTempItems.isEmpty()) {
+                    for (TempItemResponse fi : filteredTempItems) {
+                        if (fi.getBrandName().toLowerCase().equals(b.getName().toLowerCase())) {
+                            brandFilteredTempItems.add(fi);
+                        }
+                    }
+                }else{
+                    for (TempItemResponse fi : tempItemResponses) {
+                        if (fi.getBrandName().toLowerCase().equals(b.getName().toLowerCase())) {
+                            brandFilteredTempItems.add(fi);
+                        }
                     }
                 }
+
             }
             return brandFilteredTempItems;
         }
