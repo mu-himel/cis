@@ -30,6 +30,18 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
                                             @Param("currentDateTime") Long currentDateTime,
                                             Pageable pageable);
 
+    @Query(value = tenderProjectionWithFilterQuery, countQuery = tenderProjectionCountQueryFilterQuery, nativeQuery = true)
+    Page<TenderExt1> findAllTenderProjectionWithFilter(@Param("vendorId") Long vendorId,
+                                            @Param("searchFilter") String searchFilter,
+                                            @Param("subCategoryIds") List<Long> subCategoryIds,
+                                            @Param("tenderType") Optional<TenderType> tenderType,
+                                            @Param("organizationId") Optional<Long> organizationId,
+                                            @Param("categoryId") Optional<Long> categoryId,
+                                            @Param("startDate") Optional<Long> startDate,
+                                            @Param("endDate") Optional<Long> endDate,
+                                            @Param("currentDateTime") Long currentDateTime,
+                                            Pageable pageable);
+
     @Query(value = closedTenderProjectionQuery, countQuery = tenderProjectionCountQuery, nativeQuery = true)
     Page<TenderExt> findAllClosedTenderProjection(@Param("vendorId") Long vendorId,
                                             @Param("searchFilter") String searchFilter,
@@ -50,6 +62,22 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
         Long getCreationDate();
         Long getTenderItemCount();
 
+        
+        Long getDeadline();
+    }
+
+    interface TenderExt1{
+        Long getId();
+        String getTenderNo();
+        TenderStatus getTenderStatus();
+        TenderType getTenderType();
+        String getItemCategory();
+        String getTenderCreator();
+        Long getCreationDate();
+        Long getTenderItemCount();
+        Long getOrganizationId();
+        // Long getItemQty();
+        Long getCategoryId();
         
         Long getDeadline();
     }

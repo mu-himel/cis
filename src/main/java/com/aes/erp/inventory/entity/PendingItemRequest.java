@@ -52,6 +52,8 @@ public class PendingItemRequest {
     private String designation;
     private String department;
     private Long warehouseId;
+    private Long warehouseStoreId;
+
     private String warehouseName;
     private String warehouseLocation;
     private String itemAttributeName;

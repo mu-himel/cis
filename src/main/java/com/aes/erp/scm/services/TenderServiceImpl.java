@@ -6,6 +6,7 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.PendingItemAttribute;
 import com.aes.erp.inventory.service.CategoryServiceImpl;
 import com.aes.erp.inventory.service.OrganizationService;
@@ -200,7 +201,7 @@ public class TenderServiceImpl implements TenderService{
         }
 
         //added to give manual entry in tender deadline field
-        Instant instant = Instant.parse("2024-09-01T10:15:30.00Z");
+        Instant instant = Instant.parse("2024-09-30T10:15:30.00Z");
         System.out.println(instant.toEpochMilli());
 
         return tenderRepository.findAllTenderProjection(
@@ -211,7 +212,42 @@ public class TenderServiceImpl implements TenderService{
         );
     }
 
-    
+    @Override
+    public Page<?> getAllTenderProjectionWithFilter(ClaimResponseDto loggedInUser,Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> itemQty, Optional<Long> organizationId, Optional<Long> categoryId,Optional<Long> startDate, Optional<Long> endDate) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
+
+        List<SubCategory> subCategories = new ArrayList<>();
+        if(loggedInUser.getUserInfoDto().get("vendorId")!=null){
+            subCategories = categoryService.getCategoriesForVendor(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
+        }
+
+        List<Long> subCatIds = subCategories.stream().map(sc->sc.getId()).collect(Collectors.toList());
+        if(loggedInUser.getUserInfoDto()==null && loggedInUser.getUserInfoDto().get("vendorId") == null){
+            return Page.empty();
+        }
+        if(loggedInUser.getUserInfoDto().get("vendorId")==null){
+            throw new AesException("Sorry! user is not a vendor profile");
+        }
+        Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        Vendor vendor = vendorService.getById(vendorId);
+
+        if(!vendor.getVerificationStatus().equals(VendorDocumentVerificationStatus.APPROVED)){
+            return Page.empty();
+        }
+
+        //added to give manual entry in tender deadline field
+        Instant instant = Instant.parse("2024-10-01T10:15:30.00Z");
+        System.out.println(instant.toEpochMilli());
+
+        return tenderRepository.findAllTenderProjectionWithFilter(
+                vendorId,
+                searchFilter.orElse(""),
+                subCatIds, tenderType,organizationId,categoryId, startDate,
+                endDate, Instant.now().toEpochMilli(),pageable
+        );
+    }
+
 
     @Override
     public Page<?> getClosedTenderProjection(ClaimResponseDto loggedInUser, Optional<String> searchFilter,

@@ -40,4 +40,9 @@ public class OrganizationController {
         organizationService.enableOrganization(status, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<?> getOrganizationlist(@RequestParam("name") Optional<String> organizationName){
+        return new ResponseEntity<>(organizationService.getOrganizationIdbyName(organizationName),HttpStatus.OK);
+    }
 }
