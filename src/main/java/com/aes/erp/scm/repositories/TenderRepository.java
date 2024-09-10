@@ -37,8 +37,8 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
                                             @Param("tenderType") Optional<TenderType> tenderType,
                                             @Param("organizationId") Optional<Long> organizationId,
                                             @Param("categoryId") Optional<Long> categoryId,
-                                            @Param("startDate") Optional<Long> startDate,
-                                            @Param("endDate") Optional<Long> endDate,
+                                            @Param("startDate") Long startDate,
+                                            @Param("endDate") Long endDate,
                                             @Param("currentDateTime") Long currentDateTime,
                                             Pageable pageable);
 

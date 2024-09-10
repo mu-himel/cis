@@ -53,8 +53,8 @@ public class TenderController {
     @GetMapping("/tender-projection/page")
     public ResponseEntity<?> getTenderProjectionWithFilter(
         @RequestAttribute ClaimResponseDto loggedInUser,@RequestParam("searchFilter") Optional<String> searchFilter,
-                                           @RequestParam("startDate") Optional<Long> startDate,
-                                           @RequestParam("endDate")  Optional<Long> endDate ,
+                                           @RequestParam("fromDate") Optional<String> startDate,
+                                           @RequestParam("toDate")  Optional<String> endDate ,
                                            @RequestParam("page") Optional<Integer> page,
                                            @RequestParam("size") Optional<Integer> size,
                                            @RequestParam("tenderType") Optional<TenderType> tenderType,
