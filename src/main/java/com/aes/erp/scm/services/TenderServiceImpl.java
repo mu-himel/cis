@@ -175,7 +175,7 @@ public class TenderServiceImpl implements TenderService{
         if(tender.isEmpty()) throw new AesException("Sorry! Tender not found");
         return tender.get();
     }
-
+    @Deprecated(since = "newdev-0.0.15", forRemoval=true)
     @Override
     public Page<?> getAllTenderProjection(ClaimResponseDto loggedInUser,Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
@@ -213,7 +213,7 @@ public class TenderServiceImpl implements TenderService{
     }
 
     @Override
-    public Page<?> getAllTenderProjectionWithFilter(ClaimResponseDto loggedInUser,Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> itemQty, Optional<Long> organizationId, Optional<Long> categoryId,Optional<Long> startDate, Optional<Long> endDate) {
+    public Page<?> getAllTenderProjectionWithFilter(ClaimResponseDto loggedInUser,Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> itemQty, Optional<Long> organizationId, Optional<Long> categoryId,Optional<String> startDate, Optional<String> endDate) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
 
@@ -237,14 +237,23 @@ public class TenderServiceImpl implements TenderService{
         }
 
         //added to give manual entry in tender deadline field
-        Instant instant = Instant.parse("2024-10-01T10:15:30.00Z");
+        Instant instant = Instant.parse("2024-09-01T10:15:30.00Z");
         System.out.println(instant.toEpochMilli());
-
+        Long fromDate = null;
+        if(startDate.isPresent()){
+            fromDate = Instant.parse(startDate.get()+"T10:15:30.00Z").toEpochMilli();
+            System.out.println(fromDate);
+        }
+        Long toDate = null;
+        if(endDate.isPresent()){
+            toDate = Instant.parse(endDate.get()+"T10:15:30.00Z").toEpochMilli();
+            System.out.println(toDate);
+        }
         return tenderRepository.findAllTenderProjectionWithFilter(
                 vendorId,
                 searchFilter.orElse(""),
-                subCatIds, tenderType,organizationId,categoryId, startDate,
-                endDate, Instant.now().toEpochMilli(),pageable
+                subCatIds, tenderType,organizationId,categoryId, fromDate,
+                toDate, Instant.now().toEpochMilli(),pageable
         );
     }
 

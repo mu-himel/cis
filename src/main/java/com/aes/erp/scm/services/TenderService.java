@@ -33,7 +33,7 @@ public interface TenderService {
         ClaimResponseDto loggedInUser,
         Optional<String> searchFilter, Optional<Integer> page,
         Optional<Integer> size, Optional<TenderType> tenderType,Optional<Long> itemQty, Optional<Long> organizationId, Optional<Long> categoryId,
-        Optional<Long> startDate, Optional<Long> endDate
+        Optional<String> startDate, Optional<String> endDate
     );
 
     Page<?> getClosedTenderProjection(

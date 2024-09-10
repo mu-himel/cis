@@ -79,6 +79,6 @@ public class OrganizationServiceImpl implements OrganizationService{
 
     @Override
     public List<?> getOrganizationIdbyName(Optional<String> name) {
-        return organizationRepository.findByName1(name.orElse(null));
+        return organizationRepository.findByOrganizationName(name.orElse(null));
     }
 }
