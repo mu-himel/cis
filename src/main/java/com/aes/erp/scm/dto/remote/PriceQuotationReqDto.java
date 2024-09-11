@@ -2,10 +2,14 @@ package com.aes.erp.scm.dto.remote;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.aes.erp.vendor.dto.OfferDeliveryDetailDto;
 
 @Data
 public class PriceQuotationReqDto {
+    private Long rfqId;
     private String code;
     private String paymentMethod;
     private Long remoteOfferId;
@@ -19,5 +23,7 @@ public class PriceQuotationReqDto {
     private Boolean isFinal;
     private List<PriceQuotationDetailReqDto> details;
     private PriceQuotationSummaryDto priceQuotationSummary;
-    private List<String> termsAndConditions;
+    private List<String> termsAndConditions = new ArrayList<>();
+    private List<OfferDeliveryDetailDto> warehouses;
+    private String file;
 }
