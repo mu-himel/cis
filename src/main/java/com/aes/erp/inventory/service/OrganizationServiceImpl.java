@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -74,5 +75,10 @@ public class OrganizationServiceImpl implements OrganizationService{
         if(status)org.setStatus(OrganizationStatus.ENABLED);
         else org.setStatus(OrganizationStatus.DISABLED);
         organizationRepository.save(org);
+    }
+
+    @Override
+    public List<?> getOrganizationIdbyName(Optional<String> name) {
+        return organizationRepository.findByOrganizationName(name.orElse(null));
     }
 }

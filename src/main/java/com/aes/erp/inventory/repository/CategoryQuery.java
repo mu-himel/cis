@@ -141,27 +141,29 @@ public interface CategoryQuery {
         """;
 
     String findAllBySubCategoryFilteredByStoreTypeAndParentCategory = """
-            SELECT 
-            c.id AS subCategoryId,
-            c.name AS subCategoryName, c.code as subCategoryCode,
-            par.id AS parentCategoryId, 
-            par.code AS parentCategoryCode, 
-            par.name AS parentCategoryName,
-            st.id as storeTypeId, 
-            st.name AS storeTypeName,
-            (SELECT COUNT(i.id)  FROM items i WHERE i.item_category_id = c.id) as products, 
-            (SELECT COUNT(pb.id) FROM pending_brands pb WHERE pb.sub_category_id = c.id) as pendingBrands, 
-            (SELECT COUNT(pa.id) FROM pending_attributes pa WHERE pa.sub_category_id = c.id) as pendingAttributes
-            FROM item_categories c
-            LEFT JOIN item_categories par ON par.id = c.parent_category_id 
-            LEFT JOIN store_types st ON c.store_type_id = st.id 
-            WHERE c.parent_category_id IS NOT NULL AND 
-            (:store_type_id IS NULL OR st.id = :store_type_id) 
-            AND (:parent_category IS NULL OR par.id = :parent_category) 
-            AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name)||'%') 
-            AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code)||'%') 
-            AND c.active = true 
-            GROUP BY c.id""";
+        SELECT 
+        c.id AS subCategoryId,
+        c.name AS subCategoryName, 
+        c.code AS subCategoryCode,
+        par.id AS parentCategoryId, 
+        par.code AS parentCategoryCode, 
+        par.name AS parentCategoryName,
+        st.id AS storeTypeId, 
+        st.name AS storeTypeName,
+        (SELECT COUNT(i.id) FROM items i WHERE i.item_category_id = c.id) AS products, 
+        (SELECT COUNT(pb.id) FROM pending_brands pb WHERE pb.sub_category_id = c.id) AS pendingBrands, 
+        (SELECT COUNT(pa.id) FROM pending_attributes pa WHERE pa.sub_category_id = c.id) AS pendingAttributes
+    FROM item_categories c
+    LEFT JOIN item_categories par ON par.id = c.parent_category_id 
+    LEFT JOIN store_types st ON c.store_type_id = st.id 
+    WHERE c.parent_category_id IS NOT NULL 
+        AND (:store_type_id IS NULL OR st.id = :store_type_id) 
+        AND (:parent_category IS NULL OR par.id = :parent_category) 
+        AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT(:name, '%'))) 
+        AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(CONCAT(:code, '%'))) 
+        AND c.active = true 
+    GROUP BY c.id;
+    """;
 
     String getPendingCategories = """
             SELECT ic.id as id, 
