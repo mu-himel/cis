@@ -39,8 +39,8 @@ public interface TenderService {
     Page<?> getClosedTenderProjection(
                         ClaimResponseDto loggedInUser,
                         Optional<String> searchFilter, Optional<Integer> page,
-                        Optional<Integer> size, Optional<TenderType> tenderType,
-                        Optional<Long> startDate, Optional<Long> endDate
+                        Optional<Integer> size, Optional<TenderType> tenderType,Optional<Long> organizationId, Optional<Long> categoryId,
+                        Optional<String> startDate, Optional<String> endDate
                     );
                     
     List<?> getNegotiationHistories(ClaimResponseDto loggedInUser, Long id);

@@ -237,7 +237,7 @@ public class TenderServiceImpl implements TenderService{
         }
 
         //added to give manual entry in tender deadline field
-        Instant instant = Instant.parse("2024-09-01T10:15:30.00Z");
+        Instant instant = Instant.parse("2024-08-01T10:15:30.00Z");
         System.out.println(instant.toEpochMilli());
         Long fromDate = null;
         if(startDate.isPresent()){
@@ -260,8 +260,8 @@ public class TenderServiceImpl implements TenderService{
 
     @Override
     public Page<?> getClosedTenderProjection(ClaimResponseDto loggedInUser, Optional<String> searchFilter,
-            Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate,
-            Optional<Long> endDate) {
+            Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType,Optional<Long> organizationId, Optional<Long> categoryId, Optional<String> startDate,
+            Optional<String> endDate) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
 
@@ -275,11 +275,21 @@ public class TenderServiceImpl implements TenderService{
             return Page.empty();
         }
         Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
+        Long fromDate = null;
+        if(startDate.isPresent()){
+            fromDate = Instant.parse(startDate.get()+"T10:15:30.00Z").toEpochMilli();
+            System.out.println(fromDate);
+        }
+        Long toDate = null;
+        if(endDate.isPresent()){
+            toDate = Instant.parse(endDate.get()+"T10:15:30.00Z").toEpochMilli();
+            System.out.println(toDate);
+        }
         return tenderRepository.findAllClosedTenderProjection(
                 vendorId,
                 searchFilter.orElse(""),
-                subCatIds, tenderType, startDate,
-                endDate, Instant.now().toEpochMilli(),pageable);
+                subCatIds, tenderType,organizationId,categoryId, fromDate,
+                toDate, Instant.now().toEpochMilli(),pageable);
     }
 
     @Override
@@ -295,6 +305,9 @@ public class TenderServiceImpl implements TenderService{
 
     @Override
     @Transactional
+    /*
+     * This method is handling Tender rejection for the initial time when a vendor reject the tender without making any offer                   
+    */
     public void rejectTender(ClaimResponseDto loggedInUser, Long id, NoteDto noteDto) {
         
         Optional<Tender> tenderOp = tenderRepository.findById(id);
@@ -311,6 +324,12 @@ public class TenderServiceImpl implements TenderService{
             tenderParticipator.setStatus(TenderStatus.REJECTED);
             tenderParticipator.setTender(tenderOp.get());
             tenderParticipator.setVendor(new Vendor(vendorId));
+        }else{
+            TenderParticipator tenderParticipator = new TenderParticipator();
+            tenderParticipator.setStatus(TenderStatus.REJECTED);
+            tenderParticipator.setTender(tenderOp.get());
+            tenderParticipator.setVendor(new Vendor(vendorId));
+            tpRepository.save(tenderParticipator);
         }
         
     }

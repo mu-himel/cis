@@ -69,12 +69,14 @@ public class TenderController {
     @GetMapping("/closed")
     public ResponseEntity<?> getClosedTenders(
             @RequestAttribute ClaimResponseDto loggedInUser,@RequestParam("searchFilter") Optional<String> searchFilter,
-            @RequestParam("startDate") Optional<Long> startDate,
-            @RequestParam("endDate")  Optional<Long> endDate ,
+            @RequestParam("fromDate") Optional<String> startDate,
+            @RequestParam("toDate")  Optional<String> endDate ,
             @RequestParam("page") Optional<Integer> page,
             @RequestParam("size") Optional<Integer> size,
-            @RequestParam("tenderType") Optional<TenderType> tenderType){
-        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
+            @RequestParam("tenderType") Optional<TenderType> tenderType,
+            @RequestParam("organizationId") Optional<Long> organizationId,
+            @RequestParam("categoryId") Optional<Long> categoryId){
+        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType,organizationId,categoryId, startDate, endDate),
                 HttpStatus.OK);
     }
 
