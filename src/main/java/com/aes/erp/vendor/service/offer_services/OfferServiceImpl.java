@@ -378,6 +378,7 @@ public class OfferServiceImpl implements OfferService{
 
         offer.setTender(parentTender);
         offer.setNegotiationHistory(negotiationHistory);
+        List<OfferDeliveryDetailDto> dddto = createDTO.getWarehouses();
 
         //Set Parties
         Negotiator negotiationCreator = null;
@@ -429,7 +430,7 @@ public class OfferServiceImpl implements OfferService{
         tp.setTender(parentTender);
         tenderParticipatorRepository.save(tp);
         //Sent Counter Offer To ERP
-        // sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.COUNTER_TO_COMPANY);
+        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.COUNTER_TO_COMPANY,dddto);
     }
 
     @Override
@@ -556,6 +557,9 @@ public class OfferServiceImpl implements OfferService{
 
     @Override
     @Transactional
+    /*
+     * This method invoked when vendor create some offer and in the middle of the process decline the offer
+     */
     public void declineOffer(Long id, Long vendorId,NoteDto noteDto) {
         Optional<Offer> offerOp = offerRepository.findById(id);
         if(offerOp.isEmpty()){
