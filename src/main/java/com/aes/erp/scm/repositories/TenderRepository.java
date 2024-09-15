@@ -30,6 +30,18 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
                                             @Param("currentDateTime") Long currentDateTime,
                                             Pageable pageable);
 
+    @Query(value = tenderProjectionWithFilterQuery, countQuery = tenderProjectionCountQueryFilterQuery, nativeQuery = true)
+    Page<TenderExtWithFilter> findAllTenderProjectionWithFilter(@Param("vendorId") Long vendorId,
+                                            @Param("searchFilter") String searchFilter,
+                                            @Param("subCategoryIds") List<Long> subCategoryIds,
+                                            @Param("tenderType") Optional<TenderType> tenderType,
+                                            @Param("organizationId") Optional<Long> organizationId,
+                                            @Param("categoryId") Optional<Long> categoryId,
+                                            @Param("startDate") Long startDate,
+                                            @Param("endDate") Long endDate,
+                                            @Param("currentDateTime") Long currentDateTime,
+                                            Pageable pageable);
+
     @Query(value = closedTenderProjectionQuery, countQuery = tenderProjectionCountQuery, nativeQuery = true)
     Page<TenderExt> findAllClosedTenderProjection(@Param("vendorId") Long vendorId,
                                             @Param("searchFilter") String searchFilter,
@@ -52,6 +64,13 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
 
         
         Long getDeadline();
+    }
+
+    interface TenderExtWithFilter extends TenderExt{
+        Long getOrganizationId();
+        // Long getItemQty();
+        Long getCategoryId();
+
     }
 
     @Query(value = """

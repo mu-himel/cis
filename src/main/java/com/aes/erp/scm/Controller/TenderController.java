@@ -3,6 +3,8 @@ package com.aes.erp.scm.Controller;
 import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.TenderCreateDto;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.scm.Entities.TenderType;
 import com.aes.erp.scm.services.TenderService;
 import org.springframework.http.HttpStatus;
@@ -36,7 +38,8 @@ public class TenderController {
         return new ResponseEntity<>(tenderService.getAllTenders(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
                 HttpStatus.OK);
     }
-    @GetMapping("/tender-projection/page")
+    @Deprecated(since= "newdev=0.0.15",forRemoval = true)
+    @GetMapping("/tender-projection/page/filter")
     public ResponseEntity<?> getTenderProjection(
         @RequestAttribute ClaimResponseDto loggedInUser,@RequestParam("searchFilter") Optional<String> searchFilter,
                                            @RequestParam("startDate") Optional<Long> startDate,
@@ -45,6 +48,21 @@ public class TenderController {
                                            @RequestParam("size") Optional<Integer> size,
                                            @RequestParam("tenderType") Optional<TenderType> tenderType){
         return new ResponseEntity<>(tenderService.getAllTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/tender-projection/page")
+    public ResponseEntity<?> getTenderProjectionWithFilter(
+        @RequestAttribute ClaimResponseDto loggedInUser,@RequestParam("searchFilter") Optional<String> searchFilter,
+                                           @RequestParam("fromDate") Optional<String> startDate,
+                                           @RequestParam("toDate")  Optional<String> endDate ,
+                                           @RequestParam("page") Optional<Integer> page,
+                                           @RequestParam("size") Optional<Integer> size,
+                                           @RequestParam("tenderType") Optional<TenderType> tenderType,
+                                           @RequestParam("itemQty") Optional<Long> itemQty,
+                                           @RequestParam("organizationId") Optional<Long> organizationId,
+                                           @RequestParam("categoryId") Optional<Long> categoryId){
+        return new ResponseEntity<>(tenderService.getAllTenderProjectionWithFilter(loggedInUser, searchFilter, page, size, tenderType,itemQty,organizationId,categoryId, startDate, endDate),
                 HttpStatus.OK);
     }
 

@@ -452,6 +452,8 @@ public class ItemServiceImpl implements ItemService {
             postDto.setApproveStatus("APPROVED");
             postDto.setCode(null);
             postDto.setWarehouseId(pendingItem.getWarehouseId());
+            postDto.setWarehouseStoreId(pendingItem.getWarehouseStoreId());
+
             ItemCategory itemCat =  itemCategoryRepo.findById(pendingItem.getCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));
             itemMergeRequestDto.setItemParentCategory(new ItemCategory(itemCat.getScmCategoryId()));
             ItemCategory itemSubCat =  itemCategoryRepo.findById(pendingItem.getSubCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));

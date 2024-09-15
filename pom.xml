@@ -10,8 +10,8 @@
 	</parent>
 	<groupId>com.aes.erp</groupId>
 	<artifactId>release-v1</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>cwh-vms-backend</name>
+	<version>newdev-0.0.13</version>
+	<name>cmsbe</name>
 	<description>CWH + VMS </description>
 	<properties>
 		<java.version>17</java.version>
@@ -136,7 +136,7 @@
 <!--				</configuration>-->
 <!--			</plugin>-->
 		</plugins>
-		<finalName>cwh-vms-backend</finalName>
+		<finalName>cmsbe</finalName>
 	</build>
 	<profiles>
 		<profile>

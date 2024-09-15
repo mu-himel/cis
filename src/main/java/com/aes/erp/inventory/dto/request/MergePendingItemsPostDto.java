@@ -7,5 +7,7 @@ public class MergePendingItemsPostDto {
     private String code;
     private String approveStatus;
     private Long warehouseId;
+    private Long warehouseStoreId;
+
     ItemMergeRequestDto itemMergeRequestDto;
 }
