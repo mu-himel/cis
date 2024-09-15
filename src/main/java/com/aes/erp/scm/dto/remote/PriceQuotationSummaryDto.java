@@ -18,4 +18,12 @@ public class PriceQuotationSummaryDto {
     private Long creditPaymentDuration;
     private String creditPaymentUnit;
     private String note;
+
+    public String getDeliveryCharge(){
+        return this.deliveryCharge.toUpperCase();
+    }
+
+    public String setDeliveryCharge(String deliveryCharge){
+        return this.deliveryCharge = deliveryCharge.toUpperCase();
+    }
 }

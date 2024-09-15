@@ -11,4 +11,12 @@ public class OfferDeliveryDetailDto {
     private String deliveryChargeMode;
     private BigDecimal deliveryChargeAmount;
     private List<OfferItemDeliveryDetailDto> items;
+
+    public String getDeliveryChargeMode(){
+        return this.deliveryChargeMode.toUpperCase();
+    }
+
+    public String setDeliveryChargeMode(String deliveryChargeMode){
+        return this.deliveryChargeMode = deliveryChargeMode.toUpperCase();
+    }
 }

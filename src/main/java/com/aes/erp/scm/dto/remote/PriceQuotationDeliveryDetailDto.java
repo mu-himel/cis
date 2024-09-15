@@ -10,4 +10,12 @@ public class PriceQuotationDeliveryDetailDto {
     private String deliveryChargeType;
     private BigDecimal deliveryOrderQty;
     private BigDecimal deliveryChargeAmount;
+
+    public String getDeliveryChargeType(){
+        return this.deliveryChargeType.toUpperCase();
+    }
+
+    public String setDeliveryChargeType(String deliveryChargeType){
+        return this.deliveryChargeType = deliveryChargeType.toUpperCase();
+    }
 }

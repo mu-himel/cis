@@ -54,27 +54,29 @@ public class TenderController {
     @GetMapping("/tender-projection/page")
     public ResponseEntity<?> getTenderProjectionWithFilter(
         @RequestAttribute ClaimResponseDto loggedInUser,@RequestParam("searchFilter") Optional<String> searchFilter,
-                                           @RequestParam("fromDate") Optional<String> startDate,
-                                           @RequestParam("toDate")  Optional<String> endDate ,
+                                           @RequestParam("fromDate") Optional<String> fromDate,
+                                           @RequestParam("toDate")  Optional<String> toDate ,
                                            @RequestParam("page") Optional<Integer> page,
                                            @RequestParam("size") Optional<Integer> size,
                                            @RequestParam("tenderType") Optional<TenderType> tenderType,
                                            @RequestParam("itemQty") Optional<Long> itemQty,
                                            @RequestParam("organizationId") Optional<Long> organizationId,
                                            @RequestParam("categoryId") Optional<Long> categoryId){
-        return new ResponseEntity<>(tenderService.getAllTenderProjectionWithFilter(loggedInUser, searchFilter, page, size, tenderType,itemQty,organizationId,categoryId, startDate, endDate),
+        return new ResponseEntity<>(tenderService.getAllTenderProjectionWithFilter(loggedInUser, searchFilter, page, size, tenderType,itemQty,organizationId,categoryId, fromDate, toDate),
                 HttpStatus.OK);
     }
 
     @GetMapping("/closed")
     public ResponseEntity<?> getClosedTenders(
             @RequestAttribute ClaimResponseDto loggedInUser,@RequestParam("searchFilter") Optional<String> searchFilter,
-            @RequestParam("startDate") Optional<Long> startDate,
-            @RequestParam("endDate")  Optional<Long> endDate ,
+            @RequestParam("fromDate") Optional<String> fromDate,
+            @RequestParam("toDate")  Optional<String> toDate ,
             @RequestParam("page") Optional<Integer> page,
             @RequestParam("size") Optional<Integer> size,
-            @RequestParam("tenderType") Optional<TenderType> tenderType){
-        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
+            @RequestParam("tenderType") Optional<TenderType> tenderType,
+            @RequestParam("organizationId") Optional<Long> organizationId,
+            @RequestParam("categoryId") Optional<Long> categoryId){
+        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType,organizationId,categoryId, fromDate, toDate),
                 HttpStatus.OK);
     }
 
