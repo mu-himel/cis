@@ -128,7 +128,7 @@ public class OfferServiceImpl implements OfferService{
             odd.setItems(ow.getItems().stream().map(owi->{
                 OfferItemDeliveryDetail oidd = new OfferItemDeliveryDetail();
                 oidd.setItemName(owi.getItemName());
-                oidd.setDeliveryOrderQTY(owi.getDeliveryOrderQTY());
+                oidd.setDeliveryOrderQTY(owi.getDeliveryOrderQty());
                 oidd.setOfferDeliveryDetail(odd);
                 return oidd;
             }).collect(Collectors.toList()));
@@ -577,7 +577,7 @@ public class OfferServiceImpl implements OfferService{
             tp.setStatus(TenderStatus.REJECTED);
 
             Organization organization = tender.getTenderCreator();
-            String authToken = login(organization);
+            String authToken = networkService.getKeycloakAccessToken(organization);
         
             if(authToken!=null){
                 sentOfferDeclineRequest(authToken, organization, offer, noteDto);
@@ -602,20 +602,18 @@ public class OfferServiceImpl implements OfferService{
             tp.setStatus(TenderStatus.LOCKED);
 
             Organization organization = tender.getTenderCreator();
-            String authToken = login(organization);
+            String authToken = networkService.getKeycloakAccessToken(organization);
         
             if(authToken!=null){
-                sentOfferLockRequest(authToken, organization, offer);
+                // sentOfferLockRequest(authToken, organization, offer);
             }
         }
-        
-        
     }
 
     private void sentOfferLockRequest(String authToken, Organization organization,Offer offer){
-        StringBuilder sb = new StringBuilder("/price-quotations");
+        StringBuilder sb = new StringBuilder("/pq/vendor");
                 
-            sb.append("/").append(offer.getId()).append("/lock/receive");
+            sb.append("/").append(offer.getId()).append("/lock");
         
         String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();

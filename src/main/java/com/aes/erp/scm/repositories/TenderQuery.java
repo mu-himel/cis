@@ -81,7 +81,7 @@ public interface TenderQuery {
                         ELSE tp2.status
                         END as status
                         FROM tender_participators tp2 WHERE 
-                        tp2.id in (select max(id) from tender_participators tp3 where tp3.tender_id=t.id))
+                        tp2.id in (select max(id) from tender_participators tp3 where tp3.tender_id=t.id AND tp3.vendor_id = :vendorId))
                 ELSE
                         t.tender_status
                 END as tenderStatus, 
@@ -105,7 +105,7 @@ public interface TenderQuery {
         AND (:startDate IS NULL OR t.creation_date >= :startDate) 
         AND (:endDate IS NULL OR t.creation_date <= :endDate)  
         AND (COALESCE(:subCategoryIds) IS NULL OR ic.id IN (:subCategoryIds))
-        AND ((tp.status IN ('TENDER_SENT') AND t.deadline < :currentDateTime) OR tp.status IN ('REJECTED','AWARDED'))
+        AND (tp.status IN ('REJECTED','AWARDED') OR (tp.status IN ('TENDER_SENT') AND t.deadline < :currentDateTime))
         GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
         String tenderProjectionCountQuery = " SELECT count(*) FROM (" +tenderProjectionQuery+ " ) ";

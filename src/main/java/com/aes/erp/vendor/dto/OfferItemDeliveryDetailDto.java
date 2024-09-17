@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class OfferItemDeliveryDetailDto {
     private String itemName;
-    private BigDecimal deliveryOrderQTY;
+    private BigDecimal deliveryOrderQty;
 }
