@@ -22,6 +22,7 @@ public class Organization {
     private OrganizationStatus status;
 
     private String serviceIpAddress;
+    private String scmIpAddress;
     private String serviceUsername;
     private String servicePassword;
 

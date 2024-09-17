@@ -5,12 +5,17 @@ import com.aes.erp.inventory.dto.request.OrganizationCreateDto;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.OrganizationStatus;
 import com.aes.erp.inventory.repository.OrganizationRepository;
+import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.Role;
 import com.aes.erp.user_management.service.RoleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,10 +25,13 @@ import java.util.Optional;
 public class OrganizationServiceImpl implements OrganizationService{
     private final OrganizationRepository organizationRepository;
     private final RoleService roleService;
+    private final NetworkService networkService;
 
-    public OrganizationServiceImpl(OrganizationRepository organizationRepository, RoleService roleService) {
+    public OrganizationServiceImpl(OrganizationRepository organizationRepository, RoleService roleService,
+                                   NetworkService networkService) {
         this.organizationRepository = organizationRepository;
         this.roleService = roleService;
+        this.networkService = networkService;
     }
 
     @Override
@@ -39,6 +47,7 @@ public class OrganizationServiceImpl implements OrganizationService{
         organization.setName(dto.getName());
         organization.setStatus(OrganizationStatus.ENABLED);
         organization.setServiceIpAddress(dto.getServiceIpAddress());
+        organization.setScmIpAddress(dto.getScmIpAddress());
         organization.setServiceUsername(dto.getServiceUsername());
         organization.setServicePassword(dto.getServicePassword());
         Role role = roleService.read("ORGANIZATION");
@@ -80,5 +89,22 @@ public class OrganizationServiceImpl implements OrganizationService{
     @Override
     public List<?> getOrganizationIdbyName(Optional<String> name) {
         return organizationRepository.findByOrganizationName(name.orElse(null));
+    }
+
+    @Override
+    public List<Organization> getAllOrganizations() {
+        return organizationRepository.findAll();
+    }
+
+    @Override
+    @Async
+    public void sentVendorApprovedSignal() {
+        getAllOrganizations().stream().forEach(org->{
+            String token = networkService.getKeycloakAccessToken(org);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            HttpEntity<Void> payload = new HttpEntity<>(headers);
+            networkService.post(org.getServiceIpAddress()+"/integrations/ping",payload,Void.class);
+        });
     }
 }

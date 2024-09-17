@@ -62,7 +62,8 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
                 v.verification_status as verificationStatus,
                 vt.name as vendorTypeName,
                 (vs.total_score*100/1000) as score,
-                b.address as addressLine1
+                b.address as addressLine1,
+                v.ait_percentage as aitPercentage
             FROM vendor v
             LEFT JOIN vendor_types vt ON v.vendor_type_id = vt.id
             LEFT JOIN vendor_score vs ON v.vendor_score_id = vs.id
@@ -85,6 +86,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
         String getVerificationStatus();
         String getVendorTypeName();
         String getAddressLine1();
+        Integer getAitPercentage();
     }
     @Query(value = "SELECT v FROM Vendor v " +
             " LEFT JOIN FETCH v.vendorType vt " +
