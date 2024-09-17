@@ -91,4 +91,10 @@ public class OfferController {
         offerService.declineOffer(loggedInUser,id,noteDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PutMapping("/{offerId}/awarded/{vendorId}")
+    public ResponseEntity<?> getAwardedSignal(@PathVariable("offerId") Long offerId, @PathVariable("vendorId") Long vendorId){
+        offerService.getAwardedSignal(offerId,vendorId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

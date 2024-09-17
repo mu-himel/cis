@@ -20,4 +20,6 @@ public interface OfferService {
     void lockOffer(ClaimResponseDto loggedInUser, Long id);
     void declineOffer(Long id, Long vendorId,NoteDto noteDto);
     void declineOffer(ClaimResponseDto loggedInUser, Long id,NoteDto noteDto);
+
+    void getAwardedSignal(Long offerId, Long vendorId);
 }

@@ -27,6 +27,7 @@ import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.repository.OfferNegotiatorRepository;
 import com.aes.erp.vendor.repository.OfferRepository;
+import com.aes.erp.vendor.repository.VendorRepository;
 import com.aes.erp.vendor.repository.VendorScoreRepository;
 import com.aes.erp.vendor.service.negotiation_history.NegotiationHistoryService;
 import com.aes.erp.vendor.service.participator.NegotiatorService;
@@ -60,6 +61,9 @@ public class OfferServiceImpl implements OfferService{
     private final PriceQuotationRepository priceQuotationRepository;
     private final OfferItemRepository offerItemRepository;
     private final OfferRepository offerRepository;
+
+    @Autowired
+    private VendorRepository vendorRepository;
 
     @Autowired
     private VendorScoreRepository vendorScoreRepository;
@@ -553,35 +557,7 @@ public class OfferServiceImpl implements OfferService{
             String username = organization.getServiceUsername();
             String password = organization.getServicePassword();
         return networkService.getAuthToken(url,username,password);
-    }
-
-    @Override
-    @Transactional
-    /*
-     * This method invoked when vendor create some offer and in the middle of the process decline the offer
-     */
-    public void declineOffer(Long id, Long vendorId,NoteDto noteDto) {
-        Optional<Offer> offerOp = offerRepository.findById(id);
-        if(offerOp.isEmpty()){
-            throw new AesException("Sorry! Offer not found");
-        }
-        Offer offer = offerOp.get();
-        // Tender tender = offer.getTender();
-        Optional<TenderParticipator> tpOp = tenderParticipatorRepository.findByOfferId(offer.getId());
-        if(tpOp.isPresent()){
-            TenderParticipator tp = tpOp.get();
-            tp.setStatus(TenderStatus.REJECTED);
-            offer.setDeclineMessage(noteDto.getNote());
-        }
-        // TenderParticipator tp = new TenderParticipator();
-        // tp.setStatus(TenderStatus.REJECTED);
-        // tp.setVendor(new Vendor(vendorId));
-        // tp.setOffer(offer);
-        // tp.setTender(tender);
-        // tenderParticipatorRepository.save(tp);
-    }
-
-    
+    }  
 
 
     @Override
@@ -667,6 +643,67 @@ public class OfferServiceImpl implements OfferService{
         if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
             !response.getStatusCode().equals(HttpStatus.CREATED)){
             throw new AesException("Something wrong");
+        }
+    }
+
+
+    @Override
+    @Transactional
+    /*
+     * This method invoked when vendor create some offer and in the middle of the process decline the offer
+     */
+    public void declineOffer(Long id, Long vendorId,NoteDto noteDto) {
+        Optional<Offer> offerOp = offerRepository.findById(id);
+        if(offerOp.isEmpty()){
+            throw new AesException("Sorry! Offer not found");
+        }
+        Optional<Vendor> getVendor = vendorRepository.findById(vendorId);
+        if(getVendor.isEmpty()){
+            throw new AesException("Sorry! No vendor found");
+        }
+        Offer offer = offerOp.get();
+        // Vendor vendor = getVendor.get();
+        // Tender tender = offer.getTender();
+        Optional<TenderParticipator> tpOp = tenderParticipatorRepository.findByOfferId(offer.getId());
+        if(tpOp.isPresent()){
+            TenderParticipator tp = tpOp.get();
+            tp.setStatus(TenderStatus.LOST);
+            offer.setDeclineMessage(noteDto.getNote());
+        }
+        // TenderParticipator tp = new TenderParticipator();
+        // tp.setStatus(TenderStatus.REJECTED);
+        // tp.setVendor(new Vendor(vendorId));
+        // tp.setOffer(offer);
+        // tp.setTender(tender);
+        // tenderParticipatorRepository.save(tp);
+    }
+
+    @Override
+    @Transactional
+    public void getAwardedSignal(Long offerId, Long vendorId) {
+        Optional<Offer> offerOp = offerRepository.findById(offerId);
+        if(offerOp.isEmpty()){
+            throw new AesException("Sorry! Offer not found");
+        }
+        Optional<Vendor> getVendor = vendorRepository.findById(vendorId);
+        if(getVendor.isEmpty()){
+            throw new AesException("Sorry! No vendor found");
+        }
+        Vendor vendor = getVendor.get();
+        Offer offer = offerOp.get();
+        Tender tender = offer.getTender();
+
+        TenderParticipator exitingTp = offerRepository.hasOffer(TenderStatus.AWARDED,offer,vendor,tender);
+        if(exitingTp == null){
+
+            TenderParticipator exitingLockedTp = offerRepository.hasOffer(TenderStatus.LOCKED,offer,vendor,tender);
+            if(exitingLockedTp != null){
+
+                exitingLockedTp.setStatus(TenderStatus.AWARDED);
+                tenderParticipatorRepository.save(exitingLockedTp);
+            }
+        }else{
+            throw new AesException("already exist");
         }
     }
 
