@@ -14,5 +14,7 @@ public interface OrganizationService {
     Organization getOrganizationById(Long orgId);
     void enableOrganization(Boolean enable, Long id);
     List<?> getOrganizationIdbyName(Optional<String> name);
-    
+
+    List<Organization> getAllOrganizations();
+    void sentVendorApprovedSignal();
 }

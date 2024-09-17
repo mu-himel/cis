@@ -11,6 +11,7 @@ public class OrganizationCreateDto {
     private String code;
 
     private String serviceIpAddress;
+    private String scmIpAddress;
     private String serviceUsername;
     private String servicePassword;
 
