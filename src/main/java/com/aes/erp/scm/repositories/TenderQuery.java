@@ -68,7 +68,7 @@ public interface TenderQuery {
         AND (:endDate IS NULL OR t.creation_date <= :endDate) 
         AND (COALESCE(:subCategoryIds) IS NULL OR ic.id IN (:subCategoryIds))
         AND t.deadline > :currentDateTime
-        AND tp.status NOT IN ('REJECTED','AWARDED')
+        AND (tp.id IS NULL OR tp.status NOT IN ('REJECTED','AWARDED'))
         GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
         String closedTenderProjectionQuery = """
