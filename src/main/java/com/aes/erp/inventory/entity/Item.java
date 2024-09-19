@@ -75,6 +75,9 @@ public class Item {
     // @Enumerated(EnumType.STRING)
     private String itemUnit;
 
+    @OneToMany(mappedBy = "item",cascade = CascadeType.ALL)
+    private List<ItemFunctionalUnit>functionalUnits;
+
     private Integer stockThresholdQty;
     private Integer reorderPercentage;
 

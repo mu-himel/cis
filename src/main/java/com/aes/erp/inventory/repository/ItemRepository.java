@@ -19,6 +19,14 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
             "LEFT JOIN FETCH ic.parentCategory pc WHERE i.id=:id")
     Optional<Item> findById(@Param("id") Long id);
 
+//    @Query("SELECT i FROM Item i " +
+//            "LEFT JOIN FETCH i.itemCategory ic " +
+//            "LEFT JOIN FETCH i.itemParentCategory ipc " +
+//            "LEFT JOIN FETCH ic.parentCategory pc " +
+//            "LEFT JOIN FETCH i.functionalUnits fu " +
+//            "WHERE i.id=:id")
+ //   Optional<Item> findById(@Param("id") Long id);
+
 
     @Query(value = getItemsWithSearch,
             countQuery = countItemsWithSearch)
