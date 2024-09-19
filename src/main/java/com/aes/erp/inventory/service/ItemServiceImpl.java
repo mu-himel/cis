@@ -350,6 +350,14 @@ public class ItemServiceImpl implements ItemService {
 
             item.setItemAttributeName(generateItemAttributeName(item.getAttributes()));
         }
+
+        if(itemRequestDto.getFunctionalUnits()!=null && itemRequestDto.getFunctionalUnits().size()>0) {
+
+            item.setFunctionalUnits(itemRequestDto.getFunctionalUnits().stream().map(itemFunctionalUnit -> {
+                itemFunctionalUnit.setItem(item);
+                return itemFunctionalUnit;
+            }).collect(Collectors.toList()));
+        }
         itemRepository.save(item);
     }
 
