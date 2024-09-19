@@ -73,7 +73,7 @@ public class VendorServiceImpl implements VendorService {
     private VendorFileRepository vendorFileRepository;
     private final CategoryService categoryService;
     private final GeneralDetailsRepository generalDetailsRepository;
-
+    @Autowired
     private OrganizationService organizationService;
 
 
@@ -601,9 +601,9 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public List<?> getVendorList(Optional<String> name) {
+    public List<?> getVendorList(Optional<String> name,Optional<Long> categoryId,Optional<Long> subCategoryId) {
       
-        return vendorRepository.findAllVendors(name.orElse(null));
+        return vendorRepository.findAllVendors(name.orElse(null),categoryId.orElse(null),subCategoryId.orElse(null));
     }
 
     

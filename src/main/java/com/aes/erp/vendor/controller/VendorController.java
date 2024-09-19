@@ -48,9 +48,9 @@ public class VendorController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> getVendors(@RequestParam("name") Optional<String> name){
+    public ResponseEntity<?> getVendors(@RequestParam("name") Optional<String> name, @RequestParam("categoryId") Optional<Long> categoryId, @RequestParam("subCategoryId") Optional<Long> subCategoryId){
         return new ResponseEntity<>(
-            vendorService.getVendorList(name),
+            vendorService.getVendorList(name,categoryId,subCategoryId),
             HttpStatus.OK
         );
     }
