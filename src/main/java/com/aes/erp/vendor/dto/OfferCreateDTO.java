@@ -13,21 +13,21 @@ import java.util.List;
 
 @Data
 public class OfferCreateDTO {
-    private List<OfferItemCreateDto> offerItems;//
-    private List<OfferDeliveryDetailDto> warehouses;//
-    private CreditType creditType;//
-    private Boolean mushakIncluded;//
-    private BigDecimal totalDeliveryChargeAmount;//
-    private Boolean aitIncluded;//
-    private Boolean vatIncluded;//
-    private BigDecimal vatAmount;//
-    private BigDecimal vatPercent;//
-    private String note;//
-    private BigDecimal finalOfferPrice;//
-    private Long creditPaymentDays;//
-    private Boolean isFinal;//
-    private List<OfferTermsAndConditionDto> termsAndConditions = new ArrayList<>();//
+    private List<OfferItemCreateDto> offerItems;
+    private List<OfferDeliveryDetailDto> warehouses;
+    private CreditType creditType;
+    private Boolean mushakIncluded;
+    private BigDecimal totalDeliveryChargeAmount;
+    private Boolean aitIncluded;
+    private Boolean vatIncluded;
+    private BigDecimal vatAmount;
+    private BigDecimal vatPercent;
+    private String note;
+    private BigDecimal finalOfferPrice;
+    private Long creditPaymentDays;
+    private Boolean isFinal;
+    private List<OfferTermsAndConditionDto> termsAndConditions = new ArrayList<>();
     //Only used for counter offer
     @ApiModelProperty(value = "Only for counter offer")
-    private Long negotiationHistoryId;//
+    private Long negotiationHistoryId;
 }
