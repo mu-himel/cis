@@ -67,8 +67,7 @@ public interface TenderQuery {
         AND (:startDate IS NULL OR t.creation_date >= :startDate) 
         AND (:endDate IS NULL OR t.creation_date <= :endDate) 
         AND (COALESCE(:subCategoryIds) IS NULL OR ic.id IN (:subCategoryIds))
-        AND t.deadline > :currentDateTime
-        AND (tp.id IS NULL OR tp.status NOT IN ('REJECTED','AWARDED'))
+        AND (t.deadline > :currentDateTime)
         GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
         String closedTenderProjectionQuery = """
@@ -105,7 +104,7 @@ public interface TenderQuery {
         AND (:startDate IS NULL OR t.creation_date >= :startDate) 
         AND (:endDate IS NULL OR t.creation_date <= :endDate)  
         AND (COALESCE(:subCategoryIds) IS NULL OR ic.id IN (:subCategoryIds))
-        AND (tp.status IN ('REJECTED','AWARDED') OR (tp.status IN ('TENDER_SENT') AND t.deadline < :currentDateTime))
+        AND (t.deadline < :currentDateTime)
         GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
         String tenderProjectionCountQuery = " SELECT count(*) FROM (" +tenderProjectionQuery+ " ) ";
