@@ -23,7 +23,7 @@ public class OfferItemDeliveryDetail {
    @Column(updatable = false)
    private Long id;
    private String itemName;
-   private BigDecimal deliveryOrderQTY;
+   private BigDecimal deliveryOrderQty;
 
    private LocalDate deliveryDate;
 

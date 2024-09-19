@@ -128,7 +128,7 @@ public class OfferServiceImpl implements OfferService{
             odd.setItems(ow.getItems().stream().map(owi->{
                 OfferItemDeliveryDetail oidd = new OfferItemDeliveryDetail();
                 oidd.setItemName(owi.getItemName());
-                oidd.setDeliveryOrderQTY(owi.getDeliveryOrderQty());
+                oidd.setDeliveryOrderQty(owi.getDeliveryOrderQty());
                 oidd.setOfferDeliveryDetail(odd);
                 return oidd;
             }).collect(Collectors.toList()));
@@ -329,7 +329,7 @@ public class OfferServiceImpl implements OfferService{
                     offerStage.equals(OfferStage.FINAL_OFFER_TO_COMPANY)){
                     sb.append("/receive-counter");
                 }
-                String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+                String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
                 System.out.println(priceQuotationEndpoint);
                 HttpHeaders headers = new HttpHeaders();
                 headers.setBearerAuth(authToken);
@@ -552,7 +552,7 @@ public class OfferServiceImpl implements OfferService{
 
     private String login(Organization organization){
        
-            String url = organization.getServiceIpAddress().replace("/api/v1","")
+            String url = organization.getScmIpAddress().replace("/api/v1","")
                                 .concat("/authenticate");
             String username = organization.getServiceUsername();
             String password = organization.getServicePassword();
@@ -562,6 +562,9 @@ public class OfferServiceImpl implements OfferService{
 
     @Override
     @Transactional
+    /*
+     * This method invoked when vendor create some offer and in the middle of the process decline the offer by vendor
+     */
     public void declineOffer(ClaimResponseDto loggedInUser, Long id, NoteDto noteDto) {
         Optional<Offer> offerOp = offerRepository.findById(id);
         if(offerOp.isEmpty()){
@@ -580,7 +583,7 @@ public class OfferServiceImpl implements OfferService{
             String authToken = networkService.getKeycloakAccessToken(organization);
         
             if(authToken!=null){
-                sentOfferDeclineRequest(authToken, organization, offer, noteDto);
+                // sentOfferDeclineRequest(authToken, organization, offer, noteDto);
             }
         }
     }
@@ -605,7 +608,7 @@ public class OfferServiceImpl implements OfferService{
             String authToken = networkService.getKeycloakAccessToken(organization);
         
             if(authToken!=null){
-                // sentOfferLockRequest(authToken, organization, offer);
+                sentOfferLockRequest(authToken, organization, offer);
             }
         }
     }
@@ -615,7 +618,7 @@ public class OfferServiceImpl implements OfferService{
                 
             sb.append("/").append(offer.getId()).append("/lock");
         
-        String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -628,11 +631,11 @@ public class OfferServiceImpl implements OfferService{
     }
 
     private void sentOfferDeclineRequest(String authToken, Organization organization,Offer offer, NoteDto noteDto){
-        StringBuilder sb = new StringBuilder("/price-quotations");
+        StringBuilder sb = new StringBuilder("/pq/vendor");
                 
-            sb.append("/").append(offer.getId()).append("/decline/receive");
+            sb.append("/").append(offer.getId()).append("/decline");
         
-        String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -648,7 +651,7 @@ public class OfferServiceImpl implements OfferService{
     @Override
     @Transactional
     /*
-     * This method invoked when vendor create some offer and in the middle of the process decline the offer
+     * This method invoked when vendor create some offer and in the middle of the process decline the offer by scm side
      */
     public void declineOffer(Long id, Long vendorId,NoteDto noteDto) {
         Optional<Offer> offerOp = offerRepository.findById(id);
