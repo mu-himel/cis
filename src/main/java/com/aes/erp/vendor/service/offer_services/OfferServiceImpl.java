@@ -583,7 +583,7 @@ public class OfferServiceImpl implements OfferService{
             String authToken = networkService.getKeycloakAccessToken(organization);
         
             if(authToken!=null){
-                // sentOfferDeclineRequest(authToken, organization, offer, noteDto);
+                sentOfferDeclineRequest(authToken, organization, offer, noteDto);
             }
         }
     }
