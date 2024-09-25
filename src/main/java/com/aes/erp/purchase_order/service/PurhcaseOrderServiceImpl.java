@@ -26,10 +26,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
+import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
+import com.aes.erp.inventory.repository.CategoryRepository;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
 import com.aes.erp.purchase_order.dto.request.QcResultDto;
@@ -40,14 +43,28 @@ import com.aes.erp.purchase_order.repository.PoRepository;
 import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderDetailInfo;
 import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderInfo;
 import com.aes.erp.scm.Entities.Tender;
+import com.aes.erp.scm.Entities.TenderDeliveryDetail;
+import com.aes.erp.scm.Entities.TenderItem;
 import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.remote.GoodReceiveItemDetailDto;
 import com.aes.erp.scm.dto.remote.GoodReceiveNoteCreateDto;
+import com.aes.erp.scm.dto.remote.GoodReceivedManualRequestDto;
+import com.aes.erp.scm.dto.remote.GrnManualItemDetailDto;
+import com.aes.erp.scm.dto.remote.ReferenceObjDto;
+import com.aes.erp.scm.dto.remote.VendorRemoteDto;
+import com.aes.erp.scm.repositories.OfferItemRepository;
+import com.aes.erp.scm.repositories.TednerDeliveryDetailRepository;
+import com.aes.erp.scm.repositories.TednerDeliveryDetailRepository.POItemDeliveryInfo;
+import com.aes.erp.scm.repositories.TenderItemRepository;
+import com.aes.erp.scm.repositories.TenderRepository;
 import com.aes.erp.scm.services.TenderService;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.Offer;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferDeliveryDetail;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferItem;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferTermsAndCondition;
+import com.aes.erp.vendor.repository.OfferDeliveryDetailRepository;
+import com.aes.erp.vendor.repository.OfferRepository;
 import com.aes.erp.vendor.repository.OfferTermsAndConditionRepository;
 import com.aes.erp.vendor.service.offer_services.OfferService;
 
@@ -76,6 +93,28 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Autowired
     private OfferTermsAndConditionRepository offerTermsAndConditionRepository;
+
+    @Autowired
+    private TenderRepository tenderRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private TenderItemRepository tenderItemRepository;
+
+    @Autowired
+    private TednerDeliveryDetailRepository tenderDeliveryDetailRepository;
+
+    @Autowired
+    private OfferDeliveryDetailRepository offerDeliveryDetailRepository; 
+
+    @Autowired
+    private OfferRepository offerRepository;
+
+    @Autowired
+    private OfferItemRepository offerItemRepository;
+
 
     @Override
     @Transactional
@@ -208,36 +247,120 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         
     }
 
+    // @Override
+    // @Transactional
+    // public void sendPODep(Long id) {
+    //     Optional<PurchaseOrder> poOp = poRepository.findById(id);
+    //     if(poOp.isPresent()){
+    //         PurchaseOrder po = poOp.get();
+    //         Organization organization = po.getOrg();
+    //         po.setIsPoSent(true);
+    //         po.setPoStatus("IN PROGRESS");
+    //         GoodReceiveNoteCreateDto grn = new GoodReceiveNoteCreateDto();
+    //         grn.setRemotePoId(po.getRemotePoId());
+    //         grn.setPoId(po.getId());
+    //         List<GoodReceiveItemDetailDto> grids = new ArrayList<>();
+    //         po.getOrderDetails().stream().forEach(od->{
+    //             GoodReceiveItemDetailDto grid = new GoodReceiveItemDetailDto();
+    //             grid.setItemAttribute(od.getItemName());
+    //             grid.setBrandName(od.getOfferItem().getBrandName());
+    //             grid.setReceiveQty(od.getItemQty());
+    //             grid.setSubCategoryCode(po.getCategoryCode());
+    //             grids.add(grid);
+    //         });
+    //         grn.setDetails(grids);
+
+    //         String authToken = login(organization);
+    //         log.info("authtoken:" +authToken);
+    //         sendGrnRequest(organization, authToken, grn);
+    //     }
+        
+    // }
+    
+
     @Override
     @Transactional
     public void sendPO(Long id) {
         Optional<PurchaseOrder> poOp = poRepository.findById(id);
         if(poOp.isPresent()){
+            
             PurchaseOrder po = poOp.get();
             Organization organization = po.getOrg();
             po.setIsPoSent(true);
             po.setPoStatus("IN PROGRESS");
-            GoodReceiveNoteCreateDto grn = new GoodReceiveNoteCreateDto();
-            grn.setRemotePoId(po.getRemotePoId());
-            grn.setPoId(po.getId());
-            List<GoodReceiveItemDetailDto> grids = new ArrayList<>();
-            po.getOrderDetails().stream().forEach(od->{
-                GoodReceiveItemDetailDto grid = new GoodReceiveItemDetailDto();
-                grid.setItemAttribute(od.getItemName());
-                grid.setBrandName(od.getOfferItem().getBrandName());
-                grid.setReceiveQty(od.getItemQty());
-                grid.setSubCategoryCode(po.getCategoryCode());
-                grids.add(grid);
-            });
-            grn.setDetails(grids);
+            Optional<Tender> tenderOp = tenderRepository.findById(Long.parseLong(po.getTenderNo()));
+            if(tenderOp.isPresent()){
+                Tender tender = tenderOp.get();
+                // List<pqObj> pqObjList = new ArrayList<>();
+                List<POItemDeliveryInfo> warehouseOfferCatList = tenderDeliveryDetailRepository.getItemWiseDeliveryDetailPO(tender.getId(),po.getVendor().getId());
+                
+                // List <TenderItem> tenderItemList = tenderItemRepository.findByTenderId(tender.getId());
+                
+                VendorRemoteDto vendorRemoteDto = new VendorRemoteDto();
+                vendorRemoteDto.setId(po.getVendor().getId());
+                vendorRemoteDto.setName(po.getVendor().getName());
+                vendorRemoteDto.setVendorEmail(po.getVendor().getEmail());
+                vendorRemoteDto.setVendorPhone(po.getVendor().getPhone());
 
-            String authToken = login(organization);
-            log.info("authtoken:" +authToken);
-            sendGrnRequest(organization, authToken, grn);
+                for (POItemDeliveryInfo row : warehouseOfferCatList) {
+                    OfferDeliveryDetail delivery_detail = offerDeliveryDetailRepository.findByWarehouseIdAndOfferId(row.getWarehouseId(),row.getOfferId());
+                    Offer offer = offerRepository.findById(row.getOfferId()).get();
+                    List<OfferItem> offerItem = offerItemRepository.findByOfferId(row.getOfferId());
+
+                    // ItemCategory itemCategory = tender.getItemCategory();
+
+                    GoodReceivedManualRequestDto grn = new GoodReceiveNoteCreateDto();
+
+                    ReferenceObjDto rfoDto = new ReferenceObjDto(row.getScmCategoryId());
+                    grn.setCategory(rfoDto);
+                    //grn.setGrnNo();
+                    grn.setDeliveryCharge(delivery_detail.getDeliveryChargeMode());
+                    grn.setMushak(null);
+                    grn.setDeliveryChargeAmount(delivery_detail.getDeliveryChargeAmount());
+                    grn.setDays(PAGE_SIZE);
+                    if(offer.getVatIncluded() == true){
+                        grn.setVatOption("INCLUDED");
+                    }else{
+                        grn.setVatOption("EXCLUDED");
+                    }
+                    if(offer.getAitIncluded() == true){
+                        grn.setAitOption("INCLUDED");
+                    }else{
+                        grn.setAitOption("EXCLUDED");
+                    }
+                    grn.setTotalPrice(null);
+                    grn.setTotalVat(null);
+                    grn.setInTotal(null);
+                    grn.setWarehouseId(row.getWarehouseId());
+                    // grn.setPayment(offer.getCreditType());
+                    grn.setInvoicePath(null);
+                    grn.setVendor(vendorRemoteDto);
+
+
+                    List<GrnManualItemDetailDto> grids = new ArrayList<>();
+                    po.getOrderDetails().stream().forEach(od->{
+                        GrnManualItemDetailDto grid = new GrnManualItemDetailDto();
+                        grid.setCategory(null);
+                        grid.setSubCategory(null);
+                        grid.setEstDeliveryDays(PAGE_SIZE);
+                        grid.setItem(new ReferenceObjectDto(od.getOfferItem().getId()));
+                        grid.setOrderQty(od.getItemQty());
+                        grid.setPricePerUnit(od.getOfferItem().getPriceQuotation().getPricePerUnit());
+                        grids.add(grid);
+                    });
+                    grn.setGrnDetails(grids);
+
+                    String authToken = login(organization);
+                    log.info("authtoken:" +authToken);
+                    sendGrnRequest(organization, authToken, grn);
+                }
+                
+            }
+            
+            
         }
         
     }
-
     @Override
     @Transactional
     public void grnReceive(Long id) {
@@ -318,14 +441,14 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     }
 
    
-    private void sendGrnRequest(Organization organization, String authToken, GoodReceiveNoteCreateDto grn){
+    private void sendGrnRequest(Organization organization, String authToken, GoodReceivedManualRequestDto grn){
         StringBuilder sb = new StringBuilder("/goods-receive-note/receive");
         
         String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<GoodReceiveNoteCreateDto> pqPayload = new HttpEntity<>(grn, headers);
+        HttpEntity<GoodReceivedManualRequestDto> pqPayload = new HttpEntity<>(grn, headers);
         ResponseEntity<Void> response = networkService.post(priceQuotationEndpoint,pqPayload,Void.class);
         if(!response.getStatusCode().equals(HttpStatus.CREATED)) {
             throw new AesException("something wrong.");
