@@ -55,6 +55,8 @@ public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
 
     private Long scmCategoryId;
 
+    private Boolean isUserGenerated=false;
+
     @JsonProperty(value = "createdBy")
     private String requestedBy;
 
