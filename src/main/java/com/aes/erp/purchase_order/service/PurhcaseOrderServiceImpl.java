@@ -34,6 +34,7 @@ import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.repository.CategoryRepository;
 import com.aes.erp.network.NetworkService;
+import com.aes.erp.purchase_order.dto.request.PoDetailReqDto;
 import com.aes.erp.purchase_order.dto.request.PoReceiveRequestDto;
 import com.aes.erp.purchase_order.dto.request.QcResultDto;
 import com.aes.erp.purchase_order.entity.PoQcDetail;
@@ -138,10 +139,13 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setPoStatus("PENDING");
             po.setCategoryCode(poDto.getCategoryCode());
             List<PurchaseOrderDetail> poOrderDetails = new ArrayList<>();
-            poDto.getOrderDetails().stream().forEach(od->{
+            for(PoDetailReqDto od:poDto.getOrderDetails()){
                 Optional<OfferItem> offerItemOp = offer.getOfferItems().stream()
                         .filter(oi->{
-                            String oiStr = oi.getProductDescription().concat(" - "+oi.getExtendedAttributes());
+                            String oiStr = oi.getProductDescription().concat(" - ");
+                            if(oi.getExtendedAttributes() != null){
+                                oiStr = oiStr.concat(oi.getExtendedAttributes());
+                            }
                             String odStr =od.getItemName();
                             return oiStr.equals(odStr);
                         })
@@ -158,7 +162,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                     
                 }
                 
-            });
+            };
             po.setOrderDetails(poOrderDetails);
             poRepository.save(po);
         });
