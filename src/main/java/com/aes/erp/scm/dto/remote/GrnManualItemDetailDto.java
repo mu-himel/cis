@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 
 public class GrnManualItemDetailDto {
     private ReferenceObjectDto item;
-    private ItemCategory category;
-    private ItemCategory subCategory;
-    private Integer estDeliveryDays;
+    private ReferenceObjectDto category;
+    private ReferenceObjectDto subCategory;
+    private Long estDeliveryDays;
     private BigDecimal orderQty;
     private BigDecimal pricePerUnit;
 }

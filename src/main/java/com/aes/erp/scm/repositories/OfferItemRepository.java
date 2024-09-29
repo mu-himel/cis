@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OfferItemRepository extends JpaRepository<OfferItem, Long> {
     List<OfferItem> findByOfferId(Long offerId);
+
 }

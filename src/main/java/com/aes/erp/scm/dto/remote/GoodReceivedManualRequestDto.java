@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.aes.erp.common.ReferenceObjectDto;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.CreditType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,8 +28,9 @@ public class GoodReceivedManualRequestDto {
 //    private BigDecimal vatPctg;
     private BigDecimal inTotal;
     private Long warehouseId;
-    private String payment;
+    private CreditType payment;
     private String invoicePath;
+    private Long poId;
     List<GrnManualItemDetailDto> grnDetails;
 
 }

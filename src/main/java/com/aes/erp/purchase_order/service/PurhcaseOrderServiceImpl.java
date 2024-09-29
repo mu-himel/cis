@@ -1,5 +1,6 @@
 package com.aes.erp.purchase_order.service;
 
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,9 +41,11 @@ import com.aes.erp.purchase_order.dto.request.QcResultDto;
 import com.aes.erp.purchase_order.entity.PoQcDetail;
 import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
+import com.aes.erp.purchase_order.repository.PoDetailRepository;
 import com.aes.erp.purchase_order.repository.PoRepository;
 import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderDetailInfo;
 import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderInfo;
+import com.aes.erp.scm.Entities.PriceQuotation;
 import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderDeliveryDetail;
 import com.aes.erp.scm.Entities.TenderItem;
@@ -54,6 +57,7 @@ import com.aes.erp.scm.dto.remote.GrnManualItemDetailDto;
 import com.aes.erp.scm.dto.remote.ReferenceObjDto;
 import com.aes.erp.scm.dto.remote.VendorRemoteDto;
 import com.aes.erp.scm.repositories.OfferItemRepository;
+import com.aes.erp.scm.repositories.PriceQuotationRepository;
 import com.aes.erp.scm.repositories.TednerDeliveryDetailRepository;
 import com.aes.erp.scm.repositories.TednerDeliveryDetailRepository.POItemDeliveryInfo;
 import com.aes.erp.scm.repositories.TenderItemRepository;
@@ -116,6 +120,12 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     @Autowired
     private OfferItemRepository offerItemRepository;
 
+    @Autowired
+    private PoDetailRepository poDetailRepository;
+
+    @Autowired
+    private PriceQuotationRepository priceQuotationRepository;
+
 
     @Override
     @Transactional
@@ -138,13 +148,15 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setOrg(organization);
             po.setPoStatus("PENDING");
             po.setCategoryCode(poDto.getCategoryCode());
+            po.setWarehouseId(poDto.getWarehouse().getId());
+            
             List<PurchaseOrderDetail> poOrderDetails = new ArrayList<>();
             for(PoDetailReqDto od:poDto.getOrderDetails()){
                 Optional<OfferItem> offerItemOp = offer.getOfferItems().stream()
                         .filter(oi->{
-                            String oiStr = oi.getProductDescription().concat(" - ");
+                            String oiStr = oi.getProductDescription();
                             if(oi.getExtendedAttributes() != null){
-                                oiStr = oiStr.concat(oi.getExtendedAttributes());
+                                oiStr = oiStr.concat(" - "+oi.getExtendedAttributes());
                             }
                             String odStr =od.getItemName();
                             return oiStr.equals(odStr);
@@ -253,7 +265,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     // @Override
     // @Transactional
-    // public void sendPODep(Long id) {
+    // public void sendPO(Long id) {
     //     Optional<PurchaseOrder> poOp = poRepository.findById(id);
     //     if(poOp.isPresent()){
     //         PurchaseOrder po = poOp.get();
@@ -292,13 +304,15 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             Organization organization = po.getOrg();
             po.setIsPoSent(true);
             po.setPoStatus("IN PROGRESS");
-            Optional<Tender> tenderOp = tenderRepository.findById(Long.parseLong(po.getTenderNo()));
+            Optional<Tender> tenderOp = tenderRepository.findByRfqNo(po.getTenderNo());
             if(tenderOp.isPresent()){
                 Tender tender = tenderOp.get();
-                // List<pqObj> pqObjList = new ArrayList<>();
-                List<POItemDeliveryInfo> warehouseOfferCatList = tenderDeliveryDetailRepository.getItemWiseDeliveryDetailPO(tender.getId(),po.getVendor().getId());
+                // List<POItemDeliveryInfo> warehouseOfferCatList = tenderDeliveryDetailRepository.getItemWiseDeliveryDetailPO(tender.getId(),po.getVendor().getId());
                 
                 // List <TenderItem> tenderItemList = tenderItemRepository.findByTenderId(tender.getId());
+                PurchaseOrderDetail purchaseOrderDetail = poDetailRepository.findByPurchaseOrderId(po.getId());
+                // OfferItem offerItem = offerItemRepository.findById(purchaseOrderDetail.getOfferItem().getId()).get();
+                // PriceQuotation priceQuotation = priceQuotationRepository.findById(purchaseOrderDetail.getOfferItem().getPriceQuotation().getId()).get();
                 
                 VendorRemoteDto vendorRemoteDto = new VendorRemoteDto();
                 vendorRemoteDto.setId(po.getVendor().getId());
@@ -306,65 +320,77 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                 vendorRemoteDto.setVendorEmail(po.getVendor().getEmail());
                 vendorRemoteDto.setVendorPhone(po.getVendor().getPhone());
 
-                for (POItemDeliveryInfo row : warehouseOfferCatList) {
-                    OfferDeliveryDetail delivery_detail = offerDeliveryDetailRepository.findByWarehouseIdAndOfferId(row.getWarehouseId(),row.getOfferId());
-                    Offer offer = offerRepository.findById(row.getOfferId()).get();
-                    List<OfferItem> offerItem = offerItemRepository.findByOfferId(row.getOfferId());
-
-                    // ItemCategory itemCategory = tender.getItemCategory();
-
-                    GoodReceivedManualRequestDto grn = new GoodReceiveNoteCreateDto();
-
-                    ReferenceObjDto rfoDto = new ReferenceObjDto(row.getScmCategoryId());
-                    grn.setCategory(rfoDto);
-                    //grn.setGrnNo();
-                    grn.setDeliveryCharge(delivery_detail.getDeliveryChargeMode());
-                    grn.setMushak(null);
-                    grn.setDeliveryChargeAmount(delivery_detail.getDeliveryChargeAmount());
-                    grn.setDays(PAGE_SIZE);
-                    if(offer.getVatIncluded() == true){
-                        grn.setVatOption("INCLUDED");
-                    }else{
-                        grn.setVatOption("EXCLUDED");
-                    }
-                    if(offer.getAitIncluded() == true){
-                        grn.setAitOption("INCLUDED");
-                    }else{
-                        grn.setAitOption("EXCLUDED");
-                    }
-                    grn.setTotalPrice(null);
-                    grn.setTotalVat(null);
-                    grn.setInTotal(null);
-                    grn.setWarehouseId(row.getWarehouseId());
-                    // grn.setPayment(offer.getCreditType());
-                    grn.setInvoicePath(null);
-                    grn.setVendor(vendorRemoteDto);
+                // for (POItemDeliveryInfo row : warehouseOfferCatList) {
+                // Offer offer = offerRepository.findById(purchaseOrderDetail.getOfferItem().getOffer().getId()).get();
+                OfferDeliveryDetail delivery_detail = offerDeliveryDetailRepository.findByWarehouseIdAndOfferId(po.getWarehouseId(),purchaseOrderDetail.getOfferItem().getOffer().getId());
 
 
-                    List<GrnManualItemDetailDto> grids = new ArrayList<>();
-                    po.getOrderDetails().stream().forEach(od->{
-                        GrnManualItemDetailDto grid = new GrnManualItemDetailDto();
-                        grid.setCategory(null);
-                        grid.setSubCategory(null);
-                        grid.setEstDeliveryDays(PAGE_SIZE);
-                        grid.setItem(new ReferenceObjectDto(od.getOfferItem().getId()));
-                        grid.setOrderQty(od.getItemQty());
-                        grid.setPricePerUnit(od.getOfferItem().getPriceQuotation().getPricePerUnit());
-                        grids.add(grid);
-                    });
-                    grn.setGrnDetails(grids);
-
-                    String authToken = login(organization);
-                    log.info("authtoken:" +authToken);
-                    sendGrnRequest(organization, authToken, grn);
+                GoodReceivedManualRequestDto grn = new GoodReceiveNoteCreateDto();
+                grn.setGrnNo(null);
+                grn.setIndentNo(null);
+                //one order can have many items
+                ItemCategory itemCategory = tender.getItemCategory();
+                ReferenceObjDto rfoDto = new ReferenceObjDto(itemCategory.getScmCategoryId());
+                grn.setCategory(rfoDto);
+                grn.setPoId(po.getRemotePoId());
+                
+                grn.setDeliveryCharge(delivery_detail.getDeliveryChargeMode());
+                grn.setDeliveryChargeAmount((BigDecimal)delivery_detail.getDeliveryChargeAmount());
+                // grn.setDays(offerItem.getWarrantyDuration());
+                grn.setDays(purchaseOrderDetail.getOfferItem().getWarrantyDuration());
+                BigDecimal total_price = purchaseOrderDetail.getItemQty().multiply(purchaseOrderDetail.getOfferItem().getPriceQuotation().getPricePerUnit());
+                grn.setTotalPrice(total_price);
+                BigDecimal total_vat = new BigDecimal(0);
+                
+                if(purchaseOrderDetail.getOfferItem().getOffer().getMushakIncluded() == true){
+                    grn.setMushak("INCLUDED");
+                }else{
+                    grn.setMushak("EXCLUDED");
                 }
+                if(purchaseOrderDetail.getOfferItem().getOffer().getVatIncluded() == true){
+                    grn.setVatOption("INCLUDED");
+                }else{
+                    grn.setVatOption("EXCLUDED");
+                    total_vat = (total_price.multiply(purchaseOrderDetail.getOfferItem().getOffer().getVatPercent())).divide(new BigDecimal(100));
+                    
+                }
+                if(purchaseOrderDetail.getOfferItem().getOffer().getAitIncluded() == true){
+                    grn.setAitOption("INCLUDED");
+                }else{
+                    grn.setAitOption("EXCLUDED");
+                }
+
+                grn.setTotalVat(total_vat);
+                BigDecimal inTotal = total_price.add(total_vat);
+                grn.setInTotal(inTotal);
+                grn.setWarehouseId(po.getWarehouseId());
+                grn.setPayment(purchaseOrderDetail.getOfferItem().getOffer().getCreditType());
+                grn.setInvoicePath(po.getInvoicePath());
+                grn.setVendor(vendorRemoteDto);
+
+
+                List<GrnManualItemDetailDto> grids = new ArrayList<>();
+                po.getOrderDetails().stream().forEach(od->{
+                    GrnManualItemDetailDto grid = new GrnManualItemDetailDto();
+                    grid.setCategory(new ReferenceObjectDto(itemCategory.getParentCategory().getScmCategoryId()));
+                    grid.setSubCategory(new ReferenceObjectDto(itemCategory.getScmCategoryId()));
+                    grid.setEstDeliveryDays(purchaseOrderDetail.getOfferItem().getEstimatedDeliveryDays());
+                    grid.setItem(new ReferenceObjectDto(od.getOfferItem().getId()));
+                    grid.setOrderQty(od.getItemQty());
+                    grid.setPricePerUnit(od.getOfferItem().getPriceQuotation().getPricePerUnit());
+                    grids.add(grid);
+                });
+                grn.setGrnDetails(grids);
+
+                String authToken = networkService.getKeycloakAccessToken(organization);
+                log.info("authtoken:" +authToken);
+                sendGrnRequest(organization, authToken, grn);
+                //}
                 
             }
-            
-            
         }
-        
     }
+
     @Override
     @Transactional
     public void grnReceive(Long id) {
@@ -446,13 +472,14 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
    
     private void sendGrnRequest(Organization organization, String authToken, GoodReceivedManualRequestDto grn){
-        StringBuilder sb = new StringBuilder("/goods-receive-note/receive");
+        StringBuilder sb = new StringBuilder("/goods-receive-note");
         
-        String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<GoodReceivedManualRequestDto> pqPayload = new HttpEntity<>(grn, headers);
+        System.out.println(priceQuotationEndpoint);
         ResponseEntity<Void> response = networkService.post(priceQuotationEndpoint,pqPayload,Void.class);
         if(!response.getStatusCode().equals(HttpStatus.CREATED)) {
             throw new AesException("something wrong.");
