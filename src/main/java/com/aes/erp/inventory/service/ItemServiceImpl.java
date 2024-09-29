@@ -238,6 +238,15 @@ public class ItemServiceImpl implements ItemService {
                     return itemAttribute;
                 }).collect(Collectors.toList()));
             }
+
+            if(itemRequestDto.getFunctionalUnits()!=null && itemRequestDto.getFunctionalUnits().size()>0) {
+
+                item.setFunctionalUnits(itemRequestDto.getFunctionalUnits().stream().map(itemFunctionalUnit -> {
+                    itemFunctionalUnit.setItem(item);
+                    return itemFunctionalUnit;
+                }).collect(Collectors.toList()));
+            }
+
             itemRepository.save(item);
 
             if(itemRequestDto.getOrgId() != null && itemRequestDto.getScmItemId()==null){
@@ -340,6 +349,14 @@ public class ItemServiceImpl implements ItemService {
             }).collect(Collectors.toList()));
 
             item.setItemAttributeName(generateItemAttributeName(item.getAttributes()));
+        }
+
+        if(itemRequestDto.getFunctionalUnits()!=null && itemRequestDto.getFunctionalUnits().size()>0) {
+
+            item.setFunctionalUnits(itemRequestDto.getFunctionalUnits().stream().map(itemFunctionalUnit -> {
+                itemFunctionalUnit.setItem(item);
+                return itemFunctionalUnit;
+            }).collect(Collectors.toList()));
         }
         itemRepository.save(item);
     }

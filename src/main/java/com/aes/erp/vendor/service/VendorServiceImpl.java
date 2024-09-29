@@ -7,6 +7,8 @@ import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.dto.response.ItemCategoryDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.service.CategoryService;
+import com.aes.erp.inventory.service.OrganizationService;
+import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.*;
@@ -30,10 +32,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.http.HttpHeaders;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
@@ -68,6 +73,10 @@ public class VendorServiceImpl implements VendorService {
     private VendorFileRepository vendorFileRepository;
     private final CategoryService categoryService;
     private final GeneralDetailsRepository generalDetailsRepository;
+    @Autowired
+    private OrganizationService organizationService;
+
+
 
     @Value("${cps.frontend}")
     private String cpsFrontendLink;
@@ -301,6 +310,7 @@ public class VendorServiceImpl implements VendorService {
                 verificationStatus,
                 pageable);
     }
+
 
     @Override
     public VendorDetailsDto getAllDetailsOfVendor(Long vendorId) {
@@ -547,6 +557,8 @@ public class VendorServiceImpl implements VendorService {
                 vendor.setDocumentHolder(documentHolder);
             }
             vendor.setStatus(VendorStatus.ENABLED);
+            organizationService.sentVendorApprovedSignal();
+
         }
         vendorRepository.save(vendor);
     }
@@ -589,9 +601,9 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public List<?> getVendorList(Optional<String> name) {
+    public List<?> getVendorList(Optional<String> name,Optional<Long> categoryId,Optional<Long> subCategoryId) {
       
-        return vendorRepository.findAllVendors(name.orElse(null));
+        return vendorRepository.findAllVendors(name.orElse(null),categoryId.orElse(null),subCategoryId.orElse(null));
     }
 
     

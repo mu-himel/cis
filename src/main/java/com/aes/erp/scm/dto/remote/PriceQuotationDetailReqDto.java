@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class PriceQuotationDetailReqDto {
-    private String itemAttribute;
+    private String itemAttributeName;
     private String extendedAttributes;
     private Integer warrantyDuration;
     private String warrantyUnit;

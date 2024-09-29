@@ -51,7 +51,7 @@ public class Offer {
     private List<OfferItem> offerItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)
-    private List<OfferTermsAndCondition> termsAndConditions;
+    private List<OfferTermsAndCondition> termsAndConditions = new ArrayList<>();
 
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)
     private List<OfferDeliveryDetail> warehouses = new ArrayList<>();

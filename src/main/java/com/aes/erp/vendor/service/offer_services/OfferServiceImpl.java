@@ -11,6 +11,7 @@ import com.aes.erp.scm.Entities.TenderItem;
 import com.aes.erp.scm.Entities.TenderParticipator;
 import com.aes.erp.scm.Entities.TenderStatus;
 import com.aes.erp.scm.dto.NoteDto;
+import com.aes.erp.scm.dto.remote.DeliveryDetailDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationDeliveryDetailDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationDetailReqDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationReqDto;
@@ -20,11 +21,13 @@ import com.aes.erp.scm.repositories.PriceQuotationRepository;
 import com.aes.erp.scm.repositories.TenderParticipatorRepository;
 import com.aes.erp.scm.services.TenderService;
 import com.aes.erp.vendor.dto.OfferCreateDTO;
+import com.aes.erp.vendor.dto.OfferDeliveryDetailDto;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.*;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.repository.OfferNegotiatorRepository;
 import com.aes.erp.vendor.repository.OfferRepository;
+import com.aes.erp.vendor.repository.VendorRepository;
 import com.aes.erp.vendor.repository.VendorScoreRepository;
 import com.aes.erp.vendor.service.negotiation_history.NegotiationHistoryService;
 import com.aes.erp.vendor.service.participator.NegotiatorService;
@@ -39,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +61,9 @@ public class OfferServiceImpl implements OfferService{
     private final PriceQuotationRepository priceQuotationRepository;
     private final OfferItemRepository offerItemRepository;
     private final OfferRepository offerRepository;
+
+    @Autowired
+    private VendorRepository vendorRepository;
 
     @Autowired
     private VendorScoreRepository vendorScoreRepository;
@@ -121,7 +128,7 @@ public class OfferServiceImpl implements OfferService{
             odd.setItems(ow.getItems().stream().map(owi->{
                 OfferItemDeliveryDetail oidd = new OfferItemDeliveryDetail();
                 oidd.setItemName(owi.getItemName());
-                oidd.setDeliveryOrderQTY(owi.getDeliveryOrderQTY());
+                oidd.setDeliveryOrderQty(owi.getDeliveryOrderQty());
                 oidd.setOfferDeliveryDetail(odd);
                 return oidd;
             }).collect(Collectors.toList()));
@@ -159,8 +166,8 @@ public class OfferServiceImpl implements OfferService{
         Tender parentTender = tenderService.getTenderById(tenderId);
 
         
-
-
+        List<OfferDeliveryDetailDto> dddto = createDTO.getWarehouses();
+        
         NegotiationHistory negotiationHistory = new NegotiationHistory();
         Tender t = new Tender(parentTender.getId());
 
@@ -223,7 +230,7 @@ public class OfferServiceImpl implements OfferService{
         offer.setOfferStage(OfferStage.INITIAL_OFFER);
 
         //sent price quotation to erp project
-        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.INITIAL_OFFER);
+        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.INITIAL_OFFER,dddto);
 // //
 // //        System.out.println(parentTender.getCode());
 
@@ -232,7 +239,7 @@ public class OfferServiceImpl implements OfferService{
     }
 
     @Transactional
-    private void sentPriceQuotation(ClaimResponseDto loggedInUser, Tender tender, Offer offer, OfferStage offerStage){
+    private void sentPriceQuotation(ClaimResponseDto loggedInUser, Tender tender, Offer offer, OfferStage offerStage, List<OfferDeliveryDetailDto> deliveryDetailDto){
         PriceQuotationReqDto priceQuotationReqDto = new PriceQuotationReqDto();
         Map<String,Object> vendorInfo =  loggedInUser.getUserInfoDto();
         
@@ -248,6 +255,7 @@ public class OfferServiceImpl implements OfferService{
         String vendorEmail = (String)vendorInfo.get("vendorEmail");
         String vendorPhoneNo = (String)vendorInfo.get("vendorPhoneNo");
         //  (VendorType) vendorInfo.get("vendorType");
+        // priceQuotationReqDto.setRfqId(tender.getId());
         priceQuotationReqDto.setRemoteOfferId(offer.getId());
         priceQuotationReqDto.setCode(tender.getCode());
         priceQuotationReqDto.setPaymentMethod(offer.getCreditType().name());
@@ -259,6 +267,7 @@ public class OfferServiceImpl implements OfferService{
         priceQuotationReqDto.setScore(score);
         priceQuotationReqDto.setNegotiationHistoryId(offer.getNegotiationHistory().getId());
         priceQuotationReqDto.setIsFinal(offer.getIsFinal());
+        priceQuotationReqDto.setWarehouses(deliveryDetailDto);
         if(offer.getTermsAndConditions().size()>0){
             priceQuotationReqDto.setTermsAndConditions(offer.getTermsAndConditions().stream().map(otc->{
                 return otc.getTermsAndCondition();
@@ -301,7 +310,7 @@ public class OfferServiceImpl implements OfferService{
             pqdrd.setUnitPrice(o.getPriceQuotation().getPricePerUnit());
             pqdrd.setBrandName(o.getBrandName());
             pqdrd.setExtendedAttributes(o.getExtendedAttributes());
-            pqdrd.setItemAttribute(o.getProductDescription());
+            pqdrd.setItemAttributeName(o.getProductDescription());
             return pqdrd;
         }).collect(Collectors.toList()));
 
@@ -313,14 +322,15 @@ public class OfferServiceImpl implements OfferService{
             // String username = organization.getServiceUsername();
             // String password = organization.getServicePassword();
             // String authToken = networkService.getAuthToken(url,username,password);
-            String authToken = login(organization);    
+            String authToken = networkService.getKeycloakAccessToken(organization);
             if(authToken!=null){
-                StringBuilder sb = new StringBuilder("/price-quotations");
+                StringBuilder sb = new StringBuilder("/pq/vendor");
                 if(offerStage.equals(OfferStage.COUNTER_TO_COMPANY) ||
                     offerStage.equals(OfferStage.FINAL_OFFER_TO_COMPANY)){
                     sb.append("/receive-counter");
                 }
-                String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+                String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
+                System.out.println(priceQuotationEndpoint);
                 HttpHeaders headers = new HttpHeaders();
                 headers.setBearerAuth(authToken);
                 headers.setContentType(MediaType.APPLICATION_JSON);
@@ -372,6 +382,7 @@ public class OfferServiceImpl implements OfferService{
 
         offer.setTender(parentTender);
         offer.setNegotiationHistory(negotiationHistory);
+        List<OfferDeliveryDetailDto> dddto = createDTO.getWarehouses();
 
         //Set Parties
         Negotiator negotiationCreator = null;
@@ -423,7 +434,7 @@ public class OfferServiceImpl implements OfferService{
         tp.setTender(parentTender);
         tenderParticipatorRepository.save(tp);
         //Sent Counter Offer To ERP
-        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.COUNTER_TO_COMPANY);
+        sentPriceQuotation(loggedInUser, parentTender, offer, OfferStage.COUNTER_TO_COMPANY,dddto);
     }
 
     @Override
@@ -541,41 +552,19 @@ public class OfferServiceImpl implements OfferService{
 
     private String login(Organization organization){
        
-            String url = organization.getServiceIpAddress().replace("/api/v1","")
+            String url = organization.getScmIpAddress().replace("/api/v1","")
                                 .concat("/authenticate");
             String username = organization.getServiceUsername();
             String password = organization.getServicePassword();
         return networkService.getAuthToken(url,username,password);
-    }
-
-    @Override
-    @Transactional
-    public void declineOffer(Long id, Long vendorId,NoteDto noteDto) {
-        Optional<Offer> offerOp = offerRepository.findById(id);
-        if(offerOp.isEmpty()){
-            throw new AesException("Sorry! Offer not found");
-        }
-        Offer offer = offerOp.get();
-        // Tender tender = offer.getTender();
-        Optional<TenderParticipator> tpOp = tenderParticipatorRepository.findByOfferId(offer.getId());
-        if(tpOp.isPresent()){
-            TenderParticipator tp = tpOp.get();
-            tp.setStatus(TenderStatus.REJECTED);
-            offer.setDeclineMessage(noteDto.getNote());
-        }
-        // TenderParticipator tp = new TenderParticipator();
-        // tp.setStatus(TenderStatus.REJECTED);
-        // tp.setVendor(new Vendor(vendorId));
-        // tp.setOffer(offer);
-        // tp.setTender(tender);
-        // tenderParticipatorRepository.save(tp);
-    }
-
-    
+    }  
 
 
     @Override
     @Transactional
+    /*
+     * This method invoked when vendor create some offer and in the middle of the process decline the offer by vendor
+     */
     public void declineOffer(ClaimResponseDto loggedInUser, Long id, NoteDto noteDto) {
         Optional<Offer> offerOp = offerRepository.findById(id);
         if(offerOp.isEmpty()){
@@ -591,7 +580,7 @@ public class OfferServiceImpl implements OfferService{
             tp.setStatus(TenderStatus.REJECTED);
 
             Organization organization = tender.getTenderCreator();
-            String authToken = login(organization);
+            String authToken = networkService.getKeycloakAccessToken(organization);
         
             if(authToken!=null){
                 sentOfferDeclineRequest(authToken, organization, offer, noteDto);
@@ -616,22 +605,20 @@ public class OfferServiceImpl implements OfferService{
             tp.setStatus(TenderStatus.LOCKED);
 
             Organization organization = tender.getTenderCreator();
-            String authToken = login(organization);
+            String authToken = networkService.getKeycloakAccessToken(organization);
         
             if(authToken!=null){
                 sentOfferLockRequest(authToken, organization, offer);
             }
         }
-        
-        
     }
 
     private void sentOfferLockRequest(String authToken, Organization organization,Offer offer){
-        StringBuilder sb = new StringBuilder("/price-quotations");
+        StringBuilder sb = new StringBuilder("/pq/vendor");
                 
-            sb.append("/").append(offer.getId()).append("/lock/receive");
+            sb.append("/").append(offer.getId()).append("/lock");
         
-        String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -644,11 +631,11 @@ public class OfferServiceImpl implements OfferService{
     }
 
     private void sentOfferDeclineRequest(String authToken, Organization organization,Offer offer, NoteDto noteDto){
-        StringBuilder sb = new StringBuilder("/price-quotations");
+        StringBuilder sb = new StringBuilder("/pq/vendor");
                 
-            sb.append("/").append(offer.getId()).append("/decline/receive");
+            sb.append("/").append(offer.getId()).append("/decline");
         
-        String priceQuotationEndpoint = organization.getServiceIpAddress().concat(sb.toString());
+        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -657,6 +644,67 @@ public class OfferServiceImpl implements OfferService{
         if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
             !response.getStatusCode().equals(HttpStatus.CREATED)){
             throw new AesException("Something wrong");
+        }
+    }
+
+
+    @Override
+    @Transactional
+    /*
+     * This method invoked when vendor create some offer and in the middle of the process decline the offer by scm side
+     */
+    public void declineOffer(Long id, Long vendorId,NoteDto noteDto) {
+        Optional<Offer> offerOp = offerRepository.findById(id);
+        if(offerOp.isEmpty()){
+            throw new AesException("Sorry! Offer not found");
+        }
+        Optional<Vendor> getVendor = vendorRepository.findById(vendorId);
+        if(getVendor.isEmpty()){
+            throw new AesException("Sorry! No vendor found");
+        }
+        Offer offer = offerOp.get();
+        // Vendor vendor = getVendor.get();
+        // Tender tender = offer.getTender();
+        Optional<TenderParticipator> tpOp = tenderParticipatorRepository.findByOfferId(offer.getId());
+        if(tpOp.isPresent()){
+            TenderParticipator tp = tpOp.get();
+            tp.setStatus(TenderStatus.LOST);
+            offer.setDeclineMessage(noteDto.getNote());
+        }
+        // TenderParticipator tp = new TenderParticipator();
+        // tp.setStatus(TenderStatus.REJECTED);
+        // tp.setVendor(new Vendor(vendorId));
+        // tp.setOffer(offer);
+        // tp.setTender(tender);
+        // tenderParticipatorRepository.save(tp);
+    }
+
+    @Override
+    @Transactional
+    public void getAwardedSignal(Long offerId, Long vendorId) {
+        Optional<Offer> offerOp = offerRepository.findById(offerId);
+        if(offerOp.isEmpty()){
+            throw new AesException("Sorry! Offer not found");
+        }
+        Optional<Vendor> getVendor = vendorRepository.findById(vendorId);
+        if(getVendor.isEmpty()){
+            throw new AesException("Sorry! No vendor found");
+        }
+        Vendor vendor = getVendor.get();
+        Offer offer = offerOp.get();
+        Tender tender = offer.getTender();
+
+        TenderParticipator exitingTp = offerRepository.hasOffer(TenderStatus.AWARDED,offer,vendor,tender);
+        if(exitingTp == null){
+
+            TenderParticipator exitingLockedTp = offerRepository.hasOffer(TenderStatus.LOCKED,offer,vendor,tender);
+            if(exitingLockedTp != null){
+
+                exitingLockedTp.setStatus(TenderStatus.AWARDED);
+                tenderParticipatorRepository.save(exitingLockedTp);
+            }
+        }else{
+            throw new AesException("already exist");
         }
     }
 

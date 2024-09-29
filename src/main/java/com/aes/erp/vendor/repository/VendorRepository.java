@@ -54,7 +54,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
 
     @Query(value="""
-            SELECT 
+            SELECT DISTINCT
                 v.id as id,
                 v.name as name,
                 v.email as email, 
@@ -69,10 +69,13 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
             LEFT JOIN vendor_score vs ON v.vendor_score_id = vs.id
             LEFT JOIN document_holders dh ON v.document_holder_id = dh.id
             LEFT JOIN bin b ON dh.bin_document_id = b.id
+            LEFT JOIN vendor_sub_category vsc ON v.id = vsc.vendor_id
             WHERE v.verification_status IN ('PENDING_DOCUMENT_VERIFICATION','PENDING_VERIFICATION','VERIFIED','APPROVED') 
                 AND (:name IS NULL OR LOWER(v.name) LIKE CONCAT('%',LOWER(:name),'%')) 
+                AND (:subCategoryId IS NULL OR vsc.subcategory_id=:subCategoryId)
+                AND (:categoryId IS NULL OR (FIND_IN_SET(:categoryId, v.categories) > 0))
             """, nativeQuery = true)
-    List<VendorListInfo> findAllVendors(@Param("name") String name);
+    List<VendorListInfo> findAllVendors(@Param("name") String name,@Param("categoryId") Long categoryId,@Param("subCategoryId") Long subCategoryId);
 
     /**
      * InnerVendorRepository

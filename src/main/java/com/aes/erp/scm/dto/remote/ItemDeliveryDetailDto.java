@@ -1,11 +1,14 @@
-package com.aes.erp.vendor.dto;
+package com.aes.erp.scm.dto.remote;
 
 import java.math.BigDecimal;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class OfferItemDeliveryDetailDto {
+@NoArgsConstructor
+
+public class ItemDeliveryDetailDto {
     private String itemName;
     private BigDecimal deliveryOrderQty;
 }

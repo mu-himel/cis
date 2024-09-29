@@ -14,6 +14,7 @@ import com.aes.erp.vendor.utils.MLApiConfig;
 import com.aes.erp.vendor.utils.RestTemplateService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,9 @@ public class VendorDocumentValidationService {
     private final DocumentService documentService;
     private final MLApiConfig mlApiConfig;
     private final FileUploadService fileUploadService;
+
+    @Value("${uploadDir}")
+    private String uploadDir;
 
     public VendorDocumentValidationService(RestTemplateService restClient, GenericObjectMapper genericMapper, DocumentHolderRepository documentHolderRepository,
     DocumentService documentService,  MLApiConfig mlApiConfig, FileUploadService fileUploadService) {
@@ -55,7 +59,7 @@ public class VendorDocumentValidationService {
         DocumentHolder documentHolder = documentHolderRepository.getReferenceById(documentHolderId);
         document.setDocumentHolder(documentHolder);
         document.setContentType(file.getContentType());
-        Path path = Path.of("./uploads/vendor/doc/"+documentHolderId+"/"+docType);
+        Path path = Path.of(uploadDir+"/vendor/doc/"+documentHolderId+"/"+docType);
         fileUploadService.uploadFile(path, file);
         // multipartFileToBytes(file, document);
         document.setName(docType);

@@ -66,8 +66,8 @@ public interface TenderQuery {
         AND (:tenderType IS NULL OR t.tender_type = :tenderType) 
         AND (:startDate IS NULL OR t.creation_date >= :startDate) 
         AND (:endDate IS NULL OR t.creation_date <= :endDate) 
-        AND ic.id IN :subCategoryIds
-        AND t.deadline > :currentDateTime
+        AND (COALESCE(:subCategoryIds) IS NULL OR ic.id IN (:subCategoryIds))
+        AND (t.deadline > :currentDateTime)
         GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
         String closedTenderProjectionQuery = """
@@ -75,8 +75,12 @@ public interface TenderQuery {
                 t.rfq_no as tenderNo,
                 t.id as id, 
                 CASE WHEN tp.id IS NOT NULL THEN
-                        (SELECT status from tender_participators tp2 WHERE 
-                        tp2.id in (select max(id) from tender_participators tp3 where tp3.tender_id=t.id))
+                        (SELECT 
+                        CASE WHEN (tp2.status = 'TENDER_SENT' AND t.deadline < :currentDateTime) THEN 'LOST' 
+                        ELSE tp2.status
+                        END as status
+                        FROM tender_participators tp2 WHERE 
+                        tp2.id in (select max(id) from tender_participators tp3 where tp3.tender_id=t.id AND tp3.vendor_id = :vendorId))
                 ELSE
                         t.tender_status
                 END as tenderStatus, 
@@ -94,11 +98,13 @@ public interface TenderQuery {
         LEFT JOIN organizations tc ON tc.id = t.organization_id 
         WHERE (:searchFilter IS NULL OR LOWER(ic.name) 
                 LIKE %:searchFilter% OR LOWER(tc.name) LIKE %:searchFilter%) 
+        AND (:categoryId IS NULL OR ic.id = :categoryId)
+        AND (:organizationId IS NULL OR t.organization_id = :organizationId)
         AND (:tenderType IS NULL OR t.tender_type = :tenderType) 
         AND (:startDate IS NULL OR t.creation_date >= :startDate) 
-        AND (:endDate IS NULL OR t.creation_date <= :endDate) 
-        AND ic.id IN :subCategoryIds
-        AND t.deadline < :currentDateTime
+        AND (:endDate IS NULL OR t.creation_date <= :endDate)  
+        AND (COALESCE(:subCategoryIds) IS NULL OR ic.id IN (:subCategoryIds))
+        AND (t.deadline < :currentDateTime)
         GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
         String tenderProjectionCountQuery = " SELECT count(*) FROM (" +tenderProjectionQuery+ " ) ";

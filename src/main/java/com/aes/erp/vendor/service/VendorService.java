@@ -85,5 +85,5 @@ public interface VendorService {
 
     Optional<?> getAvailableVendorCountBySubCategory(String subCatCode);
 
-    List<?> getVendorList(Optional<String> name);
+    List<?> getVendorList(Optional<String> name,Optional<Long> categoryId,Optional<Long> subCategoryId);
 }
