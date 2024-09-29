@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.aes.erp</groupId>
 	<artifactId>release-v1</artifactId>
-	<version>newdev-0.0.13</version>
+	<version>newdev-0.0.14</version>
 	<name>cmsbe</name>
 	<description>CWH + VMS </description>
 	<properties>
