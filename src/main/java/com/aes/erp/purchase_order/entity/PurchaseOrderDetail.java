@@ -30,7 +30,6 @@ public class PurchaseOrderDetail {
 
     private String itemName;
     
-
     @ManyToOne
     @JsonIgnore
     private PurchaseOrder purchaseOrder;

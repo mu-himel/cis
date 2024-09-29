@@ -1,5 +1,6 @@
 package com.aes.erp.purchase_order.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -33,6 +34,7 @@ public class PurchaseOrder {
     private String poNo;
     private Long poDate;
     private Long deliveryDate;
+    private BigDecimal itemQty;
     private String categoryCode;
 
     private Boolean isPoSent;
@@ -53,6 +55,8 @@ public class PurchaseOrder {
     private Long grnReceiveDate;
 
     private Boolean isQcPass;
+
+    private Long warehouseId;
 
     @Column(length = 500)
     private String qcDeclineNote;

@@ -1,0 +1,36 @@
+package com.aes.erp.scm.dto.remote;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import com.aes.erp.common.ReferenceObjectDto;
+import com.aes.erp.vendor.entity.RFQ_Negotiation.CreditType;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+
+public class GoodReceivedManualRequestDto {
+    private String indentNo;
+    private ReferenceObjDto category;
+    private VendorRemoteDto vendor;
+    private String grnNo;
+    private String deliveryCharge;
+    private String mushak;
+    private BigDecimal deliveryChargeAmount;
+    private Integer days;
+    private String vatOption;
+    private String aitOption;
+    private BigDecimal totalPrice;
+    private BigDecimal totalVat;
+//    private BigDecimal vatPctg;
+    private BigDecimal inTotal;
+    private Long warehouseId;
+    private CreditType payment;
+    private String invoicePath;
+    private Long poId;
+    List<GrnManualItemDetailDto> grnDetails;
+
+}

@@ -20,6 +20,9 @@ import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferDeliveryDetail;
 @Repository
 public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,PurchaseQuery{
 
+    @Query(value = "SELECT * FROM tender_delivery_details t WHERE t.tender_item_id = :tenderItemId",nativeQuery = true)
+    List<TenderDeliveryDetail> findDeliveryDetailsFromTenderItem(@Param("tenderItemId") Long tenderItemId);
+
     @Query(value=pendingPos, countQuery = countPendingPos, nativeQuery=true)
     Page<PendingPOItem> findAllPendingPOs(@Param("vendorId") Long vendorId, Pageable pageable);
     

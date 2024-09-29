@@ -2,6 +2,8 @@ package com.aes.erp.purchase_order.dto.request;
 
 import java.util.List;
 
+import com.aes.erp.common.ReferenceObjectDto;
+
 import lombok.Data;
 
 @Data
@@ -14,6 +16,8 @@ public class PoRequestDto {
     private String categoryCode;
     private Long deliveryDate;
     private Long offerId;
+    private ReferenceObjectDto warehouse;
+
 
     private List<PoDetailReqDto> orderDetails;
 

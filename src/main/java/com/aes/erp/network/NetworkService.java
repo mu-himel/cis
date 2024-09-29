@@ -49,7 +49,7 @@ public class NetworkService {
 
     public String getKeycloakAccessToken(Organization organization){
         System.out.println("Keycloak Access Token ");
-        String AUTH_SERVER_URI = "http://172.17.17.254:8080/realms/cement_factory/protocol/openid-connect/token";
+        String AUTH_SERVER_URI = "http://172.17.17.254:8080/realms/aesl/protocol/openid-connect/token";
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -57,12 +57,12 @@ public class NetworkService {
 
         MultiValueMap<String, String> mapForm = new LinkedMultiValueMap<>();
         mapForm.add("grant_type", "password");
-//        mapForm.add("client_id", "erpnext");
-        mapForm.add("client_id", "aclbe");
+       mapForm.add("client_id", "erpnext");
+        // mapForm.add("client_id", "aclbe");
         mapForm.add("username", organization.getServiceUsername());
         mapForm.add("password", organization.getServicePassword());
-//        mapForm.add("client_secret", "dByixNrHgm3NIQnLpd7mbEePgajyN873");
-        mapForm.add("client_secret", "GKCp5BurtrMK9XjgkVZ5wQYh8zLpngfU");
+       mapForm.add("client_secret", "dByixNrHgm3NIQnLpd7mbEePgajyN873");
+        // mapForm.add("client_secret", "GKCp5BurtrMK9XjgkVZ5wQYh8zLpngfU");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(mapForm, headers);
 
         ResponseEntity<KeycloakOauth2Dto> response = restTemplate.postForEntity(AUTH_SERVER_URI, request , KeycloakOauth2Dto.class);
