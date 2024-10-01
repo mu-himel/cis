@@ -385,19 +385,21 @@ public class CategoryServiceImpl implements CategoryService {
 
         Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
         if(itemCategoryOptional.isPresent()){
-
+            ItemCategory itemCategory = itemCategoryOptional.get();
             Optional<Long> countOptional = categoryRepository.countAllByParentCategoryAndActive(
-                    itemCategoryOptional.get(),true);
+                    itemCategory,true);
             if(countOptional.isPresent() && countOptional.get() > 0){
                 throw new AesException("Sorry! Unable to delete, Category already used in Child Category");
             }
 
-            List<Long> getItem = categoryRepository.findAllExistingItemsForSubcategory(itemCategoryOptional.get().getId());
+            List<Long> getItem = categoryRepository.findAllExistingItemsForSubcategory(itemCategory.getId());
             if(!getItem.isEmpty()){
                 throw new AesException("Sorry! This Subcategory has existing Item");
             }
 
-            ItemCategory itemCategory = itemCategoryOptional.get();
+            if(itemCategory.getScmCategoryId()!=null){
+                throw new RuntimeException("Sorry! Category Already Synced");
+            }
             itemCategory.setActive(false);
             categoryRepository.save(itemCategory);
         }
