@@ -1,24 +1,21 @@
 package com.aes.erp.inventory.service;
 
-import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.enums.CategoryHeader;
 import com.aes.erp.inventory.enums.SubCategoryHeader;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -35,11 +32,14 @@ public class BulkUploadServiceImpl implements BulkUploadService{
     @Autowired
     private CategoryService categoryService;
 
+    @Value("${uploadDir}")
+    private String uploadDir;
+
     public void categoryBulkUpload(
         // Optional<StoreType> storeTypeOp,
                                    Optional<MultipartFile> file
     ) throws IOException {
-        Path path = Path.of("./uploads/inventory-control");
+        Path path = Path.of(uploadDir+"/inventory-control");
         FileUploadResponse fileUploadResponse = null;
         if(file.isPresent()) {
             fileUploadResponse = fileUploadService.uploadFile(path, file.get());
@@ -50,7 +50,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                 String catName = r.get("CATEGORY_NAME");
                 List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
                 if(catOp.size()==0){
-                    String code = categoryService.getNewCategoryCode();
+                    String code = categoryService.getNewCategoryCode(catName.substring(0,1),Optional.empty());
                     CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                     categoryRequestDto.setName(catName);
                     categoryRequestDto.setCode(code);
@@ -71,7 +71,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
 //            throw new AesException("Category not found");
 //        }
 
-        Path path = Path.of("./uploads/inventory-control");
+        Path path = Path.of(uploadDir+"/inventory-control");
         FileUploadResponse fileUploadResponse = null;
         if(file.isPresent()) {
             fileUploadResponse = fileUploadService.uploadFile(path, file.get());
@@ -129,7 +129,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                     ItemCategory category = catOp.stream().findFirst().orElse(null);
 
                     if(category!=null){
-                        String code = category.getCode()+"-"+categoryService.getNewCategoryCode();
+                        String code = category.getCode()+"-"+categoryService.getNewCategoryCode(subCatName.substring(0,1),Optional.ofNullable(category.getId()));
                         CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                         categoryRequestDto.setName(subCatName);
                         categoryRequestDto.setCode(code);

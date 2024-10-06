@@ -382,10 +382,20 @@ public class ItemServiceImpl implements ItemService {
         if(itemOp.isPresent()){
             Item item = itemOp.get();
             Long newProductId = item.getId() + 1;
-            return String.format("%05d",newProductId)+"-"+generateRandomNumber(5);
+            return String.format("%08d",newProductId);
         }
-        return String.format("%05d",1);
+        return String.format("%08d",1);
     }
+
+    @Override
+    public String getNextItemCode(String prefix) {
+        Long autoCode = itemRepository.findMaxOrderById(prefix);
+        if(autoCode!=null){
+            return String.format("%08d",autoCode);
+        }
+        return String.format("%08d",1);
+    }
+
     public String generateRandomNumber(int limit){
         StringBuilder sb = new StringBuilder();
         for(int i=0;i<limit;i++){

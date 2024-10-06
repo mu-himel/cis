@@ -50,6 +50,12 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
     @Query("select max(i.id) from Item i")
     Optional<Item> findMaxOrderById();
 
+    @Query(value = """
+            select count(*)+1 as autoCode FROM items i
+            WHERE i.code LIKE CONCAT(:prefix,'%')
+            """, nativeQuery = true)
+    Long findMaxOrderById(@Param("prefix") String prefix);
+
     List<ItemInfo> findAllByActiveAndItemCategoryIdOrItemParentCategoryIdAndNameLikeIgnoreCaseOrCodeLikeIgnoreCase(
             Boolean active,
             Optional<Long> categoryId, Optional<Long> categoryId1, String name, String code);

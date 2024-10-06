@@ -3,7 +3,6 @@ package com.aes.erp.inventory.service;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
-import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
@@ -70,7 +69,8 @@ public interface CategoryService {
 
     List<?> getSubCategories(Optional<Long>categoryId, Optional<String> name, Optional<String> code);
 
-    String getNewCategoryCode();
+    String getNewCategoryCode(String key,Optional<Long> categoryId);
+    String getNewCategoryCode(String key,String prefix,Optional<Long> categoryId);
 
     void deleteAttribute(Long categoryId, Long attributeId);
     Optional<ItemCategory> getCategoryForAVendor(Long vendorId, Long Id);
