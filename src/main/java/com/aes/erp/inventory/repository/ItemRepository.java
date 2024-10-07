@@ -53,6 +53,7 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
     @Query(value = """
             select count(*)+1 as autoCode FROM items i
             WHERE i.code LIKE CONCAT(:prefix,'%')
+            AND i.active=1
             """, nativeQuery = true)
     Long findMaxOrderById(@Param("prefix") String prefix);
 

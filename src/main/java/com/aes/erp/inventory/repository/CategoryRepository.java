@@ -129,7 +129,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
     @Query(value = """
             SELECT COALESCE(COUNT(*),0)+1 as autoCode  FROM item_categories sic
-                WHERE 
+                WHERE sic.active=true AND
                 (:categoryId IS NULL OR sic.parent_category_id = :categoryId) 
                 AND 
                 SUBSTR(sic.name,1,1) = :key ORDER BY sic.name ASC
@@ -139,7 +139,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
     @Query(value = """
             SELECT COALESCE(COUNT(*),0)+1 as autoCode  FROM item_categories sic
-                WHERE 
+                WHERE sic.active=true AND
                 (:categoryId IS NULL OR sic.parent_category_id = :categoryId) 
                 AND 
                 SUBSTR(sic.name,1,1) = :key 
