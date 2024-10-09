@@ -27,6 +27,8 @@ public interface VendorService {
 
     void deleteVendor(Long id);
 
+    void uploadProfileImage(Long id,String img);
+
     Page<?> getVendors(Optional<Integer> page, Optional<Integer> size,
                        Optional<String> name,
                        Optional<String> email,

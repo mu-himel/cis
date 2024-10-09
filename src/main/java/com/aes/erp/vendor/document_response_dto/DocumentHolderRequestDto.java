@@ -13,4 +13,8 @@ public class DocumentHolderRequestDto {
     private Boolean bankSolvency = false;
     private Boolean tradeLicense = false;
     private Boolean resume = false;
+    private Boolean certificateOfIncorporation = false;
+    private Boolean memorandumOfAssociation = false;
+    private Boolean articleOfAssociation = false;
+    private Boolean ownerPicture = false;
 }
