@@ -8,7 +8,6 @@ import com.aes.erp.inventory.dto.response.ItemCategoryDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.inventory.service.OrganizationService;
-import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.*;
@@ -31,14 +30,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.HttpEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.http.HttpHeaders;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
@@ -75,6 +70,9 @@ public class VendorServiceImpl implements VendorService {
     private final GeneralDetailsRepository generalDetailsRepository;
     @Autowired
     private OrganizationService organizationService;
+
+    @Autowired
+    private AuthorizedPersonRepository autorizedPersonRepository;
 
 
 
@@ -218,6 +216,17 @@ public class VendorServiceImpl implements VendorService {
     public void deleteVendor(Long id) {
         vendorRepository.deleteById(id);
     }
+
+    @Override
+    public void uploadProfileImage(Long id,String img) {
+        Optional<Vendor> vendorOptional = vendorRepository.findByUserId(id);
+        if(vendorOptional.isPresent()){
+            Vendor vendor = vendorOptional.get();
+            vendor.setVendorImage(img);
+            vendorRepository.save(vendor);
+        }
+    }
+
     @Override
     public void removeSubCategoryFromVendor(Long vendorId, Long subCategoryId){
         VendorSubCategory vendorSubCategory = vendorSubCategoryRepository.findByVendorIdAndSubCategoryId(vendorId, subCategoryId);

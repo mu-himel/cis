@@ -17,14 +17,18 @@ public class BankSolvencyDto {
     private String ID;
     @JsonIgnore
     private String secret_key;
-    @JsonProperty("accountNumber")
+    @JsonProperty("account_no")
     private String accountNumber;
-    @JsonProperty("branchName")
+    @JsonProperty("branch_name")
     private String branchName;
-    @JsonProperty("bankName")
+    @JsonProperty("bank_name")
     private String bankName;
     @JsonProperty("routingNumber")
     private String routingNumber;
+    @JsonProperty(value = "date")
+    private String date;
+    @JsonProperty(value = "name")
+    private String name;
     @JsonProperty("Error")
     private String error;
 

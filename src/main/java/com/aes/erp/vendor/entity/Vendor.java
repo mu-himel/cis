@@ -85,6 +85,9 @@ public class Vendor implements DtoConvertable<VendorDto> {
 
     private Date startedAt;
 
+    @Lob
+    private String vendorImage;
+
     @UpdateTimestamp
     private Date completedAt;
 

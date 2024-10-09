@@ -90,6 +90,23 @@ public class VendorDocumentValidationService {
                 // url = mlApiConfig.getTrade();
                 document.setDocumentType(DocumentType.TRADE);
             }
+            else if(docType.toUpperCase().contains("IRC")){
+                // url = mlApiConfig.getTrade();
+                document.setDocumentType(DocumentType.IRC);
+            }else if(docType.toUpperCase().contains("AOA")){
+                document.setDocumentType(DocumentType.AOA);
+                documentService.create(document);
+                return new ArticleOfAssociationDto();
+            }else if(docType.toUpperCase().contains("MOA")){
+                document.setDocumentType(DocumentType.MOA);
+                documentService.create(document);
+                return new MemorandumOfAssociationDto();
+            }
+//            else if(docType.toUpperCase().contains("OWNER_IMAGE")){
+//                document.setDocumentType(DocumentType.OWNER_IMAGE);
+//                documentService.create(document);
+//                return null;
+//            }
             
             result = restClient.postPdfFile(documentHolderId, docType.toLowerCase(), file, orgName, url);
             document.setResultFromMachineLearning(result);
@@ -128,6 +145,9 @@ public class VendorDocumentValidationService {
             case "TRADE" -> (Class<T>) TradeLicenseDto.class;
             case "SOLVENCY" -> (Class<T>) BankSolvencyDto.class;
             case "BANK_SOLVENCY" -> (Class<T>) BankSolvencyDto.class;
+            case "MOA" -> (Class<T>) MemorandumOfAssociationDto.class;
+            case "IRC" -> (Class<T>) CertificateOfIncorporationDto.class;
+            case "AOA" -> (Class<T>) ArticleOfAssociationDto.class;
             default -> null;
         };
     }

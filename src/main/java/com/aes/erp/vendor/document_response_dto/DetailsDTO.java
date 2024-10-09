@@ -1,6 +1,8 @@
 package com.aes.erp.vendor.document_response_dto;
 
+import com.aes.erp.vendor.dto.AuthorizedPersonDto;
 import com.aes.erp.vendor.dto.BusinessDetailsDto;
+import com.aes.erp.vendor.entity.DocmentEntities.AuthorizedPerson;
 import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import lombok.Data;
@@ -12,4 +14,5 @@ import java.util.List;
 public class DetailsDTO {
     private List<BusinessDetailsDto> businessDetails = new ArrayList<>();
     private GeneralDetails generalDetails;
+    private AuthorizedPerson authorizedPerson;
 }

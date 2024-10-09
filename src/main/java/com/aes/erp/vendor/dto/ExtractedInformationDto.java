@@ -10,4 +10,7 @@ public class ExtractedInformationDto {
     private TradeLicenseDto trade;
     private NidResponseDto nid;
     private BankSolvencyDto solvency;
+    private ArticleOfAssociationDto articleOfAssociationDto;
+    private MemorandumOfAssociationDto memorandumOfAssociationDto;
+    private CertificateOfIncorporationDto certificateOfIncorporationDto;
 }

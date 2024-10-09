@@ -16,15 +16,23 @@ public class TinResponseDto {
     private String id;
     @JsonIgnore
     private String secretKey;
+    @JsonProperty(value = "name")
     private String name;
+    @JsonProperty(value = "father_name")
     private String fatherName;
+    @JsonProperty(value = "mother_name")
     private String motherName;
+    @JsonProperty(value = "current_address")
     private String currentAddress;
+    @JsonProperty(value = "permanent_address")
     private String permanentAddress;
+    @JsonProperty(value = "previous_tin")
     private String previousTin;
+    @JsonProperty(value = "tin")
     private String tinNumber;
     @JsonProperty(value = "date")
     private String date;
+    @JsonProperty(value = "status")
     private String tinStatus;
     @JsonProperty("Error")
     private String error;
