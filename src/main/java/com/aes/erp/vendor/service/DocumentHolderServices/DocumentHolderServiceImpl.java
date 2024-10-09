@@ -2,6 +2,7 @@ package com.aes.erp.vendor.service.DocumentHolderServices;
 
 import com.aes.erp.exception.AesException;
 import com.aes.erp.vendor.document_response_dto.*;
+import com.aes.erp.vendor.dto.AuthorizedPersonDto;
 import com.aes.erp.vendor.dto.BusinessDetailsDto;
 import com.aes.erp.vendor.dto.ExtractedInformationDto;
 import com.aes.erp.vendor.entity.DocmentEntities.*;
@@ -11,11 +12,11 @@ import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorScore;
 import com.aes.erp.vendor.entity.VendorSubCategory;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
-import com.aes.erp.vendor.enums.VendorStatus;
 import com.aes.erp.vendor.repository.*;
 import com.aes.erp.vendor.service.DocumentServices.*;
 import com.aes.erp.vendor.service.VendorDocumentValidationService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,16 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     private final GeneralDetailsRepository generalDetailsRepository;
     private final DocumentRepository documentRepository;
     ModelMapper modelMapper = new ModelMapper();
+
+    @Autowired
+    private CertificateOfIncorporationService certificateOfIncorporationService;
+    @Autowired
+    private  ArticleOfAssociationService articleOfAssociationService;
+    @Autowired
+    private  MemorandumOfAssociationService memorandumOfAssociationService;
+
+    @Autowired
+    private AuthorizedPersonRepository authorizedPersonRepository;
 
     public DocumentHolderServiceImpl(DocumentHolderRepository documentHolderRepository, VendorDocumentValidationService vendorDocumentValidationService, TINService tinService, BinService binService, VendorRepository vendorRepository, TradeLicenseService tradeLicenseService, NIDService nidService, BankSolvencyService bankSolvencyService, VendorScoreRepository vendorScoreRepository, BusinessDetailsRepository businessDetailsRepository, GeneralDetailsRepository generalDetailsRepository, DocumentRepository documentRepository) {
         this.documentHolderRepository = documentHolderRepository;
@@ -132,6 +143,29 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             bankSolvencyDocument = bankSolvencyService.create(bankSolvencyDocument);
             documentHolder.setBankSolvencyDocument(bankSolvencyDocument);
         }
+        if(dto.getCertificateOfIncorporation()){
+            CertificateOfIncorporation certificateOfIncorporationDoc = new CertificateOfIncorporation();
+            certificateOfIncorporationDoc.setDocumentHolder(documentHolder);
+            certificateOfIncorporationDoc.setEnabledByDocumentHolder(true);
+            certificateOfIncorporationDoc = certificateOfIncorporationService.create(certificateOfIncorporationDoc);
+            documentHolder.setCertificateOfIncorporation(certificateOfIncorporationDoc);
+        }
+
+        if(dto.getArticleOfAssociation()){
+            ArticleOfAssociation articleOfAssociation = new ArticleOfAssociation();
+            articleOfAssociation.setDocumentHolder(documentHolder);
+            articleOfAssociation.setEnabledByDocumentHolder(true);
+            articleOfAssociation = articleOfAssociationService.create(articleOfAssociation);
+            documentHolder.setArticleOfAssociation(articleOfAssociation);
+        }
+
+        if(dto.getMemorandumOfAssociation()){
+            MemorandumOfAssociation memorandumOfAssociation = new MemorandumOfAssociation();
+            memorandumOfAssociation.setDocumentHolder(documentHolder);
+            memorandumOfAssociation.setEnabledByDocumentHolder(true);
+            memorandumOfAssociation = memorandumOfAssociationService.create(memorandumOfAssociation);
+            documentHolder.setMemorandumOfAssociation(memorandumOfAssociation);
+        }
 
         ///TODO Resume
     }
@@ -201,7 +235,20 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         generalDetails.setDocumentHolder(documentHolder);
         generalDetails = generalDetailsRepository.save(generalDetails);
         documentHolder.setGeneralDetails(generalDetails);
+
+        AuthorizedPerson newAuthorizedPerson = new AuthorizedPerson();
+        newAuthorizedPerson.setName(dto.getAuthorizedPerson().getName());
+        newAuthorizedPerson.setPhoneNumber(dto.getAuthorizedPerson().getPhoneNumber());
+        newAuthorizedPerson.setNid(dto.getAuthorizedPerson().getNid());
+        newAuthorizedPerson.setLetter(dto.getAuthorizedPerson().getLetter());
+        newAuthorizedPerson.setDocumentHolder(dto.getGeneralDetails().getDocumentHolder());
+        authorizedPersonRepository.save(newAuthorizedPerson);
+//        AuthorizedPerson authorizedPerson = modelMapper.map(dto.getAuthorizedPerson(),AuthorizedPerson.class);
+//        authorizedPerson.setDocumentHolder(documentHolder);
+
+        documentHolder.setAuthorizedPerson(newAuthorizedPerson);
         documentHolder = documentHolderRepository.save(documentHolder);
+
         vendor.setDocumentHolder(documentHolder);
         vendorRepository.save(vendor);
     }
@@ -223,10 +270,17 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         }
         documentHolder.getBusinessDetailsRecords().clear();
         documentHolder.setBusinessDetailsRecords(businessDetailsList);
+
         GeneralDetails generalDetails = modelMapper.map(dto.getGeneralDetails(), GeneralDetails.class);
         generalDetails.setDocumentHolder(documentHolder);
         generalDetails = generalDetailsRepository.save(generalDetails);
         documentHolder.setGeneralDetails(generalDetails);
+
+        AuthorizedPerson authorizedPerson = modelMapper.map(dto.getAuthorizedPerson(),AuthorizedPerson.class);
+        authorizedPerson.setDocumentHolder(documentHolder);
+        authorizedPersonRepository.save(authorizedPerson);
+        documentHolder.setAuthorizedPerson(authorizedPerson);
+
         documentHolderRepository.save(documentHolder);
     }
 
@@ -242,6 +296,10 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
                 else if(type == DocumentType.BIN)dto.setBin(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
                 else if(type == DocumentType.TIN)dto.setTin(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
                 else if(type == DocumentType.TRADE)dto.setTrade(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+                else if(type == DocumentType.MOA)dto.setMemorandumOfAssociationDto(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+                else if(type == DocumentType.IRC)dto.setCertificateOfIncorporationDto(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+                else if(type == DocumentType.AOA)dto.setArticleOfAssociationDto(vendorDocumentValidationService.mapToDto(document.getResultFromMachineLearning(), document.getName()));
+
             }
         }
         return dto;

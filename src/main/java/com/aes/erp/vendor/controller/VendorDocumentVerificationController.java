@@ -20,7 +20,14 @@ public class VendorDocumentVerificationController {
     private final TradeLicenseService tradeLicenseService;
     private final DocumentHolderService documentHolderService;
 
-    public VendorDocumentVerificationController(VendorDocumentValidationService vendorDocumentValidationService, BankSolvencyService bankSolvencyService, NIDService nidService, TINService tinService, BinService binService, TradeLicenseService tradeLicenseService, DocumentHolderService documentHolderService) {
+    private final MemorandumOfAssociationService memorandumOfAssociationService;
+
+    private final ArticleOfAssociationService articleOfAssociationService;
+
+    private final CertificateOfIncorporationService certificateOfIncorporationService;
+
+
+    public VendorDocumentVerificationController(VendorDocumentValidationService vendorDocumentValidationService, BankSolvencyService bankSolvencyService, NIDService nidService, TINService tinService, BinService binService, TradeLicenseService tradeLicenseService, DocumentHolderService documentHolderService, MemorandumOfAssociationService memorandumOfAssociationService, CertificateOfIncorporationService certificateOfIncorporationService, ArticleOfAssociationService articleOfAssociationService) {
         this.vendorDocumentValidationService = vendorDocumentValidationService;
         this.bankSolvencyService = bankSolvencyService;
         this.nidService = nidService;
@@ -28,6 +35,9 @@ public class VendorDocumentVerificationController {
         this.binService = binService;
         this.tradeLicenseService = tradeLicenseService;
         this.documentHolderService = documentHolderService;
+        this.memorandumOfAssociationService = memorandumOfAssociationService;
+        this.articleOfAssociationService = articleOfAssociationService;
+        this.certificateOfIncorporationService = certificateOfIncorporationService;
     }
 
     @PostMapping("/upload-pdf/{id}")
@@ -46,6 +56,9 @@ public class VendorDocumentVerificationController {
         binService.update(documentHolderId, confirmDocumentDto.getBin());
         tradeLicenseService.update(documentHolderId, confirmDocumentDto.getTrade());
         documentHolderService.updateDocumentHolderStatus(documentHolderId, DocumentHolderStatus.DOCUMENTS_SUBMITTED);
+        certificateOfIncorporationService.update(documentHolderId,confirmDocumentDto.getCOI());
+        articleOfAssociationService.update(documentHolderId,confirmDocumentDto.getAOA());
+        memorandumOfAssociationService.update(documentHolderId,confirmDocumentDto.getMOA());
         return new ResponseEntity<>("Successful request", HttpStatus.NO_CONTENT);
     }
 }

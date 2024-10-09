@@ -13,4 +13,7 @@ public class ConfirmDocumentDto {
     private TinResponseDto tin;
     private TradeLicenseDto trade;
     private NidResponseDto nid;
+    private CertificateOfIncorporationDto COI;
+    private MemorandumOfAssociationDto MOA;
+    private ArticleOfAssociationDto AOA;
 }

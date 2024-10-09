@@ -323,4 +323,10 @@ public class VendorController {
                 HttpStatus.OK
         );
     }
+
+    @PutMapping("/upload-img/{id}")
+    public ResponseEntity<?> uploadProfileImage(@PathVariable Long id,@RequestBody String image){
+        vendorService.uploadProfileImage(id,image);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
