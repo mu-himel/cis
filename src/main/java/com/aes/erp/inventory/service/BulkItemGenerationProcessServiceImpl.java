@@ -191,8 +191,10 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
                 item.setItemCategory(cat);
 
                 item.setName(brand.getBrand().getName().trim());
-                item.setCode("C"+cat.getId()+"S"+cat.getParentCategory().getId()+"B"+brand.getId()+
-                                localDate.getYear()+month+day+getCode(i));
+
+//                item.setCode("C"+cat.getId()+"S"+cat.getParentCategory().getId()+"B"+brand.getId()+
+//                                localDate.getYear()+month+day+getCode(i));
+                item.setCode(cat.getCode()+"-"+getCode(i,cat.getCode()));
                 item.setItemParentCategory(parentCategory);
                 item.setBrand(brand.getBrand());
                 item.setActive(false);
@@ -206,13 +208,19 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
         return products;
     }
 
-    private String getCode(AtomicInteger i){
-        Optional<TempItem> tiOp = tempItemRepository.findMaxOrderById();
-        if(tiOp.isPresent()){
-            TempItem ti = tiOp.get();
-            Long newProductId = (ti.getId()+i.getAndIncrement());
-            return String.format("%05d",newProductId);
+    private String getCode(AtomicInteger i,String prefix){
+        Long autoCode = itemRepository.findMaxOrderById(prefix);
+
+        if(autoCode!=null){
+            return String.format("%08d",(autoCode+i.get()));
         }
+//        return String.format("%08d",1);
+//        Optional<TempItem> tiOp = tempItemRepository.findMaxOrderById();
+//        if(tiOp.isPresent()){
+//            TempItem ti = tiOp.get();
+//            Long newProductId = (ti.getId()+i.getAndIncrement());
+//            return String.format("%05d",newProductId);
+//        }
         return String.format("%05d",i.getAndIncrement());
     }
 

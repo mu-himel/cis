@@ -31,12 +31,22 @@ public class DocumentHolder {
     private BINDocument binDocument;
     @OneToOne
     private TradeDocument tradeDocument;
+    @OneToOne
+    private CertificateOfIncorporation certificateOfIncorporation;
+    @OneToOne
+    private  MemorandumOfAssociation memorandumOfAssociation;
+    @OneToOne
+    private  ArticleOfAssociation articleOfAssociation;
+
     @OneToMany(mappedBy = "documentHolder")
     private List<BusinessDetails> businessDetailsRecords;
     @OneToOne
     private GeneralDetails generalDetails;
     @Enumerated(EnumType.STRING)
     private DocumentHolderStatus documentHolderStatus = DocumentHolderStatus.CREATED;
+
+    @OneToOne
+    private AuthorizedPerson authorizedPerson;
 
     public void addDocument(Document document) {
         if (document != null) {

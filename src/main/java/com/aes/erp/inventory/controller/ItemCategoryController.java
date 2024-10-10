@@ -261,9 +261,13 @@ public class ItemCategoryController {
 
     @GetMapping("/next-id")
     @ApiOperation(value = "Get New Category Id")
-    public ResponseEntity<?> getNextId(){
+    public ResponseEntity<?> getNextId(
+            @RequestParam("key") String key,
+            @RequestParam("prefix") String prefix,
+            @RequestParam("categoryId") Optional<Long> categoryId
+    ){
         Map<String,Object> response = new HashMap<>();
-        response.put("code",categoryService.getNewCategoryCode());
+        response.put("code",categoryService.getNewCategoryCode(key,prefix,categoryId));
         return new ResponseEntity<>(
                 response,
                 HttpStatus.OK

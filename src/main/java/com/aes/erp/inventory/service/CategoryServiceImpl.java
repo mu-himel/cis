@@ -7,22 +7,17 @@ import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
-import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
-import com.aes.erp.inventory.dto.response.KeycloakOauth2Dto;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.CategoryAttribute;
-import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.repository.*;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
-import io.swagger.models.HttpMethod;
 
-import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -36,9 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -385,33 +377,42 @@ public class CategoryServiceImpl implements CategoryService {
 
         Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
         if(itemCategoryOptional.isPresent()){
-
+            ItemCategory itemCategory = itemCategoryOptional.get();
             Optional<Long> countOptional = categoryRepository.countAllByParentCategoryAndActive(
-                    itemCategoryOptional.get(),true);
+                    itemCategory,true);
             if(countOptional.isPresent() && countOptional.get() > 0){
                 throw new AesException("Sorry! Unable to delete, Category already used in Child Category");
             }
 
-            List<Long> getItem = categoryRepository.findAllExistingItemsForSubcategory(itemCategoryOptional.get().getId());
+            List<Long> getItem = categoryRepository.findAllExistingItemsForSubcategory(itemCategory.getId());
             if(!getItem.isEmpty()){
                 throw new AesException("Sorry! This Subcategory has existing Item");
             }
 
-            ItemCategory itemCategory = itemCategoryOptional.get();
+            if(itemCategory.getScmCategoryId()!=null){
+                throw new RuntimeException("Sorry! Category Already Synced");
+            }
             itemCategory.setActive(false);
             categoryRepository.save(itemCategory);
         }
     }
 
     @Override
-    public String getNewCategoryCode() {
-        Optional<ItemCategory> icOp = categoryRepository.findMaxOrderById();
-        if(icOp.isPresent()){
-            ItemCategory ic = icOp.get();
-            Long newProductId = ic.getId() + 1;
-            return String.format("%05d",newProductId);
-        }
-        return String.format("%05d",1);
+    public String getNewCategoryCode(String key, Optional<Long> categoryId) {
+        String autoCode = categoryRepository.findMaxOrderById(key,categoryId.orElse(null));
+//        if(icOp.isPresent()){
+//            ItemCategory ic = icOp.get();
+//            Long newProductId = ic.getId() + 1;
+//            return String.format("%05d",newProductId);
+//        }
+//        return String.format("%05d",1);
+        return autoCode;
+    }
+
+    @Override
+    public String getNewCategoryCode(String key, String prefix, Optional<Long> categoryId) {
+        String autoCode = categoryRepository.findMaxOrderById(key,prefix, categoryId.orElse(null));
+        return autoCode;
     }
 
     @Override

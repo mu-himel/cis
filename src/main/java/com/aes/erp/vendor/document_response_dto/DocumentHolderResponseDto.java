@@ -1,6 +1,7 @@
 package com.aes.erp.vendor.document_response_dto;
 
 import com.aes.erp.common.ReferenceObjectDto;
+import com.aes.erp.vendor.entity.DocmentEntities.AuthorizedPerson;
 import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.Document;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
@@ -23,11 +24,15 @@ public class DocumentHolderResponseDto {
     private String binNumber;
     private String tradeLicenseNumber;
     private String bankAccountNumber;
+    private String certificateOfIncorporation;
+    private String articleOfAssociation;
+    private String memorandumOfAssociation;
     private String category;
     private String vendorType;
     private List<String> vendorSubCategories = new ArrayList<>();
     private List<BusinessDetails> businessDetailsRecords;
     private GeneralDetails generalDetails;
+    private AuthorizedPerson authorizedPerson;
     private String msg;
     private DocumentHolderStatus documentHolderStatus;
 //    private Set<Document> documentsList = new HashSet<>();

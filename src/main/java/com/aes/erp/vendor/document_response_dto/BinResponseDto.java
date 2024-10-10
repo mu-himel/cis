@@ -25,16 +25,24 @@ public class BinResponseDto {
     private String secretKey;
     @JsonProperty(value = "address")
     private String address;
+    @JsonProperty(value = "bin")
     private String binNumber;
+    @JsonProperty(value = "effective_date")
     private String effectiveDate;
-    @JsonProperty(value = "eTin")
+    @JsonProperty(value = "etin")
     private String eTin;
+    @JsonProperty(value = "issue_date")
     private String issueDate;
+    @JsonProperty(value = "name")
     private String companyName;
+    @JsonProperty(value = "old_bin")
     private String oldBinNumber;
     private String tinNumber;
+    @JsonProperty(value = "ownership")
     private String ownershipType;
+    @JsonProperty(value = "trading_brand_name")
     private String tradingBrandName;
+    @JsonProperty(value = "major_area_of_economic_activity")
     private String majorAreaofEcoAct;
     @JsonProperty("Error")
     private String error;

@@ -115,9 +115,11 @@ public class ItemController {
 
     @GetMapping("/next-id")
     @ApiOperation(value = "Get New Product Id")
-    public ResponseEntity<?> getNextId(){
+    public ResponseEntity<?> getNextId(
+            @RequestParam("prefix") String prefix
+    ){
         Map<String,Object> response = new HashMap<>();
-        response.put("code",itemService.getNextItemCode());
+        response.put("code",itemService.getNextItemCode(prefix));
         return new ResponseEntity<>(
                 response,
                 HttpStatus.OK
