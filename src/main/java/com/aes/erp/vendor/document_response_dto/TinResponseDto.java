@@ -34,8 +34,10 @@ public class TinResponseDto {
     private String date;
     @JsonProperty(value = "status")
     private String tinStatus;
-    @JsonProperty("Error")
+    @JsonProperty("state")
     private String error;
+    @JsonProperty("message")
+    private String message;
     
     public TINDocument dtoToEntityMapping(TinResponseDto dto, TINDocument tinDocument){
         if(!dto.getName().isEmpty())tinDocument.setName(dto.getName());

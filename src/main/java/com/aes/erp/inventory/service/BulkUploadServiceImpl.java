@@ -48,9 +48,11 @@ public class BulkUploadServiceImpl implements BulkUploadService{
 
             for(CSVRecord r:records){
                 String catName = r.get("CATEGORY_NAME");
+                String prefix= r.get("PRE_FIX");
                 List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
                 if(catOp.size()==0){
-                    String code = categoryService.getNewCategoryCode();
+
+                    String code = prefix+categoryService.getNewCategoryCode();
                     CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                     categoryRequestDto.setName(catName);
                     categoryRequestDto.setCode(code);

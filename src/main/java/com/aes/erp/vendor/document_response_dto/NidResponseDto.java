@@ -19,18 +19,24 @@ import java.util.Date;
 @AllArgsConstructor
 public class NidResponseDto {
     // @JsonFormat(pattern = "dd MMM yyyy")
+    @JsonProperty("date_of_birth")
     private String dateOfBirth;
+    @JsonProperty("e_name")
     private String name;
+    @JsonProperty("nid_no")
     private String nidNumber;
     private String address;
+    @JsonProperty("father_name")
     private String fatherName;
+    @JsonProperty("mother_name")
     private String motherName;
+    @JsonProperty("b_name")
     private String banglaName;
     // @JsonIgnore
     @JsonProperty("message")
     private String error;
     // @JsonIgnore
-    @JsonProperty("status")
+    @JsonProperty("state")
     private String status;
 
     public NIDDocument dtoToEntityMapping(NidResponseDto dto, NIDDocument nidDocument){

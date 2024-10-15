@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface ArticleOfAssociationRepository extends JpaRepository<ArticleOfAssociation, Long> {
     @Query(value = "SELECT * FROM article_of_association c " +
             "WHERE c.document_holder_id = :document_holder_id", nativeQuery = true)
-    ArticleOfAssociation getCOIDocumentByDocumentHolderId(@Param("document_holder_id") Long documentHolder);
+    ArticleOfAssociation getAOADocumentByDocumentHolderId(@Param("document_holder_id") Long documentHolder);
 }
