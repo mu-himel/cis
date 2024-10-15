@@ -1,13 +1,7 @@
 package com.aes.erp.inventory.repository;
 
 import com.aes.erp.inventory.dto.response.SubCategory;
-import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -134,8 +127,30 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     )
     List<ItemCategoryInfo> findAllSubCategories(@Param("parentCategoryId") Long parentCategoryId, @Param("categoryName") String categoryName);
 
-    @Query("select max(ic.id) from ItemCategory ic")
-    Optional<ItemCategory> findMaxOrderById();
+    @Query(value = """
+            SELECT COALESCE(COUNT(*),0)+1 as autoCode  FROM item_categories sic
+                WHERE sic.active=true AND
+                (:categoryId IS NULL OR sic.parent_category_id = :categoryId) 
+                AND 
+                SUBSTR(sic.name,1,1) = :key ORDER BY sic.name ASC
+            """,nativeQuery = true)
+    String findMaxOrderById(String key,Long categoryId);
+
+
+    @Query(value = """
+            SELECT COALESCE(COUNT(*),0)+1 as autoCode  FROM item_categories sic
+                WHERE sic.active=true AND
+                (:categoryId IS NULL OR sic.parent_category_id = :categoryId) 
+                AND 
+                SUBSTR(sic.name,1,1) = :key 
+                AND (
+                    (:categoryId IS NOT NULL AND sic.code LIKE CONCAT(:prefix,'%'))
+                OR
+                    (:categoryId IS NULL AND SUBSTR(sic.code,1,1)=:prefix)
+                )
+                ORDER BY sic.name ASC
+            """,nativeQuery = true)
+    String findMaxOrderById(String key,String prefix, Long categoryId);
 
     @Query(value = "SELECT * FROM item_categories ic " +
             "WHERE (:id IS NOT NULL AND ic.id = :id) " +
