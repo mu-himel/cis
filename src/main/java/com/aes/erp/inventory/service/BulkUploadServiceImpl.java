@@ -53,9 +53,13 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                 if(catOp.size()==0){
 
                     String code = categoryService.getNewCategoryCode(catName.substring(0,1),prefix,Optional.empty());
+                    StringBuilder generated_code = new StringBuilder();
+                    generated_code.append(prefix);
+                    generated_code.append(catName.substring(0,1));
+                    generated_code.append(code);
                     CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                     categoryRequestDto.setName(catName);
-                    categoryRequestDto.setCode(code);
+                    categoryRequestDto.setCode(generated_code.toString());
                     // categoryRequestDto.setStoreType(storeTypeOp.get());
                     categoryService.addCategory(categoryRequestDto);
                 }
@@ -131,10 +135,15 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                     ItemCategory category = catOp.stream().findFirst().orElse(null);
 
                     if(category!=null){
-                        String code = category.getCode()+"-"+categoryService.getNewCategoryCode(subCatName.substring(0,1),Optional.ofNullable(category.getId()));
+                        String code = categoryService.getNewCategoryCode(subCatName.substring(0,1),Optional.ofNullable(category.getId()));
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(category.getCode());
+                        sb.append("-");
+                        sb.append(subCatName.substring(0,1));
+                        sb.append(code);
                         CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                         categoryRequestDto.setName(subCatName);
-                        categoryRequestDto.setCode(code);
+                        categoryRequestDto.setCode(sb.toString());
 //                        String vatPercentage =vat.replace("%","");
 //                        if(!vatPercentage.isEmpty()){
 //                            categoryRequestDto.setVat(BigDecimal.valueOf(Long.valueOf(vatPercentage)));

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Repository
@@ -96,8 +97,9 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
     Optional<Long> countAllByParentCategoryAndActive(ItemCategory itemCategory,Boolean active);
 
-    Boolean existsByCode(String code);
+    Boolean existsByCodeAndActive(String code, Boolean active);
     Boolean existsByNameAndActive(String name, Boolean active);
+
 
     @Query(value = "SELECT ic.id FROM item_categories ic WHERE ic.parent_category_id IS null AND ic.active = true AND ic.name = :catName" ,nativeQuery = true)
     List<Long> findDuplicateCategoryId(String catName);
@@ -139,7 +141,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
     @Query(value = """
             SELECT COALESCE(COUNT(*),0)+1 as autoCode  FROM item_categories sic
-                WHERE sic.active=true AND
+                WHERE
                 (:categoryId IS NULL OR sic.parent_category_id = :categoryId) 
                 AND 
                 SUBSTR(sic.name,1,1) = :key 
