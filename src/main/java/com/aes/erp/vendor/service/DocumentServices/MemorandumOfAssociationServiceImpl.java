@@ -23,7 +23,7 @@ public class MemorandumOfAssociationServiceImpl implements MemorandumOfAssociati
 
     @Override
     public void update(Long documentHolderId, MemorandumOfAssociationDto dto) {
-        MemorandumOfAssociation entity = memorandumOfAssociationRepository.getCOIDocumentByDocumentHolderId(documentHolderId);
+        MemorandumOfAssociation entity = memorandumOfAssociationRepository.getMOADocumentByDocumentHolderId(documentHolderId);
         entity = dto.dtoToEntityMapping(dto, entity);
         Document document = documentService.getDocumentByDocumentHolderIdAndType(documentHolderId, DocumentType.MOA);
         entity.setDocument(document);

@@ -48,9 +48,11 @@ public class BulkUploadServiceImpl implements BulkUploadService{
 
             for(CSVRecord r:records){
                 String catName = r.get("CATEGORY_NAME");
+                String prefix= r.get("PRE_FIX");
                 List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
                 if(catOp.size()==0){
-                    String code = categoryService.getNewCategoryCode(catName.substring(0,1),Optional.empty());
+
+                    String code = categoryService.getNewCategoryCode(catName.substring(0,1),prefix,Optional.empty());
                     CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                     categoryRequestDto.setName(catName);
                     categoryRequestDto.setCode(code);
@@ -82,7 +84,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                 String catName = r.get("CATEGORY_NAME");
                 String subCatName = r.get("SUB_CATEGORY_NAME");
                 // String itemName = r.get("ITEM_NAME");
-                String vat = r.get("VAT");
+//                String vat = r.get("VAT");
                 String attrType = r.get("ATTRIBUTE_TYPE");
                 String attrValue = r.get("ATTRIBUTE_VALUE");
                 String attrUnit = r.get("ATTRIBUTE_UNIT");
@@ -93,7 +95,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                     Map<String, Object> subCatProps = new HashMap<>();
                     subCatProps.put("name", subCatName);
                     subCatProps.put("catName",catName);
-                    subCatProps.put("vat",vat);
+//                    subCatProps.put("vat",vat);
                     subCatProps.put("brands", Arrays.asList(brands.split(",")));
                     List<Map<String,Object>> attrs = new ArrayList<>();
                     Map<String ,Object> attr =  new HashMap<>();
@@ -118,7 +120,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
 
                 String catName = ((Map<String, Object>)_subCat).get("catName").toString();
                 String subCatName = ((Map<String, Object>)_subCat).get("name").toString();
-                String vat = ((Map<String, Object>)_subCat).get("vat").toString();
+//                String vat = ((Map<String, Object>)_subCat).get("vat").toString();
 
                 List<String> brands = (List<String>) ((Map<String, Object>)_subCat).get("brands");
                 List<Map<String,Object>> attributes = (List<Map<String,Object>>)((Map<String, Object>)_subCat).get("attributes");
@@ -133,10 +135,10 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                         CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                         categoryRequestDto.setName(subCatName);
                         categoryRequestDto.setCode(code);
-                        String vatPercentage =vat.replace("%","");
-                        if(!vatPercentage.isEmpty()){
-                            categoryRequestDto.setVat(BigDecimal.valueOf(Long.valueOf(vatPercentage)));
-                        }
+//                        String vatPercentage =vat.replace("%","");
+//                        if(!vatPercentage.isEmpty()){
+//                            categoryRequestDto.setVat(BigDecimal.valueOf(Long.valueOf(vatPercentage)));
+//                        }
                         categoryRequestDto.setParentCategory(category);
                         // categoryRequestDto.setStoreType(category.getStoreType());
                         categoryRequestDto.setBrands(brands);

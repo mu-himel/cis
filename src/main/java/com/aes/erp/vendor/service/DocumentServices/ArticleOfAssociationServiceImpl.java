@@ -23,7 +23,7 @@ public class ArticleOfAssociationServiceImpl implements ArticleOfAssociationServ
 
     @Override
     public void update(Long documentHolderId, ArticleOfAssociationDto dto) {
-        ArticleOfAssociation entity = articleOfAssociationRepository.getCOIDocumentByDocumentHolderId(documentHolderId);
+        ArticleOfAssociation entity = articleOfAssociationRepository.getAOADocumentByDocumentHolderId(documentHolderId);
         entity = dto.dtoToEntityMapping(dto, entity);
         Document document = documentService.getDocumentByDocumentHolderIdAndType(documentHolderId, DocumentType.AOA);
         entity.setDocument(document);

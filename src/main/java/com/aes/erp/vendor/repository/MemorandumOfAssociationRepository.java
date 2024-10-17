@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface MemorandumOfAssociationRepository extends JpaRepository<MemorandumOfAssociation,Long> {
     @Query(value = "SELECT * FROM memorandum_of_association c " +
             "WHERE c.document_holder_id = :document_holder_id", nativeQuery = true)
-    MemorandumOfAssociation getCOIDocumentByDocumentHolderId(@Param("document_holder_id") Long documentHolder);
+    MemorandumOfAssociation getMOADocumentByDocumentHolderId(@Param("document_holder_id") Long documentHolder);
 }

@@ -44,8 +44,10 @@ public class BinResponseDto {
     private String tradingBrandName;
     @JsonProperty(value = "major_area_of_economic_activity")
     private String majorAreaofEcoAct;
-    @JsonProperty("Error")
+    @JsonProperty("state")
     private String error;
+    @JsonProperty("message")
+    private String message;
 
     public BINDocument dtoToEntityMapping(BinResponseDto dto, BINDocument document){
         if(!dto.getAddress().isEmpty())document.setAddress(dto.getAddress());
