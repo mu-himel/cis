@@ -102,8 +102,18 @@ public class CategoryServiceImpl implements CategoryService {
         if(categoryRequestDto.getOrganization()!=null){
             category.setOrganization(categoryRequestDto.getOrganization());
         }
-        if(categoryRepository.existsByCode(category.getCode())){
-            throw new AesException("Category code already exist");
+        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByNameAndActive(category.getName().toUpperCase(),false);
+        if(itemCategoryOpt.isPresent()){
+//            throw new AesException("Category code already exist");
+            ItemCategory itemCategory = itemCategoryOpt.get();
+            System.out.println("Category name already exist and deactivated");
+            itemCategory.setActive(true);
+            categoryRepository.save(itemCategory);
+            return itemCategory.getId();
+        }
+        if (categoryRepository.existsByCodeAndActive(category.getCode(),true)) {
+            System.out.println("Category code already exist");
+            return category.getId();
         }
 
         //uncomment this to fix bug SDOERP-1223
