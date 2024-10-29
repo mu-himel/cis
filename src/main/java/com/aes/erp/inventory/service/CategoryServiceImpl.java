@@ -516,10 +516,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     private void sentItemCategoryTransfer(String authToken, String userId, Organization org,List<CategoryRequestDto> categoryList){
         StringBuilder sb = new StringBuilder("/item-categories");
-                
+
         sb.append("/bulk-create");
-    
-        String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+
+        String itemCategoryTransferEndpoint = org.getScmIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -528,9 +528,11 @@ public class CategoryServiceImpl implements CategoryService {
         bcr.setUserId(userId);
         bcr.setCategories(categoryList);
         HttpEntity<BulkCategoryRequestDto> pqPayload = new HttpEntity<>(bcr, headers);
-        ResponseEntity<Void> response = networkService.post(itemCategoryTransferEndpoint,pqPayload,Void.class);
-        if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
-            !response.getStatusCode().equals(HttpStatus.CREATED)){
+        System.out.println(pqPayload);
+        System.out.println(itemCategoryTransferEndpoint);
+        ResponseEntity<Void> response = networkService.post(itemCategoryTransferEndpoint, pqPayload, Void.class);
+        if (!response.getStatusCode().equals(HttpStatus.NO_CONTENT) &&
+                !response.getStatusCode().equals(HttpStatus.CREATED)) {
             throw new AesException("Something wrong");
         }
     }
