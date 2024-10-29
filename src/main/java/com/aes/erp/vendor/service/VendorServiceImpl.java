@@ -6,13 +6,18 @@ import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.dto.response.ItemCategoryDto;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.PendingItemRequest;
+import com.aes.erp.inventory.repository.CategoryRepository;
+import com.aes.erp.inventory.repository.ItemRepository;
 import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.inventory.service.OrganizationService;
+import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.*;
 
 import com.aes.erp.vendor.entity.*;
+import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
 import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolderStatus;
@@ -30,9 +35,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -74,10 +81,17 @@ public class VendorServiceImpl implements VendorService {
     @Autowired
     private AuthorizedPersonRepository autorizedPersonRepository;
 
+    @Autowired
+    private NetworkService networkService;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Value("${cps.frontend}")
     private String cpsFrontendLink;
+
+    @Value("${accounts.apiEndpoint}")
+    private String accountsApiEndpoint;
 
 
     public VendorServiceImpl(EmailSenderUtil emailSenderUtil, VendorSubCategoryRepository vendorSubCategoryRepository, GenericModelMapper modelMapper, VendorTypeService vendorTypeService, CategoryService categoryService, GeneralDetailsRepository generalDetailsRepository) {
@@ -556,6 +570,7 @@ public class VendorServiceImpl implements VendorService {
                 documentHolder = documentHolderService.updateDocumentHolderStatus(documentHolder.getId(), DocumentHolderStatus.APPROVED_BY_ENLISTER);
                 vendor.setDocumentHolder(documentHolder);
             }
+            vendorRepository.save(vendor);
         }
         if(dto.getEmployeeType()  == EmployeeType.AUDITOR && vendor.getVerificationStatus() == VendorDocumentVerificationStatus.PENDING_APPROVAL){
             vendor.setVerificationStatus(VendorDocumentVerificationStatus.APPROVED);
@@ -567,9 +582,72 @@ public class VendorServiceImpl implements VendorService {
             }
             vendor.setStatus(VendorStatus.ENABLED);
             organizationService.sentVendorApprovedSignal();
+            vendor = vendorRepository.save(vendor);
 
+            createVendorLedger(vendor);
         }
-        vendorRepository.save(vendor);
+    }
+
+    public void createVendorLedger(Vendor vendor){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(networkService.getKeycloakAccessToken(organizationService.getOrganizationById(2L)));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        VendorLedgerCreateDto postDto = new VendorLedgerCreateDto();
+        postDto.setVendorCpsId(vendor.getId().toString());
+        postDto.setVendorName(vendor.getName());
+        postDto.setVendorType(vendor.getVendorType().getName());
+        postDto.setVendorPhone(vendor.getPhone());
+        postDto.setVendorEmail(vendor.getEmail());
+        postDto.setVendorNid(vendor.getDocumentHolder().getNidDocument().getNid());
+        postDto.setTin(vendor.getDocumentHolder().getTinDocument().getTin());
+        postDto.setTradeLicense(vendor.getDocumentHolder().getTradeDocument().getTradeLicenseNumber());
+        postDto.setVatCertificate(vendor.getDocumentHolder().getBinDocument().getBin());
+        postDto.setBankSolvency(vendor.getDocumentHolder().getBankSolvencyDocument().getAccount());
+
+        StringBuilder sb1 = new StringBuilder();
+        for (String id : vendor.getCategories().split(",")) {
+            Optional<ItemCategory> catOpt = categoryRepository.findById(Long.parseLong(id.trim()));
+            if (catOpt.isPresent()) {
+                sb1.append(catOpt.get().getName());
+                sb1.append(",");
+            }
+        }
+        if (sb1.length() > 0) {
+            postDto.setCategories(sb1.substring(0, sb1.length() - 1));
+        }
+
+        postDto.setModeOfTransaction(vendor.getDocumentHolder().getGeneralDetails().getModeOfTransaction());
+        postDto.setModeOfTransportation(vendor.getDocumentHolder().getGeneralDetails().getModeOfTransportation());
+        postDto.setCreditPeriod(vendor.getDocumentHolder().getGeneralDetails().getCreditPeriodDays());
+        postDto.setAvgDeliveryTime(vendor.getDocumentHolder().getGeneralDetails().getDeliveryLeadTime());
+        postDto.setDeliverySchedule(vendor.getDocumentHolder().getGeneralDetails().getDeliverySchedule());
+        postDto.setUrgentDeliverySupport(vendor.getDocumentHolder().getGeneralDetails().getUrgentDeliverySupport());
+        postDto.setProductReplacementType(vendor.getDocumentHolder().getGeneralDetails().getReplacementType());
+        postDto.setAnnualBusinessVolume(vendor.getDocumentHolder().getGeneralDetails().getAnnualBusinessVolume());
+
+        List<BusinessDetailsDto> businessDetailsDtoList = new ArrayList<>();
+        for (BusinessDetails detail : vendor.getDocumentHolder().getBusinessDetailsRecords()) {
+            // Access fields or methods of each BusinessDetail instance
+            BusinessDetailsDto businessDetailsDto = new BusinessDetailsDto();
+            businessDetailsDto.setOrgName(detail.getOrgName());
+            businessDetailsDto.setBusinessType(detail.getBusinessType());
+            businessDetailsDto.setAnnualVolume(detail.getAnnualVolume());
+            businessDetailsDto.setNumberOfYear(detail.getNumberOfYear());
+            businessDetailsDto.setWorkOrderFile(detail.getWorkOrderFile());
+            businessDetailsDtoList.add(businessDetailsDto);
+        }
+        postDto.setBusinessDetails(businessDetailsDtoList);
+
+        HttpEntity<VendorLedgerCreateDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
+
+        String vendorLedgerCreationApiEndpoint = accountsApiEndpoint.concat("/vendor-ledgers/create");
+        ResponseEntity<Void> response = networkService.post(vendorLedgerCreationApiEndpoint, mPCDtoPayload, Void.class);
+        if (response.getStatusCode().equals(HttpStatus.CREATED)) {
+            System.out.println("Ledger Created");
+        } else {
+            throw new RuntimeException("No Ledger Created");
+        }
     }
 
     @Override

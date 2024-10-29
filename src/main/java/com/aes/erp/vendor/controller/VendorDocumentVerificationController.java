@@ -56,9 +56,9 @@ public class VendorDocumentVerificationController {
         binService.update(documentHolderId, confirmDocumentDto.getBin());
         tradeLicenseService.update(documentHolderId, confirmDocumentDto.getTrade());
         documentHolderService.updateDocumentHolderStatus(documentHolderId, DocumentHolderStatus.DOCUMENTS_SUBMITTED);
-        certificateOfIncorporationService.update(documentHolderId,confirmDocumentDto.getCOI());
-        articleOfAssociationService.update(documentHolderId,confirmDocumentDto.getAOA());
-        memorandumOfAssociationService.update(documentHolderId,confirmDocumentDto.getMOA());
+        certificateOfIncorporationService.update(documentHolderId,confirmDocumentDto.getCoi());
+        articleOfAssociationService.update(documentHolderId,confirmDocumentDto.getAoa());
+        memorandumOfAssociationService.update(documentHolderId,confirmDocumentDto.getMoa());
         return new ResponseEntity<>("Successful request", HttpStatus.NO_CONTENT);
     }
 }

@@ -1,13 +1,11 @@
 package com.aes.erp.vendor.document_response_dto;
 
 import com.aes.erp.common.ReferenceObjectDto;
-import com.aes.erp.vendor.entity.DocmentEntities.AuthorizedPerson;
-import com.aes.erp.vendor.entity.DocmentEntities.BusinessDetails;
-import com.aes.erp.vendor.entity.DocmentEntities.Document;
-import com.aes.erp.vendor.entity.DocmentEntities.GeneralDetails;
+import com.aes.erp.vendor.entity.DocmentEntities.*;
 import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolderStatus;
 import lombok.Data;
 
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.ArrayList;
@@ -35,5 +33,7 @@ public class DocumentHolderResponseDto {
     private AuthorizedPerson authorizedPerson;
     private String msg;
     private DocumentHolderStatus documentHolderStatus;
+//    @Lob
+    private String vendorImage;
 //    private Set<Document> documentsList = new HashSet<>();
 }
