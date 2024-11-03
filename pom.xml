@@ -11,7 +11,7 @@
 	<groupId>com.aes.erp</groupId>
 	<artifactId>release-v1</artifactId>
 	<version>newdev-0.0.16</version>
-	<name>cmsbe</name>
+	<name>cpsbe</name>
 	<description>CWH + VMS </description>
 	<properties>
 		<java.version>17</java.version>
@@ -136,7 +136,7 @@
 <!--				</configuration>-->
 <!--			</plugin>-->
 		</plugins>
-		<finalName>cmsbe</finalName>
+		<finalName>cpsbe</finalName>
 	</build>
 	<profiles>
 		<profile>

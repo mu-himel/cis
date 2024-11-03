@@ -99,21 +99,30 @@ public class CategoryServiceImpl implements CategoryService {
     public Long addCategory(CategoryRequestDto categoryRequestDto) {
         ItemCategory category = categoryRequestDto.getEntity();
 
-        if(categoryRequestDto.getOrganization()!=null){
+        if (categoryRequestDto.getOrganization() != null) {
             category.setOrganization(categoryRequestDto.getOrganization());
         }
-        if(categoryRepository.existsByCode(category.getCode())){
-            throw new AesException("Category code already exist");
+        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByNameAndActive(category.getName().toUpperCase(), false);
+        if (itemCategoryOpt.isPresent()) {
+//            throw new AesException("Category code already exist");
+            ItemCategory itemCategory = itemCategoryOpt.get();
+            System.out.println("Category name already exist and deactivated");
+            itemCategory.setActive(true);
+            categoryRepository.save(itemCategory);
+            return itemCategory.getId();
+        }
+        if (categoryRepository.existsByCodeAndActive(category.getCode(), true)) {
+            System.out.println("Category code already exist");
+            return category.getId();
         }
 
         //uncomment this to fix bug SDOERP-1223
-        if(categoryRequestDto.getParentCategory() == null){
+        if (categoryRequestDto.getParentCategory() == null) {
             List<Long> catList = categoryRepository.findDuplicateCategoryId(category.getName());
-            if(!catList.isEmpty()){
+            if (!catList.isEmpty()) {
                 throw new AesException("Sorry! Category Name already exist");
             }
-        }
-        else{
+        } else {
             List<Long> subcatList = categoryRepository.findDuplicateSubCategoryId(category.getName());
             if(!subcatList.isEmpty()){
                 throw new AesException("Sorry! Sub Category Name already exist");
@@ -504,12 +513,12 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private void sentItemCategoryTransfer(String authToken, String userId, Organization org,List<CategoryRequestDto> categoryList){
+    private void sentItemCategoryTransfer(String authToken, String userId, Organization org,List<CategoryRequestDto> categoryList) {
         StringBuilder sb = new StringBuilder("/item-categories");
-                
+
         sb.append("/bulk-create");
-    
-        String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+
+        String itemCategoryTransferEndpoint = org.getScmIpAddress().concat(sb.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -518,9 +527,11 @@ public class CategoryServiceImpl implements CategoryService {
         bcr.setUserId(userId);
         bcr.setCategories(categoryList);
         HttpEntity<BulkCategoryRequestDto> pqPayload = new HttpEntity<>(bcr, headers);
-        ResponseEntity<Void> response = networkService.post(itemCategoryTransferEndpoint,pqPayload,Void.class);
-        if(!response.getStatusCode().equals(HttpStatus.NO_CONTENT) && 
-            !response.getStatusCode().equals(HttpStatus.CREATED)){
+        System.out.println(pqPayload);
+        System.out.println(itemCategoryTransferEndpoint);
+        ResponseEntity<Void> response = networkService.post(itemCategoryTransferEndpoint, pqPayload, Void.class);
+        if (!response.getStatusCode().equals(HttpStatus.NO_CONTENT) &&
+                !response.getStatusCode().equals(HttpStatus.CREATED)) {
             throw new AesException("Something wrong");
         }
     }

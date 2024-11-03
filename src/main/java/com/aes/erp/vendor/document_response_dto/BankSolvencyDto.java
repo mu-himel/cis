@@ -23,20 +23,23 @@ public class BankSolvencyDto {
     private String branchName;
     @JsonProperty("bank_name")
     private String bankName;
-    @JsonProperty("routingNumber")
+    @JsonProperty("routing_number")
     private String routingNumber;
     @JsonProperty(value = "date")
     private String date;
     @JsonProperty(value = "name")
     private String name;
-    @JsonProperty("Error")
+    //    @JsonProperty("Error")
+//    private String error;
+    @JsonProperty("state")
     private String error;
+    @JsonProperty("message")
+    private String message;
 
-
-    public BankSolvencyDocument dtoToEntityMapping(BankSolvencyDto dto, BankSolvencyDocument bankSolvencyDocument){
-        if(!dto.getAccountNumber().isEmpty())bankSolvencyDocument.setAccount(dto.getAccountNumber());
-        if(!dto.getBankName().isEmpty())bankSolvencyDocument.setBankName(dto.getBankName());
-        if(!dto.getBranchName().isEmpty())bankSolvencyDocument.setBranchName(dto.getBranchName());
+    public BankSolvencyDocument dtoToEntityMapping(BankSolvencyDto dto, BankSolvencyDocument bankSolvencyDocument) {
+        if (!dto.getAccountNumber().isEmpty()) bankSolvencyDocument.setAccount(dto.getAccountNumber());
+        if (!dto.getBankName().isEmpty()) bankSolvencyDocument.setBankName(dto.getBankName());
+        if (!dto.getBranchName().isEmpty()) bankSolvencyDocument.setBranchName(dto.getBranchName());
         return bankSolvencyDocument;
     }
 }

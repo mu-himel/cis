@@ -287,7 +287,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     @Override
     public ExtractedInformationDto getHolderExtractedDetailsForConfirmation(Long id) {
         ExtractedInformationDto dto = new ExtractedInformationDto();
-        List<DocumentType> allDocTypes = Arrays.asList(DocumentType.BIN, DocumentType.TIN, DocumentType.NID, DocumentType.BANK_SOLVENCY, DocumentType.TRADE);
+        List<DocumentType> allDocTypes = Arrays.asList(DocumentType.BIN, DocumentType.TIN, DocumentType.NID, DocumentType.BANK_SOLVENCY, DocumentType.TRADE, DocumentType.IRC, DocumentType.AOA, DocumentType.MOA);
         for(DocumentType type: allDocTypes){
             Document document = documentRepository.getDocumentByDocumentHolderId(id, type.ordinal());
             if(document != null){

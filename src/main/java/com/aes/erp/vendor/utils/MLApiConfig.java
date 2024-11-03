@@ -14,4 +14,5 @@ public class MLApiConfig {
     public String solvency;
     public String trade;
     public String apiEndpoint;
+    public String apiEndpoint_dev_cluster;
 }

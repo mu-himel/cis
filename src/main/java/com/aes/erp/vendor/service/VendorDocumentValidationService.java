@@ -79,7 +79,7 @@ public class VendorDocumentValidationService {
                 document.setDocumentType(DocumentType.BIN);
             }
             else if(docType.toUpperCase().equals("NID")){
-                // url = mlApiConfig.getApiEndpoint();
+//                url = mlApiConfig.getApiEndpoint_dev_cluster();
                 document.setDocumentType(DocumentType.NID);
             }
             else if(docType.toUpperCase().contains("SOLVENCY")){
@@ -87,7 +87,7 @@ public class VendorDocumentValidationService {
                 document.setDocumentType(DocumentType.BANK_SOLVENCY);
             }
             else if(docType.toUpperCase().contains("TRADE")){
-                // url = mlApiConfig.getTrade();
+                url = mlApiConfig.getApiEndpoint_dev_cluster();
                 document.setDocumentType(DocumentType.TRADE);
             }
             else if(docType.toUpperCase().contains("IRC")){
@@ -95,10 +95,12 @@ public class VendorDocumentValidationService {
                 document.setDocumentType(DocumentType.IRC);
             }else if(docType.toUpperCase().contains("AOA")){
                 document.setDocumentType(DocumentType.AOA);
+                document.setResultFromMachineLearning("{\"company_name\":\"null\", \"address\":\"null\", \"year_of_establishment\":\"2000\"}");
                 documentService.create(document);
                 return new ArticleOfAssociationDto();
             }else if(docType.toUpperCase().contains("MOA")){
                 document.setDocumentType(DocumentType.MOA);
+                document.setResultFromMachineLearning("{\"company_name\":\"null\"}");
                 documentService.create(document);
                 return new MemorandumOfAssociationDto();
             }
@@ -113,11 +115,10 @@ public class VendorDocumentValidationService {
             documentService.create(document);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(result);
-            
-            if(result == null || jsonNode.has("Error")){
+
+            if (result == null || jsonNode.has("Error") || jsonNode.has("state")) {
                 throw new AesException("Wrong document uploaded");
-            }
-            else{
+            } else {
                 //Finishing The asynchronous task
                 return mapToDto(result, docType);
             }
