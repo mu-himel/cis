@@ -6,9 +6,11 @@ import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.dto.response.ItemCategoryDto;
 import com.aes.erp.inventory.entity.ItemCategory;
+import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.PendingItemRequest;
 import com.aes.erp.inventory.repository.CategoryRepository;
 import com.aes.erp.inventory.repository.ItemRepository;
+import com.aes.erp.inventory.repository.OrganizationRepository;
 import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.inventory.service.OrganizationService;
 import com.aes.erp.network.NetworkService;
@@ -86,6 +88,9 @@ public class VendorServiceImpl implements VendorService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private OrganizationRepository organizationRepository;
 
     @Value("${cps.frontend}")
     private String cpsFrontendLink;
@@ -583,14 +588,17 @@ public class VendorServiceImpl implements VendorService {
             vendor.setStatus(VendorStatus.ENABLED);
             organizationService.sentVendorApprovedSignal();
             vendor = vendorRepository.save(vendor);
+            List<Organization> organizationList = organizationRepository.findAll();
+            for (Organization org:organizationList) {
+                createVendorLedger(vendor,org);
 
-            createVendorLedger(vendor);
+            }
         }
     }
 
-    public void createVendorLedger(Vendor vendor){
+    public void createVendorLedger(Vendor vendor, Organization organization){
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(networkService.getKeycloakAccessToken(organizationService.getOrganizationById(2L)));
+        headers.setBearerAuth(networkService.getKeycloakAccessToken(organizationService.getOrganizationById(organization.getId())));
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         VendorLedgerCreateDto postDto = new VendorLedgerCreateDto();
@@ -641,7 +649,7 @@ public class VendorServiceImpl implements VendorService {
 
         HttpEntity<VendorLedgerCreateDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
 
-        String vendorLedgerCreationApiEndpoint = accountsApiEndpoint.concat("/vendor-ledgers/create");
+        String vendorLedgerCreationApiEndpoint = organization.getAccIpAddress().concat("/vendor-ledgers/create");
         ResponseEntity<Void> response = networkService.post(vendorLedgerCreationApiEndpoint, mPCDtoPayload, Void.class);
         if (response.getStatusCode().equals(HttpStatus.CREATED)) {
             System.out.println("Ledger Created");
