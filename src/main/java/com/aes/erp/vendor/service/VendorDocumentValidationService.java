@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 @Service
@@ -61,7 +62,14 @@ public class VendorDocumentValidationService {
         document.setContentType(file.getContentType());
         Path path = Path.of(uploadDir+"/vendor/doc/"+documentHolderId+"/"+docType);
         fileUploadService.uploadFile(path, file);
-        // multipartFileToBytes(file, document);
+//        try {
+//            String fileContent = new String(file.getBytes(), StandardCharsets.UTF_8);
+//            document.setFile(fileContent);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return "File upload failed!";
+//        }
+         multipartFileToBytes(file, document);
         document.setName(docType);
         document.setFileName(file.getOriginalFilename());
         try {

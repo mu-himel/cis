@@ -370,8 +370,31 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         if(documentHolder.getTradeDocument()!= null ){
             responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
         }
+        if(documentHolder.getArticleOfAssociation() != null){
+            if(documentHolder.getArticleOfAssociation().getDocument().getFile() !=null) {
+                String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getArticleOfAssociation().getDocument().getFile());
+                responseDto.setArticleOfAssociation("data:image/jpeg;base64," + encodedFileContent);
+            }
+//            responseDto.setArticleOfAssociation(documentHolder.getArticleOfAssociation().getDocument().getFile().toString());
+        }
+        if(documentHolder.getMemorandumOfAssociation()!= null){
+            if(documentHolder.getMemorandumOfAssociation().getDocument().getFile()!= null) {
+                String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getMemorandumOfAssociation().getDocument().getFile());
+                responseDto.setMemorandumOfAssociation("data:image/jpeg;base64," + encodedFileContent);
+            }
+        }
+        if(documentHolder.getCertificateOfIncorporation()!= null){
+            if(documentHolder.getCertificateOfIncorporation().getDocument()!= null) {
+                String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getCertificateOfIncorporation().getDocument().getFile());
+                responseDto.setCertificateOfIncorporation("data:image/jpeg;base64," + encodedFileContent);
+            }
+        }
         if(documentHolder.getBusinessDetailsRecords() != null && !documentHolder.getBusinessDetailsRecords().isEmpty()){
             responseDto.setBusinessDetailsRecords(documentHolder.getBusinessDetailsRecords());
+        }
+
+        if(documentHolder.getAuthorizedPerson()!= null){
+            responseDto.setAuthorizedPerson(documentHolder.getAuthorizedPerson());
         }
         Optional<GeneralDetails> generalDetails = generalDetailsRepository.findByDocumentHolderId(documentHolder.getId());
         generalDetails.ifPresent(responseDto::setGeneralDetails);
@@ -387,7 +410,18 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
                     responseDto.getVendorSubCategories().add(subCategory.getSubcategory().getName());
                 }
             }
+            if (vendor.getVendorImage() != null) {
+                responseDto.setVendorImage(vendor.getVendorImage());
+            }
+//            Optional<Vendor> vendorOptional = vendorRepository.findById(vendor.getId());
+//            if(vendorOptional.isPresent()) {
+//                if (vendor.getVendorImage() != null) {
+//                    responseDto.setVendorImage(vendorOptional.get().getVendorImage());
+//                }
+//            }
         }
+
+
         return responseDto;
     }
 }
