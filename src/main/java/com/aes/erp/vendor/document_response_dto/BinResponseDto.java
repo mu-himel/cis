@@ -37,6 +37,7 @@ public class BinResponseDto {
     private String companyName;
     @JsonProperty(value = "old_bin")
     private String oldBinNumber;
+    @JsonProperty(value = "tin_number")
     private String tinNumber;
     @JsonProperty(value = "ownership")
     private String ownershipType;
