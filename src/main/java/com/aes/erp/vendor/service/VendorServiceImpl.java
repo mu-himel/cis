@@ -586,7 +586,7 @@ public class VendorServiceImpl implements VendorService {
                 vendor.setDocumentHolder(documentHolder);
             }
             vendor.setStatus(VendorStatus.ENABLED);
-            organizationService.sentVendorApprovedSignal();
+//            organizationService.sentVendorApprovedSignal();
             vendor = vendorRepository.save(vendor);
             List<Organization> organizationList = organizationRepository.findAll();
             for (Organization org:organizationList) {
