@@ -371,22 +371,28 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
         }
         if(documentHolder.getArticleOfAssociation() != null){
-            if(documentHolder.getArticleOfAssociation().getDocument().getFile() !=null) {
-                String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getArticleOfAssociation().getDocument().getFile());
-                responseDto.setArticleOfAssociation("data:image/jpeg;base64," + encodedFileContent);
+            if(documentHolder.getArticleOfAssociation().getDocument()!=null) {
+                if (documentHolder.getArticleOfAssociation().getDocument().getFile() != null) {
+                    String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getArticleOfAssociation().getDocument().getFile());
+                    responseDto.setArticleOfAssociation("data:image/jpeg;base64," + encodedFileContent);
+                }
             }
 //            responseDto.setArticleOfAssociation(documentHolder.getArticleOfAssociation().getDocument().getFile().toString());
         }
         if(documentHolder.getMemorandumOfAssociation()!= null){
-            if(documentHolder.getMemorandumOfAssociation().getDocument().getFile()!= null) {
-                String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getMemorandumOfAssociation().getDocument().getFile());
-                responseDto.setMemorandumOfAssociation("data:image/jpeg;base64," + encodedFileContent);
+            if(documentHolder.getMemorandumOfAssociation().getDocument() != null) {
+                if (documentHolder.getMemorandumOfAssociation().getDocument().getFile() != null) {
+                    String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getMemorandumOfAssociation().getDocument().getFile());
+                    responseDto.setMemorandumOfAssociation("data:image/jpeg;base64," + encodedFileContent);
+                }
             }
         }
         if(documentHolder.getCertificateOfIncorporation()!= null){
             if(documentHolder.getCertificateOfIncorporation().getDocument()!= null) {
-                String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getCertificateOfIncorporation().getDocument().getFile());
-                responseDto.setCertificateOfIncorporation("data:image/jpeg;base64," + encodedFileContent);
+                if (documentHolder.getCertificateOfIncorporation().getDocument().getFile() != null) {
+                    String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getCertificateOfIncorporation().getDocument().getFile());
+                    responseDto.setCertificateOfIncorporation("data:image/jpeg;base64," + encodedFileContent);
+                }
             }
         }
         if(documentHolder.getBusinessDetailsRecords() != null && !documentHolder.getBusinessDetailsRecords().isEmpty()){
