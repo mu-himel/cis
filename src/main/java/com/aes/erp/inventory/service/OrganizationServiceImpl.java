@@ -48,6 +48,7 @@ public class OrganizationServiceImpl implements OrganizationService{
         organization.setStatus(OrganizationStatus.ENABLED);
         organization.setServiceIpAddress(dto.getServiceIpAddress());
         organization.setScmIpAddress(dto.getScmIpAddress());
+        organization.setAccIpAddress(dto.getAccIpAddress());
         organization.setServiceUsername(dto.getServiceUsername());
         organization.setServicePassword(dto.getServicePassword());
         Role role = roleService.read("ORGANIZATION");
