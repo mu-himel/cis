@@ -29,6 +29,13 @@ public class PurchaseOrderDetail {
     private OfferItem offerItem;
 
     private String itemName;
+
+    private Long warehouseId;
+    private BigDecimal deliveryCharge;
+    private BigDecimal vatAmount;
+    private BigDecimal vatPercent;
+    private BigDecimal subTotal;
+    private BigDecimal totalPrice;
     
     @ManyToOne
     @JsonIgnore
