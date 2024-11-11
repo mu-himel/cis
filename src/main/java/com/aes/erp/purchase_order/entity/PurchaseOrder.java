@@ -56,11 +56,11 @@ public class PurchaseOrder {
 
     private Boolean isQcPass;
 
-    private Long warehouseId;
+//    private Long warehouseId;
 
     @Column(length = 500)
     private String qcDeclineNote;
-
+    private String deliveryChargeType;
 
     @ManyToOne
     private Organization org;

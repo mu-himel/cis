@@ -8,6 +8,12 @@ import lombok.Data;
 
 @Data
 public class PoDetailReqDto {
+    private ReferenceObjectDto warehouse;
     private String itemName;
     private BigDecimal itemQty;
+    private BigDecimal deliveryCharge;
+    private BigDecimal vatAmount;
+    private BigDecimal vatPercent;
+    private BigDecimal subTotal;
+    private BigDecimal totalPrice;
 }
