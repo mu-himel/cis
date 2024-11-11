@@ -5,11 +5,7 @@ import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.network.NetworkService;
-import com.aes.erp.scm.Entities.PriceQuotation;
-import com.aes.erp.scm.Entities.Tender;
-import com.aes.erp.scm.Entities.TenderItem;
-import com.aes.erp.scm.Entities.TenderParticipator;
-import com.aes.erp.scm.Entities.TenderStatus;
+import com.aes.erp.scm.Entities.*;
 import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.remote.DeliveryDetailDto;
 import com.aes.erp.scm.dto.remote.PriceQuotationDeliveryDetailDto;
@@ -42,11 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -276,35 +268,56 @@ public class OfferServiceImpl implements OfferService{
 
         Map<String,Object>  deliveryChargeType = new HashMap<>();
         priceQuotationReqDto.setDetails(offer.getOfferItems().stream().map(o->{
-           
+
             PriceQuotationDetailReqDto pqdrd = new PriceQuotationDetailReqDto();
             Optional<TenderItem> tenderItemOp = tender.getTenderItems().stream().filter(ti->
-                ti.getProductDescription().equals(o.getProductDescription())
+                    ti.getProductDescription().equals(o.getProductDescription())
             ).findFirst();
 
-            if(tenderItemOp.isEmpty()){
+            if (tenderItemOp.isEmpty()) {
                 throw new AesException("Sorry! Tender Item not found");
             }
             TenderItem tenderItem = tenderItemOp.get();
             pqdrd.setWarrantyDuration(o.getWarrantyDuration());
             pqdrd.setWarrantyUnit(o.getWarrantyUnit());
             pqdrd.setEstDeliveryDays(Integer.parseInt(o.getEstimatedDeliveryDays().toString()));
-            pqdrd.setDeliveryDetails(tenderItem.getDeliveryDetails().stream().map(tdd->{
-                
-                PriceQuotationDeliveryDetailDto pqdd = new PriceQuotationDeliveryDetailDto();
-                pqdd.setWarehouseName(tdd.getWareHouseName());
-                if(offer.getDeliveryChargeAmount().equals(BigDecimal.valueOf(0))){
-                    
-                    deliveryChargeType.put("deliveryCharge","Included");
-                }else{
-                    deliveryChargeType.put("deliveryCharge","Excluded");
+            pqdrd.setDeliveryDetails(offer.getWarehouses().stream().map(w -> {
+                Optional<TenderDeliveryDetail> tddOp = tenderItem.getDeliveryDetails().stream().filter(dd -> dd.getWarehouseId().equals(w.getWarehouseId())).findFirst();
+
+
+                if (tddOp.isPresent()) {
+                    PriceQuotationDeliveryDetailDto pqdd = new PriceQuotationDeliveryDetailDto();
+                    TenderDeliveryDetail tdd = tddOp.get();
+                    pqdd.setWarehouseId(w.getWarehouseId());
+                    pqdd.setWarehouseName(tdd.getWareHouseName());
+                    pqdd.setDeliveryOrderQty(tdd.getDeliveryOrderQTY());
+                    if (w.getDeliveryChargeAmount().equals(BigDecimal.valueOf(0))) {
+                        deliveryChargeType.put("deliveryCharge", "Included");
+                    } else {
+                        deliveryChargeType.put("deliveryCharge", "Excluded");
+                    }
+                    pqdd.setDeliveryChargeAmount(w.getDeliveryChargeAmount());
+                    pqdd.setDeliveryChargeType(w.getDeliveryChargeMode());
+                    return pqdd;
                 }
-              
-                pqdd.setDeliveryOrderQty(tdd.getDeliveryOrderQTY());
-                pqdd.setDeliveryChargeType(String.valueOf(deliveryChargeType.get("deliveryCharge")));
-                pqdd.setDeliveryChargeAmount(offer.getDeliveryChargeAmount());
-                return pqdd;
-            }).collect(Collectors.toList()));
+                return null;
+            }).filter(Objects::nonNull).collect(Collectors.toList()));
+//            pqdrd.setDeliveryDetails(tenderItem.getDeliveryDetails().stream().map(tdd->{
+//
+//                PriceQuotationDeliveryDetailDto pqdd = new PriceQuotationDeliveryDetailDto();
+//                pqdd.setWarehouseName(tdd.getWareHouseName());
+//                if(offer.getDeliveryChargeAmount().equals(BigDecimal.valueOf(0))){
+//
+//                    deliveryChargeType.put("deliveryCharge","Included");
+//                }else{
+//                    deliveryChargeType.put("deliveryCharge","Excluded");
+//                }
+//
+//                pqdd.setDeliveryOrderQty(tdd.getDeliveryOrderQTY());
+//                pqdd.setDeliveryChargeType(String.valueOf(deliveryChargeType.get("deliveryCharge")));
+//                pqdd.setDeliveryChargeAmount(offer.getDeliveryChargeAmount());
+//                return pqdd;
+//            }).collect(Collectors.toList()));
 
             pqdrd.setRfqQty(o.getItemQuantity());
             pqdrd.setUnitPrice(o.getPriceQuotation().getPricePerUnit());
