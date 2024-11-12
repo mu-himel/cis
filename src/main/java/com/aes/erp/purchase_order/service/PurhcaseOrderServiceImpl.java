@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 
 import com.aes.erp.purchase_order.dto.request.PoDeliveryDetailsDto;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDeliveryDetail;
+import com.aes.erp.scm.Entities.TenderDeliveryDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -177,6 +178,11 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                     for (PoDeliveryDetailsDto pd :od.getPoDeliveryDetailsDtoList()) {
                         PurchaseOrderDeliveryDetail podd = new PurchaseOrderDeliveryDetail();
                         podd.setWarehouseId(pd.getWarehouse().getId());
+                        Optional<TenderDeliveryDetail> tenderDeliveryDetailOptional = tenderDeliveryDetailRepository.getTenderDeliveryDetailByWarehouseId(pd.getWarehouse().getId());
+                        if(tenderDeliveryDetailOptional.isPresent()) {
+                            podd.setWarehouseName(tenderDeliveryDetailOptional.get().getWareHouseName());
+                            podd.setWarehouseAddress(tenderDeliveryDetailOptional.get().getWareHouseAddress());
+                        }
                         podd.setItemQty(pd.getItemQty());
                         podd.setDeliveryCharge(pd.getDeliveryCharge());
                         podd.setPurchaseOrderDetail(pod);
