@@ -10,16 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.text.html.FormSubmitEvent.MethodType;
 import javax.transaction.Transactional;
 
+import com.aes.erp.purchase_order.dto.request.PoDeliveryDetailsDto;
+import com.aes.erp.purchase_order.entity.PurchaseOrderDeliveryDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,14 +43,9 @@ import com.aes.erp.purchase_order.entity.PurchaseOrder;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDetail;
 import com.aes.erp.purchase_order.repository.PoDetailRepository;
 import com.aes.erp.purchase_order.repository.PoRepository;
-import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderDetailInfo;
 import com.aes.erp.purchase_order.repository.PoRepository.PurchaseOrderInfo;
-import com.aes.erp.scm.Entities.PriceQuotation;
 import com.aes.erp.scm.Entities.Tender;
-import com.aes.erp.scm.Entities.TenderDeliveryDetail;
-import com.aes.erp.scm.Entities.TenderItem;
 import com.aes.erp.scm.dto.NoteDto;
-import com.aes.erp.scm.dto.remote.GoodReceiveItemDetailDto;
 import com.aes.erp.scm.dto.remote.GoodReceiveNoteCreateDto;
 import com.aes.erp.scm.dto.remote.GoodReceivedManualRequestDto;
 import com.aes.erp.scm.dto.remote.GrnManualItemDetailDto;
@@ -59,7 +54,6 @@ import com.aes.erp.scm.dto.remote.VendorRemoteDto;
 import com.aes.erp.scm.repositories.OfferItemRepository;
 import com.aes.erp.scm.repositories.PriceQuotationRepository;
 import com.aes.erp.scm.repositories.TednerDeliveryDetailRepository;
-import com.aes.erp.scm.repositories.TednerDeliveryDetailRepository.POItemDeliveryInfo;
 import com.aes.erp.scm.repositories.TenderItemRepository;
 import com.aes.erp.scm.repositories.TenderRepository;
 import com.aes.erp.scm.services.TenderService;
@@ -145,10 +139,11 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setRemotePoId(poDto.getId());
             po.setVendor(new Vendor(poDto.getVendorId()));
             po.setDeliveryDate(poDto.getDeliveryDate());
+            po.setDeliveryChargeType(poDto.getDeliveryChargeType());
             po.setOrg(organization);
             po.setPoStatus("PENDING");
             po.setCategoryCode(poDto.getCategoryCode());
-            po.setWarehouseId(poDto.getWarehouse().getId());
+//            po.setWarehouseId(poDto.getWarehouse().getId());
             
             List<PurchaseOrderDetail> poOrderDetails = new ArrayList<>();
             for(PoDetailReqDto od:poDto.getOrderDetails()){
@@ -162,18 +157,33 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             return oiStr.equals(odStr);
                         })
                         .findFirst();
-                if(offerItemOp.isPresent()){
+                if(offerItemOp.isPresent()) {
                     // throw new AesException("Sorry! Offer Item not found");
-               
+
                     PurchaseOrderDetail pod = new PurchaseOrderDetail();
                     pod.setItemName(od.getItemName());
                     pod.setItemQty(od.getItemQty());
+//                    pod.setWarehouseId(od.getWarehouse().getId());
+                    pod.setDeliveryCharge(od.getDeliveryCharge());
+                    pod.setVatAmount(od.getVatAmount());
+                    pod.setVatPercent(od.getVatPercent());
+                    pod.setTotalPrice(od.getTotalPrice());
+                    pod.setSubTotal(od.getSubTotal());
                     pod.setOfferItem(offerItemOp.get());
                     pod.setPurchaseOrder(po);
                     poOrderDetails.add(pod);
-                    
+
+                    List<PurchaseOrderDeliveryDetail> purchaseOrderDeliveryDetailsList = new ArrayList<>();
+                    for (PoDeliveryDetailsDto pd :od.getPoDeliveryDetailsDtoList()) {
+                        PurchaseOrderDeliveryDetail podd = new PurchaseOrderDeliveryDetail();
+                        podd.setWarehouseId(pd.getWarehouse().getId());
+                        podd.setItemQty(pd.getItemQty());
+                        podd.setDeliveryCharge(pd.getDeliveryCharge());
+                        podd.setPurchaseOrderDetail(pod);
+                        purchaseOrderDeliveryDetailsList.add(podd);
+                    }
+                    pod.setPurchaseOrderDeliveryDetails(purchaseOrderDeliveryDetailsList);
                 }
-                
             };
             po.setOrderDetails(poOrderDetails);
             poRepository.save(po);
@@ -299,7 +309,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     public void sendPO(Long id) {
         Optional<PurchaseOrder> poOp = poRepository.findById(id);
         if(poOp.isPresent()){
-            
+            boolean isWarehousePresent = false;
             PurchaseOrder po = poOp.get();
             Organization organization = po.getOrg();
             po.setIsPoSent(true);
@@ -307,10 +317,12 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             Optional<Tender> tenderOp = tenderRepository.findByRfqNo(po.getTenderNo());
             if(tenderOp.isPresent()){
                 Tender tender = tenderOp.get();
+                ItemCategory itemCategory = tender.getItemCategory();
+                ReferenceObjDto rfoDto = new ReferenceObjDto(itemCategory.getScmCategoryId());
                 // List<POItemDeliveryInfo> warehouseOfferCatList = tenderDeliveryDetailRepository.getItemWiseDeliveryDetailPO(tender.getId(),po.getVendor().getId());
                 
                 // List <TenderItem> tenderItemList = tenderItemRepository.findByTenderId(tender.getId());
-                PurchaseOrderDetail purchaseOrderDetail = poDetailRepository.findByPurchaseOrderId(po.getId());
+                List<PurchaseOrderDetail> purchaseOrderDetail = poDetailRepository.findByPurchaseOrderId(po.getId());
                 // OfferItem offerItem = offerItemRepository.findById(purchaseOrderDetail.getOfferItem().getId()).get();
                 // PriceQuotation priceQuotation = priceQuotationRepository.findById(purchaseOrderDetail.getOfferItem().getPriceQuotation().getId()).get();
                 
@@ -319,73 +331,98 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                 vendorRemoteDto.setName(po.getVendor().getName());
                 vendorRemoteDto.setVendorEmail(po.getVendor().getEmail());
                 vendorRemoteDto.setVendorPhone(po.getVendor().getPhone());
+                List<GoodReceivedManualRequestDto> goodReceivedManualRequestDtoList = new ArrayList<>();
+                for (PurchaseOrderDetail row:purchaseOrderDetail) {
+                    // for (POItemDeliveryInfo row : warehouseOfferCatList) {
+                    // Offer offer = offerRepository.findById(purchaseOrderDetail.getOfferItem().getOffer().getId()).get();
+//                    OfferDeliveryDetail delivery_detail = offerDeliveryDetailRepository.findByWarehouseIdAndOfferId(row.getWarehouseId(), row.getOfferItem().getOffer().getId());
+                    //one order can have many items
+                    for (PurchaseOrderDeliveryDetail podd: row.getPurchaseOrderDeliveryDetails()) {
 
-                // for (POItemDeliveryInfo row : warehouseOfferCatList) {
-                // Offer offer = offerRepository.findById(purchaseOrderDetail.getOfferItem().getOffer().getId()).get();
-                OfferDeliveryDetail delivery_detail = offerDeliveryDetailRepository.findByWarehouseIdAndOfferId(po.getWarehouseId(),purchaseOrderDetail.getOfferItem().getOffer().getId());
+
+                        for (GoodReceivedManualRequestDto goodReceiveNoteDto : goodReceivedManualRequestDtoList) {
+                            if (podd.getWarehouseId().equals(goodReceiveNoteDto.getWarehouseId())) {
+                                GrnManualItemDetailDto grnManualItemDetail = new GrnManualItemDetailDto();
+
+                                grnManualItemDetail.setCategory(new ReferenceObjectDto(itemCategory.getParentCategory().getScmCategoryId()));
+                                grnManualItemDetail.setSubCategory(new ReferenceObjectDto(itemCategory.getScmCategoryId()));
+                                grnManualItemDetail.setEstDeliveryDays(row.getOfferItem().getEstimatedDeliveryDays());
+                                grnManualItemDetail.setItem(new ReferenceObjectDto(row.getOfferItem().getId()));
+                                grnManualItemDetail.setOrderQty(podd.getItemQty());
+                                grnManualItemDetail.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
+
+                                goodReceiveNoteDto.getGrnDetails().add(grnManualItemDetail);
+                                goodReceiveNoteDto.setDeliveryChargeAmount(goodReceiveNoteDto.getDeliveryChargeAmount().add(podd.getDeliveryCharge()));
+                                isWarehousePresent = true;
+                                break;
+                            } else {
+                                isWarehousePresent = false;
+                            }
+                        }
+                        if (!isWarehousePresent) {
+                            GoodReceivedManualRequestDto grn = new GoodReceiveNoteCreateDto();
+                            grn.setGrnNo(null);
+                            grn.setIndentNo(null);
+
+                            grn.setCategory(rfoDto);
+                            grn.setPoId(po.getRemotePoId());
+
+                            grn.setDeliveryCharge(po.getDeliveryChargeType());
+                            grn.setDeliveryChargeAmount(podd.getDeliveryCharge());
+                            // grn.setDays(offerItem.getWarrantyDuration());
+                            grn.setDays(row.getOfferItem().getWarrantyDuration());
+
+                            BigDecimal total_price = podd.getItemQty().multiply(row.getOfferItem().getPriceQuotation().getPricePerUnit());
+//                            grn.setTotalPrice(total_price);
+                            BigDecimal total_vat = new BigDecimal(0);
+
+                            if (row.getOfferItem().getOffer().getMushakIncluded() == true) {
+                                grn.setMushak("INCLUDED");
+                            } else {
+                                grn.setMushak("EXCLUDED");
+                            }
+                            if (row.getOfferItem().getOffer().getVatIncluded() == true) {
+                                grn.setVatOption("INCLUDED");
+                            } else {
+                                grn.setVatOption("EXCLUDED");
+                                total_vat = (total_price.multiply(row.getOfferItem().getOffer().getVatPercent())).divide(new BigDecimal(100));
+
+                            }
+                            if (row.getOfferItem().getOffer().getAitIncluded() == true) {
+                                grn.setAitOption("INCLUDED");
+                            } else {
+                                grn.setAitOption("EXCLUDED");
+                            }
+
+//                            grn.setTotalVat(total_vat);
+//                            BigDecimal inTotal = total_price.add(total_vat);
+//                            grn.setInTotal(inTotal);
+                            grn.setWarehouseId(podd.getWarehouseId());
+                            grn.setPayment(row.getOfferItem().getOffer().getCreditType());
+                            grn.setInvoicePath(po.getInvoicePath());
+                            grn.setVendor(vendorRemoteDto);
 
 
-                GoodReceivedManualRequestDto grn = new GoodReceiveNoteCreateDto();
-                grn.setGrnNo(null);
-                grn.setIndentNo(null);
-                //one order can have many items
-                ItemCategory itemCategory = tender.getItemCategory();
-                ReferenceObjDto rfoDto = new ReferenceObjDto(itemCategory.getScmCategoryId());
-                grn.setCategory(rfoDto);
-                grn.setPoId(po.getRemotePoId());
-                
-                grn.setDeliveryCharge(delivery_detail.getDeliveryChargeMode());
-                grn.setDeliveryChargeAmount((BigDecimal)delivery_detail.getDeliveryChargeAmount());
-                // grn.setDays(offerItem.getWarrantyDuration());
-                grn.setDays(purchaseOrderDetail.getOfferItem().getWarrantyDuration());
-                BigDecimal total_price = purchaseOrderDetail.getItemQty().multiply(purchaseOrderDetail.getOfferItem().getPriceQuotation().getPricePerUnit());
-                grn.setTotalPrice(total_price);
-                BigDecimal total_vat = new BigDecimal(0);
-                
-                if(purchaseOrderDetail.getOfferItem().getOffer().getMushakIncluded() == true){
-                    grn.setMushak("INCLUDED");
-                }else{
-                    grn.setMushak("EXCLUDED");
+                            List<GrnManualItemDetailDto> grids = new ArrayList<>();
+                            GrnManualItemDetailDto grid = new GrnManualItemDetailDto();
+                            grid.setCategory(new ReferenceObjectDto(itemCategory.getParentCategory().getScmCategoryId()));
+                            grid.setSubCategory(new ReferenceObjectDto(itemCategory.getScmCategoryId()));
+                            grid.setEstDeliveryDays(row.getOfferItem().getEstimatedDeliveryDays());
+                            grid.setItem(new ReferenceObjectDto(row.getOfferItem().getId()));
+                            grid.setOrderQty(podd.getItemQty());
+                            grid.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
+                            grids.add(grid);
+                            grn.setGrnDetails(grids);
+                            goodReceivedManualRequestDtoList.add(grn);
+                        }
+                    }
                 }
-                if(purchaseOrderDetail.getOfferItem().getOffer().getVatIncluded() == true){
-                    grn.setVatOption("INCLUDED");
-                }else{
-                    grn.setVatOption("EXCLUDED");
-                    total_vat = (total_price.multiply(purchaseOrderDetail.getOfferItem().getOffer().getVatPercent())).divide(new BigDecimal(100));
-                    
+
+                for (GoodReceivedManualRequestDto grn: goodReceivedManualRequestDtoList) {
+                    String authToken = networkService.getKeycloakAccessToken(organization);
+                    log.info("authtoken:" + authToken);
+                    sendGrnRequest(organization, authToken, grn);
                 }
-                if(purchaseOrderDetail.getOfferItem().getOffer().getAitIncluded() == true){
-                    grn.setAitOption("INCLUDED");
-                }else{
-                    grn.setAitOption("EXCLUDED");
-                }
-
-                grn.setTotalVat(total_vat);
-                BigDecimal inTotal = total_price.add(total_vat);
-                grn.setInTotal(inTotal);
-                grn.setWarehouseId(po.getWarehouseId());
-                grn.setPayment(purchaseOrderDetail.getOfferItem().getOffer().getCreditType());
-                grn.setInvoicePath(po.getInvoicePath());
-                grn.setVendor(vendorRemoteDto);
-
-
-                List<GrnManualItemDetailDto> grids = new ArrayList<>();
-                po.getOrderDetails().stream().forEach(od->{
-                    GrnManualItemDetailDto grid = new GrnManualItemDetailDto();
-                    grid.setCategory(new ReferenceObjectDto(itemCategory.getParentCategory().getScmCategoryId()));
-                    grid.setSubCategory(new ReferenceObjectDto(itemCategory.getScmCategoryId()));
-                    grid.setEstDeliveryDays(purchaseOrderDetail.getOfferItem().getEstimatedDeliveryDays());
-                    grid.setItem(new ReferenceObjectDto(od.getOfferItem().getId()));
-                    grid.setOrderQty(od.getItemQty());
-                    grid.setPricePerUnit(od.getOfferItem().getPriceQuotation().getPricePerUnit());
-                    grids.add(grid);
-                });
-                grn.setGrnDetails(grids);
-
-                String authToken = networkService.getKeycloakAccessToken(organization);
-                log.info("authtoken:" +authToken);
-                sendGrnRequest(organization, authToken, grn);
-                //}
                 
             }
         }

@@ -16,7 +16,7 @@ public class PoRequestDto {
     private String categoryCode;
     private Long deliveryDate;
     private Long offerId;
-    private ReferenceObjectDto warehouse;
+    private String deliveryChargeType;
 
 
     private List<PoDetailReqDto> orderDetails;

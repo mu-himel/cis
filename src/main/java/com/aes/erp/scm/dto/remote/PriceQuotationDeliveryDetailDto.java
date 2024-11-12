@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 public class PriceQuotationDeliveryDetailDto {
+    private Long warehouseId;
     private String warehouseName;
     private String deliveryChargeType;
     private BigDecimal deliveryOrderQty;
