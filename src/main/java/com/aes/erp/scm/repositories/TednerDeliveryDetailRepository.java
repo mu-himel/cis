@@ -9,11 +9,15 @@ import com.aes.erp.scm.Entities.TenderDeliveryDetail;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
 public interface TednerDeliveryDetailRepository extends JpaRepository<TenderDeliveryDetail,Long>{
     List<TenderDeliveryDetail> findByTenderItemId(Long tenderItemId);
+
+    @Query(value = "SELECT DISTINCT * FROM tender_delivery_details tdd WHERE tdd.warehouse_id = :warehouseId LIMIT 1",nativeQuery = true)
+    Optional<TenderDeliveryDetail> getTenderDeliveryDetailByWarehouseId(Long warehouseId);
 
     @Query(value="""
         SELECT tdd.warehouseId,tdd.deliveryOrderQty,tdd.tenderItemId,ic.scm_categoryId,
