@@ -341,10 +341,10 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                 for (PurchaseOrderDetail row:purchaseOrderDetail) {
                     // for (POItemDeliveryInfo row : warehouseOfferCatList) {
                     // Offer offer = offerRepository.findById(purchaseOrderDetail.getOfferItem().getOffer().getId()).get();
-//                    OfferDeliveryDetail delivery_detail = offerDeliveryDetailRepository.findByWarehouseIdAndOfferId(row.getWarehouseId(), row.getOfferItem().getOffer().getId());
                     //one order can have many items
                     for (PurchaseOrderDeliveryDetail podd: row.getPurchaseOrderDeliveryDetails()) {
 
+                    OfferDeliveryDetail delivery_detail = offerDeliveryDetailRepository.findByWarehouseIdAndOfferId(podd.getWarehouseId(), row.getOfferItem().getOffer().getId());
 
                         for (GoodReceivedManualRequestDto goodReceiveNoteDto : goodReceivedManualRequestDtoList) {
                             if (podd.getWarehouseId().equals(goodReceiveNoteDto.getWarehouseId())) {
@@ -391,6 +391,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                                 grn.setVatOption("INCLUDED");
                             } else {
                                 grn.setVatOption("EXCLUDED");
+                                grn.setVatPctg(row.getOfferItem().getOffer().getVatPercent());
                                 total_vat = (total_price.multiply(row.getOfferItem().getOffer().getVatPercent())).divide(new BigDecimal(100));
 
                             }
