@@ -15,6 +15,8 @@ public class PurchaseOrderDeliveryDetail {
     Long id;
 
     private Long warehouseId;
+    private String warehouseName;
+    private String warehouseAddress;
     private BigDecimal itemQty;
     private BigDecimal deliveryCharge;
 

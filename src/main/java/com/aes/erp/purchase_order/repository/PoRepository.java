@@ -73,6 +73,17 @@ public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,Purchase
         OfferItemInfo getOfferItem();
 
         String getItemName();
+        BigDecimal getDeliveryCharge();
+
+        List<PurchaseOrderDeliveryDetailInfo> getPurchaseOrderDeliveryDetails();
+    }
+
+    public interface PurchaseOrderDeliveryDetailInfo{
+        Long getWarehouseId();
+        BigDecimal getItemQty();
+        BigDecimal getDeliveryCharge();
+        String getWarehouseAddress();
+        String getWarehouseName();
     }
 
     /**
