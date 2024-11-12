@@ -25,7 +25,7 @@ public class GoodReceivedManualRequestDto {
     private String aitOption;
     private BigDecimal totalPrice;
     private BigDecimal totalVat;
-//    private BigDecimal vatPctg;
+    private BigDecimal vatPctg;
     private BigDecimal inTotal;
     private Long warehouseId;
     private CreditType payment;
