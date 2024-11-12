@@ -178,6 +178,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                         PurchaseOrderDeliveryDetail podd = new PurchaseOrderDeliveryDetail();
                         podd.setWarehouseId(pd.getWarehouse().getId());
                         podd.setItemQty(pd.getItemQty());
+                        podd.setDeliveryCharge(pd.getDeliveryCharge());
                         podd.setPurchaseOrderDetail(pod);
                         purchaseOrderDeliveryDetailsList.add(podd);
                     }
