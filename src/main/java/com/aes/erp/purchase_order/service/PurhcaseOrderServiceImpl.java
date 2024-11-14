@@ -524,8 +524,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     private void sendGrnRequest(Organization organization, String authToken, GoodReceivedManualRequestDto grn){
         StringBuilder sb = new StringBuilder("/goods-receive-note");
         
-//        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
-        String priceQuotationEndpoint = "http://172.17.18.79:9095/api/v1/goods-receive-note";
+        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
+//        String priceQuotationEndpoint = "http://172.17.18.79:9095/api/v1/goods-receive-note";
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
