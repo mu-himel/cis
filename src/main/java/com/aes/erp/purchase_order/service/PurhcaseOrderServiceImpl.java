@@ -444,7 +444,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     @Override
     @Transactional
     public void grnReceive(Long id) {
-        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        Optional<PurchaseOrder> poOp = poRepository.findByRemotePoId(id);
         if(poOp.isPresent()){
             PurchaseOrder po = poOp.get();
             po.setIsPoSent(true);
@@ -459,7 +459,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     @Override
     @Transactional
     public void declineGrn(Long id, NoteDto noteDto) {
-        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        Optional<PurchaseOrder> poOp = poRepository.findByRemotePoId(id);
         if(poOp.isPresent()){
             PurchaseOrder po = poOp.get();
             po.setIsPoSent(false);
