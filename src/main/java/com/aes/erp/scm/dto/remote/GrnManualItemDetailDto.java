@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class GrnManualItemDetailDto {
-    private ReferenceObjectDto item;
+    private String itemCode;
     private ReferenceObjectDto category;
     private ReferenceObjectDto subCategory;
     private Long estDeliveryDays;

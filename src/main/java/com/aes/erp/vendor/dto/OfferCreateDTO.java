@@ -24,7 +24,7 @@ public class OfferCreateDTO {
     private BigDecimal vatPercent;
     private String note;
     private BigDecimal finalOfferPrice;
-    private Long creditPaymentDays;
+    private Integer creditPaymentDays;
     private Boolean isFinal;
     private List<OfferTermsAndConditionDto> termsAndConditions = new ArrayList<>();
     //Only used for counter offer

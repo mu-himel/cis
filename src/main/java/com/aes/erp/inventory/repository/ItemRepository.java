@@ -40,6 +40,7 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
             @Param("storeTypeId")Long storeTypeId, Pageable pageable
     );
 
+    Optional<Item> findByItemAttributeNameAndName(String itemAttributeName, String name);
 
     List<ItemInfo> findAllByActiveAndNameLikeIgnoreCase(Boolean active, String name);
 

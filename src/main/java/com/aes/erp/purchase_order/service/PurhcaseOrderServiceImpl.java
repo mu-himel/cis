@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import com.aes.erp.inventory.entity.Item;
+import com.aes.erp.inventory.repository.ItemRepository;
 import com.aes.erp.purchase_order.dto.request.PoDeliveryDetailsDto;
 import com.aes.erp.purchase_order.entity.PurchaseOrderDeliveryDetail;
 import com.aes.erp.scm.Entities.TenderDeliveryDetail;
@@ -120,6 +122,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Autowired
     private PriceQuotationRepository priceQuotationRepository;
+    @Autowired
+    private ItemRepository itemRepository;
 
 
     @Override
@@ -353,7 +357,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                                 grnManualItemDetail.setCategory(new ReferenceObjectDto(itemCategory.getParentCategory().getScmCategoryId()));
                                 grnManualItemDetail.setSubCategory(new ReferenceObjectDto(itemCategory.getScmCategoryId()));
                                 grnManualItemDetail.setEstDeliveryDays(row.getOfferItem().getEstimatedDeliveryDays());
-                                grnManualItemDetail.setItem(new ReferenceObjectDto(row.getOfferItem().getId()));
+                                Optional<Item> itemOptional = itemRepository.findByItemAttributeNameAndName(row.getOfferItem().getProductDescription(),row.getOfferItem().getBrandName());
+                                itemOptional.ifPresent(item -> grnManualItemDetail.setItemCode(item.getCode()));
                                 grnManualItemDetail.setOrderQty(podd.getItemQty());
                                 grnManualItemDetail.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
 
@@ -376,7 +381,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             grn.setDeliveryCharge(po.getDeliveryChargeType());
                             grn.setDeliveryChargeAmount(podd.getDeliveryCharge());
                             // grn.setDays(offerItem.getWarrantyDuration());
-                            grn.setDays(row.getOfferItem().getWarrantyDuration());
+                            grn.setDays(row.getOfferItem().getOffer().getCreditPaymentDays());
 
                             BigDecimal total_price = podd.getItemQty().multiply(row.getOfferItem().getPriceQuotation().getPricePerUnit());
 //                            grn.setTotalPrice(total_price);
@@ -415,7 +420,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             grid.setCategory(new ReferenceObjectDto(itemCategory.getParentCategory().getScmCategoryId()));
                             grid.setSubCategory(new ReferenceObjectDto(itemCategory.getScmCategoryId()));
                             grid.setEstDeliveryDays(row.getOfferItem().getEstimatedDeliveryDays());
-                            grid.setItem(new ReferenceObjectDto(row.getOfferItem().getId()));
+                            Optional<Item> itemOptional = itemRepository.findByItemAttributeNameAndName(row.getOfferItem().getProductDescription(),row.getOfferItem().getBrandName());
+                            itemOptional.ifPresent(item -> grid.setItemCode(item.getCode()));
                             grid.setOrderQty(podd.getItemQty());
                             grid.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
                             grids.add(grid);
@@ -438,7 +444,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     @Override
     @Transactional
     public void grnReceive(Long id) {
-        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        Optional<PurchaseOrder> poOp = poRepository.findByRemotePoId(id);
         if(poOp.isPresent()){
             PurchaseOrder po = poOp.get();
             po.setIsPoSent(true);
@@ -453,7 +459,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     @Override
     @Transactional
     public void declineGrn(Long id, NoteDto noteDto) {
-        Optional<PurchaseOrder> poOp = poRepository.findById(id);
+        Optional<PurchaseOrder> poOp = poRepository.findByRemotePoId(id);
         if(poOp.isPresent()){
             PurchaseOrder po = poOp.get();
             po.setIsPoSent(false);
@@ -518,7 +524,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     private void sendGrnRequest(Organization organization, String authToken, GoodReceivedManualRequestDto grn){
         StringBuilder sb = new StringBuilder("/goods-receive-note");
         
-        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
+//        String priceQuotationEndpoint = organization.getScmIpAddress().concat(sb.toString());
+        String priceQuotationEndpoint = "http://172.17.18.79:9095/api/v1/goods-receive-note";
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
