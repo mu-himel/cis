@@ -18,24 +18,34 @@ import com.aes.erp.scm.Entities.TenderDeliveryDetail;
 import com.aes.erp.vendor.entity.RFQ_Negotiation.OfferDeliveryDetail;
 
 @Repository
-public interface PoRepository extends JpaRepository<PurchaseOrder,Long>,PurchaseQuery{
+public interface PoRepository extends JpaRepository<PurchaseOrder, Long>, PurchaseQuery {
 
-    @Query(value = "SELECT * FROM tender_delivery_details t WHERE t.tender_item_id = :tenderItemId",nativeQuery = true)
+    @Query(value = "SELECT * FROM tender_delivery_details t WHERE t.tender_item_id = :tenderItemId", nativeQuery = true)
     List<TenderDeliveryDetail> findDeliveryDetailsFromTenderItem(@Param("tenderItemId") Long tenderItemId);
 
-    @Query(value=pendingPos, countQuery = countPendingPos, nativeQuery=true)
+    @Query(value = pendingPos, countQuery = countPendingPos, nativeQuery = true)
     Page<PendingPOItem> findAllPendingPOs(@Param("vendorId") Long vendorId, Pageable pageable);
-    
-    @Query(value=closedPos, countQuery = countClosedPos, nativeQuery=true)
+
+    @Query(value = closedPos, countQuery = countClosedPos, nativeQuery = true)
     Page<PendingPOItem> findAllClosedPOs(Long vendorId, Pageable pageable);
-    interface PendingPOItem{
+
+    Optional<PurchaseOrder> findByRemotePoId(Long id);
+
+    interface PendingPOItem {
         Long getId();
+
         String getPoNo();
+
         String getTenderNo();
+
         String getProductType();
+
         Long getPoDate();
+
         Long getDeliveryDate();
+
         Long getItemQty();
+
         String getPoStatus();
         String getOrgName();
     }
