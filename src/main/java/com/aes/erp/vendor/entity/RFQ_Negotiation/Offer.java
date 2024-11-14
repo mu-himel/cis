@@ -41,7 +41,7 @@ public class Offer {
     private Boolean aitIncluded;
     private String note;
     private BigDecimal finalOfferPrice;
-    private Long creditPaymentDays;
+    private Integer creditPaymentDays;
 
     private Boolean isFinal;
 

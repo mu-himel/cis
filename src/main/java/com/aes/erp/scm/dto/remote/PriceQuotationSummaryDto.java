@@ -15,7 +15,7 @@ public class PriceQuotationSummaryDto {
     private Boolean isAitAdded;
     private BigDecimal subTotalPrice;
     private BigDecimal totalPrice;
-    private Long creditPaymentDuration;
+    private Integer creditPaymentDuration;
     private String creditPaymentUnit;
     private String note;
 
