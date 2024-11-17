@@ -389,7 +389,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public String getNextItemCode(String prefix) {
-        Long autoCode = itemRepository.findMaxOrderById(prefix);
+        Long autoCode = itemRepository.findNextCodeByCount(prefix);
         if(autoCode!=null){
             return String.format("%08d",autoCode);
         }

@@ -14,4 +14,6 @@ public interface CategoryAttributeRepository extends JpaRepository<CategoryAttri
     void deleteByIdAndCategoryId(Long attributeId, Long categoryId);
 
     Optional<CategoryAttribute> findByCategoryIdAndAttributeType(Long subCatId, String attributeType);
+
+    void deleteByCategoryId(Long id);
 }
