@@ -20,4 +20,5 @@ public interface SubcategoryBrandRepository extends JpaRepository<SubCategoryBra
 
     Optional<SubCategoryBrand> findAllByBrandIdAndSubcategoryId(Long brandId,Long subcategoryId);
 
+    void deleteBySubcategoryId(Long id);
 }

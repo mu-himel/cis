@@ -220,9 +220,10 @@ public class ItemCategoryController {
             if(organization!=null && organization.isPresent()){
                 categoryRequestDto.setOrganization(organization.get());
             }
-        Long id = categoryService.addCategory(categoryRequestDto);
+        Map<String,Object> objectMap = categoryService.addCategory(categoryRequestDto);
         HttpHeaders headers = new HttpHeaders();
-        headers.set("id",id.toString());
+        headers.set("id",objectMap.get("id").toString());
+        headers.set("message",objectMap.get("message").toString());
         return new ResponseEntity<>(headers,HttpStatus.CREATED);
     }
 

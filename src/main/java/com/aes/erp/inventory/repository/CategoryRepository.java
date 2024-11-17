@@ -102,11 +102,11 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     Boolean existsByNameAndActive(String name, Boolean active);
 
 
-    @Query(value = "SELECT ic.id FROM item_categories ic WHERE ic.parent_category_id IS null AND ic.active = true AND ic.name = :catName" ,nativeQuery = true)
-    List<Long> findDuplicateCategoryId(String catName);
+    @Query(value = "SELECT ic.id FROM item_categories ic WHERE ic.parent_category_id IS null AND ic.active = true AND ic.name = :catName AND SUBSTR(ic.code,1,1) = SUBSTR(:catCode,1,1)" ,nativeQuery = true)
+    List<Long> findDuplicateCategoryId(String catName,String catCode);
 
-    @Query(value = "SELECT ic.id FROM item_categories ic WHERE ic.parent_category_id IS NOT null AND ic.active = true AND ic.name = :subcatName" ,nativeQuery = true)
-    List<Long> findDuplicateSubCategoryId(String subcatName);
+    @Query(value = "SELECT ic.id FROM item_categories ic WHERE ic.parent_category_id IS NOT null AND ic.active = true AND ic.name = :subCatName AND SUBSTR(ic.code,1,5) = SUBSTR(:subCatCode,1,5)" ,nativeQuery = true)
+    List<Long> findDuplicateSubCategoryId(String subCatName,String subCatCode);
 
 
     @Query(value = "SELECT ic.id as id, ic.name as name, ic.code as code FROM ItemCategory ic " +
@@ -223,6 +223,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     Optional<ItemCategory> findByName(String name);
 
     Optional<ItemCategory> findByNameAndActive(String name, Boolean b);
+    Optional<ItemCategory> findByCodeAndActive(String code, Boolean b);
 
     interface PendingItemCategoryListInfo{
 

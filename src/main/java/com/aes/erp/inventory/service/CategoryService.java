@@ -13,13 +13,14 @@ import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface CategoryService {
 
     
 
-    Long addCategory(CategoryRequestDto categoryRequestDto);
+    Map<String,Object> addCategory(CategoryRequestDto categoryRequestDto);
     ItemCategory addCategoryFromCategoryEntity(ItemCategory itemCategory);
 
     void updateCategory(Long id,CategoryRequestDto categoryRequestDto);

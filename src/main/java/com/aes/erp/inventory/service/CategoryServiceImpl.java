@@ -96,36 +96,63 @@ public class CategoryServiceImpl implements CategoryService {
     }
     @Override
     @Transactional
-    public Long addCategory(CategoryRequestDto categoryRequestDto) {
+    public Map<String,Object> addCategory(CategoryRequestDto categoryRequestDto) {
+        Map<String,Object> returnMap = new HashMap<>();
         ItemCategory category = categoryRequestDto.getEntity();
 
-        if (categoryRequestDto.getOrganization() != null) {
+        if(categoryRequestDto.getOrganization()!=null){
             category.setOrganization(categoryRequestDto.getOrganization());
         }
-        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByNameAndActive(category.getName().toUpperCase(), false);
-        if (itemCategoryOpt.isPresent()) {
+        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByNameAndActive(category.getName().toUpperCase(),false);
+//        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByCodeAndActive(category.getCode().toUpperCase(),false);
+        if(itemCategoryOpt.isPresent()){
 //            throw new AesException("Category code already exist");
             ItemCategory itemCategory = itemCategoryOpt.get();
             System.out.println("Category name already exist and deactivated");
-            itemCategory.setActive(true);
-            categoryRepository.save(itemCategory);
-            return itemCategory.getId();
+            if(category.getParentCategory() == null) {
+                //category
+                //check if this product prefix matches with given prefix
+                if (itemCategory.getCode().substring(0, 1).equals(category.getCode().substring(0, 1))) {
+                    itemCategory.setActive(true);
+                    categoryRepository.save(itemCategory);
+                    returnMap.put("id", itemCategory.getId());
+                    returnMap.put("message", "Category with name " + category.getName() + " was created before with code " + itemCategory.getCode() + ". Replace " + category.getCode() + "by previously assigned code" + itemCategory.getCode());
+                    return returnMap;
+                }
+            }else {
+                //
+                if (itemCategory.getCode().substring(0, 4).equals(category.getCode().substring(0, 4))) {
+                    if(category.getParentCategory().getId().equals(itemCategory.getParentCategory().getId())){
+                        itemCategory.setActive(true);
+                        addAtrToSubcategory(categoryRequestDto, itemCategory);
+                        addBrandToSubCategory(categoryRequestDto,itemCategory);
+                        categoryRepository.save(itemCategory);
+                        returnMap.put("id", itemCategory.getId());
+                        returnMap.put("message", "SubCategory with name " + category.getName() + " was created before with code " + itemCategory.getCode() + ". Replace " + category.getCode() + "by previously assigned code" + itemCategory.getCode());
+                        return returnMap;
+                    }
+                }
+            }
         }
-        if (categoryRepository.existsByCodeAndActive(category.getCode(), true)) {
+        if (categoryRepository.existsByCodeAndActive(category.getCode(),true)) {
             System.out.println("Category code already exist");
-            return category.getId();
+            returnMap.put("id",category.getId());
+            returnMap.put("message","Category code "+category.getCode()+" already exist");
+            return returnMap;
+//            return category.getId();
         }
 
         //uncomment this to fix bug SDOERP-1223
-        if (categoryRequestDto.getParentCategory() == null) {
-            List<Long> catList = categoryRepository.findDuplicateCategoryId(category.getName());
-            if (!catList.isEmpty()) {
-                throw new AesException("Sorry! Category Name already exist");
+        if(categoryRequestDto.getParentCategory() == null){
+            List<Long> catList = categoryRepository.findDuplicateCategoryId(category.getName(),category.getCode());
+            if(!catList.isEmpty()){
+                throw new AesException("Sorry! Category Name "+ category.getName()+" already exist with code "+category.getCode());
             }
-        } else {
-            List<Long> subcatList = categoryRepository.findDuplicateSubCategoryId(category.getName());
+        }
+        else{
+            List<Long> subcatList = categoryRepository.findDuplicateSubCategoryId(category.getName(),category.getCode());
             if(!subcatList.isEmpty()){
-                throw new AesException("Sorry! Sub Category Name already exist");
+                throw new AesException("Sorry! Sub Category Name "+ category.getName()+" already exist with code "+category.getCode());
             }
         }
 
@@ -152,6 +179,22 @@ public class CategoryServiceImpl implements CategoryService {
             category.setCategoryStatus(CategoryStatus.APPROVED);
             category.setActive(true);
         }
+        addAtrToSubcategory(categoryRequestDto, category);
+        if(categoryRequestDto.getScmCategoryId()!=null){
+            category.setScmCategoryId(categoryRequestDto.getScmCategoryId());
+        }
+
+
+        category.setCreatedAt(Instant.now().toEpochMilli());
+        categoryRepository.save(category);
+        addBrandToSubCategory(categoryRequestDto, category);
+        returnMap.put("id",category.getId());
+        returnMap.put("message","Successfully Created");
+        return returnMap;
+//        return category.getId();
+    }
+
+    private static void addAtrToSubcategory(CategoryRequestDto categoryRequestDto, ItemCategory category) {
         if(categoryRequestDto.getAttributes()!=null && categoryRequestDto.getAttributes().size()>0){
             ItemCategory finalCategory = category;
             category.setAttributes(categoryRequestDto.getAttributes().stream().map(categoryAttribute -> {
@@ -162,15 +205,6 @@ public class CategoryServiceImpl implements CategoryService {
                 return categoryAttribute;
             }).collect(Collectors.toList()));
         }
-        if(categoryRequestDto.getScmCategoryId()!=null){
-            category.setScmCategoryId(categoryRequestDto.getScmCategoryId());
-        }
-
-
-        category.setCreatedAt(Instant.now().toEpochMilli());
-        categoryRepository.save(category);
-        addBrandToSubCategory(categoryRequestDto, category);
-        return category.getId();
     }
 
     @Override
@@ -401,6 +435,10 @@ public class CategoryServiceImpl implements CategoryService {
             if(itemCategory.getScmCategoryId()!=null){
                 throw new RuntimeException("Sorry! Category Already Synced");
             }
+            if(itemCategory.getParentCategory() !=null) {
+                categoryAttributeRepository.deleteByCategoryId(itemCategory.getId());
+                subcategoryBrandRepository.deleteBySubcategoryId(itemCategory.getId());
+            }
             itemCategory.setActive(false);
             categoryRepository.save(itemCategory);
         }
@@ -513,7 +551,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private void sentItemCategoryTransfer(String authToken, String userId, Organization org,List<CategoryRequestDto> categoryList) {
+    private void sentItemCategoryTransfer(String authToken, String userId, Organization org,List<CategoryRequestDto> categoryList){
         StringBuilder sb = new StringBuilder("/item-categories");
 
         sb.append("/bulk-create");

@@ -48,21 +48,21 @@ public class BulkUploadServiceImpl implements BulkUploadService{
 
             for(CSVRecord r:records){
                 String catName = r.get("CATEGORY_NAME");
-                String prefix = r.get("PRE_FIX");
-                List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
-                if(catOp.size()==0) {
+                String prefix= r.get("PREFIX");
+//                List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
+//                if(catOp.size()==0){
 
-                    String code = categoryService.getNewCategoryCode(catName.substring(0, 1), prefix, Optional.empty());
-                    StringBuilder generated_code = new StringBuilder();
-                    generated_code.append(prefix);
-                    generated_code.append(catName.substring(0, 1));
-                    generated_code.append(code);
-                    CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
-                    categoryRequestDto.setName(catName);
-                    categoryRequestDto.setCode(generated_code.toString());
-                    // categoryRequestDto.setStoreType(storeTypeOp.get());
-                    categoryService.addCategory(categoryRequestDto);
-                }
+                String code = categoryService.getNewCategoryCode(catName.substring(0,1),prefix,Optional.empty());
+                StringBuilder generated_code = new StringBuilder();
+                generated_code.append(prefix);
+                generated_code.append(catName.substring(0,1));
+                generated_code.append(code);
+                CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
+                categoryRequestDto.setName(catName);
+                categoryRequestDto.setCode(generated_code.toString());
+                // categoryRequestDto.setStoreType(storeTypeOp.get());
+                categoryService.addCategory(categoryRequestDto);
+//                }
             }
         }
     }
@@ -134,12 +134,12 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                     List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
                     ItemCategory category = catOp.stream().findFirst().orElse(null);
 
-                    if(category!=null) {
-                        String code = categoryService.getNewCategoryCode(subCatName.substring(0, 1), Optional.ofNullable(category.getId()));
+                    if(category!=null){
+                        String code = categoryService.getNewCategoryCode(subCatName.substring(0,1),Optional.ofNullable(category.getId()));
                         StringBuilder sb = new StringBuilder();
                         sb.append(category.getCode());
                         sb.append("-");
-                        sb.append(subCatName.substring(0, 1));
+                        sb.append(subCatName.substring(0,1));
                         sb.append(code);
                         CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
                         categoryRequestDto.setName(subCatName);
@@ -152,11 +152,11 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                         // categoryRequestDto.setStoreType(category.getStoreType());
                         categoryRequestDto.setBrands(brands);
                         categoryRequestDto.setAttributes(
-                                attributes.stream().map(attr -> {
+                                attributes.stream().map(attr->{
                                     CategoryAttribute ca = new CategoryAttribute();
-                                    ca.setAttributeType((String) attr.get("attributeType"));
-                                    ca.setAttributeValue((String) attr.get("attributeValue"));
-                                    ca.setAttributeUnit((String) attr.get("attributeUnit"));
+                                    ca.setAttributeType((String)attr.get("attributeType"));
+                                    ca.setAttributeValue((String)attr.get("attributeValue"));
+                                    ca.setAttributeUnit((String)attr.get("attributeUnit"));
                                     return ca;
                                 }).collect(Collectors.toList())
                         );
