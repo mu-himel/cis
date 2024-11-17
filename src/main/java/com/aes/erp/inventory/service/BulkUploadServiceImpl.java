@@ -48,21 +48,21 @@ public class BulkUploadServiceImpl implements BulkUploadService{
 
             for(CSVRecord r:records){
                 String catName = r.get("CATEGORY_NAME");
-                String prefix= r.get("PRE_FIX");
-                List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
-                if(catOp.size()==0){
+                String prefix= r.get("PREFIX");
+//                List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
+//                if(catOp.size()==0){
 
-                    String code = categoryService.getNewCategoryCode(catName.substring(0,1),prefix,Optional.empty());
-                    StringBuilder generated_code = new StringBuilder();
-                    generated_code.append(prefix);
-                    generated_code.append(catName.substring(0,1));
-                    generated_code.append(code);
-                    CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
-                    categoryRequestDto.setName(catName);
-                    categoryRequestDto.setCode(generated_code.toString());
-                    // categoryRequestDto.setStoreType(storeTypeOp.get());
-                    categoryService.addCategory(categoryRequestDto);
-                }
+                String code = categoryService.getNewCategoryCode(catName.substring(0,1),prefix,Optional.empty());
+                StringBuilder generated_code = new StringBuilder();
+                generated_code.append(prefix);
+                generated_code.append(catName.substring(0,1));
+                generated_code.append(code);
+                CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
+                categoryRequestDto.setName(catName);
+                categoryRequestDto.setCode(generated_code.toString());
+                // categoryRequestDto.setStoreType(storeTypeOp.get());
+                categoryService.addCategory(categoryRequestDto);
+//                }
             }
         }
     }
