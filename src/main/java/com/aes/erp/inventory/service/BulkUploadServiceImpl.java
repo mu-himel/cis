@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.exception.AesException;
 import com.aes.erp.fileupload.dto.FileUploadResponse;
 import com.aes.erp.fileupload.service.FileUploadService;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
@@ -100,7 +101,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                     subCatProps.put("name", subCatName);
                     subCatProps.put("catName",catName);
 //                    subCatProps.put("vat",vat);
-                    subCatProps.put("brands", Arrays.asList(Arrays.stream(brands.split(",")).map(b->b.trim())));
+                    subCatProps.put("brands", Arrays.asList(brands.split(",")).stream().map(b->b.trim()).toList());
                     List<Map<String,Object>> attrs = new ArrayList<>();
                     Map<String ,Object> attr =  new HashMap<>();
                     attr.put("attributeType",attrType);
@@ -128,8 +129,11 @@ public class BulkUploadServiceImpl implements BulkUploadService{
 
                 List<String> brands = (List<String>) ((Map<String, Object>)_subCat).get("brands");
                 List<Map<String,Object>> attributes = (List<Map<String,Object>>)((Map<String, Object>)_subCat).get("attributes");
-
-                List<ItemCategory> subCatOp = categoryService.existCategoryBySubCatNameIgnoreCase(subCatName.trim());
+                Optional<ItemCategory> itemCategoryOptional = categoryService.getByName(catName.trim());
+                if(itemCategoryOptional.isEmpty()){
+                    throw new AesException("Sorry No Parent Category Found");
+                }
+                List<ItemCategory> subCatOp = categoryService.existCategoryByParentCategoryIdSubCatNameIgnoreCase(itemCategoryOptional.get().getId(),subCatName.trim());
                 if(subCatOp.size()==0) {
                     List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
                     ItemCategory category = catOp.stream().findFirst().orElse(null);
