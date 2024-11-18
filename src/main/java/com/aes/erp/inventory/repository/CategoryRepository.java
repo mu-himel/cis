@@ -222,6 +222,14 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 
     Optional<ItemCategory> findByName(String name);
 
+    @Query(value = """
+                    SELECT * FROM item_categories itc 
+                    WHERE itc.name = :name 
+                    AND itc.active = :b
+                    AND ((SUBSTR(itc.code,1,1) = SUBSTR(:code,1,1))
+                        OR (SUBSTR(itc.code,1,5) = SUBSTR(:code,1,5)))""",nativeQuery = true)
+    Optional<ItemCategory> getByNameAndActiveAndCode(String name, Boolean b,String code);
+
     Optional<ItemCategory> findByNameAndActive(String name, Boolean b);
     Optional<ItemCategory> findByCodeAndActive(String code, Boolean b);
 
