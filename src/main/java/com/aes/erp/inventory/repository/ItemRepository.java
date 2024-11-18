@@ -98,7 +98,7 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
             FROM item_attributes ia
             LEFT JOIN items i on i.id=ia.item_id
             GROUP BY i.id) p
-            WHERE p.active = 1 AND p.brand_id=:brandId AND itemAttributes = :attribute
+            WHERE p.brand_id=:brandId AND itemAttributes = :attribute
             """,nativeQuery = true)
         List<ItemInfoByAttribute> findByAttributes(Long brandId, String attribute);
 

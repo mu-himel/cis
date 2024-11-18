@@ -47,7 +47,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
             Iterable<CSVRecord> records = getCategoryRecords(fileUploadResponse);
 
             for(CSVRecord r:records){
-                String catName = r.get("CATEGORY_NAME");
+                String catName = r.get("CATEGORY_NAME").trim();
                 String prefix= r.get("PREFIX");
 //                List<ItemCategory> catOp = categoryService.existCategoryByNameIgnoreCase(catName.trim());
 //                if(catOp.size()==0){
@@ -85,13 +85,13 @@ public class BulkUploadServiceImpl implements BulkUploadService{
             Map<String,Object> subCat = new HashMap<>();
             for(CSVRecord r:records){
                 // String storeType = r.get("STORE_TYPE");
-                String catName = r.get("CATEGORY_NAME");
-                String subCatName = r.get("SUB_CATEGORY_NAME");
+                String catName = r.get("CATEGORY_NAME").trim();
+                String subCatName = r.get("SUB_CATEGORY_NAME").trim();
                 // String itemName = r.get("ITEM_NAME");
 //                String vat = r.get("VAT");
-                String attrType = r.get("ATTRIBUTE_TYPE");
-                String attrValue = r.get("ATTRIBUTE_VALUE");
-                String attrUnit = r.get("ATTRIBUTE_UNIT");
+                String attrType = r.get("ATTRIBUTE_TYPE").trim();
+                String attrValue = r.get("ATTRIBUTE_VALUE").trim();
+                String attrUnit = r.get("ATTRIBUTE_UNIT").trim();
                 String brands = r.get("BRANDS");
                 String _key =subCatName.replaceAll(" ","_").toLowerCase();
 
@@ -100,7 +100,7 @@ public class BulkUploadServiceImpl implements BulkUploadService{
                     subCatProps.put("name", subCatName);
                     subCatProps.put("catName",catName);
 //                    subCatProps.put("vat",vat);
-                    subCatProps.put("brands", Arrays.asList(brands.split(",")));
+                    subCatProps.put("brands", Arrays.asList(Arrays.stream(brands.split(",")).map(b->b.trim())));
                     List<Map<String,Object>> attrs = new ArrayList<>();
                     Map<String ,Object> attr =  new HashMap<>();
                     attr.put("attributeType",attrType);
