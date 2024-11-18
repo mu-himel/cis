@@ -233,6 +233,8 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     Optional<ItemCategory> findByNameAndActive(String name, Boolean b);
     Optional<ItemCategory> findByCodeAndActive(String code, Boolean b);
 
+    List<ItemCategory> findByParentCategoryIdAndNameIgnoreCase(Long parentCategoryId, String categoryName);
+
     interface PendingItemCategoryListInfo{
 
         Long getId();

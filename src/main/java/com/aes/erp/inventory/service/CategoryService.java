@@ -82,6 +82,8 @@ public interface CategoryService {
 
     List<ItemCategory> existCategoryBySubCatNameIgnoreCase(String category_name);
 
+    List<ItemCategory> existCategoryByParentCategoryIdSubCatNameIgnoreCase(Long Id,String category_name);
+
     Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId, String attributeType);
     void bulkImport(String token, Organization org, String userId, Long warehouseId, Long storeId,Long parentCategoryId,
                     List<Long> id);
@@ -105,4 +107,5 @@ public interface CategoryService {
 
     void updateCategoryScmId(List<ImportCategoryScmIdUpdateDto> scmIdList);
 
+    Optional<ItemCategory> getByName(String trim);
 }
