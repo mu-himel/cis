@@ -64,22 +64,32 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
     @Async
     public void saveProducts(List<TempItem> products,BulkProcessLog bulkProcess){
         
-        List<TempItem> filteredItems = new ArrayList<>();
+//        List<TempItem> filteredItems = new ArrayList<>();
         for(TempItem item : products){
+            String newCode = getNextItemCode(item.getCode());
+            item.setCode(item.getCode()+"-"+newCode);
             List<?> exists = this.getByAttributes(item.getBrand().getId(), item.getItemAttributeName());
             if(exists.size()==0){
                 item.setAttributes(item.getAttributes().stream().map(attr->{
                     attr.setItem(item);
                     return attr;
                 }).collect(Collectors.toList()));
-                filteredItems.add(item);
-                // itemRepository.save(item);
+//                filteredItems.add(item);
+                tempItemRepository.save(item);
             }
         }
-        tempItemRepository.saveAll(filteredItems);
+//        tempItemRepository.saveAll(filteredItems);
         
         bulkProcess.setStatus(BulkItemStatus.DONE);
         bulkProcessLogRepository.saveAndFlush(bulkProcess);
+    }
+
+    private String getNextItemCode(String prefix) {
+        Long autoCode = tempItemRepository.findNextCodeByCount(prefix);
+        if(autoCode!=null){
+            return String.format("%08d",autoCode);
+        }
+        return String.format("%08d",1);
     }
 
     private List<?> getByAttributes(Long brandId, String attribute) {
@@ -201,7 +211,7 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
 
 //                item.setCode("C"+cat.getId()+"S"+cat.getParentCategory().getId()+"B"+brand.getId()+
 //                                localDate.getYear()+month+day+getCode(i));
-                item.setCode(cat.getCode()+"-"+getCode(i,cat.getCode()));
+                item.setCode(cat.getCode());
                 item.setItemParentCategory(parentCategory);
                 item.setBrand(brand.getBrand());
                 item.setActive(false);

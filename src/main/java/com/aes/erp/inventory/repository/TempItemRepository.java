@@ -39,7 +39,13 @@ public interface TempItemRepository extends JpaRepository<TempItem,Long>{
         WHERE ti.active=false AND ipc.id=:parentCategoryId AND ic.id=:categoryId""",nativeQuery = true)
         List<TempItemResponseInfo> findAllInactiveItems(Long parentCategoryId, Long categoryId);
 
-        /**
+    @Query(value = """
+            select count(*)+1 as autoCode FROM temp_items i
+            WHERE i.code LIKE CONCAT(:prefix,'%')
+            """, nativeQuery = true)
+    Long findNextCodeByCount(String prefix);
+
+    /**
          * TempItemResponseInfo
          */
         public interface TempItemResponseInfo {
