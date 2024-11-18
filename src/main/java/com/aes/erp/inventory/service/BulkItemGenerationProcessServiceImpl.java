@@ -90,41 +90,48 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
     @Transactional
     public void activateItems(ActivateItemDto activateItemDto) {
         for(ActivateItemDetailDto itemDetailDto : activateItemDto.getItemIdList()){
-            Optional<TempItem> itemOp = tempItemRepository.findById(itemDetailDto.getId());
-            if(itemOp.isPresent()){
-                TempItem tempItem = itemOp.get();
-                Item item = copyItemFromTempItem(tempItem);
-                itemRepository.save(item);
+            Optional<TempItem> tempItemOp = tempItemRepository.findById(itemDetailDto.getId());
+            if (tempItemOp.isPresent()) {
+                TempItem tempItem = tempItemOp.get();
+                Optional<Item> itemOp = copyItemFromTempItem(tempItem);
+                if (itemOp.isPresent()) {
+                    Item item = itemOp.get();
+                    itemRepository.save(item);
+                }
                 tempItem.setActive(true);
             }
         }
     }
 
-    private Item copyItemFromTempItem(TempItem tempItem){
-        Item item = new Item();
-        item.setCode(tempItem.getCode());
-        item.setItemAttributeName(tempItem.getItemAttributeName());
-        item.setActive(true);
-        item.setItemCategory(tempItem.getItemCategory());
-        item.setItemParentCategory(tempItem.getItemParentCategory());
-        item.setBrand(tempItem.getBrand());
-        item.setName(tempItem.getName());
-        item.setAttributes(tempItem.getAttributes().stream().map(tia->{
-            ItemAttribute itemAttribute = new ItemAttribute();
-            itemAttribute.setAttributeType(tia.getAttributeType());
-            itemAttribute.setAttributeUnit(tia.getAttributeUnit());
-            itemAttribute.setAttributeValue(tia.getAttributeValue());
-            itemAttribute.setItem(item);
-            return itemAttribute;
-        }).collect(Collectors.toList()));
+    private Optional<Item> copyItemFromTempItem(TempItem tempItem) {
 
-        
-        return item;
+        Optional<Item> itemExist = itemRepository.findByItemAttributeNameAndNameAndActive(tempItem.getItemAttributeName(), tempItem.getName(), true);
+        if (itemExist.isEmpty()) {
+            Item item = new Item();
+            item.setCode(tempItem.getCode());
+            item.setItemAttributeName(tempItem.getItemAttributeName());
+            item.setActive(true);
+            item.setItemCategory(tempItem.getItemCategory());
+            item.setItemParentCategory(tempItem.getItemParentCategory());
+            item.setBrand(tempItem.getBrand());
+            item.setName(tempItem.getName());
+            item.setAttributes(tempItem.getAttributes().stream().map(tia -> {
+                ItemAttribute itemAttribute = new ItemAttribute();
+                itemAttribute.setAttributeType(tia.getAttributeType());
+                itemAttribute.setAttributeUnit(tia.getAttributeUnit());
+                itemAttribute.setAttributeValue(tia.getAttributeValue());
+                itemAttribute.setItem(item);
+                return itemAttribute;
+            }).collect(Collectors.toList()));
+
+            return Optional.of(item);
+        }
+        return Optional.empty();
     }
 
     @Override
-    public void getPermuttedItems(BulkItemGenConfig config , List<ItemCategory> categories) {
-        
+    public void getPermuttedItems(BulkItemGenConfig config, List<ItemCategory> categories) {
+
         List<TempItem> products = new ArrayList<>();
         for(ItemCategory cat : categories){
             List<List<String>> attributes = new ArrayList<>();

@@ -117,22 +117,22 @@ public class ItemController {
     @ApiOperation(value = "Get New Product Id")
     public ResponseEntity<?> getNextId(
             @RequestParam("prefix") String prefix
-    ){
-        Map<String,Object> response = new HashMap<>();
-        response.put("code",itemService.getNextItemCode(prefix));
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", itemService.getNextItemCode(prefix));
         return new ResponseEntity<>(
                 response,
                 HttpStatus.OK
         );
     }
 
-    @GetMapping("/sub-category/{subCatcode}")
-    public ResponseEntity<?> getItemListBySubCategoryWithAttribute(@PathVariable("subCatcode") String subCatcode){
-        Map<String,Object> items = new HashMap<>();
-        items.put("items", itemService.getSubCategoryWiseItemListWithAttribute(subCatcode));
+    @GetMapping("/sub-category/{subCatCode}")
+    public ResponseEntity<?> getItemListBySubCategoryWithAttribute(@PathVariable("subCatCode") String subCatCode) {
+        Map<String, Object> items = new HashMap<>();
+        items.put("items", itemService.getSubCategoryWiseItemListWithAttribute(subCatCode));
         return new ResponseEntity<>(
-            items,    
-            HttpStatus.OK
+                items,
+                HttpStatus.OK
         );
     }
 

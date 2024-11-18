@@ -72,14 +72,19 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
 
     List<ItemInfo> findAllByActiveAndCodeLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(boolean b, String s, String s1);
 
-    interface ItemInfo{
+    Optional<Item> findByItemAttributeNameAndNameAndActive(String itemAttributeName, String name, boolean b);
+
+    interface ItemInfo {
         Long getId();
+
         String getName();
+
         String getItemAttributeName();
+
         String getCode();
     }
 
-    interface PageItemList extends ItemInfo{
+    interface PageItemList extends ItemInfo {
         Long getCategoryId();
         Long getSubCategoryId();
         String getCategoryName();
