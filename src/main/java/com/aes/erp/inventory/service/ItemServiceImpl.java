@@ -194,15 +194,26 @@ public class ItemServiceImpl implements ItemService {
         Long brandId = (itemRequestDto.getBrand()!=null)? itemRequestDto.getBrand().getId() : null;
         List<?> itemExistByAttr = this.getByAttributes(brandId,itemAttributeName);
         if(itemExistByAttr.size()>0){
+            Optional<Item> itemOp = itemRepository.findByCode(itemRequestDto.getCode());
             if(itemRequestDto.getOrgId() != null){
                 Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
-                Optional<Item> itemOp = itemRepository.findByCode(itemRequestDto.getCode());
+//                Optional<Item> itemOp = itemRepository.findByCode(itemRequestDto.getCode());
                 if(itemOp.isPresent()){
                     sentItem(org,itemOp.get(),itemRequestDto.getWarehouseId());
                 }
-                
+
             }else{
-                throw new AesException("Sorry! "+itemExistByAttr.size()+" Items Already exist with same attributes for this brand");
+                ItemRepository.ItemInfoByAttribute itemInfoByAttribute = (ItemRepository.ItemInfoByAttribute) itemExistByAttr.get(0);
+                Optional<Item> itemOpt = itemRepository.findById(itemInfoByAttribute.getId());
+                if(itemOpt.isPresent()){
+                    Item item1 = itemOpt.get();
+                    item1.setActive(true);
+                    return;
+                }
+
+//                 Item item1 = itemExistByAttr.get();
+//                 item1.setActive(true);
+//                throw new AesException("Sorry! "+itemExistByAttr.size()+" Items Already exist with same attributes for this brand");
             }
             
         }

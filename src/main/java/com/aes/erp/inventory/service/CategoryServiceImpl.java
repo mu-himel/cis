@@ -99,11 +99,12 @@ public class CategoryServiceImpl implements CategoryService {
     public Map<String,Object> addCategory(CategoryRequestDto categoryRequestDto) {
         Map<String,Object> returnMap = new HashMap<>();
         ItemCategory category = categoryRequestDto.getEntity();
-
+        category.setName(category.getName().trim());
         if(categoryRequestDto.getOrganization()!=null){
             category.setOrganization(categoryRequestDto.getOrganization());
         }
-        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByNameAndActive(category.getName().toUpperCase(),false);
+        Optional<ItemCategory> itemCategoryOpt = categoryRepository.getByNameAndActiveAndCode(category.getName().toUpperCase(),false,category.getCode());
+//        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByNameAndActive(category.getName().toUpperCase(),false);
 //        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByCodeAndActive(category.getCode().toUpperCase(),false);
         if(itemCategoryOpt.isPresent()){
 //            throw new AesException("Category code already exist");
