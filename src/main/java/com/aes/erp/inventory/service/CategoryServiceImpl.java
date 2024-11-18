@@ -500,6 +500,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<ItemCategory> existCategoryByParentCategoryIdSubCatNameIgnoreCase(Long parentCategoryId, String category_name) {
+        return categoryRepository.findByParentCategoryIdAndNameIgnoreCase(parentCategoryId,category_name);
+    }
+
+    @Override
+    public Optional<ItemCategory> getByName(String catName) {
+        return categoryRepository.findByName(catName);
+    }
+
+    @Override
     public Optional<CategoryAttribute> getCategoryAttributeValueBySubCatAndAttributeType(Long subCatId,
             String attributeType) {
                 return    categoryAttributeRepository.findByCategoryIdAndAttributeType(subCatId,attributeType);
