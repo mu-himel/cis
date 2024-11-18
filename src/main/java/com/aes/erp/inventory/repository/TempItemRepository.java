@@ -29,27 +29,39 @@ public interface TempItemRepository extends JpaRepository<TempItem,Long>{
     Optional<TempItem> findMaxOrderById();
 
     @Query(value="""
-        SELECT ti.id as id, ti.item_attribute_name as itemAttributeName,
-        b.name as brandName, ic.name as categoryName, ic.code as categoryCode, ipc.name as parentCategoryName, ipc.code as parentCategoryCode,
-        ti.code as productCode
-        FROM temp_items ti 
-        LEFT JOIN item_categories ic ON ic.id = ti.item_category_id
-        LEFT JOIN item_categories ipc ON ipc.id = ti.item_parent_category_id
-        LEFT JOIN brands b ON b.id = ti.brand_id
-        WHERE ti.active=false AND ipc.id=:parentCategoryId AND ic.id=:categoryId""",nativeQuery = true)
-        List<TempItemResponseInfo> findAllInactiveItems(Long parentCategoryId, Long categoryId);
+            SELECT ti.id as id, ti.item_attribute_name as itemAttributeName,
+            b.name as brandName, ic.name as categoryName, ic.code as categoryCode, ipc.name as parentCategoryName, ipc.code as parentCategoryCode,
+            ti.code as productCode
+            FROM temp_items ti 
+            LEFT JOIN item_categories ic ON ic.id = ti.item_category_id
+            LEFT JOIN item_categories ipc ON ipc.id = ti.item_parent_category_id
+            LEFT JOIN brands b ON b.id = ti.brand_id
+            WHERE ti.active=false AND ipc.id=:parentCategoryId AND ic.id=:categoryId""", nativeQuery = true)
+    List<TempItemResponseInfo> findAllInactiveItems(Long parentCategoryId, Long categoryId);
 
-        /**
-         * TempItemResponseInfo
-         */
-        public interface TempItemResponseInfo {
-                Long getId();
-                String getItemAttributeName();
-                String getBrandName();
-                String getCategoryName();
-                String getCategoryCode();
-                String getParentCategoryName();
-                String getParentCategoryCode();
+    @Query(value = """
+            select count(*)+1 as autoCode FROM temp_items i
+            WHERE i.code LIKE CONCAT(:prefix,'%')
+            """, nativeQuery = true)
+    Long findNextCodeByCount(String prefix);
+
+    /**
+     * TempItemResponseInfo
+     */
+    public interface TempItemResponseInfo {
+        Long getId();
+
+        String getItemAttributeName();
+
+        String getBrandName();
+
+        String getCategoryName();
+
+        String getCategoryCode();
+
+        String getParentCategoryName();
+
+        String getParentCategoryCode();
                 String getProductCode();
                 
         }
