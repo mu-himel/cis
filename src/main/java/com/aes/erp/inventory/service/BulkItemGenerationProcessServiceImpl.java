@@ -65,12 +65,12 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
     public void saveProducts(List<TempItem> products,BulkProcessLog bulkProcess){
         
 //        List<TempItem> filteredItems = new ArrayList<>();
-        for(TempItem item : products) {
+        for(TempItem item : products){
             String newCode = getNextItemCode(item.getCode());
-            item.setCode(item.getCode() + "-" + newCode);
-            List<?> exists = this.getByAttributes(item.getBrand().getId(), item.getItemAttributeName());
-            if (exists.size() == 0) {
-                item.setAttributes(item.getAttributes().stream().map(attr -> {
+            item.setCode(item.getCode()+"-"+newCode);
+            List<?> exists = this.getByAttributes(item.getBrand().getId(), item.getItemAttributeName(), item.getItemCategory().getId());
+            if(exists.size()==0){
+                item.setAttributes(item.getAttributes().stream().map(attr->{
                     attr.setItem(item);
                     return attr;
                 }).collect(Collectors.toList()));
@@ -79,7 +79,7 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
             }
         }
 //        tempItemRepository.saveAll(filteredItems);
-
+        
         bulkProcess.setStatus(BulkItemStatus.DONE);
         bulkProcessLogRepository.saveAndFlush(bulkProcess);
     }
@@ -92,8 +92,8 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
         return String.format("%08d", 1);
     }
 
-    private List<?> getByAttributes(Long brandId, String attribute) {
-        return tempItemRepository.findByAttributesNotActive(brandId, attribute);
+    private List<?> getByAttributes(Long brandId, String attribute, Long subCatId) {
+        return itemRepository.findByAttributes(brandId, attribute, subCatId);
     }
 
 
@@ -115,7 +115,8 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
 
     private Optional<Item> copyItemFromTempItem(TempItem tempItem) {
 
-        Optional<Item> itemExist = itemRepository.findByItemAttributeNameAndNameAndActive(tempItem.getItemAttributeName(), tempItem.getName(), true);
+        Optional<Item> itemExist = itemRepository.findByItemCategoryIdAndItemAttributeNameAndNameAndActive(tempItem.getItemCategory().getId(),
+                tempItem.getItemAttributeName(), tempItem.getName(), true);
         if (itemExist.isEmpty()) {
             Item item = new Item();
             item.setCode(tempItem.getCode());

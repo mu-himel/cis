@@ -45,6 +45,9 @@ public interface TempItemRepository extends JpaRepository<TempItem,Long>{
             """, nativeQuery = true)
     Long findNextCodeByCount(String prefix);
 
+    @Query(value = "SELECT ti FROM TempItem ti WHERE ti.code = :code")
+    Optional<TempItem> findByCode(String code);
+
     /**
      * TempItemResponseInfo
      */
