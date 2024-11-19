@@ -172,18 +172,26 @@ public class TenderServiceImpl implements TenderService{
     @Override
     public Tender getTenderByRfqNo(String tenderNo) {
         Optional<Tender> tender = tenderRepository.findByRfqNo(tenderNo);
-        if(tender.isEmpty()) throw new AesException("Sorry! Tender not found");
+        if (tender.isEmpty()) throw new AesException("Sorry! Tender not found");
         return tender.get();
     }
-    @Deprecated(since = "newdev-0.0.15", forRemoval=true)
+
     @Override
-    public Page<?> getAllTenderProjection(ClaimResponseDto loggedInUser,Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
-        Sort sort = Sort.by(Sort.Direction.DESC,"id");
-        Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
+    public Tender getTenderByRfqNo(Long orgId, String tenderNo) {
+        Optional<Tender> tender = tenderRepository.findByRfqNoAndTenderCreatorId(tenderNo, orgId);
+        if (tender.isEmpty()) throw new AesException("Sorry! Tender not found");
+        return tender.get();
+    }
+
+    @Deprecated(since = "newdev-0.0.15", forRemoval = true)
+    @Override
+    public Page<?> getAllTenderProjection(ClaimResponseDto loggedInUser, Optional<String> searchFilter, Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> startDate, Optional<Long> endDate) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(10), sort);
 
         List<SubCategory> subCategories = new ArrayList<>();
-        if(loggedInUser.getUserInfoDto().get("vendorId")!=null){
-            subCategories = categoryService.getCategoriesForVendor(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
+        if (loggedInUser.getUserInfoDto().get("vendorId") != null) {
+            subCategories = categoryService.getCategoriesForVendor(Long.valueOf((Integer) loggedInUser.getUserInfoDto().get("vendorId")));
         }
 
         List<Long> subCatIds = subCategories.stream().map(sc->sc.getId()).collect(Collectors.toList());

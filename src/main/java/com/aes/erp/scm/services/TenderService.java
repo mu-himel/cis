@@ -46,4 +46,6 @@ public interface TenderService {
     List<?> getNegotiationHistories(ClaimResponseDto loggedInUser, Long id);
     void rejectTender(ClaimResponseDto loggedInUser, Long id, NoteDto noteDto);
     Tender getTenderByRfqNo(String tenderNo);
+
+    Tender getTenderByRfqNo(Long orgId, String tenderNo);
 }
