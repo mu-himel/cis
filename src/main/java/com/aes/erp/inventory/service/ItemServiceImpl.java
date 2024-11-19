@@ -192,7 +192,7 @@ public class ItemServiceImpl implements ItemService {
         String itemAttributeName = generateItemAttributeName(itemRequestDto.getAttributes());
         
         Long brandId = (itemRequestDto.getBrand()!=null)? itemRequestDto.getBrand().getId() : null;
-        List<?> itemExistByAttr = this.getByAttributes(brandId,itemAttributeName);
+        List<?> itemExistByAttr = this.getByAttributes(brandId,itemAttributeName,itemRequestDto.getItemCategory().getId());
         if(itemExistByAttr.size()>0){
             Optional<Item> itemOp = itemRepository.findByCode(itemRequestDto.getCode());
             if(itemRequestDto.getOrgId() != null){
@@ -320,8 +320,8 @@ public class ItemServiceImpl implements ItemService {
         sentItemTransfer(authToken, org, remoteItemRequestDto);
     }
 
-    private List<?> getByAttributes(Long brandId, String attribute) {
-        return itemRepository.findByAttributes(brandId,attribute);
+    private List<?> getByAttributes(Long brandId, String attribute,Long subCatId) {
+        return itemRepository.findByAttributes(brandId,attribute,subCatId);
     }
 
     @Override

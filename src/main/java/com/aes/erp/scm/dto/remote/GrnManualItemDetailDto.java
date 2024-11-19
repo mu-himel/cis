@@ -18,4 +18,5 @@ public class GrnManualItemDetailDto {
     private Long estDeliveryDays;
     private BigDecimal orderQty;
     private BigDecimal pricePerUnit;
+    private BigDecimal deliveryChargeAmount;
 }
