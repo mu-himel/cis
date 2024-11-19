@@ -363,6 +363,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                                 grnManualItemDetail.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
 
                                 goodReceiveNoteDto.getGrnDetails().add(grnManualItemDetail);
+                                grnManualItemDetail.setDeliveryChargeAmount(podd.getDeliveryCharge());
                                 goodReceiveNoteDto.setDeliveryChargeAmount(goodReceiveNoteDto.getDeliveryChargeAmount().add(podd.getDeliveryCharge()));
                                 isWarehousePresent = true;
                                 break;
@@ -423,6 +424,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             Optional<Item> itemOptional = itemRepository.findByItemAttributeNameAndName(row.getOfferItem().getProductDescription(),row.getOfferItem().getBrandName());
                             itemOptional.ifPresent(item -> grid.setItemCode(item.getCode()));
                             grid.setOrderQty(podd.getItemQty());
+                            grid.setDeliveryChargeAmount(podd.getDeliveryCharge());
                             grid.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
                             grids.add(grid);
                             grn.setGrnDetails(grids);

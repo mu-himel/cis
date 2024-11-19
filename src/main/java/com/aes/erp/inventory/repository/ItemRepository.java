@@ -102,10 +102,11 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
                     ia.attribute_unit order by ia.id asc separator ' - ') itemAttributes
             FROM item_attributes ia
             LEFT JOIN items i on i.id=ia.item_id
+            WHERE i.item_category_id = :subCatId
             GROUP BY i.id) p
             WHERE p.brand_id=:brandId AND itemAttributes = :attribute
             """,nativeQuery = true)
-        List<ItemInfoByAttribute> findByAttributes(Long brandId, String attribute);
+        List<ItemInfoByAttribute> findByAttributes(Long brandId, String attribute,Long subCatId);
 
         @Query(value = """
             SELECT * FROM (SELECT i.id, i.brand_id ,i.active,

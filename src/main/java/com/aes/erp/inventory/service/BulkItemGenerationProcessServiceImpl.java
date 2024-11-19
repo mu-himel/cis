@@ -100,7 +100,8 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
     @Transactional
     public void activateItems(ActivateItemDto activateItemDto) {
         for(ActivateItemDetailDto itemDetailDto : activateItemDto.getItemIdList()){
-            Optional<TempItem> tempItemOp = tempItemRepository.findById(itemDetailDto.getId());
+//            Optional<TempItem> tempItemOp = tempItemRepository.findById(itemDetailDto.getId());
+            Optional<TempItem> tempItemOp = tempItemRepository.findByCode(itemDetailDto.getCode());
             if (tempItemOp.isPresent()) {
                 TempItem tempItem = tempItemOp.get();
                 Optional<Item> itemOp = copyItemFromTempItem(tempItem);
