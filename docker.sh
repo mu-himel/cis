@@ -1,5 +1,5 @@
 #!/bin/bash
-image=devopsaes/cpvms-be:newdev-1.0.6
+image=devopsaes/cpvms-be:newdev-1.0.7
 docker build -t $image --no-cache .
 echo  "image $image is built"
 docker push $image
