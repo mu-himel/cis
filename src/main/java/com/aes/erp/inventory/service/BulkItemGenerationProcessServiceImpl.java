@@ -68,7 +68,7 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
         for(TempItem item : products){
             String newCode = getNextItemCode(item.getCode());
             item.setCode(item.getCode()+"-"+newCode);
-            List<?> exists = this.getByAttributes(item.getBrand().getId(), item.getItemAttributeName());
+            List<?> exists = this.getByAttributes(item.getBrand().getId(), item.getItemAttributeName(), item.getItemCategory().getId());
             if(exists.size()==0){
                 item.setAttributes(item.getAttributes().stream().map(attr->{
                     attr.setItem(item);
@@ -86,22 +86,21 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
 
     private String getNextItemCode(String prefix) {
         Long autoCode = tempItemRepository.findNextCodeByCount(prefix);
-        if(autoCode!=null){
-            return String.format("%08d",autoCode);
+        if (autoCode != null) {
+            return String.format("%08d", autoCode);
         }
-        return String.format("%08d",1);
+        return String.format("%08d", 1);
     }
 
-    private List<?> getByAttributes(Long brandId, String attribute) {
-        return tempItemRepository.findByAttributesNotActive(brandId,attribute);
+    private List<?> getByAttributes(Long brandId, String attribute, Long subCatId) {
+        return itemRepository.findByAttributes(brandId, attribute, subCatId);
     }
 
 
     @Transactional
     public void activateItems(ActivateItemDto activateItemDto) {
-        for(ActivateItemDetailDto itemDetailDto : activateItemDto.getItemIdList()){
-//            Optional<TempItem> tempItemOp = tempItemRepository.findById(itemDetailDto.getId());
-            Optional<TempItem> tempItemOp = tempItemRepository.findByCode(itemDetailDto.getCode());
+        for (ActivateItemDetailDto itemDetailDto : activateItemDto.getItemIdList()) {
+            Optional<TempItem> tempItemOp = tempItemRepository.findById(itemDetailDto.getId());
             if (tempItemOp.isPresent()) {
                 TempItem tempItem = tempItemOp.get();
                 Optional<Item> itemOp = copyItemFromTempItem(tempItem);
@@ -116,7 +115,8 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
 
     private Optional<Item> copyItemFromTempItem(TempItem tempItem) {
 
-        Optional<Item> itemExist = itemRepository.findByItemAttributeNameAndNameAndActive(tempItem.getItemAttributeName(), tempItem.getName(), true);
+        Optional<Item> itemExist = itemRepository.findByItemCategoryIdAndItemAttributeNameAndNameAndActive(tempItem.getItemCategory().getId(),
+                tempItem.getItemAttributeName(), tempItem.getName(), true);
         if (itemExist.isEmpty()) {
             Item item = new Item();
             item.setCode(tempItem.getCode());
