@@ -207,6 +207,9 @@ public class ItemServiceImpl implements ItemService {
                 Optional<Item> itemOpt = itemRepository.findById(itemInfoByAttribute.getId());
                 if(itemOpt.isPresent()){
                     Item item1 = itemOpt.get();
+                    if(item1.getActive().equals(true)){
+                        throw new AesException("Item already exist");
+                    }
                     item1.setActive(true);
                     return;
                 }
