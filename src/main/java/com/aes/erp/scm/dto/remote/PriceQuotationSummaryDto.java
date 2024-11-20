@@ -13,6 +13,7 @@ public class PriceQuotationSummaryDto {
     private String vatPercent;
     private String vatAmount;
     private Boolean isAitAdded;
+    private String aitPercent;
     private BigDecimal subTotalPrice;
     private BigDecimal totalPrice;
     private Integer creditPaymentDuration;

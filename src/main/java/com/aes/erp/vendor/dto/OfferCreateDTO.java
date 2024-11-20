@@ -22,6 +22,7 @@ public class OfferCreateDTO {
     private Boolean vatIncluded;
     private BigDecimal vatAmount;
     private BigDecimal vatPercent;
+    private BigDecimal aitPercent;
     private String note;
     private BigDecimal finalOfferPrice;
     private Integer creditPaymentDays;
