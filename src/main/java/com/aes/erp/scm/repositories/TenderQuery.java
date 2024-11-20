@@ -104,14 +104,32 @@ public interface TenderQuery {
         AND (:startDate IS NULL OR t.creation_date >= :startDate) 
         AND (:endDate IS NULL OR t.creation_date <= :endDate)  
         AND (COALESCE(:subCategoryIds) IS NULL OR ic.id IN (:subCategoryIds))
-        AND (t.deadline < :currentDateTime)
-        GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
+                AND (t.deadline < :currentDateTime)
+                GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
-        String tenderProjectionCountQuery = " SELECT count(*) FROM (" +tenderProjectionQuery+ " ) ";
+    String tenderProjectionCountQuery = " SELECT count(*) FROM (" + tenderProjectionQuery + " ) ";
 
-        String tenderProjectionCountQueryFilterQuery = " SELECT count(*) FROM (" +tenderProjectionWithFilterQuery+ " ) ";
+    String tenderProjectionCountQueryFilterQuery = " SELECT count(*) FROM (" + tenderProjectionWithFilterQuery + " ) ";
 
 
-        String closedTenderProjectionCountQuery = " SELECT count(*) FROM (" +closedTenderProjectionQuery+ " ) ";
+    String closedTenderProjectionCountQuery = " SELECT count(*) FROM (" + closedTenderProjectionQuery + " ) ";
 
+    String getLowestBidByTenderNo = """
+            SELECT 
+                p.rfq_no as rfqNo,
+                p.brand_name as brandName,
+                p.product_description as itemAttributeName,
+                p.extended_attributes as extendedAttributes,
+                p.total as total
+            FROM (SELECT rfq_no, oi.brand_name , oi.product_description , oi.extended_attributes, COALESCE(pq.total_price,0) as total FROM tenders t
+            LEFT JOIN tender_items ti ON ti.tender_id  = t.id
+            LEFT JOIN offers o ON o.tender_id  = t.id
+            LEFT JOIN offer_items oi ON oi.offer_id  = o.id
+            LEFT JOIN price_quotations pq ON oi.price_quotation_id = pq.id
+            where t.rfq_no = :tenderNo
+            ) p
+            WHERE  p.total>0
+            GROUP BY p.brand_name, p.product_description,p.total
+            ORDER BY total ASC 
+            """;
 }

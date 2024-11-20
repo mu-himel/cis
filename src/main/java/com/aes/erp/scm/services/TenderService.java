@@ -37,15 +37,19 @@ public interface TenderService {
     );
 
     Page<?> getClosedTenderProjection(
-                        ClaimResponseDto loggedInUser,
-                        Optional<String> searchFilter, Optional<Integer> page,
-                        Optional<Integer> size, Optional<TenderType> tenderType,Optional<Long> organizationId, Optional<Long> categoryId,
-                        Optional<String> fromDate, Optional<String> toDate
-                    );
-                    
+            ClaimResponseDto loggedInUser,
+            Optional<String> searchFilter, Optional<Integer> page,
+            Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> organizationId, Optional<Long> categoryId,
+            Optional<String> fromDate, Optional<String> toDate
+    );
+
     List<?> getNegotiationHistories(ClaimResponseDto loggedInUser, Long id);
+
     void rejectTender(ClaimResponseDto loggedInUser, Long id, NoteDto noteDto);
+
     Tender getTenderByRfqNo(String tenderNo);
 
     Tender getTenderByRfqNo(Long orgId, String tenderNo);
+
+    List<?> getTenderLowestBids(String rfqNo);
 }

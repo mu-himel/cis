@@ -38,7 +38,9 @@ public class Offer {
     private Boolean vatIncluded;
     private BigDecimal vatPercent;
     private BigDecimal vatAmount;
+    private BigDecimal aitAmount;
     private Boolean aitIncluded;
+    private BigDecimal aitPercent;
     private String note;
     private BigDecimal finalOfferPrice;
     private Integer creditPaymentDays;

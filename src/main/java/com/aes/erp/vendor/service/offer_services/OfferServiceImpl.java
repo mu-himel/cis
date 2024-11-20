@@ -84,9 +84,11 @@ public class OfferServiceImpl implements OfferService{
     private void createOfferItemsFromTenderItems(Offer offer, OfferCreateDTO createDTO){
         // List<OfferItem> savedItems = new ArrayList<>();
         offer.setAitIncluded(createDTO.getAitIncluded());
+        offer.setAitPercent(createDTO.getAitPercent());
         offer.setVatIncluded(createDTO.getVatIncluded());
         offer.setDeliveryChargeAmount(createDTO.getTotalDeliveryChargeAmount());
         offer.setVatAmount(createDTO.getVatAmount());
+        offer.setAitAmount(createDTO.getAitAmount());
         offer.setVatPercent(createDTO.getVatPercent());
         offer.setCreditPaymentDays(createDTO.getCreditPaymentDays());
         offer.setCreditType(createDTO.getCreditType());
@@ -374,8 +376,8 @@ public class OfferServiceImpl implements OfferService{
 
         pqs.setVatPercent(createDTO.getVatPercent().toString());
         pqs.setVatAmount(createDTO.getVatAmount().toString());
-        
-
+        pqs.setAitAmount(createDTO.getAitAmount().toString());
+        pqs.setAitPercent(createDTO.getAitPercent().toString());
         pqs.setSubTotalPrice(createDTO.getFinalOfferPrice());
         pqs.setTotalPrice(createDTO.getFinalOfferPrice());
         pqr.setPriceQuotationSummary(pqs);
