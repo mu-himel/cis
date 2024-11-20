@@ -127,9 +127,9 @@ public interface TenderQuery {
             LEFT JOIN offer_items oi ON oi.offer_id  = o.id
             LEFT JOIN price_quotations pq ON oi.price_quotation_id = pq.id
             where t.rfq_no = :tenderNo
-            GROUP BY t.rfq_no,oi.brand_name , oi.product_description , oi.extended_attributes
             ) p
             WHERE  p.total>0
+            GROUP BY p.brand_name, p.product_description,p.total
             ORDER BY total ASC 
             """;
 }
