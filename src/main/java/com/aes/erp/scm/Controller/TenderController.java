@@ -28,25 +28,31 @@ public class TenderController {
     }
     @GetMapping("/tender-entity/page")
     public ResponseEntity<?> getAllTenders(
-        @RequestAttribute ClaimResponseDto loggedInUser,
-                                           @RequestParam("searchFilter") Optional<String> searchFilter,
-                                           @RequestParam("startDate") Optional<Long> startDate,
-                                           @RequestParam("endDate")  Optional<Long> endDate ,
-                                           @RequestParam("page") Optional<Integer> page,
-                                           @RequestParam("size") Optional<Integer> size,
-                                           @RequestParam("tenderType") Optional<TenderType> tenderType){
+            @RequestAttribute ClaimResponseDto loggedInUser,
+            @RequestParam("searchFilter") Optional<String> searchFilter,
+            @RequestParam("startDate") Optional<Long> startDate,
+            @RequestParam("endDate") Optional<Long> endDate,
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("tenderType") Optional<TenderType> tenderType) {
         return new ResponseEntity<>(tenderService.getAllTenders(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
                 HttpStatus.OK);
     }
-    @Deprecated(since= "newdev=0.0.15",forRemoval = true)
+
+    @GetMapping("/lowest/{rfqNo}")
+    public ResponseEntity<?> getTenderLowestBids(@PathVariable("rfqNo") String rfqNo) {
+        return new ResponseEntity<>(tenderService.getTenderLowestBids(rfqNo), HttpStatus.OK);
+    }
+
+    @Deprecated(since = "newdev=0.0.15", forRemoval = true)
     @GetMapping("/tender-projection/page/filter")
     public ResponseEntity<?> getTenderProjection(
-        @RequestAttribute ClaimResponseDto loggedInUser,@RequestParam("searchFilter") Optional<String> searchFilter,
-                                           @RequestParam("startDate") Optional<Long> startDate,
-                                           @RequestParam("endDate")  Optional<Long> endDate ,
-                                           @RequestParam("page") Optional<Integer> page,
-                                           @RequestParam("size") Optional<Integer> size,
-                                           @RequestParam("tenderType") Optional<TenderType> tenderType){
+            @RequestAttribute ClaimResponseDto loggedInUser, @RequestParam("searchFilter") Optional<String> searchFilter,
+            @RequestParam("startDate") Optional<Long> startDate,
+            @RequestParam("endDate") Optional<Long> endDate,
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("tenderType") Optional<TenderType> tenderType) {
         return new ResponseEntity<>(tenderService.getAllTenderProjection(loggedInUser, searchFilter, page, size, tenderType, startDate, endDate),
                 HttpStatus.OK);
     }

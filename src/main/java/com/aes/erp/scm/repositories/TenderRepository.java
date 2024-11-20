@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,6 +56,21 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
                                                   Pageable pageable);
 
     Optional<Tender> findByRfqNoAndTenderCreatorId(String tenderNo, Long tenderCreatorId);
+
+    @Query(value = getLowestBidByTenderNo, nativeQuery = true)
+    List<TenderLowestBid> findLowestBidByTenderNo(String tenderNo);
+
+    interface TenderLowestBid {
+        String getRfqNo();
+
+        String getBrandName();
+
+        String getItemAttributeName();
+
+        String getExtendedAttributes();
+
+        BigDecimal getTotal();
+    }
 
     interface TenderExt {
         Long getId();

@@ -177,6 +177,11 @@ public class TenderServiceImpl implements TenderService{
     }
 
     @Override
+    public List<?> getTenderLowestBids(String rfqNo) {
+        return tenderRepository.findLowestBidByTenderNo(rfqNo);
+    }
+
+    @Override
     public Tender getTenderByRfqNo(Long orgId, String tenderNo) {
         Optional<Tender> tender = tenderRepository.findByRfqNoAndTenderCreatorId(tenderNo, orgId);
         if (tender.isEmpty()) throw new AesException("Sorry! Tender not found");
