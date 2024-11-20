@@ -237,7 +237,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                 }
                 String tenderNo = ((PurchaseOrderInfo)detail).getTenderNo();
 
-                Tender tender = tenderService.getTenderByRfqNo(tenderNo);
+                Tender tender = tenderService.getTenderByRfqNo(detail.getOrg().getId(), tenderNo);
                 if(tender!=null){
                     // tender.getId();
                     // vendorId
@@ -324,7 +324,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             Organization organization = po.getOrg();
             po.setIsPoSent(true);
             po.setPoStatus("IN PROGRESS");
-            Optional<Tender> tenderOp = tenderRepository.findByRfqNo(po.getTenderNo());
+            Optional<Tender> tenderOp = tenderRepository.findByRfqNoAndTenderCreatorId(po.getTenderNo(), po.getOrg().getId());
             if(tenderOp.isPresent()){
                 Tender tender = tenderOp.get();
                 ItemCategory itemCategory = tender.getItemCategory();

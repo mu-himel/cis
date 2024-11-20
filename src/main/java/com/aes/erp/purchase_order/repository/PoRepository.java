@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import com.aes.erp.inventory.entity.Organization;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -53,6 +54,8 @@ public interface PoRepository extends JpaRepository<PurchaseOrder, Long>, Purcha
     <T> Optional<T> findById(Long id, Class<T> t);
 
     interface PurchaseOrderInfo{
+        Organization getOrg();
+
         Long getId();
         String getTenderNo();
         String getPoNo(); 

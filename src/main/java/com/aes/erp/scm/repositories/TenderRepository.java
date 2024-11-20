@@ -44,24 +44,33 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
 
     @Query(value = closedTenderProjectionQuery, countQuery = tenderProjectionCountQuery, nativeQuery = true)
     Page<TenderExt> findAllClosedTenderProjection(@Param("vendorId") Long vendorId,
-                                            @Param("searchFilter") String searchFilter,
-                                            @Param("subCategoryIds") List<Long> subCategoryIds,
-                                            @Param("tenderType") Optional<TenderType> tenderType,
-                                            @Param("organizationId") Optional<Long> organizationId,
-                                            @Param("categoryId") Optional<Long> categoryId,
-                                            @Param("startDate") Long startDate,
-                                            @Param("endDate") Long endDate,
-                                            @Param("currentDateTime") Long currentDateTime,
-                                            Pageable pageable);
+                                                  @Param("searchFilter") String searchFilter,
+                                                  @Param("subCategoryIds") List<Long> subCategoryIds,
+                                                  @Param("tenderType") Optional<TenderType> tenderType,
+                                                  @Param("organizationId") Optional<Long> organizationId,
+                                                  @Param("categoryId") Optional<Long> categoryId,
+                                                  @Param("startDate") Long startDate,
+                                                  @Param("endDate") Long endDate,
+                                                  @Param("currentDateTime") Long currentDateTime,
+                                                  Pageable pageable);
 
-    interface TenderExt{
+    Optional<Tender> findByRfqNoAndTenderCreatorId(String tenderNo, Long tenderCreatorId);
+
+    interface TenderExt {
         Long getId();
+
         String getTenderNo();
+
         TenderStatus getTenderStatus();
+
         TenderType getTenderType();
+
         String getItemCategory();
+
         String getTenderCreator();
+
         Long getCreationDate();
+
         Long getTenderItemCount();
 
         
