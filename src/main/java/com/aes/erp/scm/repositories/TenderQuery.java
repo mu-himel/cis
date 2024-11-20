@@ -121,14 +121,15 @@ public interface TenderQuery {
                 p.product_description as itemAttributeName,
                 p.extended_attributes as extendedAttributes,
                 p.total as total
-             FROM (SELECT rfq_no, oi.brand_name , oi.product_description , oi.extended_attributes, (COALESCE(final_offer_price,0)+COALESCE(delivery_charge_amount,0)) as total FROM tenders t
+            FROM (SELECT rfq_no, oi.brand_name , oi.product_description , oi.extended_attributes, COALESCE(pq.total_price,0) as total FROM tenders t
             LEFT JOIN tender_items ti ON ti.tender_id  = t.id
             LEFT JOIN offers o ON o.tender_id  = t.id
             LEFT JOIN offer_items oi ON oi.offer_id  = o.id
+            LEFT JOIN price_quotations pq ON oi.price_quotation_id = pq.id
             where t.rfq_no = :tenderNo
             GROUP BY t.rfq_no,oi.brand_name , oi.product_description , oi.extended_attributes
             ) p
             WHERE  p.total>0
-            ORDER BY total DESC LIMIT 1
+            ORDER BY total ASC 
             """;
 }
