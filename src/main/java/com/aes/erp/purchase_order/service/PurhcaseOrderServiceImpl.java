@@ -363,8 +363,14 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                                 grnManualItemDetail.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
 
                                 goodReceiveNoteDto.getGrnDetails().add(grnManualItemDetail);
+                                goodReceiveNoteDto.setTotalPrice(goodReceiveNoteDto.getTotalPrice().add(podd.getItemQty().multiply(row.getOfferItem().getPriceQuotation().getPricePerUnit())));
+                                goodReceiveNoteDto.setTotalVat((goodReceiveNoteDto.getTotalPrice().multiply(goodReceiveNoteDto.getVatPctg())).divide(new BigDecimal(100)));
+
                                 grnManualItemDetail.setDeliveryChargeAmount(podd.getDeliveryCharge());
                                 goodReceiveNoteDto.setDeliveryChargeAmount(goodReceiveNoteDto.getDeliveryChargeAmount().add(podd.getDeliveryCharge()));
+
+                                goodReceiveNoteDto.setInTotal((goodReceiveNoteDto.getTotalPrice().add(goodReceiveNoteDto.getTotalVat())).add(goodReceiveNoteDto.getDeliveryChargeAmount()));
+
                                 isWarehousePresent = true;
                                 break;
                             } else {
@@ -375,6 +381,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             GoodReceivedManualRequestDto grn = new GoodReceiveNoteCreateDto();
                             grn.setGrnNo(null);
                             grn.setIndentNo(null);
+                            grn.setIndentNo(tender.getRfqNo());
 
                             grn.setCategory(rfoDto);
                             grn.setPoId(po.getRemotePoId());
@@ -385,7 +392,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             grn.setDays(row.getOfferItem().getOffer().getCreditPaymentDays());
 
                             BigDecimal total_price = podd.getItemQty().multiply(row.getOfferItem().getPriceQuotation().getPricePerUnit());
-//                            grn.setTotalPrice(total_price);
+                            grn.setTotalPrice(total_price);
                             BigDecimal total_vat = new BigDecimal(0);
 
                             if (row.getOfferItem().getOffer().getMushakIncluded() == true) {
@@ -398,7 +405,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             } else {
                                 grn.setVatOption("EXCLUDED");
                                 grn.setVatPctg(row.getOfferItem().getOffer().getVatPercent());
-                                total_vat = (total_price.multiply(row.getOfferItem().getOffer().getVatPercent())).divide(new BigDecimal(100));
+                                total_vat = (total_price.multiply(grn.getVatPctg())).divide(new BigDecimal(100));
 
                             }
                             if (row.getOfferItem().getOffer().getAitIncluded() == true) {
@@ -407,9 +414,9 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                                 grn.setAitOption("EXCLUDED");
                             }
 
-//                            grn.setTotalVat(total_vat);
-//                            BigDecimal inTotal = total_price.add(total_vat);
-//                            grn.setInTotal(inTotal);
+                            grn.setTotalVat(total_vat);
+                            BigDecimal inTotal = total_price.add(total_vat).add(grn.getDeliveryChargeAmount());
+                            grn.setInTotal(inTotal);
                             grn.setWarehouseId(podd.getWarehouseId());
                             grn.setPayment(row.getOfferItem().getOffer().getCreditType());
                             grn.setInvoicePath(po.getInvoicePath());

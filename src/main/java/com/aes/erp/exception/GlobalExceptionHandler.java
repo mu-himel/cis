@@ -2,6 +2,7 @@ package com.aes.erp.exception;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +67,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleAesExceptions(DataIntegrityViolationException re) {
         Map<String,Object> response = new HashMap<>();
         response.put("message",re.getRootCause().getLocalizedMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ClientAbortException.class})
+    public ResponseEntity<Object> handleValidationExceptions(ClientAbortException ve) {
+        Map<String,Object> response = new HashMap<>();
+        response.put("message", ve.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
