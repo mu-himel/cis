@@ -1,6 +1,5 @@
 package com.aes.erp.inventory.service;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import com.aes.erp.inventory.dto.request.ActivateItemDetailDto;
 import com.aes.erp.inventory.dto.request.ActivateItemDto;
-import com.aes.erp.inventory.entity.Brand;
 import com.aes.erp.inventory.entity.BulkGenBrand;
 import com.aes.erp.inventory.entity.BulkItemGenConfig;
 import com.aes.erp.inventory.entity.BulkProcessLog;
@@ -28,7 +27,6 @@ import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.Item;
 import com.aes.erp.inventory.entity.ItemAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.entity.TempItem;
 import com.aes.erp.inventory.entity.TempItemAttribute;
 import com.aes.erp.inventory.repository.BulkProcessLogRepository;
@@ -198,6 +196,7 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
         
         // List<SubCategoryBrand> brands = categoryService.getBrandsByCategoryId(cat.getId());
         AtomicInteger i = new AtomicInteger();
+        AtomicReference<String> temp = new AtomicReference<>();
         for(BulkGenBrand brand : brands){
             ItemCategory parentCategory = cat.getParentCategory();
             LocalDate localDate = LocalDate.now();
@@ -216,7 +215,9 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
                 item.setItemParentCategory(parentCategory);
                 item.setBrand(brand.getBrand());
                 item.setActive(false);
-                item.setItemAttributeName(String.join(" - ",cp));
+                temp.set(String.join(" - ", cp));
+                System.out.println(temp.get());
+                item.setItemAttributeName(temp.get());
                 item.setAttributes(extractAttributesFromItemAttributeName(cat, item.getItemAttributeName()));
                 products.add(item);
                 
