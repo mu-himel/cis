@@ -2,13 +2,15 @@ package com.aes.erp.vendor.document_response_dto;
 
 import com.aes.erp.vendor.entity.DocmentEntities.CertificateOfIncorporation;
 import com.aes.erp.vendor.entity.DocmentEntities.NIDDocument;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-
+//@JsonIgnoreProperties(value = {"issue_date"})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CertificateOfIncorporationDto {
     private String irc_number;
     private String name;
