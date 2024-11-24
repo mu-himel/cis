@@ -1,6 +1,8 @@
 package com.aes.erp.purchase_order.service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -368,8 +370,14 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
                                 grnManualItemDetail.setDeliveryChargeAmount(podd.getDeliveryCharge());
                                 goodReceiveNoteDto.setDeliveryChargeAmount(goodReceiveNoteDto.getDeliveryChargeAmount().add(podd.getDeliveryCharge()));
+                                if (row.getOfferItem().getOffer().getVatIncluded() == true) {
+                                    goodReceiveNoteDto.setTotalVat((goodReceiveNoteDto.getTotalPrice().multiply(goodReceiveNoteDto.getVatPctg())).divide((new BigDecimal(100).add(goodReceiveNoteDto.getVatPctg())),RoundingMode.HALF_UP));
+                                    goodReceiveNoteDto.setInTotal(goodReceiveNoteDto.getTotalPrice().add(goodReceiveNoteDto.getDeliveryChargeAmount()));
 
-                                goodReceiveNoteDto.setInTotal((goodReceiveNoteDto.getTotalPrice().add(goodReceiveNoteDto.getTotalVat())).add(goodReceiveNoteDto.getDeliveryChargeAmount()));
+                                }else {
+                                    goodReceiveNoteDto.setTotalVat((goodReceiveNoteDto.getTotalPrice().multiply(goodReceiveNoteDto.getVatPctg())).divide(new BigDecimal(100),RoundingMode.HALF_UP));
+                                    goodReceiveNoteDto.setInTotal((goodReceiveNoteDto.getTotalPrice().add(goodReceiveNoteDto.getTotalVat())).add(goodReceiveNoteDto.getDeliveryChargeAmount()));
+                                }
 
                                 isWarehousePresent = true;
                                 break;
@@ -400,23 +408,27 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             } else {
                                 grn.setMushak("EXCLUDED");
                             }
+                            grn.setVatPctg(row.getOfferItem().getOffer().getVatPercent());
                             if (row.getOfferItem().getOffer().getVatIncluded() == true) {
                                 grn.setVatOption("INCLUDED");
+//                                BigDecimal dividedBy = new BigDecimal(100L);
+//                                BigDecimal result1 = dividedBy.add(grn.getVatPctg());
+//                                BigDecimal result2 = total_price.multiply(grn.getVatPctg());
+//                                total_vat = result2.divide(result1, RoundingMode.HALF_UP);
+                                total_vat = (total_price.multiply(grn.getVatPctg())).divide((new BigDecimal(100).add(grn.getVatPctg())),RoundingMode.HALF_UP);
+                                grn.setTotalVat(total_vat);
+                                grn.setInTotal(total_price.add(grn.getDeliveryChargeAmount()));
                             } else {
                                 grn.setVatOption("EXCLUDED");
-                                grn.setVatPctg(row.getOfferItem().getOffer().getVatPercent());
-                                total_vat = (total_price.multiply(grn.getVatPctg())).divide(new BigDecimal(100));
-
+                                total_vat = (total_price.multiply(grn.getVatPctg())).divide(new BigDecimal(100),RoundingMode.HALF_UP);
+                                grn.setTotalVat(total_vat);
+                                grn.setInTotal(total_price.add(total_vat).add(grn.getDeliveryChargeAmount()));
                             }
                             if (row.getOfferItem().getOffer().getAitIncluded() == true) {
                                 grn.setAitOption("INCLUDED");
                             } else {
                                 grn.setAitOption("EXCLUDED");
                             }
-
-                            grn.setTotalVat(total_vat);
-                            BigDecimal inTotal = total_price.add(total_vat).add(grn.getDeliveryChargeAmount());
-                            grn.setInTotal(inTotal);
                             grn.setWarehouseId(podd.getWarehouseId());
                             grn.setPayment(row.getOfferItem().getOffer().getCreditType());
                             grn.setInvoicePath(po.getInvoicePath());
