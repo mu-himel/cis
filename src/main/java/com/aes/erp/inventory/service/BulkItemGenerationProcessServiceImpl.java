@@ -255,7 +255,7 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
             }).findFirst();
             
             if(catAttrOp.isPresent()){
-                _attr = attr.replace(catAttrOp.get().getAttributeType(),"");
+                _attr = attr.replaceFirst(catAttrOp.get().getAttributeType(),"");
             
                 // String[] args = _attr.trim().split(" ");
                 TempItemAttribute pia = new TempItemAttribute();
