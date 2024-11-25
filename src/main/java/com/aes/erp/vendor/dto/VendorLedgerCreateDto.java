@@ -29,5 +29,9 @@ public class VendorLedgerCreateDto {
     private String annualBusinessVolume;
     private String vendorCpsId;
 
+    private String vendorBankAccountNo;
+    private String vendorBankName;
+    private String vendorBankBranch;
+
     private List<BusinessDetailsDto> businessDetails;
 }

@@ -611,7 +611,10 @@ public class VendorServiceImpl implements VendorService {
         postDto.setTin(vendor.getDocumentHolder().getTinDocument().getTin());
         postDto.setTradeLicense(vendor.getDocumentHolder().getTradeDocument().getTradeLicenseNumber());
         postDto.setVatCertificate(vendor.getDocumentHolder().getBinDocument().getBin());
-        postDto.setBankSolvency(vendor.getDocumentHolder().getBankSolvencyDocument().getAccount());
+        postDto.setBankSolvency(vendor.getDocumentHolder().getBankSolvencyDocument().getId().toString());
+        postDto.setVendorBankName(vendor.getDocumentHolder().getBankSolvencyDocument().getBankName());
+        postDto.setVendorBankAccountNo(vendor.getDocumentHolder().getBankSolvencyDocument().getAccount());
+        postDto.setVendorBankBranch(vendor.getDocumentHolder().getBankSolvencyDocument().getBranchName());
 
         StringBuilder sb1 = new StringBuilder();
         for (String id : vendor.getCategories().split(",")) {
@@ -649,7 +652,8 @@ public class VendorServiceImpl implements VendorService {
 
         HttpEntity<VendorLedgerCreateDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
 
-        String vendorLedgerCreationApiEndpoint = organization.getAccIpAddress().concat("/vendor-ledgers/create");
+//        String vendorLedgerCreationApiEndpoint = organization.getAccIpAddress().concat("/vendor-ledgers/create");
+        String vendorLedgerCreationApiEndpoint = "http://172.17.18.118:9096/api/v1/vendor-ledgers/create";
         ResponseEntity<Void> response = networkService.post(vendorLedgerCreationApiEndpoint, mPCDtoPayload, Void.class);
         if (response.getStatusCode().equals(HttpStatus.CREATED)) {
             System.out.println("Ledger Created");
