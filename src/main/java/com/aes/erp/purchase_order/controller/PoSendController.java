@@ -28,30 +28,30 @@ public class PoSendController {
     }
 
     @PutMapping("/{id}/received-grn")
-    public ResponseEntity<?> receiveGrn(@PathVariable("id") Long id){
+    public ResponseEntity<?> receiveGrn(@PathVariable("id") String id) {
         purchaseOrderService.grnReceive(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}/declined-grn")
-    public ResponseEntity<?> declineGrn(@PathVariable("id") Long id,
-    @RequestBody NoteDto noteDto
-    ){
-        purchaseOrderService.declineGrn(id,noteDto);
+    public ResponseEntity<?> declineGrn(@PathVariable("id") String id,
+                                        @RequestBody NoteDto noteDto
+    ) {
+        purchaseOrderService.declineGrn(id, noteDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}/receive-qc")
-    public ResponseEntity<?> receiveQc(@PathVariable("id") Long id,
-        @RequestBody QcResultDto qcResultDto){
-        purchaseOrderService.receiveQc(id,qcResultDto);
+    public ResponseEntity<?> receiveQc(@PathVariable("id") String id,
+                                       @RequestBody QcResultDto qcResultDto) {
+        purchaseOrderService.receiveQc(id, qcResultDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    
+
     @PutMapping("/{id}/decline-qc")
-    public ResponseEntity<?> declineQc(@PathVariable("id") Long id,
-        @RequestBody QcResultDto qcResultDto){
-        purchaseOrderService.declineQc(id,qcResultDto);
+    public ResponseEntity<?> declineQc(@PathVariable("id") String id,
+                                       @RequestBody QcResultDto qcResultDto) {
+        purchaseOrderService.declineQc(id, qcResultDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
