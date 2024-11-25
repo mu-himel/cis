@@ -14,8 +14,8 @@ import com.aes.erp.scm.dto.NoteDto;
 public interface PurchaseOrderService {
 
     void receivePO(Organization organization, PoReceiveRequestDto poDto);
-    
-    Page<?> getPendingPOs(ClaimResponseDto loggedInUser, Optional<Integer>page, Optional<Integer>size);
+
+    Page<?> getPendingPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size);
 
     <T> Optional<T> getDetailById(ClaimResponseDto loggedInUser, Long id, Class<T> t);
 
@@ -24,9 +24,13 @@ public interface PurchaseOrderService {
     void uploadInvoice(ClaimResponseDto loggedInUser, Long id, Optional<MultipartFile> fileOp);
 
     void sendPO(Long id);
-    void grnReceive(Long id);
-    void declineGrn(Long id,NoteDto noteDto);
-    void declineQc(Long id, QcResultDto qcResultDto);
-    void receiveQc(Long id, QcResultDto qcResultDto);
-    
+
+    void grnReceive(String id);
+
+    void declineGrn(String id, NoteDto noteDto);
+
+    void declineQc(String id, QcResultDto qcResultDto);
+
+    void receiveQc(String id, QcResultDto qcResultDto);
+
 }

@@ -393,6 +393,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
                             grn.setCategory(rfoDto);
                             grn.setPoId(po.getRemotePoId());
+                            grn.setPoNo(po.getPoNo());
 
                             grn.setDeliveryCharge(po.getDeliveryChargeType());
                             grn.setDeliveryChargeAmount(podd.getDeliveryCharge());
@@ -464,9 +465,9 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Override
     @Transactional
-    public void grnReceive(Long id) {
-        Optional<PurchaseOrder> poOp = poRepository.findByRemotePoId(id);
-        if(poOp.isPresent()){
+    public void grnReceive(String id) {
+        Optional<PurchaseOrder> poOp = poRepository.findByPoNo(id);
+        if (poOp.isPresent()) {
             PurchaseOrder po = poOp.get();
             po.setIsPoSent(true);
             po.setPoStatus("RECEIVED");
@@ -475,13 +476,12 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
         }
     }
 
-    
 
     @Override
     @Transactional
-    public void declineGrn(Long id, NoteDto noteDto) {
-        Optional<PurchaseOrder> poOp = poRepository.findByRemotePoId(id);
-        if(poOp.isPresent()){
+    public void declineGrn(String id, NoteDto noteDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findByPoNo(id);
+        if (poOp.isPresent()) {
             PurchaseOrder po = poOp.get();
             po.setIsPoSent(false);
             po.setPoStatus("DECLINED");
@@ -489,21 +489,21 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setGrnReceiveDate(Instant.now().toEpochMilli());
             po.setGrnDeclineNote(noteDto.getNote());
         }
-        
+
     }
 
     @Override
     @Transactional
-    public void receiveQc(Long id, QcResultDto qcResultDto) {
-        Optional<PurchaseOrder> poOp = poRepository.findById(id);
-        if(poOp.isPresent()){
+    public void receiveQc(String id, QcResultDto qcResultDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findByPoNo(id);
+        if (poOp.isPresent()) {
             PurchaseOrder po = poOp.get();
             po.setIsQcPass(true);
-            po.setIsPoSent(qcResultDto.getStatus().equals("QC_PASS")? true : false);
+            po.setIsPoSent(qcResultDto.getStatus().equals("QC_PASS") ? true : false);
             po.setQcDeclineNote(null);
             po.setPoStatus(qcResultDto.getStatus());
             po.setQcResult(qcResultDto.getQcResult());
-            po.setQcDetails(qcResultDto.getQcDetails().stream().map(qcDetail->{
+            po.setQcDetails(qcResultDto.getQcDetails().stream().map(qcDetail -> {
                 PoQcDetail poQcDetail = new PoQcDetail();
                 poQcDetail.setPoId(qcDetail.getPoId());
                 poQcDetail.setDate(qcDetail.getDate());
@@ -519,9 +519,9 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Override
     @Transactional
-    public void declineQc(Long id, QcResultDto qcResultDto) {
-        Optional<PurchaseOrder> poOp = poRepository.findById(id);
-        if(poOp.isPresent()){
+    public void declineQc(String id, QcResultDto qcResultDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findByPoNo(id);
+        if (poOp.isPresent()) {
             PurchaseOrder po = poOp.get();
             po.setIsQcPass(false);
             po.setIsPoSent(false);
@@ -529,7 +529,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             po.setPoStatus(qcResultDto.getStatus());
             po.setQcResult(qcResultDto.getQcResult());
         }
-        
+
     }
 
     private String login(Organization organization){

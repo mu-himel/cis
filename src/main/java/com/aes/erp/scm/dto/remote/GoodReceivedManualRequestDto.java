@@ -31,6 +31,7 @@ public class GoodReceivedManualRequestDto {
     private CreditType payment;
     private String invoicePath;
     private Long poId;
+    private String poNo;
     List<GrnManualItemDetailDto> grnDetails;
 
 }
