@@ -20,10 +20,10 @@ public class OfferCreateDTO {
     private BigDecimal totalDeliveryChargeAmount;
     private Boolean aitIncluded;
     private Boolean vatIncluded;
-    private BigDecimal vatAmount;
-    private BigDecimal aitAmount;
-    private BigDecimal vatPercent;
-    private BigDecimal aitPercent;
+    private String vatAmount;
+    private String aitAmount;
+    private String vatPercent;
+    private String aitPercent;
     private String note;
     private BigDecimal finalOfferPrice;
     private Integer creditPaymentDays;
@@ -32,4 +32,20 @@ public class OfferCreateDTO {
     //Only used for counter offer
     @ApiModelProperty(value = "Only for counter offer")
     private Long negotiationHistoryId;
+
+    public BigDecimal getVatAmount() {
+        return new BigDecimal(vatAmount);
+    }
+
+    public BigDecimal getAitAmount() {
+        return new BigDecimal(aitAmount);
+    }
+
+    public BigDecimal getVatPercent() {
+        return new BigDecimal(vatPercent);
+    }
+
+    public BigDecimal getAitPercent() {
+        return new BigDecimal(aitPercent);
+    }
 }
