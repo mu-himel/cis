@@ -217,14 +217,17 @@ public class ItemCategoryController {
     public ResponseEntity<?> createItemCategory(
         @RequestAttribute("organization") Optional<Organization> organization,
         @RequestBody @Valid CategoryRequestDto categoryRequestDto){
-            if(organization!=null && organization.isPresent()){
-                categoryRequestDto.setOrganization(organization.get());
-            }
-        Map<String,Object> objectMap = categoryService.addCategory(categoryRequestDto);
+        if (organization != null && organization.isPresent()) {
+            categoryRequestDto.setOrganization(organization.get());
+        }
+        Map<String, Object> objectMap = categoryService.addCategory(categoryRequestDto);
         HttpHeaders headers = new HttpHeaders();
-        headers.set("id",objectMap.get("id").toString());
-        headers.set("message",objectMap.get("message").toString());
-        return new ResponseEntity<>(headers,HttpStatus.CREATED);
+        if (objectMap.get("id") == null) {
+            throw new RuntimeException(objectMap.get("message").toString());
+        }
+        headers.set("id", objectMap.get("id").toString());
+        headers.set("message", objectMap.get("message").toString());
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
