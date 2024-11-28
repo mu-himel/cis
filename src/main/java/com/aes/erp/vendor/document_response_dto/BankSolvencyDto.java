@@ -40,6 +40,8 @@ public class BankSolvencyDto {
         if(!dto.getAccountNumber().isEmpty())bankSolvencyDocument.setAccount(dto.getAccountNumber());
         if(!dto.getBankName().isEmpty())bankSolvencyDocument.setBankName(dto.getBankName());
         if(!dto.getBranchName().isEmpty())bankSolvencyDocument.setBranchName(dto.getBranchName());
+        if(!dto.getName().isEmpty())bankSolvencyDocument.setAccountHolderName(dto.getName());
+//        if(!dto.getRoutingNumber().isEmpty())bankSolvencyDocument.setRoutingNumber(dto.getRoutingNumber());
         return bankSolvencyDocument;
     }
 }
