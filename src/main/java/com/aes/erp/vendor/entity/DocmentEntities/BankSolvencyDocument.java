@@ -17,6 +17,7 @@ public class BankSolvencyDocument {
     @Column(name = "id", nullable = false)
     private Long id;
     private String account;
+    private String accountHolderName;
     @OneToOne(fetch = FetchType.LAZY)
     private DocumentHolder documentHolder;
     @OneToOne(fetch = FetchType.LAZY)
@@ -24,4 +25,5 @@ public class BankSolvencyDocument {
     private Boolean enabledByDocumentHolder = false;
     private String branchName;
     private String bankName;
+    private String routingNumber;
 }

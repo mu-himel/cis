@@ -31,7 +31,9 @@ public class VendorLedgerCreateDto {
 
     private String vendorBankAccountNo;
     private String vendorBankName;
+    private String vendorBankHolderName;
     private String vendorBankBranch;
+    private String routingNumber;
 
     private List<BusinessDetailsDto> businessDetails;
 }
