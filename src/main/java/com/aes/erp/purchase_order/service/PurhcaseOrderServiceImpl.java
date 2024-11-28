@@ -359,7 +359,9 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                                 grnManualItemDetail.setCategory(new ReferenceObjectDto(itemCategory.getParentCategory().getScmCategoryId()));
                                 grnManualItemDetail.setSubCategory(new ReferenceObjectDto(itemCategory.getScmCategoryId()));
                                 grnManualItemDetail.setEstDeliveryDays(row.getOfferItem().getEstimatedDeliveryDays());
-                                Optional<Item> itemOptional = itemRepository.findByItemAttributeNameAndName(row.getOfferItem().getProductDescription(),row.getOfferItem().getBrandName());
+                                Optional<Item> itemOptional = itemRepository.findByItemCategoryIdAndItemAttributeNameAndNameAndActive(
+                                        itemCategory.getId(),
+                                        row.getOfferItem().getProductDescription(), row.getOfferItem().getBrandName(), true);
                                 itemOptional.ifPresent(item -> grnManualItemDetail.setItemCode(item.getCode()));
                                 grnManualItemDetail.setOrderQty(podd.getItemQty());
                                 grnManualItemDetail.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
@@ -441,7 +443,9 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             grid.setCategory(new ReferenceObjectDto(itemCategory.getParentCategory().getScmCategoryId()));
                             grid.setSubCategory(new ReferenceObjectDto(itemCategory.getScmCategoryId()));
                             grid.setEstDeliveryDays(row.getOfferItem().getEstimatedDeliveryDays());
-                            Optional<Item> itemOptional = itemRepository.findByItemAttributeNameAndName(row.getOfferItem().getProductDescription(),row.getOfferItem().getBrandName());
+                            Optional<Item> itemOptional = itemRepository.findByItemCategoryIdAndItemAttributeNameAndNameAndActive(
+                                    itemCategory.getId(),
+                                    row.getOfferItem().getProductDescription(), row.getOfferItem().getBrandName(), true);
                             itemOptional.ifPresent(item -> grid.setItemCode(item.getCode()));
                             grid.setOrderQty(podd.getItemQty());
                             grid.setDeliveryChargeAmount(podd.getDeliveryCharge());
