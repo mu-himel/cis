@@ -590,7 +590,9 @@ public class VendorServiceImpl implements VendorService {
             vendor = vendorRepository.save(vendor);
             List<Organization> organizationList = organizationRepository.findAll();
             for (Organization org:organizationList) {
-                createVendorLedger(vendor,org);
+                if(!org.getName().equals("A_ONE_POLYMER")) {
+                    createVendorLedger(vendor, org);
+                }
 
             }
         }
@@ -615,6 +617,8 @@ public class VendorServiceImpl implements VendorService {
         postDto.setVendorBankName(vendor.getDocumentHolder().getBankSolvencyDocument().getBankName());
         postDto.setVendorBankAccountNo(vendor.getDocumentHolder().getBankSolvencyDocument().getAccount());
         postDto.setVendorBankBranch(vendor.getDocumentHolder().getBankSolvencyDocument().getBranchName());
+        postDto.setVendorBankHolderName(vendor.getDocumentHolder().getBankSolvencyDocument().getAccountHolderName());
+        postDto.setRoutingNumber(vendor.getDocumentHolder().getBankSolvencyDocument().getRoutingNumber());
 
         StringBuilder sb1 = new StringBuilder();
         for (String id : vendor.getCategories().split(",")) {
