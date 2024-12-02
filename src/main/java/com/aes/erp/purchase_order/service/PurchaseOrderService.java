@@ -25,12 +25,12 @@ public interface PurchaseOrderService {
 
     void sendPO(Long id);
 
-    void grnReceive(String id);
+    void grnReceive(Organization organization, String id);
 
-    void declineGrn(String id, NoteDto noteDto);
+    void declineGrn(Organization organization, String id, NoteDto noteDto);
 
-    void declineQc(String id, QcResultDto qcResultDto);
+    void declineQc(Organization organization, String id, QcResultDto qcResultDto);
 
-    void receiveQc(String id, QcResultDto qcResultDto);
+    void receiveQc(Organization organization, String id, QcResultDto qcResultDto);
 
 }

@@ -469,8 +469,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Override
     @Transactional
-    public void grnReceive(String id) {
-        Optional<PurchaseOrder> poOp = poRepository.findByPoNo(id);
+    public void grnReceive(Organization organization, String id) {
+        Optional<PurchaseOrder> poOp = poRepository.findByPoNoAndOrgId(id, organization.getId());
         if (poOp.isPresent()) {
             PurchaseOrder po = poOp.get();
             po.setIsPoSent(true);
@@ -483,8 +483,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Override
     @Transactional
-    public void declineGrn(String id, NoteDto noteDto) {
-        Optional<PurchaseOrder> poOp = poRepository.findByPoNo(id);
+    public void declineGrn(Organization organization, String id, NoteDto noteDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findByPoNoAndOrgId(id, organization.getId());
         if (poOp.isPresent()) {
             PurchaseOrder po = poOp.get();
             po.setIsPoSent(false);
@@ -498,8 +498,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Override
     @Transactional
-    public void receiveQc(String id, QcResultDto qcResultDto) {
-        Optional<PurchaseOrder> poOp = poRepository.findByPoNo(id);
+    public void receiveQc(Organization organization, String id, QcResultDto qcResultDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findByPoNoAndOrgId(id, organization.getId());
         if (poOp.isPresent()) {
             PurchaseOrder po = poOp.get();
             po.setIsQcPass(true);
@@ -523,8 +523,8 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
     @Override
     @Transactional
-    public void declineQc(String id, QcResultDto qcResultDto) {
-        Optional<PurchaseOrder> poOp = poRepository.findByPoNo(id);
+    public void declineQc(Organization organization, String id, QcResultDto qcResultDto) {
+        Optional<PurchaseOrder> poOp = poRepository.findByPoNoAndOrgId(id, organization.getId());
         if (poOp.isPresent()) {
             PurchaseOrder po = poOp.get();
             po.setIsQcPass(false);
