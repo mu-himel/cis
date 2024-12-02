@@ -34,6 +34,8 @@ public interface PoRepository extends JpaRepository<PurchaseOrder, Long>, Purcha
 
     Optional<PurchaseOrder> findByPoNo(String id);
 
+    Optional<PurchaseOrder> findByPoNoAndOrgId(String id, Long orgId);
+
     List<PurchaseOrder> findAllByRemotePoId(Long id);
 
     interface PendingPOItem {
