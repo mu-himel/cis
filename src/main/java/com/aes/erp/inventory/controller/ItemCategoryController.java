@@ -226,6 +226,7 @@ public class ItemCategoryController {
             throw new RuntimeException(objectMap.get("message").toString());
         }
         headers.set("id", objectMap.get("id").toString());
+        headers.set("code", objectMap.get("code").toString());
         headers.set("message", objectMap.get("message").toString());
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
