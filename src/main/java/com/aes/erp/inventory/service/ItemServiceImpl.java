@@ -151,7 +151,7 @@ public class ItemServiceImpl implements ItemService {
             if(name.isPresent()){
                 result = itemRepository
                         .findAllByActiveAndItemCategoryIdOrItemParentCategoryIdAndNameLikeIgnoreCaseOrCodeLikeIgnoreCase(
-                        true,categoryId,categoryId,name.get()+"%",name.get()+"%");
+                                true, categoryId, categoryId, name.get() + "%", code.get() + "%");
 
             }
             return result;
@@ -162,7 +162,7 @@ public class ItemServiceImpl implements ItemService {
             return itemRepository.findAllByActiveAndNameLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(true,name.get()+"%","%"+name.get()+"%");
         }
         if(name.isEmpty() && code.isPresent()){
-            return  itemRepository.findAllByActiveAndCodeLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(true, code.get()+"%",name.get()+"%");
+            return itemRepository.findAllByActiveAndCodeLikeIgnoreCaseOrItemAttributeNameLikeIgnoreCase(true, code.get() + "%", code.get() + "%");
         }
         return new ArrayList<>();
     }
