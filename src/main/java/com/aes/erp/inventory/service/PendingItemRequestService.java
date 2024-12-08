@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -11,8 +12,9 @@ import com.aes.erp.inventory.dto.request.PendingBrandDto;
 import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
 
 public interface PendingItemRequestService {
-    void createPendingItemRequest(PendingItemRequestDto pRequestDto);
-    Page<?> getPage(Optional<Long>categoryId, Optional<Long> subCategoryId, Optional<Integer>page, Optional<Integer> size);
+    Map<String, Object> createPendingItemRequest(PendingItemRequestDto pRequestDto);
+
+    Page<?> getPage(Optional<Long> categoryId, Optional<Long> subCategoryId, Optional<Integer> page, Optional<Integer> size);
     Optional<?> getDetail(Long id);
     List<?> getPendingBrands(Long subCatId);
     void createPendingBrand(PendingBrandDto pendingBrandDto);

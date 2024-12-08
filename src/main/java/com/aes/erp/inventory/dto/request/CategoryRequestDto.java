@@ -33,6 +33,8 @@ public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
     @ApiModelProperty(required = true)
     private String code;
 
+    private String prefix;
+
     private ItemCategory parentCategory;
 
     private List<CategoryAttribute> attributes;

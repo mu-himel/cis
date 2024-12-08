@@ -31,8 +31,8 @@ public class PendingItemReqController {
 
     @PostMapping
     public ResponseEntity<?> createPendingItemRequest(@RequestBody PendingItemRequestDto pendingItemRequestDto){
-        pendingItemRequestService.createPendingItemRequest(pendingItemRequestDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(pendingItemRequestService.createPendingItemRequest(pendingItemRequestDto),
+                HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")

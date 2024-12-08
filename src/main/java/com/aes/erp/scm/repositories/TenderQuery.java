@@ -107,12 +107,12 @@ public interface TenderQuery {
                 AND (t.deadline < :currentDateTime)
                 GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
-    String tenderProjectionCountQuery = " SELECT count(*) FROM (" + tenderProjectionQuery + " ) ";
+    String tenderProjectionCountQuery = " SELECT count(*) FROM (" + tenderProjectionQuery + " ) as t ";
 
-    String tenderProjectionCountQueryFilterQuery = " SELECT count(*) FROM (" + tenderProjectionWithFilterQuery + " ) ";
+    String tenderProjectionCountQueryFilterQuery = " SELECT count(*) FROM (" + tenderProjectionWithFilterQuery + " ) as t ";
 
 
-    String closedTenderProjectionCountQuery = " SELECT count(*) FROM (" + closedTenderProjectionQuery + " ) ";
+    String closedTenderProjectionCountQuery = " SELECT count(*) FROM (" + closedTenderProjectionQuery + " ) as t ";
 
     String getLowestBidByTenderNo = """
             SELECT 

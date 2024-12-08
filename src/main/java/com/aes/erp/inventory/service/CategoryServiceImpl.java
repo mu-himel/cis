@@ -97,16 +97,19 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public Map<String,Object> addCategory(CategoryRequestDto categoryRequestDto) {
-        Map<String,Object> returnMap = new HashMap<>();
+        Map<String, Object> returnMap = new HashMap<>();
         ItemCategory category = categoryRequestDto.getEntity();
+        Optional<Long> _parentCatIdOp = (categoryRequestDto.getParentCategory() != null) ?
+                Optional.ofNullable(categoryRequestDto.getParentCategory().getId()) : Optional.empty();
+        category.setCode(getNewCategoryCode(category.getName().substring(0, 1), categoryRequestDto.getPrefix(), _parentCatIdOp));
         category.setName(category.getName().trim());
-        if(categoryRequestDto.getOrganization()!=null){
+        if (categoryRequestDto.getOrganization() != null) {
             category.setOrganization(categoryRequestDto.getOrganization());
         }
-        Optional<ItemCategory> itemCategoryOpt = categoryRepository.getByNameAndActiveAndCode(category.getName().toUpperCase(),false,category.getCode());
+        Optional<ItemCategory> itemCategoryOpt = categoryRepository.getByNameAndActiveAndCode(category.getName().toUpperCase(), false, category.getCode());
 //        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByNameAndActive(category.getName().toUpperCase(),false);
 //        Optional<ItemCategory> itemCategoryOpt = categoryRepository.findByCodeAndActive(category.getCode().toUpperCase(),false);
-        if(itemCategoryOpt.isPresent()){
+        if (itemCategoryOpt.isPresent()) {
 //            throw new AesException("Category code already exist");
             ItemCategory itemCategory = itemCategoryOpt.get();
             System.out.println("Category name already exist and deactivated");
@@ -117,6 +120,7 @@ public class CategoryServiceImpl implements CategoryService {
                     itemCategory.setActive(true);
                     categoryRepository.save(itemCategory);
                     returnMap.put("id", itemCategory.getId());
+                    returnMap.put("code", itemCategory.getCode());
                     returnMap.put("message", "Category with name " + category.getName() + " was created before with code " + itemCategory.getCode() + ". Replace " + category.getCode() + "by previously assigned code" + itemCategory.getCode());
                     return returnMap;
                 }
@@ -129,6 +133,7 @@ public class CategoryServiceImpl implements CategoryService {
                         addBrandToSubCategory(categoryRequestDto,itemCategory);
                         categoryRepository.save(itemCategory);
                         returnMap.put("id", itemCategory.getId());
+                        returnMap.put("code", itemCategory.getCode());
                         returnMap.put("message", "SubCategory with name " + category.getName() + " was created before with code " + itemCategory.getCode() + ". Replace " + category.getCode() + "by previously assigned code" + itemCategory.getCode());
                         return returnMap;
                     }
@@ -137,8 +142,9 @@ public class CategoryServiceImpl implements CategoryService {
         }
         if (categoryRepository.existsByCodeAndActive(category.getCode(),true)) {
             System.out.println("Category code already exist");
-            returnMap.put("id",category.getId());
-            returnMap.put("message","Category code "+category.getCode()+" already exist");
+            returnMap.put("id", category.getId());
+            returnMap.put("code", category.getCode());
+            returnMap.put("message", "Category code " + category.getCode() + " already exist");
             return returnMap;
 //            return category.getId();
         }
@@ -189,8 +195,9 @@ public class CategoryServiceImpl implements CategoryService {
         category.setCreatedAt(Instant.now().toEpochMilli());
         categoryRepository.save(category);
         addBrandToSubCategory(categoryRequestDto, category);
-        returnMap.put("id",category.getId());
-        returnMap.put("message","Successfully Created");
+        returnMap.put("id", category.getId());
+        returnMap.put("code", category.getCode());
+        returnMap.put("message", "Successfully Created");
         return returnMap;
 //        return category.getId();
     }
@@ -460,8 +467,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public String getNewCategoryCode(String key, String prefix, Optional<Long> categoryId) {
-        String autoCode = categoryRepository.findMaxOrderById(key,prefix, categoryId.orElse(null));
-        return autoCode;
+        String autoCode = categoryRepository.findMaxOrderById(key, prefix, categoryId.orElse(null));
+        StringBuilder sb = new StringBuilder();
+        sb.append(prefix.toUpperCase());
+        if (categoryId.isPresent()) {
+            sb.append("-").append(key.toUpperCase());
+        } else {
+            sb.append(key.toUpperCase());
+        }
+        sb.append(autoCode);
+        return sb.toString();
     }
 
     @Override

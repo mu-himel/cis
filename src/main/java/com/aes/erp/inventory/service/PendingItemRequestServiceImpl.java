@@ -1,8 +1,6 @@
 package com.aes.erp.inventory.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -62,6 +60,9 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     private CategoryService categoryService;
 
     @Autowired
+    private ItemService itemService;
+
+    @Autowired
     private NetworkService networkService;
 
     @Value("${scm.apiEndpoint}")
@@ -69,17 +70,17 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
     @Override
     @Transactional
-    public void createPendingItemRequest(PendingItemRequestDto pRequestDto) {
-    
+    public Map<String, Object> createPendingItemRequest(PendingItemRequestDto pRequestDto) {
+
         PendingItemRequest pir = pRequestDto.getEntity();
 
-        Optional<Brand> brandOp =brandRepository.findByName(pRequestDto.getBrand());
-        if(brandOp.isEmpty()){
+        Optional<Brand> brandOp = brandRepository.findByName(pRequestDto.getBrand());
+        if (brandOp.isEmpty()) {
             throw new AesException("Sorry! Brand not specified");
         }
 
         Optional<ItemCategory> catOp = categoryService.existByCode(pRequestDto.getSubCategoryCode());
-        if(catOp.isEmpty()){
+        if (catOp.isEmpty()) {
             throw new AesException("Sorry! Sub Category not specified");
         }
         ItemCategory subCat = catOp.get();
@@ -87,14 +88,18 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
         pir.setSubCategory(subCat);
         pir.setCategory(subCat.getParentCategory());
         pir.setBrand(brandOp.get());
-        pir.setAttributes(pRequestDto.getAttributes().stream().map(pia->{
+        pir.setAttributes(pRequestDto.getAttributes().stream().map(pia -> {
             pia.setId(null);
             pia.setPendingItemRequest(pir);
             return pia;
         }).collect(Collectors.toList()));
         pir.setOrganization(new Organization(pRequestDto.getOrganizationId()));
+        pir.setCode(subCat.getCode().concat("-").concat(itemService.getNextItemCode(subCat.getCode())));
         pendingItemRequestRepository.save(pir);
-        
+        Map<String, Object> result = new HashMap<>();
+        result.put("code", pir.getCode());
+        result.put("pendingItemRequestId", pir.getId());
+        return result;
     }
 
     private String getNextItemCode() {
