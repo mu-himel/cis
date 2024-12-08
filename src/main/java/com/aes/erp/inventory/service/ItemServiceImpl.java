@@ -599,7 +599,7 @@ public class ItemServiceImpl implements ItemService {
         }else{
             //Merge with existing item 
             Item existingItem = itemRepository.findById(mergePendingItemsDto.getMergeItemId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
-
+            postDto.setIsMerged(true);
             postDto.setApproveStatus("REJECTED");
             postDto.setCode(existingItem.getCode());
             postDto.setWarehouseId(pendingItem.getWarehouseId());
