@@ -238,6 +238,7 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
         MergePendingItemsPostDto mpcpDTO = new MergePendingItemsPostDto();
         mpcpDTO.setApproveStatus("REJECTED");
+        mpcpDTO.setIsMerged(false);
         mpcpDTO.setWarehouseId(getPendingItem.getWarehouseId());
         mpcpDTO.setWarehouseStoreId(getPendingItem.getWarehouseStoreId());
         HttpEntity<MergePendingItemsPostDto> mPCDtoPayload = new HttpEntity<>(mpcpDTO, headers);

@@ -8,6 +8,6 @@ public class MergePendingItemsPostDto {
     private String approveStatus;
     private Long warehouseId;
     private Long warehouseStoreId;
-
+    private Boolean isMerged;
     ItemMergeRequestDto itemMergeRequestDto;
 }
