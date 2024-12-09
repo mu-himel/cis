@@ -405,7 +405,7 @@ public class ItemServiceImpl implements ItemService {
     public String getNextItemCode(String prefix) {
         Long autoCode = itemRepository.findNextCodeByCount(prefix);
         if(autoCode!=null){
-            return String.format("%08d",autoCode);
+            return String.format("%08d", ++autoCode);
         }
         return String.format("%08d",1);
     }
