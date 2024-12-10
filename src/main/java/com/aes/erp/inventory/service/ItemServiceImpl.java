@@ -602,6 +602,7 @@ public class ItemServiceImpl implements ItemService {
             postDto.setIsMerged(true);
             postDto.setApproveStatus("REJECTED");
             postDto.setCode(existingItem.getCode());
+            postDto.setWarehouseStoreId(pendingItem.getWarehouseStoreId());
             postDto.setWarehouseId(pendingItem.getWarehouseId());
             itemMergeRequestDto.setName(existingItem.getName());
             itemMergeRequestDto.setCode(existingItem.getCode());
