@@ -38,9 +38,10 @@ public class ItemCategory {
   @ManyToOne
   private ItemCategory parentCategory;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "store_type_id")
-  private StoreType storeType;
+//  @ManyToOne(fetch = FetchType.EAGER)
+//  @JoinColumn(name = "store_type_id")
+//  private StoreType storeType;
+  private Long storeTypeId;
 
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
   private List<CategoryBudget> budgets;

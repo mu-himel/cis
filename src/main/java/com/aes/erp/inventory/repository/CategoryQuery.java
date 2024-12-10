@@ -102,11 +102,10 @@ public interface CategoryQuery {
 
 
     String findAllByItemCategoryWithSubCategoryCount = "SELECT c.id AS categoryId, c.name AS categoryName, " +
-            "c.code AS categoryCode, COUNT(sub.id) AS subcategoryCount,st.id as storeTypeId, st.name AS storeTypeName " +
+            "c.code AS categoryCode, COUNT(sub.id) AS subcategoryCount,'' as storeTypeId, '' AS storeTypeName " +
             "FROM ItemCategory c " +
             "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id  AND sub.active = true AND sub.categoryStatus = 'APPROVED' " +
-            "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
-            "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
+            "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR c.storeTypeId = :storeTypeId) " +
             " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name) || '%' ) " +
             " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code) || '%' )" +
             "AND c.active = true AND c.categoryStatus IN ('APPROVED') " +
@@ -115,8 +114,7 @@ public interface CategoryQuery {
     String countQueryForFindAllByItemCategoryWithSubCategoryCount = "SELECT COUNT(DISTINCT c.id) AS categoryCount " +
             "FROM ItemCategory c " +
             "LEFT JOIN ItemCategory sub ON c.id = sub.parentCategory.id  AND sub.active = true " +
-            "LEFT JOIN StoreType st ON c.storeType.id = st.id " +
-            "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR st.id = :storeTypeId) " +
+            "WHERE c.parentCategory IS NULL AND (:storeTypeId IS NULL OR c.storeTypeId = :storeTypeId) " +
             " AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(:name) || '%' ) " +
             " AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(:code) || '%' )" +
             "AND c.active = true AND c.categoryStatus IN ('APPROVED')";
@@ -148,18 +146,17 @@ public interface CategoryQuery {
         par.id AS parentCategoryId, 
         par.code AS parentCategoryCode, 
                 par.name AS parentCategoryName,
-                st.id AS storeTypeId, 
-                st.name AS storeTypeName,
+                c.storeTypeId AS storeTypeId, 
+                '' AS storeTypeName,
                 (SELECT COUNT(i.id) FROM items i WHERE i.item_category_id = c.id) AS products, 
                 (SELECT COUNT(pb.id) FROM pending_brands pb WHERE pb.sub_category_id = c.id) AS pendingBrands, 
                 (SELECT COUNT(pa.id) FROM pending_attributes pa WHERE pa.sub_category_id = c.id) AS pendingAttributes
             FROM item_categories c
             LEFT JOIN item_categories par ON par.id = c.parent_category_id 
-            LEFT JOIN store_types st ON c.store_type_id = st.id 
             WHERE c.parent_category_id IS NOT NULL 
                 AND c.active = true 
                 AND c.category_status IN ('APPROVED')
-                AND (:store_type_id IS NULL OR st.id = :store_type_id) 
+                AND (:store_type_id IS NULL OR c.storeTypeId = :store_type_id) 
                 AND (:parent_category IS NULL OR par.id = :parent_category) 
                 AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT(:name, '%'))) 
                 AND (:code IS NULL OR LOWER(c.code) LIKE LOWER(CONCAT(:code, '%')))
