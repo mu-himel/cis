@@ -12,4 +12,6 @@ public class MergePendingCategoryPostDto {
     private CategoryStatus approveStatus;
     private Long scmParentCategoryId;
     private MergePendingCategoryDto mergePendingCategoryDto;
+    private Long warehouseStoreId;
+
 }
