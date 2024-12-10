@@ -192,7 +192,7 @@ public class ItemCategoryController {
 
         catDetail.put("productQty", categoryService.getProductQtyByCategoryAndSubCategory(catId,subCatId));
         catDetail.put("parentCategory",parentCategory);
-        catDetail.put("storeType", itemCategory.getStoreType());
+        catDetail.put("storeType", itemCategory.getStoreTypeId());
         catDetail.put("budgets", itemCategory.getBudgets());
         catDetail.put("attributes", itemCategory.getAttributes());
         catDetail.put("active", itemCategory.getActive());

@@ -666,7 +666,7 @@ public class CategoryServiceImpl implements CategoryService {
         headers.setBearerAuth(networkService.getKeycloakAccessToken(getItemCategory.getOrganization()));
         headers.setContentType(MediaType.APPLICATION_JSON);
         MergePendingCategoryPostDto postDto = new MergePendingCategoryPostDto();
-
+        postDto.setWarehouseStoreId(getItemCategory.getStoreTypeId());
         HttpEntity<MergePendingCategoryPostDto> mPCDtoPayload = new HttpEntity<>(postDto, headers);
 
         StringBuilder sb = new StringBuilder("/item-categories");

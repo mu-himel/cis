@@ -42,7 +42,7 @@ public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
     @JsonProperty(value = "brands")
     private List<String> brands;
 
-    private StoreType storeType;
+    private Long storeTypeId;
 
     private BigDecimal vat;
 
