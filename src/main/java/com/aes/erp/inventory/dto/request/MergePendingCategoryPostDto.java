@@ -13,5 +13,6 @@ public class MergePendingCategoryPostDto {
     private Long scmParentCategoryId;
     private MergePendingCategoryDto mergePendingCategoryDto;
     private Long warehouseStoreId;
+    private Boolean isMerged;
 
 }

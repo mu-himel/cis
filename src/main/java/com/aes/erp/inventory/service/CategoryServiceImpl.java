@@ -773,7 +773,7 @@ public class CategoryServiceImpl implements CategoryService {
         }else{
             //send post request to SCM with categoryname and code using networkservice
             ItemCategory existingItemCategory = categoryRepository.findById(mergePendingCategoryDto.getMergeCategoryId()).orElseThrow( ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No such data found"));;
-
+            postDto.setIsMerged(true);
             postDto.setApproveStatus(CategoryStatus.REJECTED);
             postDto.setCode(getItemCategory.getCode());
             MergePendingCategoryDto mpcDto = new MergePendingCategoryDto();
