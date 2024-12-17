@@ -210,12 +210,13 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
              @Param("name") String name, @Param("code") String code);
 
     @Query(value = """
-        SELECT ic FROM ItemCategory ic 
-        LEFT JOIN ic.parentCategory pc
-        WHERE pc IS NOT NULL AND ic.active=true 
-        AND (:categoryId IS NULL OR pc.id=:categoryId)
-        AND (:name IS NULL OR ic.name LIKE concat(:name,'%'))
-        AND (:code IS NULL OR ic.code LIKE concat(:code,'%'))""")
+            SELECT ic FROM ItemCategory ic 
+            LEFT JOIN ic.parentCategory pc
+            WHERE pc IS NOT NULL AND ic.active=true 
+            AND ic.categoryStatus IN ('APPROVED')
+            AND (:categoryId IS NULL OR pc.id=:categoryId)
+            AND (:name IS NULL OR ic.name LIKE concat(:name,'%'))
+            AND (:code IS NULL OR ic.code LIKE concat(:code,'%'))""")
     List<ItemCategory> findAllSubCategory(
             @Param("categoryId") Long categoryId,
             @Param("name") String name, @Param("code") String code);
