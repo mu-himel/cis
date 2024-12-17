@@ -75,8 +75,9 @@ public class UserService {
 //                reportingManager = employeeOptional.get();
 //
 //        }
+        Long nextId = userRepository.getNextId();
 
-        User user = new User();
+        User user = new User(nextId);
         Optional<User> existUserChecking = userRepository.findByEmailAddress(userDto.getEmail());
         if(!existUserChecking.isEmpty()){
             throw new AesException(EMAIL_ALREADY_EXIST);
@@ -134,21 +135,22 @@ public class UserService {
 
     }
 
-    public User createVendorUserAccount(VendorDto vendorDto){
+    public User createVendorUserAccount(VendorDto vendorDto) {
 
         Optional<User> existUserChecking = userRepository.findByEmailAddress(vendorDto.getEmail());
-        if(!existUserChecking.isEmpty()){
+        if (!existUserChecking.isEmpty()) {
             throw new AesException(EMAIL_ALREADY_EXIST);
         }
-        User user = new User();
+        Long nextId = userRepository.getNextId();
+        User user = new User(nextId);
         user.setEmailAddress(vendorDto.getEmail());
         user.setFirstName(vendorDto.getName());
 
         UserCredential userCredential = new UserCredential();
         userCredential.setEmailAddress(vendorDto.getEmail());
-        if(vendorDto.getPassword().isEmpty()){
+        if (vendorDto.getPassword().isEmpty()) {
             userCredential.setPassword(passwordEncoder.encode("123456"));
-        }else{
+        } else {
             userCredential.setPassword(passwordEncoder.encode(vendorDto.getPassword()));
         }
         /*userCredential.setRoles(userDto.getRoles());*/
@@ -279,8 +281,8 @@ public class UserService {
     }
 
     @Transactional
-    public void createSuperAdmin(String username, String pass) {
-        User user = new User();
+    public void createSuperAdmin(Long id, String username, String pass) {
+        User user = new User(id);
         user.setEmailAddress(username);
         user.setFirstName("Super");
         user.setLastName("Admin");
@@ -289,7 +291,7 @@ public class UserService {
         userCredential.setEmailAddress(user.getEmailAddress());
         userCredential.setPassword(passwordEncoder.encode(pass));
         userCredential.setActive(true);
-        userCredentialRepository.save(userCredential);
+        userCredentialRepository.saveAndFlush(userCredential);
         user.setUserCredential(userCredential);
 
 
@@ -298,7 +300,7 @@ public class UserService {
         Role role = roleService.read("SYS_ADMIN");
         userCredentialToRole.setRole(role);
         userCredentialToRoleRepository.save(userCredentialToRole);
-        user = userRepository.save(user);
+        user = userRepository.saveAndFlush(user);
         Employee employee = new Employee(
                 employeeService.getNextEmployeeId(),
                 user.getFirstName()+ " "+user.getLastName(),

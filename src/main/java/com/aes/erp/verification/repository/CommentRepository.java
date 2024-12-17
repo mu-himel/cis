@@ -19,6 +19,6 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
 
         String getMessage();
 
-        VerificationRepository.EmployeeInfo getCommentedBy();
+//        VerificationRepository.EmployeeInfo getCommentedBy();
     }
 }

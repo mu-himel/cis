@@ -150,10 +150,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
             nativeQuery = true)
     List<UserInfo> findAllUnassignedUsers();
 
-    interface UserInfo{
+    @Query(value = """
+            SELECT MAX(COALESCE(u.id,0))+1 FROM User u
+            """)
+    Long getNextId();
+
+    interface UserInfo {
         Long getId();
+
         String getFirstName();
+
         String getLastName();
+
         String getEmailAddress();
 
         String getName();

@@ -18,7 +18,6 @@ public class RoleNode {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;

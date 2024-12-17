@@ -23,7 +23,6 @@ import static com.aes.erp.config.RegexPattern.EMAIL_PATTERN;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long id;
 
