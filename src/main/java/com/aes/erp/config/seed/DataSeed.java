@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,17 +66,19 @@ public class DataSeed implements CommandLineRunner {
 
     private void init(){
         this.initRoles();
-        this.createRoleNode();
         this.createDepartment();
+        this.createRoleNode();
         this.createEnlisterRoleNode();
         this.createAuditorRoleNode();
         this.createVendorRoleNode();
         this.createInventoryControllerRoleNode();
         this.initUserAccounts();
-        this.assignUserToRole();
-        this.initModules();
+//
         this.initVendorTypes();
         this.initAttributeUnits();
+        this.assignUserToRole();
+        this.initModules();
+
     }
 
     private void initRoles(){
@@ -110,6 +114,7 @@ public class DataSeed implements CommandLineRunner {
         roleService.createRoles(roleNames);
     }
 
+    @Transactional
     private void createRoleNode(){
         Optional<RoleNode> roleNode = designationService.getDesignationById(1L);
         if(roleNode.isEmpty()) {
@@ -117,6 +122,7 @@ public class DataSeed implements CommandLineRunner {
         }
     }
 
+    @Transactional
     private void createDepartment(){
         Optional<Department> department = departmentService.getDepartment(1L);
         if(department.isEmpty()){
@@ -124,6 +130,7 @@ public class DataSeed implements CommandLineRunner {
         }
     }
 
+    @Transactional
     private void createEnlisterRoleNode(){
         Optional<RoleNode> roleNodeOptional = designationService.findByName("ENLISTER");
         if(roleNodeOptional.isEmpty()){
@@ -131,6 +138,7 @@ public class DataSeed implements CommandLineRunner {
         }
     }
 
+    @Transactional
     private void createAuditorRoleNode(){
         Optional<RoleNode> roleNodeOptional = designationService.findByName("AUDITOR");
         if(roleNodeOptional.isEmpty()){
@@ -138,6 +146,7 @@ public class DataSeed implements CommandLineRunner {
         }
     }
 
+    @Transactional
     private void createVendorRoleNode() {
         Optional<RoleNode> roleNodeOptional = designationService.findByName("VENDOR");
         if(roleNodeOptional.isEmpty()){
@@ -145,6 +154,7 @@ public class DataSeed implements CommandLineRunner {
         }
     }
 
+    @Transactional
     private void createInventoryControllerRoleNode(){
         Optional<RoleNode> roleNodeOptional = designationService.findByName("INVENTORY CONTROLLER");
         if(roleNodeOptional.isEmpty()){
@@ -152,24 +162,27 @@ public class DataSeed implements CommandLineRunner {
         }
     }
 
+    @Transactional
     private void initUserAccounts(){
         User user = userService.getUserByUserId(1L);
         if(user==null){
             System.out.println("Super admin Not Exist");
-            userService.createSuperAdmin("superadmin@gmail.com","12345678");
-        }else{
+            userService.createSuperAdmin(1L, "superadmin@gmail.com", "12345678");
+        } else {
             System.out.println("Super admin Exist");
         }
 
         User admin = userService.getUserByEmail("admin2@gmail.com");
-        if(admin == null){
-            userService.createSuperAdmin("admin2@gmail.com", "12345678");
+        if (admin == null) {
+            userService.createSuperAdmin(2L, "admin2@gmail.com", "12345678");
         }
     }
 
-    private void assignUserToRole(){
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    private void assignUserToRole() {
         Optional<UserAssignment> userAssignmentOp = userAssignRepository.findById(1L);
-        if(userAssignmentOp.isEmpty()) {
+        if (userAssignmentOp.isEmpty()) {
             UserAssignment userAssignment = new UserAssignment();
             userAssignment.setId(1L);
             userAssignment.setUser(new User(1L));
