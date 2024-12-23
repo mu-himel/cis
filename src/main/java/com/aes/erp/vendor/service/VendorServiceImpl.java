@@ -591,7 +591,7 @@ public class VendorServiceImpl implements VendorService {
             List<Organization> organizationList = organizationRepository.findAll();
             for (Organization org:organizationList) {
                 if(!org.getName().equals("A_ONE_POLYMER")) {
-//                    createVendorLedger(vendor, org);
+                    createVendorLedger(vendor, org);
                 }
 
             }
