@@ -189,12 +189,17 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRequestDto.getEntity();
 
         item.setCreatedBy(new User(loggedInUser.getId()));
+        Optional<ItemCategory> catOp = itemCategoryRepo.findById(itemRequestDto.getItemCategory().getId());
+        if (catOp.isEmpty()) {
+            throw new AesException("Sorry! Sub Category not specified");
+        }
+        item.setCode(catOp.get().getCode().concat("-").concat(getNextItemCode(catOp.get().getCode())));
         String itemAttributeName = generateItemAttributeName(itemRequestDto.getAttributes());
         
         Long brandId = (itemRequestDto.getBrand()!=null)? itemRequestDto.getBrand().getId() : null;
         List<?> itemExistByAttr = this.getByAttributes(brandId,itemAttributeName,itemRequestDto.getItemCategory().getId());
         if(itemExistByAttr.size()>0){
-            Optional<Item> itemOp = itemRepository.findByCode(itemRequestDto.getCode());
+            Optional<Item> itemOp = itemRepository.findByCode(item.getCode());
             if(itemRequestDto.getOrgId() != null){
                 Organization org = organizationService.getOrganizationById(itemRequestDto.getOrgId());
 //                Optional<Item> itemOp = itemRepository.findByCode(itemRequestDto.getCode());
@@ -231,7 +236,7 @@ public class ItemServiceImpl implements ItemService {
             }
         }else{
 
-            item.setCode(itemRequestDto.getCode());
+//            item.setCode(itemRequestDto.getCode());
 
             if(item.getItemParentCategory()==null && item.getItemCategory()==null){
                 throw new AesException("Item Sub Category Missing");
