@@ -20,7 +20,9 @@ public class Organization {
 
     private String name;
     private OrganizationStatus status;
-
+    private String realm;
+    private String clientId;
+    private String clientSecret;
     private String serviceIpAddress;
     private String scmIpAddress;
     private String accIpAddress;

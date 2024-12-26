@@ -40,7 +40,7 @@ public class OrganizationServiceImpl implements OrganizationService{
             throw new AesException("Organization name is required");
         }
         Optional<Organization> organizationOptional = organizationRepository.findByName(dto.getName());
-        if(organizationOptional.isPresent()){
+        if (organizationOptional.isPresent()) {
             throw new AesException("Organization is already registered");
         }
         Organization organization = new Organization();
@@ -49,6 +49,9 @@ public class OrganizationServiceImpl implements OrganizationService{
         organization.setServiceIpAddress(dto.getServiceIpAddress());
         organization.setScmIpAddress(dto.getScmIpAddress());
         organization.setAccIpAddress(dto.getAccIpAddress());
+        organization.setRealm(dto.getRealm());
+        organization.setClientId(dto.getClientId());
+        organization.setClientSecret(dto.getClientSecret());
         organization.setServiceUsername(dto.getServiceUsername());
         organization.setServicePassword(dto.getServicePassword());
         Role role = roleService.read("ORGANIZATION");

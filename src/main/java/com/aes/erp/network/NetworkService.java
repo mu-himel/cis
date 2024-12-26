@@ -20,15 +20,6 @@ public class NetworkService {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${keycloak}")
-    private String keycloak;
-
-    @Value("${clientId}")
-    private String clientId;
-
-    @Value("${clientSecret}")
-    private String clientSecret;
-
 
     public String getAuthToken(String url, String username, String password) {
         HttpHeaders headers = new HttpHeaders();
@@ -59,8 +50,8 @@ public class NetworkService {
 
     public String getKeycloakAccessToken(Organization organization) {
         System.out.println("Keycloak Access Token ");
-//        String AUTH_SERVER_URI = "http://172.17.17.254:8080/realms/aesl/protocol/openid-connect/token";
-        String AUTH_SERVER_URI = keycloak;
+        String AUTH_SERVER_URI = "http://172.17.17.254:8080/realms/" + organization.getRealm() + "/protocol/openid-connect/token";
+//        String AUTH_SERVER_URI = keycloak;
         System.out.println(AUTH_SERVER_URI);
         RestTemplate restTemplate = new RestTemplate();
 
@@ -69,11 +60,11 @@ public class NetworkService {
 
         MultiValueMap<String, String> mapForm = new LinkedMultiValueMap<>();
         mapForm.add("grant_type", "password");
-        mapForm.add("client_id", clientId);
+        mapForm.add("client_id", organization.getClientId());
         // mapForm.add("client_id", "aclbe");
         mapForm.add("username", organization.getServiceUsername());
         mapForm.add("password", organization.getServicePassword());
-        mapForm.add("client_secret", clientSecret);
+        mapForm.add("client_secret", organization.getClientSecret());
         // mapForm.add("client_secret", "GKCp5BurtrMK9XjgkVZ5wQYh8zLpngfU");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(mapForm, headers);
 
