@@ -144,9 +144,19 @@ public class TenderServiceImpl implements TenderService{
     }
 
     private List<CategoryAttribute> extractAttributesFromItemAttributeName(ItemCategory cat, String itemAttributeName){
-        String[] attrs = itemAttributeName.split(" - ");
         List<CategoryAttribute> pendingItemAttrList = new ArrayList<>();
-        
+        if(itemAttributeName == null){
+//            int count = 0;
+//            for (CategoryAttribute c: cat.getAttributes()) {
+//                itemAttributeName = c.getAttributeType()+" "+" "+" "+c.getAttributeUnit();
+//                count++;
+//                if(count != cat.getAttributes().size()){
+//                    itemAttributeName = itemAttributeName + " - ";
+//                }
+//            }
+            return pendingItemAttrList;
+        }
+        String[] attrs = itemAttributeName.split(" - ");
         
         for(String attr : attrs){
             String _attr="";
