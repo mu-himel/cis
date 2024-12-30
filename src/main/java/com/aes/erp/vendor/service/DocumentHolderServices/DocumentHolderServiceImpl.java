@@ -183,6 +183,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
         return mapEntityToDTO(documentHolder, vendor);
     }
 
+    @Transactional
     @Override
     public MisMatchResponseDto findMisMatch(MisMatchDto misMatchDto, Long documentHolderId) {;
         MisMatchResponseDto misMatchResponseDto = new MisMatchResponseDto();
@@ -323,9 +324,11 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     }
 
     public int calculateYearsOfBusiness(DocumentHolder documentHolder){
-        Timestamp issueDateBin = documentHolder.getBinDocument().getIssueDate();
-        if(issueDateBin == null)issueDateBin = Timestamp.from(Instant.now());
-        return LocalDate.now().getYear() - issueDateBin.toLocalDateTime().getYear();
+        if(documentHolder.getBinDocument().getIssueDate() != null) {
+            Timestamp issueDateBin = documentHolder.getBinDocument().getIssueDate();
+            return LocalDate.now().getYear() - issueDateBin.toLocalDateTime().getYear();
+        }
+        return 0;
     }
     public void setVendorScore(Vendor vendor, VendorScore vendorScore){
         float totalBusinessYears = calculateYearsOfBusiness(vendor.getDocumentHolder());
