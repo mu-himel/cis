@@ -85,7 +85,7 @@ public class BulkItemGenerationProcessServiceImpl implements BulkItemGenerationP
     private String getNextItemCode(String prefix) {
         Long autoCode = tempItemRepository.findNextCodeByCount(prefix);
         if (autoCode != null) {
-            return String.format("%08d", autoCode);
+            return String.format("%08d", ++autoCode);
         }
         return String.format("%08d", 1);
     }

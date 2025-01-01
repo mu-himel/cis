@@ -40,8 +40,12 @@ public interface TempItemRepository extends JpaRepository<TempItem,Long>{
     List<TempItemResponseInfo> findAllInactiveItems(Long parentCategoryId, Long categoryId);
 
     @Query(value = """
-            select count(*)+1 as autoCode FROM temp_items i
-            WHERE i.code LIKE CONCAT(:prefix,'%')
+            select substring_index(code,CONCAT(:prefix,'-'),-1) FROM (
+                select max(code) code FROM (SELECT id, code, true as active from items i\s
+                                                        WHERE code LIKE CONCAT(:prefix,'%')
+                                                                     UNION
+                                                                     SELECT id, code, false as active from temp_items pir WHERE code LIKE CONCAT(:prefix,'%')) p
+                                 WHERE p.code LIKE CONCAT(:prefix,'%') ORDER BY code asc ) p
             """, nativeQuery = true)
     Long findNextCodeByCount(String prefix);
 
