@@ -22,9 +22,9 @@ public class CertificateOfIncorporationDto {
     private String error;
 
 
-    public CertificateOfIncorporation dtoToEntityMapping(CertificateOfIncorporationDto dto, CertificateOfIncorporation entity){
-        if(!dto.getIrc_number().isEmpty())entity.setCertificateOfIncorporationNo(dto.getIrc_number());
-        if(!dto.getName().isEmpty())entity.setCompanyName(dto.getName());
+    public CertificateOfIncorporation dtoToEntityMapping(CertificateOfIncorporationDto dto, CertificateOfIncorporation entity) {
+        if (!dto.getIrc_number().isEmpty()) entity.setCertificateOfIncorporationNo(dto.getIrc_number());
+        if (!dto.getName().isEmpty()) entity.setCompanyName(dto.getName());
 
         return entity;
     }

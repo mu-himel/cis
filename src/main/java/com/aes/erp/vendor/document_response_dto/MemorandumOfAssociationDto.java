@@ -17,8 +17,8 @@ public class MemorandumOfAssociationDto {
     @JsonProperty("message")
     private String message;
 
-    public MemorandumOfAssociation dtoToEntityMapping(MemorandumOfAssociationDto dto, MemorandumOfAssociation entity){
-        if(!dto.getCompanyName().isEmpty())entity.setCompanyName(dto.getCompanyName());
+    public MemorandumOfAssociation dtoToEntityMapping(MemorandumOfAssociationDto dto, MemorandumOfAssociation entity) {
+        if (!dto.getCompanyName().isEmpty()) entity.setCompanyName(dto.getCompanyName());
 
         return entity;
     }

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.aes.erp</groupId>
 	<artifactId>release-v1</artifactId>
-	<version>newdev-0.0.13</version>
+	<version>newdev-1.1.8</version>
 	<name>cpsbe</name>
 	<description>CWH + VMS </description>
 	<properties>
@@ -145,7 +145,7 @@
 				<active>dev</active>
 			</properties>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 			</activation>
 		</profile>
 		<profile>
@@ -154,7 +154,7 @@
 				<active>prod</active>
 			</properties>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 		</profile>
 	</profiles>

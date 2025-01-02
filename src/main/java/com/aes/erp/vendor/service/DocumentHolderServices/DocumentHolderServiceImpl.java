@@ -288,7 +288,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
     @Override
     public ExtractedInformationDto getHolderExtractedDetailsForConfirmation(Long id) {
         ExtractedInformationDto dto = new ExtractedInformationDto();
-        List<DocumentType> allDocTypes = Arrays.asList(DocumentType.BIN, DocumentType.TIN, DocumentType.NID, DocumentType.BANK_SOLVENCY, DocumentType.TRADE,DocumentType.IRC,DocumentType.AOA,DocumentType.MOA);
+        List<DocumentType> allDocTypes = Arrays.asList(DocumentType.BIN, DocumentType.TIN, DocumentType.NID, DocumentType.BANK_SOLVENCY, DocumentType.TRADE, DocumentType.IRC, DocumentType.AOA, DocumentType.MOA);
         for(DocumentType type: allDocTypes){
             Document document = documentRepository.getDocumentByDocumentHolderId(id, type.ordinal());
             if(document != null){
@@ -374,7 +374,7 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             responseDto.setTradeLicenseNumber(documentHolder.getTradeDocument().getTradeLicenseNumber());
         }
         if(documentHolder.getArticleOfAssociation() != null){
-            if(documentHolder.getArticleOfAssociation().getDocument()!=null) {
+            if (documentHolder.getArticleOfAssociation().getDocument() != null) {
                 if (documentHolder.getArticleOfAssociation().getDocument().getFile() != null) {
                     String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getArticleOfAssociation().getDocument().getFile());
                     responseDto.setArticleOfAssociation("data:image/jpeg;base64," + encodedFileContent);
@@ -382,8 +382,8 @@ public class DocumentHolderServiceImpl implements DocumentHolderService{
             }
 //            responseDto.setArticleOfAssociation(documentHolder.getArticleOfAssociation().getDocument().getFile().toString());
         }
-        if(documentHolder.getMemorandumOfAssociation()!= null){
-            if(documentHolder.getMemorandumOfAssociation().getDocument() != null) {
+        if(documentHolder.getMemorandumOfAssociation()!= null) {
+            if (documentHolder.getMemorandumOfAssociation().getDocument() != null) {
                 if (documentHolder.getMemorandumOfAssociation().getDocument().getFile() != null) {
                     String encodedFileContent = Base64.getEncoder().encodeToString(documentHolder.getMemorandumOfAssociation().getDocument().getFile());
                     responseDto.setMemorandumOfAssociation("data:image/jpeg;base64," + encodedFileContent);

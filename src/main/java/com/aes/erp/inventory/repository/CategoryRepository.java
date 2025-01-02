@@ -98,6 +98,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
     Optional<Long> countAllByParentCategoryAndActive(ItemCategory itemCategory,Boolean active);
 
     Boolean existsByCodeAndActive(String code, Boolean active);
+
     Boolean existsByNameAndActive(String name, Boolean active);
 
 

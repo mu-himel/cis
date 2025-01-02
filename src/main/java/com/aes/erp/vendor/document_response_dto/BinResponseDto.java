@@ -50,15 +50,15 @@ public class BinResponseDto {
     @JsonProperty("message")
     private String message;
 
-    public BINDocument dtoToEntityMapping(BinResponseDto dto, BINDocument document){
-        if(!dto.getAddress().isEmpty())document.setAddress(dto.getAddress());
-        if(!dto.getBinNumber().isEmpty())document.setBin(dto.getBinNumber());
-        if(!dto.getOldBinNumber().isEmpty())document.setOldBin(dto.getOldBinNumber());
-        if(!dto.getTinNumber().isEmpty())document.setTin(dto.getTinNumber());
-        if(!dto.getCompanyName().isEmpty())document.setCompanyName(dto.getCompanyName());
-        if(dto.getEffectiveDate() != null)document.setEffectiveDate(dto.getEffectiveDate());
-        if(dto.getIssueDate() != null)document.setIssueDate(getTimestamp(dto.getIssueDate(), "dd/MM/yyyy"));
-        if(!dto.getOwnershipType().isEmpty())document.setOwnershipType(dto.getOwnershipType());
+    public BINDocument dtoToEntityMapping(BinResponseDto dto, BINDocument document) {
+        if (!dto.getAddress().isEmpty()) document.setAddress(dto.getAddress());
+        if (!dto.getBinNumber().isEmpty()) document.setBin(dto.getBinNumber());
+        if (!dto.getOldBinNumber().isEmpty()) document.setOldBin(dto.getOldBinNumber());
+        if (!dto.getTinNumber().isEmpty()) document.setTin(dto.getTinNumber());
+        if (!dto.getCompanyName().isEmpty()) document.setCompanyName(dto.getCompanyName());
+        if (dto.getEffectiveDate() != null) document.setEffectiveDate(dto.getEffectiveDate());
+        if (dto.getIssueDate() != null) document.setIssueDate(getTimestamp(dto.getIssueDate(), "dd/MM/yyyy"));
+        if (!dto.getOwnershipType().isEmpty()) document.setOwnershipType(dto.getOwnershipType());
         return document;
     }
 

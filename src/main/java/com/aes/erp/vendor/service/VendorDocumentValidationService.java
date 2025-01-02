@@ -123,11 +123,10 @@ public class VendorDocumentValidationService {
             documentService.create(document);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(result);
-            
-            if(result == null || jsonNode.has("Error") || jsonNode.has("state")){
+
+            if (result == null || jsonNode.has("Error") || jsonNode.has("state")) {
                 throw new AesException("Wrong document uploaded");
-            }
-            else{
+            } else {
                 //Finishing The asynchronous task
                 return mapToDto(result, docType);
             }

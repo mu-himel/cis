@@ -21,10 +21,10 @@ public class ArticleOfAssociationDto {
     @JsonProperty("message")
     private String message;
 
-    public ArticleOfAssociation dtoToEntityMapping(ArticleOfAssociationDto dto, ArticleOfAssociation entity){
-        if(!dto.getCompanyName().isEmpty())entity.setCompanyName(dto.getCompanyName());
-        if(!dto.getYearOfEstablishment().isEmpty())entity.setYearOfEstablishment(dto.getYearOfEstablishment());
-        if(!dto.getAddress().isEmpty())entity.setAddress(dto.getAddress());
+    public ArticleOfAssociation dtoToEntityMapping(ArticleOfAssociationDto dto, ArticleOfAssociation entity) {
+        if (!dto.getCompanyName().isEmpty()) entity.setCompanyName(dto.getCompanyName());
+        if (!dto.getYearOfEstablishment().isEmpty()) entity.setYearOfEstablishment(dto.getYearOfEstablishment());
+        if (!dto.getAddress().isEmpty()) entity.setAddress(dto.getAddress());
         return entity;
     }
 }
