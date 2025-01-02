@@ -20,27 +20,40 @@ public class TradeLicenseDto {
     private String ID;
     @JsonIgnore
     private String secret_key;
+    @JsonProperty("issue_date")
     private String issueDate;
+    @JsonProperty("issue_time")
     private String issueTime;
     private String mobileNo;
     private String nid;
+    @JsonProperty("license_no")
     private String tradeLicenseNo;
 
-    @JsonProperty(value = "nameOfBusiness")
+    //    @JsonProperty(value = "nameOfBusiness")
+    @JsonProperty(value = "business_name")
     private String businessInstituteName;
+    @JsonProperty(value = "business_start_date")
     private String businessStartDate;
+    @JsonProperty("owner_name")
     private String ownerName;
+    @JsonProperty("father_name")
     private String fatherOrHusbandName;
+    @JsonProperty("mother_name")
     private String motherName;
-    @JsonProperty(value = "natureOfBusiness")
+    //    @JsonProperty(value = "natureOfBusiness")
+    @JsonProperty("business_nature")
     private String businessNature;
-    @JsonProperty(value = "typeOfBusiness")
+//    @JsonProperty(value = "typeOfBusiness")
+    @JsonProperty(value = "business_type")
     private String businessType;
-    @JsonProperty(value = "businessAddress")
+//    @JsonProperty(value = "businessAddress")
+    @JsonProperty(value = "business_address")
     private String instituteAddress;
     private String instituteArea;
+    @JsonProperty("nid_or_passport")
     private String nidPassportNo;
     private String phone;
+    @JsonProperty(value = "fiscal_year")
     private String fiscalYear;
     private String ownerPresentAddress;
     private String presentAddressHolding;
@@ -70,16 +83,19 @@ public class TradeLicenseDto {
     private String licenseExpireDate;
     private String ownerIdentification;
     private String validity;
+    @JsonProperty("bin_no")
+    private String bin;
+    private String email;
 
     //New added field tracked on 26th June, 2024
     private String cityCorporationName;
 
 
-    
+
     @JsonProperty("None")
     @JsonIgnore
     private String ignore;
-    
+
     @JsonProperty("Error")
     private String error;
 
@@ -96,7 +112,7 @@ public class TradeLicenseDto {
     }
 
     private Timestamp getTimestamp(String date,String format){
-		DateTimeFormatter df = DateTimeFormatter.ofPattern(format);
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(format);
         LocalDate ld = LocalDate.parse(date,df);
         return Timestamp.valueOf(ld.atStartOfDay());
     }
