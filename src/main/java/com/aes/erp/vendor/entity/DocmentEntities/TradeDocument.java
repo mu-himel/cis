@@ -19,7 +19,7 @@ public class TradeDocument {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    private Timestamp issueDate;
+    private String issueDate;
     private String mobileNo;
     private String nid;
     private String tradeLicenseNumber;

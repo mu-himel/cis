@@ -102,7 +102,9 @@ public class TradeLicenseDto {
     public TradeDocument dtoToEntityMapping(TradeLicenseDto dto, TradeDocument tradeDocument){
         if(dto.getIssueDate() != null && !(dto.getIssueDate().equals("null") || dto.getIssueDate().equals("")))
         {
-            tradeDocument.setIssueDate(getTimestamp(dto.getIssueDate(), "dd MMM yyyy"));
+//            tradeDocument.setIssueDate(getTimestamp(dto.getIssueDate(), "dd MMM yyyy"));
+            tradeDocument.setIssueDate(dto.getIssueDate());
+
         }
         if(dto.getNidPassportNo()!=null && !dto.getNidPassportNo().isEmpty())tradeDocument.setNid(dto.getNidPassportNo());
         // if(!dto.getMobileNo().isEmpty())tradeDocument.setMobileNo(dto.getMobileNo());
