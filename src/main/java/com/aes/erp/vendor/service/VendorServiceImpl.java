@@ -590,9 +590,10 @@ public class VendorServiceImpl implements VendorService {
             vendor = vendorRepository.save(vendor);
             List<Organization> organizationList = organizationRepository.findAll();
             for (Organization org:organizationList) {
-                if(!org.getName().equals("A_ONE_POLYMER")) {
-//                    createVendorLedger(vendor, org);
-                }
+                createVendorLedger(vendor, org);
+//                if(!org.getName().equals("A_ONE_POLYMER")) {
+////                    createVendorLedger(vendor, org);
+//                }
 
             }
         }
