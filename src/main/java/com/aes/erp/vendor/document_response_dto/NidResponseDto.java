@@ -45,7 +45,9 @@ public class NidResponseDto {
         if(!dto.getBanglaName().isEmpty())nidDocument.setName(dto.getBanglaName());
         if(!dto.getFatherName().isEmpty())nidDocument.setFatherName(dto.getFatherName());
         if(!dto.getMotherName().isEmpty())nidDocument.setMotherName(dto.getMotherName());
-        if(dto.getDateOfBirth() != null)nidDocument.setDateOfBirth(getTimestamp(dto.getDateOfBirth(), "dd MMM yyyy"));
+        if(dto.getDateOfBirth() != null)nidDocument.setDateOfBirth(dto.getDateOfBirth());
+
+//        if(dto.getDateOfBirth() != null)nidDocument.setDateOfBirth(getTimestamp(dto.getDateOfBirth(), "dd MMM yyyy"));
         return nidDocument;
     }
     

@@ -17,7 +17,7 @@ public class NIDDocument {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    private Date dateOfBirth;
+    private String dateOfBirth;
     private String name;
     private String nid;
     private String fatherName;
