@@ -156,7 +156,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             for(PoDetailReqDto od:poDto.getOrderDetails()){
                 Optional<OfferItem> offerItemOp = offer.getOfferItems().stream()
                         .filter(oi->{
-                            String oiStr = oi.getProductDescription();
+                            String oiStr = oi.getBrandName().concat("-"+oi.getProductDescription());
                             if(oi.getExtendedAttributes() != null){
                                 oiStr = oiStr.concat(" - "+oi.getExtendedAttributes());
                             }
@@ -372,6 +372,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
 
                                 grnManualItemDetail.setDeliveryChargeAmount(podd.getDeliveryCharge());
                                 goodReceiveNoteDto.setDeliveryChargeAmount(goodReceiveNoteDto.getDeliveryChargeAmount().add(podd.getDeliveryCharge()));
+                                grnManualItemDetail.setVatAmount(row.getVatAmount());
                                 if (row.getOfferItem().getOffer().getVatIncluded() == true) {
                                     goodReceiveNoteDto.setTotalVat((goodReceiveNoteDto.getTotalPrice().multiply(goodReceiveNoteDto.getVatPctg())).divide((new BigDecimal(100).add(goodReceiveNoteDto.getVatPctg())),RoundingMode.HALF_UP));
                                     goodReceiveNoteDto.setInTotal(goodReceiveNoteDto.getTotalPrice().add(goodReceiveNoteDto.getDeliveryChargeAmount()));
@@ -449,6 +450,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
                             itemOptional.ifPresent(item -> grid.setItemCode(item.getCode()));
                             grid.setOrderQty(podd.getItemQty());
                             grid.setDeliveryChargeAmount(podd.getDeliveryCharge());
+                            grid.setVatAmount(row.getVatAmount());
                             grid.setPricePerUnit(row.getOfferItem().getPriceQuotation().getPricePerUnit());
                             grids.add(grid);
                             grn.setGrnDetails(grids);
