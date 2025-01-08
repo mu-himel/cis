@@ -19,4 +19,6 @@ public class GrnManualItemDetailDto {
     private BigDecimal orderQty;
     private BigDecimal pricePerUnit;
     private BigDecimal deliveryChargeAmount;
+    private BigDecimal vatAmount;
+
 }
