@@ -224,20 +224,24 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void updateCategory(Long id, CategoryRequestDto categoryRequestDto) {
         Optional<ItemCategory> itemCategoryOptional = categoryRepository.findById(id);
-        if(itemCategoryOptional.isEmpty()){
+        if (itemCategoryOptional.isEmpty()) {
             throw new AesException("Category Not Found");
         }
 
         ItemCategory itemCategory = itemCategoryOptional.get();
-        if(!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())){
+        if (itemCategory.getScmCategoryId() != null) {
+            throw new RuntimeException("Sorry! This category already synced with scm, renaming this might be cause of data inconsistency");
+        }
+
+        if (!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())) {
             throw new AesException("Category Code should be unique");
         }
-        Optional<ItemCategory> itemCatOp = categoryRepository.getByNameAndActiveAndCode(categoryRequestDto.getName().toUpperCase(),true,categoryRequestDto.getCode());
+        Optional<ItemCategory> itemCatOp = categoryRepository.getByNameAndActiveAndCode(categoryRequestDto.getName().toUpperCase(), true, categoryRequestDto.getCode());
 
 //        Optional<ItemCategory> itemCatOp = categoryRepository.findByNameAndActive(categoryRequestDto.getName(),true);
-        if(itemCatOp.isPresent()){
-            if(!itemCatOp.get().getId().equals(id)){
-                throw new AesException("Sorry! Category exist with this name with #ID:"+itemCatOp.get().getId());
+        if (itemCatOp.isPresent()) {
+            if (!itemCatOp.get().getId().equals(id)) {
+                throw new AesException("Sorry! Category exist with this name with #ID:" + itemCatOp.get().getId());
             }
         }
 
