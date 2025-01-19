@@ -35,6 +35,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -138,6 +139,12 @@ public class TenderServiceImpl implements TenderService{
         Tender tender = tenderOp.get();
         tender.setTenderItems(tender.getTenderItems().stream().map(ti->{
             ti.setAttributes(extractAttributesFromItemAttributeName(tender.getItemCategory(), ti.getProductDescription()));
+
+            ti.setOrderQuantity(ti.getDeliveryDetails()
+                    .stream()
+                    .map(TenderDeliveryDetail::getDeliveryOrderQTY)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add).longValue());
+
             return ti;
         }).collect(Collectors.toList()));
         return tender;
