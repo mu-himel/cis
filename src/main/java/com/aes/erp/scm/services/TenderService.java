@@ -52,4 +52,6 @@ public interface TenderService {
     Tender getTenderByRfqNo(Long orgId, String tenderNo);
 
     List<?> getTenderLowestBids(String rfqNo);
+
+    void expire(String rfqNo);
 }

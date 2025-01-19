@@ -110,4 +110,10 @@ public class TenderController {
             tenderService.rejectTender(loggedInUser,id, noteDto);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PutMapping("/expire/{rfqNo}")
+    public ResponseEntity<?> expireTender(@PathVariable("rfqNo") String rfqNo){
+        tenderService.expire(rfqNo);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }
