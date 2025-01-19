@@ -12,7 +12,6 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="cps_vms" target="17" />
-      <module name="release-v1" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

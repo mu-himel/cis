@@ -199,6 +199,16 @@ public class TenderServiceImpl implements TenderService{
     }
 
     @Override
+    public void expire(String rfqNo) {
+        Optional<Tender> tenderOp = tenderRepository.findByRfqNo(rfqNo);
+        if(tenderOp.isPresent()){
+            Tender tender = tenderOp.get();
+            tender.setDeadline(Instant.now().toEpochMilli());
+            tenderRepository.save(tender);
+        }
+    }
+
+    @Override
     public Tender getTenderByRfqNo(Long orgId, String tenderNo) {
         Optional<Tender> tender = tenderRepository.findByRfqNoAndTenderCreatorId(tenderNo, orgId);
         if (tender.isEmpty()) throw new AesException("Sorry! Tender not found");
