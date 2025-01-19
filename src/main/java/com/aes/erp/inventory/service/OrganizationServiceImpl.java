@@ -41,7 +41,7 @@ public class OrganizationServiceImpl implements OrganizationService{
         }
         Optional<Organization> organizationOptional = organizationRepository.findByName(dto.getName());
         if (organizationOptional.isPresent()) {
-            throw new AesException("Organization is already registered");
+            throw new AesException("Organization is already registered " + dto.getName());
         }
         Organization organization = new Organization();
         organization.setName(dto.getName());
