@@ -82,8 +82,8 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private NetworkService networkService;
 
-    @Value("${scm.apiEndpoint}")
-    private String scmApiEndpoint;
+//    @Value("${scm.apiEndpoint}")
+//    private String scmApiEndpoint;
 
     @Autowired
     private OrganizationService organizationService;
@@ -490,17 +490,17 @@ public class ItemServiceImpl implements ItemService {
         StringBuilder sb = new StringBuilder("/items");
         sb.append("/approve/");
         sb.append(pendingItem.getScmItemId());
-
-        String itemTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+        String scmEndpoint = pendingItem.getOrganization().getScmIpAddress();
+        String itemTransferEndpoint = scmEndpoint.concat(sb.toString());
         System.out.println(itemTransferEndpoint);
-        if (mergePendingItemsDto.getMergeItemId() == null){
+        if (mergePendingItemsDto.getMergeItemId() == null) {
             //No Merge
             postDto.setApproveStatus("APPROVED");
             postDto.setCode(null);
             postDto.setWarehouseId(pendingItem.getWarehouseId());
             postDto.setWarehouseStoreId(pendingItem.getWarehouseStoreId());
 
-            ItemCategory itemCat =  itemCategoryRepo.findById(pendingItem.getCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));
+            ItemCategory itemCat = itemCategoryRepo.findById(pendingItem.getCategory().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT, "no such entry"));
             itemMergeRequestDto.setItemParentCategory(new ItemCategory(itemCat.getScmCategoryId()));
             ItemCategory itemSubCat =  itemCategoryRepo.findById(pendingItem.getSubCategory().getId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NO_CONTENT,"no such entry"));
             itemMergeRequestDto.setItemCategory(new ItemCategory(itemSubCat.getScmCategoryId()));

@@ -65,8 +65,8 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     @Autowired
     private NetworkService networkService;
 
-    @Value("${scm.apiEndpoint}")
-    private String scmApiEndpoint;
+//    @Value("${scm.apiEndpoint}")
+//    private String scmApiEndpoint;
 
     @Override
     @Transactional
@@ -246,12 +246,13 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
         StringBuilder sb = new StringBuilder("/items");
         sb.append("/approve/");
         sb.append(getPendingItem.getScmItemId());
-        String itemTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+        String scmEndpoint = getPendingItem.getOrganization().getScmIpAddress();
+        String itemTransferEndpoint = scmEndpoint.concat(sb.toString());
 
-        ResponseEntity<Void> response = networkService.put(itemTransferEndpoint,mPCDtoPayload,Void.class);
-        if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+        ResponseEntity<Void> response = networkService.put(itemTransferEndpoint, mPCDtoPayload, Void.class);
+        if (response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
             pendingItemRequestRepository.deleteById(getPendingItem.getId());
-        }else{
+        } else {
             throw new AesException("Something wrong");
         }
 
