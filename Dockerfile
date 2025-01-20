@@ -1,4 +1,4 @@
-FROM maven:3.6.3-openjdk-17-slim as BUILDER
+FROM maven:3.6.3-openjdk-17-slim AS builder
 
 WORKDIR /app
 
@@ -9,11 +9,11 @@ COPY ./src/main/resources/application-prod.properties ./src/main/resources/appli
 RUN mvn clean install -DskipTests
 
 
-FROM openjdk:17-oracle as PROD
+FROM openjdk:17-oracle AS prod
 
 WORKDIR /app
 
-COPY --from=BUILDER /app/target/*.jar app.jar
+COPY --from=builder /app/target/*.jar app.jar
 
 ### couldnt upload to uploads folder due to specific user but not root
 
