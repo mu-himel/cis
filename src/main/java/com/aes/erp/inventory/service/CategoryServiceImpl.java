@@ -60,8 +60,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private NetworkService networkService;
 
-    @Value("${scm.apiEndpoint}")
-    private String scmApiEndpoint;
+//    @Value("${scm.apiEndpoint}")
+//    private String scmApiEndpoint;
 
     public CategoryServiceImpl(BrandRepository brandRepository, GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository) {
         this.brandRepository = brandRepository;
@@ -69,8 +69,8 @@ public class CategoryServiceImpl implements CategoryService {
         this.subcategoryBrandRepository = subcategoryBrandRepository;
     }
 
-    public void addBrandToSubCategory(CategoryRequestDto dto, ItemCategory category){
-        if(dto.getBrands() != null){
+    public void addBrandToSubCategory(CategoryRequestDto dto, ItemCategory category) {
+        if (dto.getBrands() != null) {
             Set<SubCategoryBrand> subCategoryBrands = new HashSet<>();
             for(String brandName: dto.getBrands()) {
                 Optional<SubCategoryBrand> existingBrandOptional = subcategoryBrandRepository.getBrandByNameAndSubCategoryId(brandName, category.getId());
@@ -665,7 +665,7 @@ public class CategoryServiceImpl implements CategoryService {
         // if(mergePendingCategoryDto.getCode() == null){
         //     emptyDto = true;
         // }
-
+        ;
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(networkService.getKeycloakAccessToken(getItemCategory.getOrganization()));
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -676,14 +676,15 @@ public class CategoryServiceImpl implements CategoryService {
         StringBuilder sb = new StringBuilder("/item-categories");
         sb.append("/approve/category/");
         sb.append(getItemCategory.getScmCategoryId());
-        String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+        String scmEndpoint = getItemCategory.getOrganization().getScmIpAddress();
+        String itemCategoryTransferEndpoint = scmEndpoint.concat(sb.toString());
         System.out.println(itemCategoryTransferEndpoint);
-        
 
-        if(mergePendingCategoryDto.getMergeCategoryId() == null){
+
+        if (mergePendingCategoryDto.getMergeCategoryId() == null) {
             //no merge, send with actual item ID in the URL
 
-            
+
             postDto.setApproveStatus(CategoryStatus.APPROVED);
             postDto.setCode(null);
             // mergePendingCategoryDto.setCode(getItemCategory.getCode());
@@ -827,14 +828,15 @@ public class CategoryServiceImpl implements CategoryService {
         StringBuilder sb = new StringBuilder("/item-categories");
         sb.append("/approve/category/");
         sb.append(getItemCategory.getScmCategoryId());
-        String itemCategoryTransferEndpoint = scmApiEndpoint.concat(sb.toString());
+        String scmEndpoint = getItemCategory.getOrganization().getScmIpAddress();
+        String itemCategoryTransferEndpoint = scmEndpoint.concat(sb.toString());
 
-        ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint,mPCDtoPayload,Void.class);
-        if(response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+        ResponseEntity<Void> response = networkService.put(itemCategoryTransferEndpoint, mPCDtoPayload, Void.class);
+        if (response.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
             getItemCategory.setCategoryStatus(CategoryStatus.REJECTED);
             getItemCategory.setActive(false);
             categoryRepository.save(getItemCategory);
-        }else{
+        } else {
             throw new AesException("Something wrong");
         }
 
