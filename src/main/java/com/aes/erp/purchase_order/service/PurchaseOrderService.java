@@ -15,11 +15,32 @@ public interface PurchaseOrderService {
 
     void receivePO(Organization organization, PoReceiveRequestDto poDto);
 
-    Page<?> getPendingPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size);
+    Page<?> getPendingPOs(ClaimResponseDto loggedInUser,
+                          Optional<Integer> page,
+                          Optional<Integer> size,
+                          Optional<String> poNo,
+                          Optional<String> tenderNo,
+                          Optional<Long> organizationId,
+                          Optional<String> categoryId,
+                          Optional<String> subCategoryId,
+                          Optional<String> deliveryDate,
+                          Optional<String> status,
+                          Optional<String> fromDate,
+                          Optional<String> toDate);
 
     <T> Optional<T> getDetailById(ClaimResponseDto loggedInUser, Long id, Class<T> t);
 
-    Page<?> getClosedPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size);
+    Page<?> getClosedPOs(ClaimResponseDto loggedInUser,
+                         Optional<Integer> page,
+                         Optional<Integer> size,
+                         Optional<String> poNo,
+                         Optional<String> tenderNo,
+                         Optional<Long> organizationId,
+                         Optional<String> categoryId,
+                         Optional<String> subCategoryId,
+                         Optional<String> deliveryDate,
+                         Optional<String> fromDate,
+                         Optional<String> toDate);
 
     void uploadInvoice(ClaimResponseDto loggedInUser, Long id, Optional<MultipartFile> fileOp);
 

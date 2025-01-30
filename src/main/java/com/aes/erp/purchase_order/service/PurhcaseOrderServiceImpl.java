@@ -204,22 +204,82 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
     }
 
     @Override
-    public Page<?> getPendingPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size) {
-        
+    public Page<?> getPendingPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size,
+                                 Optional<String> poNo,
+                                 Optional<String> tenderNo,
+                                 Optional<Long> organizationId,
+                                 Optional<String> categoryId,
+                                 Optional<String> subCategoryId,
+                                 Optional<String> deliveryDateInString,
+                                 Optional<String> status,
+                                 Optional<String> fromDateInString,
+                                 Optional<String> toDateInString) {
+
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
-        if(loggedInUser.getUserInfoDto().get("vendorId")==null){
+        if (loggedInUser.getUserInfoDto().get("vendorId") == null) {
             throw new AesException("Sorry! user is not a vendor profile");
         }
         Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
-        return poRepository.findAllPendingPOs(vendorId,pageable);
+        Long deliveryDate = null;
+        Long fromDate = null;
+        Long toDate = null;
+        if (deliveryDateInString.isPresent()) {
+            deliveryDate = Instant.parse(deliveryDateInString.get() + "T10:15:30.00Z").toEpochMilli();
+        }
+        if (fromDateInString.isPresent()) {
+            fromDate = Instant.parse(fromDateInString.get() + "T00:00:00.00Z").minusSeconds(60 * 60 * 6).toEpochMilli();
+        }
+        if (toDateInString.isPresent()) {
+            toDate = Instant.parse(toDateInString.get() + "T17:59:59.00Z").toEpochMilli();
+
+        }
+        return poRepository.findAllPendingPOs(vendorId, pageable,
+                poNo.orElse(null),
+                tenderNo.orElse(null),
+                organizationId.orElse(null),
+                categoryId.orElse(null),
+                subCategoryId.orElse(null),
+                deliveryDate,
+                status.orElse(null),
+                fromDate,
+                toDate);
     }
 
 
     @Override
-    public Page<?> getClosedPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size) {
+    public Page<?> getClosedPOs(ClaimResponseDto loggedInUser, Optional<Integer> page, Optional<Integer> size,
+                                Optional<String> poNo,
+                                Optional<String> tenderNo,
+                                Optional<Long> organizationId,
+                                Optional<String> categoryId,
+                                Optional<String> subCategoryId,
+                                Optional<String> deliveryDateInString,
+                                Optional<String> fromDateInString,
+                                Optional<String> toDateInString) {
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
         Long vendorId = Long.parseLong(loggedInUser.getUserInfoDto().get("vendorId").toString());
-        return poRepository.findAllClosedPOs(vendorId,pageable);
+        Long deliveryDate = null;
+        Long fromDate = null;
+        Long toDate = null;
+        if (deliveryDateInString.isPresent()) {
+            deliveryDate = Instant.parse(deliveryDateInString.get() + "T10:15:30.00Z").toEpochMilli();
+        }
+        if (fromDateInString.isPresent()) {
+            fromDate = Instant.parse(fromDateInString.get() + "T10:15:30.00Z").minusSeconds(60 * 60 * 6).toEpochMilli();
+        }
+        if (toDateInString.isPresent()) {
+            toDate = Instant.parse(toDateInString.get() + "T17:59:59.00Z").toEpochMilli();
+        }
+        return poRepository.findAllClosedPOs(vendorId, pageable,
+                poNo.orElse(null),
+                tenderNo.orElse(null),
+                organizationId.orElse(null),
+                categoryId.orElse(null),
+                subCategoryId.orElse(null),
+                deliveryDate,
+                fromDate,
+                toDate);
+
     }
 
     @Override

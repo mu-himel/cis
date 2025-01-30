@@ -25,10 +25,16 @@ public interface PoRepository extends JpaRepository<PurchaseOrder, Long>, Purcha
     List<TenderDeliveryDetail> findDeliveryDetailsFromTenderItem(@Param("tenderItemId") Long tenderItemId);
 
     @Query(value = pendingPos, countQuery = countPendingPos, nativeQuery = true)
-    Page<PendingPOItem> findAllPendingPOs(@Param("vendorId") Long vendorId, Pageable pageable);
+    Page<PendingPOItem> findAllPendingPOs(@Param("vendorId") Long vendorId, Pageable pageable, String poNo,
+                                          String tenderNo, Long organizationId, String categoryId,
+                                          String subCategoryId, Long deliveryDate, String status,
+                                          Long fromDate, Long toDate);
 
     @Query(value = closedPos, countQuery = countClosedPos, nativeQuery = true)
-    Page<PendingPOItem> findAllClosedPOs(Long vendorId, Pageable pageable);
+    Page<PendingPOItem> findAllClosedPOs(Long vendorId, Pageable pageable, String poNo,
+                                         String tenderNo, Long organizationId, String categoryId,
+                                         String subCategoryId, Long deliveryDate,
+                                         Long fromDate, Long toDate);
 
     Optional<PurchaseOrder> findByRemotePoId(Long id);
 
