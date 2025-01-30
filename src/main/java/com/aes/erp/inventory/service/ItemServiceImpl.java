@@ -193,7 +193,9 @@ public class ItemServiceImpl implements ItemService {
         if (catOp.isEmpty()) {
             throw new AesException("Sorry! Sub Category not specified");
         }
+//    System.out.println("DEBUG "+catOp.get().getCode());
         item.setCode(catOp.get().getCode().concat("-").concat(getNextItemCode(catOp.get().getCode())));
+//        System.out.println("DEBUG "+item.getCode());
         String itemAttributeName = generateItemAttributeName(itemRequestDto.getAttributes());
         
         Long brandId = (itemRequestDto.getBrand()!=null)? itemRequestDto.getBrand().getId() : null;
@@ -635,14 +637,38 @@ public class ItemServiceImpl implements ItemService {
     public void updateItemScmId(List<ImportItemScmIdUpdateDto> itemScmIdList) {
         for (ImportItemScmIdUpdateDto getItem : itemScmIdList) {
             Optional<Item> getItemOp = itemRepository.findById(getItem.getItemIdCps());
-            if(getItemOp.isPresent()){
+            if (getItemOp.isPresent()) {
                 Item pickItem = getItemOp.get();
                 pickItem.setScmItemId(getItem.getItemIdScm());
                 itemRepository.save(pickItem);
             }
         }
     }
-    
 
-    
+    @Override
+    @Transactional
+    public void importItem(ClaimResponseDto claimResponseDto, ItemRequestDto itemRequestDto) {
+        Item item = itemRequestDto.getEntity();
+        item.setCreatedBy(new User(claimResponseDto.getId()));
+        item.setCode(itemRequestDto.getCode().concat("-").concat(getNextItemCode(itemRequestDto.getCode())));
+        String itemAttributeName = generateItemAttributeName(itemRequestDto.getAttributes());
+
+        Long brandId = (itemRequestDto.getBrand() != null) ? itemRequestDto.getBrand().getId() : null;
+        List<?> itemExistByAttr = this.getByAttributes(brandId, itemAttributeName, itemRequestDto.getItemCategory().getId());
+        if (itemExistByAttr.size() > 0) {
+            // update attribute only
+        }
+        item.setItemAttributeName(itemAttributeName);
+        if (itemRequestDto.getBrand() != null && itemRequestDto.getBrand().getId() != null) {
+            item.setBrand(new Brand(itemRequestDto.getBrand().getId()));
+        }
+
+        if (itemRequestDto.getAttributes() != null && itemRequestDto.getAttributes().size() > 0) {
+            item.setAttributes(itemRequestDto.getAttributes().stream().map(itemAttribute -> {
+                itemAttribute.setItem(item);
+                return itemAttribute;
+            }).collect(Collectors.toList()));
+        }
+        itemRepository.save(item);
+    }
 }

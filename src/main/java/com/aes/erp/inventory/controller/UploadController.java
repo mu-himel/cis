@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.controller;
 
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.entity.StoreType;
 import com.aes.erp.inventory.service.BulkUploadService;
@@ -7,6 +8,7 @@ import com.aes.erp.inventory.service.StoreTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +49,17 @@ public class UploadController {
     ) throws IOException {
 
         bulkUploadService.subCategoryBulkUpload(file);
-        return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/products")
+    public ResponseEntity<?> uploadProduct(
+            @RequestAttribute ClaimResponseDto loggedInUser,
+            @RequestPart("file") Optional<MultipartFile> file
+    ) throws IOException {
+        bulkUploadService.productUpload(loggedInUser, file);
+        return new ResponseEntity<>(
+                HttpStatus.NO_CONTENT);
     }
 
 }

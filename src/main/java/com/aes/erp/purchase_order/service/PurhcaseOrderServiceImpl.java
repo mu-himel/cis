@@ -265,7 +265,7 @@ public class PurhcaseOrderServiceImpl implements PurchaseOrderService{
             deliveryDate = Instant.parse(deliveryDateInString.get() + "T10:15:30.00Z").toEpochMilli();
         }
         if (fromDateInString.isPresent()) {
-            fromDate = Instant.parse(fromDateInString.get() + "T10:15:30.00Z").minusSeconds(60 * 60 * 6).toEpochMilli();
+            fromDate = Instant.parse(fromDateInString.get() + "T00:00:00.00Z").minusSeconds(60 * 60 * 6).toEpochMilli();
         }
         if (toDateInString.isPresent()) {
             toDate = Instant.parse(toDateInString.get() + "T17:59:59.00Z").toEpochMilli();

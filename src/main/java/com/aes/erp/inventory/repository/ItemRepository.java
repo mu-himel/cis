@@ -62,7 +62,7 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
             select substring_index(code,CONCAT(:prefix,'-'),-1) FROM (select max(code) code FROM (SELECT id, code, true as active from items i WHERE code LIKE CONCAT(:prefix,'%')
                                                             UNION
                                                             SELECT id, code, false as active from pending_item_requests pir WHERE code LIKE CONCAT(:prefix,'%')) p
-                        WHERE p.code LIKE CONCAT(:prefix,'%') ORDER BY code asc ) p
+                        WHERE p.code LIKE CONCAT(:prefix,'-%') ORDER BY code asc ) p
             """, nativeQuery = true)
     Long findNextCodeByCount(@Param("prefix") String prefix);
 

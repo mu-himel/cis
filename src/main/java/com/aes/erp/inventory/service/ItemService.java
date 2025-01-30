@@ -57,4 +57,5 @@ public interface ItemService {
     void updateItemScmId(List<ImportItemScmIdUpdateDto> itemScmIdList);
 
 
+    void importItem(ClaimResponseDto claimResponseDto, ItemRequestDto itemRequestDto);
 }
