@@ -320,21 +320,21 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                     }
 
                 }
-
-                if (!brandExist.containsKey(product.getBrandName())) {
-                    Optional<Brand> brandOp = brandRepository.findByName(product.getBrandName());
+                String brandName = product.getBrandName().trim();
+                if (!brandExist.containsKey(brandName)) {
+                    Optional<Brand> brandOp = brandRepository.findByName(brandName);
                     if (brandOp.isPresent()) {
                         Brand brand = brandOp.get();
-                        brandExist.put(product.getBrandName(), brand);
+                        brandExist.put(brandName, brand);
                     } else {
                         Brand brand = new Brand();
-                        brand.setName(product.getBrandName());
+                        brand.setName(brandName);
                         brand = brandRepository.save(brand);
-                        brandExist.put(product.getBrandName(), brand);
+                        brandExist.put(brandName, brand);
                     }
                 }
                 CategoryRepository.CatSubCatInfo catSubCatInfo = (CategoryRepository.CatSubCatInfo) catExist.get(_key);
-                Brand brand = (Brand) brandExist.get(product.getBrandName());
+                Brand brand = (Brand) brandExist.get(brandName);
                 ItemRequestDto itemRequestDto = new ItemRequestDto();
                 itemRequestDto.setItemUnit(product.getUnit());
                 if (catSubCatInfo == null) {
