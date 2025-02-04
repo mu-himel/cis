@@ -211,7 +211,7 @@ public class BulkUploadServiceImpl implements BulkUploadService {
             FileUploadResponse fileUploadResponse = fileUploadService.uploadFile(path, file.get());
             Iterable<CSVRecord> records = getProductRecords(fileUploadResponse);
             Long i = 0L, ri = 2L;
-
+            Map<String, Object> data = new HashMap<>();
             for (CSVRecord r : records) {
                 String prefix = r.get("PREFIX").trim();
                 String catName = r.get("CATEGORY_NAME").trim();
@@ -226,11 +226,25 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                 List<String> attrVals = Arrays.asList(attrValue.split(","));
                 List<String> attrTypesArr = Arrays.asList(attrTypes.split(","));
 
-                Map<String, Object> data = new HashMap<>();
+
                 //StringBuilder sb = new StringBuilder();
 
 
                 for (String brand : brandsArr) {
+                    ItemImportReq itemImportReq = null;
+                    String dataKey = catName.trim() + "_" + subCatName.trim() + "_" + brand.trim();
+                    if (!data.containsKey(dataKey)) {
+                        itemImportReq = new ItemImportReq();
+                        itemImportReq.setCsvIndex(ri);
+                        itemImportReq.setBrandName(brand);
+                        itemImportReq.setCategoryName(catName);
+                        itemImportReq.setSubCategoryName(subCatName);
+                        itemImportReq.setUnit(purchaseUnit);
+                        itemImportReq.setAttributeDtoList(new ArrayList<>());
+                        data.put(dataKey, itemImportReq);
+                    } else {
+                        itemImportReq = (ItemImportReq) data.get(dataKey);
+                    }
 
                     //sb.append(catName).append(",").append(subCatName).append(",").append(brand)
                     //       .append(",").append(purchaseUnit).append(",");
@@ -238,60 +252,27 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 //                    data.put("subCategory",subCatName);
 //                    data.put("brand", brand);
 
-
+                    List<CategoryAttributeDto> attributeDtos = itemImportReq.getAttributeDtoList();
                     for (String attrType : attrTypesArr) {
-                        for (String attrVal : attrVals) {
-                            ItemImportReq itemImportReq = new ItemImportReq();
-                            itemImportReq.setCsvIndex(ri);
-                            List<CategoryAttributeDto> attributeDtos = new ArrayList<>();
-                            itemImportReq.setBrandName(brand);
-                            itemImportReq.setCategoryName(catName);
-                            itemImportReq.setSubCategoryName(subCatName);
-                            itemImportReq.setUnit(purchaseUnit);
+                        Optional<CategoryAttributeDto> catAttrDtoOp = attributeDtos.stream().filter(attr -> attr.getAttributeType().trim().equals(attrType.trim())).findFirst();
+                        if (catAttrDtoOp.isEmpty()) {
                             CategoryAttributeDto catAttrDto = new CategoryAttributeDto();
-                            //sb.append(attrType).append(",").append(attrVal).append(",").append(attrUnit);
-                            catAttrDto.setAttributeType(attrType);
-                            catAttrDto.setAttributeValue(attrVal);
-                            catAttrDto.setAttributeUnit(attrUnit);
-                            attributeDtos.add(catAttrDto);
-                            itemImportReq.setAttributeDtoList(attributeDtos);
-                            products.add(itemImportReq);
-                            i++;
-                            System.out.print("\rItem Count:" + i);
+                            for (String attrVal : attrVals) {
+                                //sb.append(attrType).append(",").append(attrVal).append(",").append(attrUnit);
+                                catAttrDto.setAttributeType(attrType);
+                                catAttrDto.setAttributeValue(attrVal);
+                                catAttrDto.setAttributeUnit(attrUnit);
+                                i++;
+                                System.out.print("\rItem Count:" + i);
+                            }
+                            if (catAttrDto.getAttributeValue().trim().length() > 0) {
+                                attributeDtos.add(catAttrDto);
+                            }
                         }
-
                     }
-
-
-//                    for (String attrVal : attrVals) {
-//                        StringBuilder sb = new StringBuilder();
-//                        sb.append(brand).append(catName)
-//                                .append(subCatName)
-//                                .append(attrType);
-////                        String _key = Hashing.sha256().hashString(sb.toString(), StandardCharsets.UTF_8).toString();
-//                        String _key = sb.toString();
-//                        if (!products.containsKey(_key)) {
-//                            Map<String, Object> data = new HashMap<>();
-//                            List<CategoryAttributeDto> attributes = new ArrayList<>();
-//                            attributes.add(new CategoryAttributeDto(attrType, attrVal, attrUnit));
-//                            data.put("brand", brand);
-//                            data.put("category", catName);
-//                            data.put("subCategory", subCatName);
-//                            data.put("attributes", attributes);
-////                    data.put("attributes",brands);
-//                            products.put(_key, data);
-//                        } else {
-//                            Map<String, Object> data = (Map<String, Object>) products.get(_key);
-//                            List<CategoryAttributeDto> attributes = (List<CategoryAttributeDto>) data.get("attributes");
-//                            attributes.add(new CategoryAttributeDto(attrType, attrVal, attrUnit));
-//                        }
-//
-////                        System.out.println(
-////                                sb.toString());
-//                    }
-
+                    itemImportReq.setAttributeDtoList(attributeDtos);
+//                    products.add(itemImportReq);
                 }
-
                 ri++;
             }
 
@@ -300,25 +281,22 @@ public class BulkUploadServiceImpl implements BulkUploadService {
             Long index = 0L;
             System.out.println();
             System.out.println("Total CSV Index: " + ri + "\n");
+            products = data.entrySet().stream().map(e -> {
+                return (ItemImportReq) e.getValue();
+            }).collect(Collectors.toList());
             for (ItemImportReq product : products) {
                 System.out.print("\r Csv Index: " + product.getCsvIndex() + " ");
                 String _key = product.getCategoryName() + product.getSubCategoryName();
                 if (!catExist.containsKey(_key)) {
-//                    System.out.println("HERE 1 " + product.getCategoryName()+ " " + product.getSubCategoryName());
                     Optional<CategoryRepository.CatSubCatInfo> catSubCatOp = categoryService
                             .getCatSubCatId(
                                     product.getCategoryName(),
                                     product.getSubCategoryName()
                             );
-//                    System.out.println("HERE 2");
                     if (catSubCatOp.isPresent()) {
-//                        System.out.println("HERE 3");
                         CategoryRepository.CatSubCatInfo catSubCatInfo = catSubCatOp.get();
                         catExist.put(_key, catSubCatInfo);
-
-
                     }
-
                 }
                 String brandName = product.getBrandName().trim();
                 if (!brandExist.containsKey(brandName)) {
@@ -338,10 +316,8 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                 ItemRequestDto itemRequestDto = new ItemRequestDto();
                 itemRequestDto.setItemUnit(product.getUnit());
                 if (catSubCatInfo == null) {
-
                     System.out.println("DEBUG  : [" + product.getCategoryName() + "] [" + product.getSubCategoryName() + "]");
                 } else {
-//                    System.out.println("DEBUG "+product.getCategoryName()+" "+catSubCatInfo.getCatId()+" "+product.getSubCategoryName()+" "+catSubCatInfo.getSubCatId());
                     itemRequestDto.setCode(catSubCatInfo.getSubCatCode());
                     itemRequestDto.setItemCategory(new ItemCategory(catSubCatInfo.getSubCatId()));
                     itemRequestDto.setItemParentCategory(new ItemCategory(catSubCatInfo.getCatId()));
