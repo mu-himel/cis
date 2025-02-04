@@ -29,15 +29,12 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
 
 
     @Query(value = getItemsWithSearch,
-            countQuery = countItemsWithSearch)
+            countQuery = countItemsWithSearch, nativeQuery = true)
     Page<PageItemList> findAllItems(
             @Param("name") String name,
             @Param("code") String code,
-            @Param("reorderPercentage") Integer reorderPercentage,
-            @Param("stockThresholdQty") Integer stockThresholdQty,
             @Param("categoryId") Long categoryId,
-            @Param("subCategoryId") Long subCategoryId,
-            @Param("storeTypeId")Long storeTypeId, Pageable pageable
+            @Param("subCategoryId") Long subCategoryId, Long storeTypeId, Pageable pageable
     );
 
     Optional<Item> findByItemAttributeNameAndName(String itemAttributeName, String name);

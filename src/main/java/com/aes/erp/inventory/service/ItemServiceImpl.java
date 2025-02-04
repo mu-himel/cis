@@ -133,8 +133,6 @@ public class ItemServiceImpl implements ItemService {
         Page<?> result  = itemRepository.findAllItems(
                 name.orElse(null),
                 code.orElse(null),
-                reorderPercentage.orElse(null),
-                stockThresholdQty.orElse(null),
                 categoryId.orElse(null),
                 subCategoryId.orElse(null),
                 storeTypeId.orElse(null),
