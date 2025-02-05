@@ -5,7 +5,8 @@ public interface ItemQuery {
     String getItemsWithSearch = """
             SELECT i.id as id, i.name as name, i.code as code,
                               ic.id as subCategoryId, ic.name as subCategoryName, ic.code as subCategoryCode,
-                              ipc.id as categoryId, ipc.name as categoryName, ipc.code as categoryCode
+                              ipc.id as categoryId, ipc.name as categoryName, ipc.code as categoryCode,
+                              i.item_attribute_name as itemAttributeName
                               FROM items i
                               LEFT JOIN item_categories ic ON ic.id = i.item_category_id
                               LEFT JOIN item_categories ipc ON ipc.id = i.item_parent_category_id
