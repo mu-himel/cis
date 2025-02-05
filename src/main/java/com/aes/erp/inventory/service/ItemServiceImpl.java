@@ -655,6 +655,7 @@ public class ItemServiceImpl implements ItemService {
         List<?> itemExistByAttr = this.getByAttributes(brandId, itemAttributeName, itemRequestDto.getItemCategory().getId());
         if (itemExistByAttr.size() > 0) {
             // update attribute only
+            return;
         }
         item.setItemAttributeName(itemAttributeName);
         if (itemRequestDto.getBrand() != null && itemRequestDto.getBrand().getId() != null) {

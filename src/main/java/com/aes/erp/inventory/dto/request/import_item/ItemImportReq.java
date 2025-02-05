@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemImportReq {
+    private String key;
     private Long csvIndex;
     private String categoryName;
     private String subCategoryName;
