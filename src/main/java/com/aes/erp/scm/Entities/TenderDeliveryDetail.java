@@ -26,6 +26,8 @@ public class TenderDeliveryDetail {
     private Long warehouseId;
     private String wareHouseName;
     private String wareHouseAddress;
+
+    @Column(precision = 38, scale = 4)
     private BigDecimal deliveryOrderQTY;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
