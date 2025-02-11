@@ -1,11 +1,7 @@
 package com.aes.erp.vendor.entity.RFQ_Negotiation;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.Max;
 
 import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.vendor.entity.Vendor;
@@ -34,5 +30,6 @@ public class OfferTermsAndCondition {
     @JsonIgnore
     private Tender tender;
 
+    @Column(length = 500)
     private String termsAndCondition;
 }

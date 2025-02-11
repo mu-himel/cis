@@ -26,6 +26,8 @@ public class Offer {
     @Column(updatable = false)
     private Long id;
     private boolean deliveryChargeIncluded;
+
+    @Column(precision = 38, scale = 4)
     private BigDecimal deliveryChargeAmount;
 
     @Enumerated(value = EnumType.STRING)
@@ -36,12 +38,22 @@ public class Offer {
 
     private Boolean mushakIncluded;
     private Boolean vatIncluded;
+
+    @Column(precision = 38, scale = 4)
     private BigDecimal vatPercent;
+
+    @Column(precision = 38, scale = 4)
     private BigDecimal vatAmount;
+
+    @Column(precision = 38, scale = 4)
     private BigDecimal aitAmount;
     private Boolean aitIncluded;
+
+    @Column(precision = 38, scale = 4)
     private BigDecimal aitPercent;
     private String note;
+
+    @Column(precision = 38, scale = 4)
     private BigDecimal finalOfferPrice;
     private Integer creditPaymentDays;
 
