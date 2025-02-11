@@ -2,6 +2,8 @@ package com.aes.erp.vendor.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class OfferItemCreateDto {
     private String productDescription;
@@ -9,7 +11,7 @@ public class OfferItemCreateDto {
     private String brandName;
     private String specification;
     private String location;
-    private Long itemQuantity;
+    private BigDecimal itemQuantity;
     private Long estimatedDeliveryDays;
     private Integer warrantyDuration;
     private String warrantyUnit;
