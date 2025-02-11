@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController()
 @RequestMapping("/api/v1/offers")
 public class OfferController {
@@ -26,7 +28,7 @@ public class OfferController {
     public ResponseEntity<?> acceptTender(
             @RequestAttribute ClaimResponseDto loggedInUser,
             @PathVariable("tenderId") Long tenderId,
-                                          @RequestBody OfferCreateDTO offerCreateDTO){
+            @Valid @RequestBody OfferCreateDTO offerCreateDTO){
         offerService.createInitialOffer(loggedInUser, offerCreateDTO, tenderId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

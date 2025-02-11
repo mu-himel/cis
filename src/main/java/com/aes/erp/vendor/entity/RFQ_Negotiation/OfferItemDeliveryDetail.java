@@ -23,6 +23,8 @@ public class OfferItemDeliveryDetail {
    @Column(updatable = false)
    private Long id;
    private String itemName;
+
+   @Column(precision = 38, scale = 4)
    private BigDecimal deliveryOrderQty;
 
    private LocalDate deliveryDate;
