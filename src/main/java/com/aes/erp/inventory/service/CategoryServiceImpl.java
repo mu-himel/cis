@@ -229,10 +229,9 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         ItemCategory itemCategory = itemCategoryOptional.get();
-        if (itemCategory.getScmCategoryId() != null) {
+        /*if (itemCategory.getScmCategoryId() != null) {
             throw new RuntimeException("Sorry! This category already synced with scm, renaming this might be cause of data inconsistency");
-        }
-
+        }*/
         if (!itemCategory.getCode().equalsIgnoreCase(categoryRequestDto.getCode())) {
             throw new AesException("Category Code should be unique");
         }

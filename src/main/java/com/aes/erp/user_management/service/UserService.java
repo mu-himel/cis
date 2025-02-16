@@ -135,6 +135,7 @@ public class UserService {
 
     }
 
+    @Transactional
     public User createVendorUserAccount(VendorDto vendorDto) {
 
         Optional<User> existUserChecking = userRepository.findByEmailAddress(vendorDto.getEmail());
@@ -162,7 +163,12 @@ public class UserService {
         String role = "VENDOR";
         userCredentialToRole.setRole(roleService.read(role));
         userCredentialToRoleRepository.save(userCredentialToRole);
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        }catch (Exception e){
+            throw new RuntimeException("Error occurs while saving user: "+e.getMessage());
+        }
+
     }
 
     public void update(UserDTO userDto, long id) {
