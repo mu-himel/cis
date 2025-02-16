@@ -181,7 +181,7 @@ public class VendorServiceImpl implements VendorService {
    
         
         senderBody.setContent("<p>"+senderBody.getContent()+"</p><p>" +  "Email: " + vendorDto.getEmail() +" " + "Password: " + vendorDto.getPassword()+"</p><p>Please visit <a href=\""+cpsFrontendLink+"\">here</a> to login");
-        emailSenderUtil.sendMail(senderBody);
+//        emailSenderUtil.sendMail(senderBody);
     }
 
     @Override
