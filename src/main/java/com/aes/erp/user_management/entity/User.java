@@ -26,10 +26,10 @@ public class User {
     @Column(updatable = false)
     private Long id;
 
-    @Length(min = 0, max = 50, message = "First name field can be at max 50 characters long")
+    @Length(min = 0, max = 255, message = "First name field can be at max 50 characters long")
     private String firstName;
 
-    @Length(min = 0, max = 50, message = "Last name field can be at max 50 characters long")
+    @Length(min = 0, max = 255, message = "Last name field can be at max 50 characters long")
     private String lastName;
 
     @Column(name = "emailAddress", unique = true)
