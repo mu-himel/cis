@@ -6,6 +6,7 @@ import com.aes.erp.vendor.entity.DocumentHolder.DocumentHolder;
 import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.entity.VendorType;
 import com.aes.erp.vendor.enums.VendorStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.List;
@@ -39,10 +41,10 @@ public class VendorDto implements Serializable, EntityConvertable<Vendor> {
     private String phone;
 
 
-    @NotBlank(message = "Vendor Type is required")
+    @NotNull(message = "Vendor Type is required")
     private VendorType vendorType;
     // @NotBlank(message = "Vendor Type is required")
-    
+
     private Long vendorTypeId;
 
     private String password;
@@ -55,7 +57,7 @@ public class VendorDto implements Serializable, EntityConvertable<Vendor> {
     private List<ReferenceObjectDto> items;
 
 
-
+    @JsonIgnore
     @Override
     @ApiModelProperty(hidden = true)
     public Vendor getEntity() {

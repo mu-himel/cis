@@ -17,7 +17,11 @@ public class PurchaseOrderDeliveryDetail {
     private Long warehouseId;
     private String warehouseName;
     private String warehouseAddress;
+
+    @Column(precision = 38,scale = 4)
     private BigDecimal itemQty;
+
+    @Column(precision = 38,scale = 4)
     private BigDecimal deliveryCharge;
 
     @ManyToOne

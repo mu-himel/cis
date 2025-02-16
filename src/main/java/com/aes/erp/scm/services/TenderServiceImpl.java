@@ -142,8 +142,11 @@ public class TenderServiceImpl implements TenderService{
 
             ti.setOrderQuantity(ti.getDeliveryDetails()
                     .stream()
-                    .map(TenderDeliveryDetail::getDeliveryOrderQTY)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add).longValue());
+                    .map(tii -> {
+                        return tii.getDeliveryOrderQTY();
+
+                    })
+                    .reduce(new BigDecimal(0L), BigDecimal::add));
 
             return ti;
         }).collect(Collectors.toList()));

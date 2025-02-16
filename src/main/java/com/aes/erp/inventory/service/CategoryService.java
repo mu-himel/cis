@@ -9,6 +9,7 @@ import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.entity.SubCategoryBrand;
 
+import com.aes.erp.inventory.repository.CategoryRepository;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
@@ -99,8 +100,11 @@ public interface CategoryService {
     Integer getSubCategoryCount(Long id);
 
     Integer getProductQtyByCategoryAndSubCategory(Long catId, Long subCatId);
+
     void mergePendingCategory(Long id, MergePendingCategoryDto mergePendingCategoryDto);
+
     void rejectPendingCategory(Long id);
+
     public List<?> getAllItemCategoryList(Optional<String> name, Optional<String> code);
 
     List<?> getSubCategoryListFilteredByParentCategoryNameOrCode(Optional<Long> categoryId, Optional<String> name, Optional<String> code);
@@ -108,4 +112,6 @@ public interface CategoryService {
     void updateCategoryScmId(List<ImportCategoryScmIdUpdateDto> scmIdList);
 
     Optional<ItemCategory> getByName(String trim);
+
+    Optional<CategoryRepository.CatSubCatInfo> getCatSubCatId(String cat, String subCat);
 }

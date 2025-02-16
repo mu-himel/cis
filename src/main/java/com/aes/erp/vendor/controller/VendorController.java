@@ -151,6 +151,16 @@ public class VendorController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PostMapping("/create-bulk-vendor")
+    public ResponseEntity<?> createBulkVendor(
+            @RequestPart("file") Optional<MultipartFile> file
+    ) throws  Exception {
+        String test="test";
+        System.out.println("File :: "+ file.get());
+        vendorService.createBulkVendor(file);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateVendor(@PathVariable("id") Long id, @RequestBody VendorDto vendorDto){
         vendorService.updateVendor(id, vendorDto);

@@ -10,6 +10,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -28,7 +30,9 @@ public class OfferItem {
     private Long estimatedDeliveryDays;
     private Integer warrantyDuration;
     private String warrantyUnit;
-    private Long itemQuantity;
+
+    @Column(precision = 38, scale = 4)
+    private BigDecimal itemQuantity;
     @OneToOne(cascade = CascadeType.ALL)
     private PriceQuotation priceQuotation;
     @JsonIgnore

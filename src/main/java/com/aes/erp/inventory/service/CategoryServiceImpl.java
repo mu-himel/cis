@@ -846,7 +846,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void updateCategoryScmId(List<ImportCategoryScmIdUpdateDto> scmIdList) {
         for (ImportCategoryScmIdUpdateDto id : scmIdList) {
             Optional<ItemCategory> itemCatOp = categoryRepository.findById(id.getCategoryIdCps());
-            if(itemCatOp.isPresent()){
+            if (itemCatOp.isPresent()) {
                 ItemCategory iitemCat = itemCatOp.get();
                 iitemCat.setScmCategoryId(id.getCategoryIdScm());
                 categoryRepository.save(iitemCat);
@@ -854,4 +854,8 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
+    @Override
+    public Optional<CategoryRepository.CatSubCatInfo> getCatSubCatId(String cat, String subCat) {
+        return categoryRepository.findByCategorySubCategoryName(cat, subCat);
+    }
 }

@@ -34,6 +34,8 @@ public class PurchaseOrder {
     private String poNo;
     private Long poDate;
     private Long deliveryDate;
+
+    @Column(precision = 38,scale = 4)
     private BigDecimal itemQty;
     private String categoryCode;
 

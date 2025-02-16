@@ -294,15 +294,30 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
         String getMainCategoryCode();
     }
 
-    @Query(value="""
-        SELECT ic from ItemCategory ic WHERE 
-        ic.parentCategory.id IS NOT NULL AND ic.active=true
-        AND (:categoryId IS NULL OR ic.parentCategory.id = :categoryId) AND 
-        (:subCategoryId IS NULL OR ic.id=:subCategoryId)
-    """)
+    @Query(value = """
+                SELECT ic from ItemCategory ic WHERE 
+                ic.parentCategory.id IS NOT NULL AND ic.active=true
+                AND (:categoryId IS NULL OR ic.parentCategory.id = :categoryId) AND 
+                (:subCategoryId IS NULL OR ic.id=:subCategoryId)
+            """)
     List<ItemCategory> findAllSubCategories(@Param("categoryId") Long categoryId,
-    @Param("subCategoryId") Long subCategoryId);
+                                            @Param("subCategoryId") Long subCategoryId);
 
 
-    
+    @Query(value = """
+            SELECT sc.id as subCatId, sc.code as subCatCode, c.id as catId, c.name as catName, sc.name as subCatName
+            FROM item_categories sc
+            LEFT JOIN item_categories c ON c.id = sc.parent_category_id
+            WHERE sc.parent_category_id IS NOT NULL AND sc.name=:subCategoryName
+            AND c.name=:categoryName
+            """, nativeQuery = true)
+    Optional<CatSubCatInfo> findByCategorySubCategoryName(String categoryName, String subCategoryName);
+
+    interface CatSubCatInfo {
+        Long getCatId();
+
+        Long getSubCatId();
+
+        String getSubCatCode();
+    }
 }

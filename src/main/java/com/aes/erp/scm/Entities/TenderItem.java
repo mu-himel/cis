@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +28,12 @@ public class TenderItem {
     private List<CategoryAttribute> attributes;
     private String brandName;
     private String specification;
-    private Long orderQuantity;
+
+    @Column(precision = 38, scale = 4)
+    private BigDecimal orderQuantity;
     @OneToMany(mappedBy = "tenderItem")
     private List<TenderDeliveryDetail> deliveryDetails = new ArrayList<>();
-    
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "tender_id")

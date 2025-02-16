@@ -29,15 +29,12 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
 
 
     @Query(value = getItemsWithSearch,
-            countQuery = countItemsWithSearch)
+            countQuery = countItemsWithSearch, nativeQuery = true)
     Page<PageItemList> findAllItems(
             @Param("name") String name,
             @Param("code") String code,
-            @Param("reorderPercentage") Integer reorderPercentage,
-            @Param("stockThresholdQty") Integer stockThresholdQty,
             @Param("categoryId") Long categoryId,
-            @Param("subCategoryId") Long subCategoryId,
-            @Param("storeTypeId")Long storeTypeId, Pageable pageable
+            @Param("subCategoryId") Long subCategoryId, Long storeTypeId, Pageable pageable
     );
 
     Optional<Item> findByItemAttributeNameAndName(String itemAttributeName, String name);
@@ -62,7 +59,7 @@ public interface ItemRepository extends JpaRepository<Item,Long>,ItemQuery {
             select substring_index(code,CONCAT(:prefix,'-'),-1) FROM (select max(code) code FROM (SELECT id, code, true as active from items i WHERE code LIKE CONCAT(:prefix,'%')
                                                             UNION
                                                             SELECT id, code, false as active from pending_item_requests pir WHERE code LIKE CONCAT(:prefix,'%')) p
-                        WHERE p.code LIKE CONCAT(:prefix,'%') ORDER BY code asc ) p
+                        WHERE p.code LIKE CONCAT(:prefix,'-%') ORDER BY code asc ) p
             """, nativeQuery = true)
     Long findNextCodeByCount(@Param("prefix") String prefix);
 

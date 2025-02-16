@@ -42,22 +42,40 @@ public class PurchaseOrderController {
 
     @GetMapping("/pending")
     public ResponseEntity<?> getPendingPOs(
-        @RequestAttribute ClaimResponseDto loggedInUser,
-        @RequestParam("page") Optional<Integer> page,
-        @RequestParam("size") Optional<Integer> size
+            @RequestAttribute ClaimResponseDto loggedInUser,
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("poNo") Optional<String> poNo,
+            @RequestParam("tenderNo") Optional<String> tenderNo,
+            @RequestParam("organizationId") Optional<Long> organizationId,
+            @RequestParam("categoryId") Optional<String> categoryId,
+            @RequestParam("subCategoryId") Optional<String> subCategoryId,
+            @RequestParam("deliveryDate") Optional<String> deliveryDate,
+            @RequestParam("status") Optional<String> status,
+            @RequestParam("fromDate") Optional<String> fromDate,
+            @RequestParam("toDate") Optional<String> toDate
     ){
-        return new ResponseEntity<>(poService.getPendingPOs(loggedInUser, page,size),HttpStatus.OK);
+        return new ResponseEntity<>(poService.getPendingPOs(loggedInUser, page, size, poNo, tenderNo, organizationId, categoryId, subCategoryId, deliveryDate, status, fromDate, toDate), HttpStatus.OK);
     }
 
     @GetMapping("/closed")
     public ResponseEntity<?> getClosedPOs(
-        @RequestAttribute ClaimResponseDto loggedInUser,
-        @RequestParam("page") Optional<Integer> page,
-        @RequestParam("size") Optional<Integer> size
+            @RequestAttribute ClaimResponseDto loggedInUser,
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size,
+            @RequestParam("poNo") Optional<String> poNo,
+            @RequestParam("tenderNo") Optional<String> tenderNo,
+            @RequestParam("organizationId") Optional<Long> organizationId,
+            @RequestParam("categoryId") Optional<String> categoryId,
+            @RequestParam("subCategoryId") Optional<String> subCategoryId,
+            @RequestParam("deliveryDate") Optional<String> deliveryDate,
+            @RequestParam("fromDate") Optional<String> fromDate,
+            @RequestParam("toDate") Optional<String> toDate
+
     ){
         return new ResponseEntity<>(
-            poService.getClosedPOs(loggedInUser,page,size),
-            HttpStatus.OK
+                poService.getClosedPOs(loggedInUser, page, size, poNo, tenderNo, organizationId, categoryId, subCategoryId, deliveryDate, fromDate, toDate),
+                HttpStatus.OK
         );
     }
 

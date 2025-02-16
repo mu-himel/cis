@@ -12,7 +12,7 @@ public class PriceQuotationDetailReqDto {
     private Integer warrantyDuration;
     private String warrantyUnit;
     private String brandName;
-    private Long rfqQty;
+    private BigDecimal rfqQty;
     private BigDecimal unitPrice;
     private Integer estDeliveryDays;
     private List<PriceQuotationDeliveryDetailDto> deliveryDetails;
