@@ -30,6 +30,10 @@ import com.aes.erp.vendor.repository.*;
 import com.aes.erp.vendor.service.DocumentHolderServices.DocumentHolderService;
 import com.aes.erp.vendor.utils.EmailSenderUtil;
 import com.aes.erp.vendor.utils.GenericModelMapper;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.modelmapper.internal.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -43,6 +47,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
@@ -149,9 +158,14 @@ public class VendorServiceImpl implements VendorService {
             }
             vendor.setVendorSubCategories(newSubcategorySet);
         }
-        vendor.setCategories(vendorDto.getCategories());
+        if (vendorDto.getCategories() != null){
+            vendor.setCategories(vendorDto.getCategories());
+        }
         vendor.setVerificationStatus(VendorDocumentVerificationStatus.PENDING_DOCUMENT_VERIFICATION);
-        vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorType().getId()));
+
+        if (vendorDto.getVendorType() != null){
+            vendor.setVendorType(vendorTypeService.getVendorById(vendorDto.getVendorType().getId()));
+        }
         vendor.setUser(user);
 
         vendor.setStartedAt(new Date());
@@ -168,6 +182,89 @@ public class VendorServiceImpl implements VendorService {
         
         senderBody.setContent("<p>"+senderBody.getContent()+"</p><p>" +  "Email: " + vendorDto.getEmail() +" " + "Password: " + vendorDto.getPassword()+"</p><p>Please visit <a href=\""+cpsFrontendLink+"\">here</a> to login");
         emailSenderUtil.sendMail(senderBody);
+    }
+
+    @Override
+    @Transactional
+    public void createBulkVendor(Optional<MultipartFile> file2) throws Exception {
+        if (file2.isPresent()){
+            MultipartFile file = file2.get();
+            try (CSVParser csvParser = new CSVParser(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8),
+                    CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
+
+                for (CSVRecord csvRecord : csvParser) {
+                    VendorDto vendorDto = new VendorDto();
+
+                    if (csvRecord.get("Vendor Name").equalsIgnoreCase("N/A")) {
+                        vendorDto.setName(null);
+                    } else {
+                        vendorDto.setName(csvRecord.get("Vendor Name"));
+                    }
+
+
+                    if (csvRecord.get("Vendor Category").equalsIgnoreCase("N/A")) {
+                        vendorDto.setCategories(null);
+                    } else {
+                        vendorDto.setCategories(csvRecord.get("Vendor Category"));
+                    }
+
+                    if (csvRecord.get("Vendor Sub-Category").equalsIgnoreCase("N/A") ) {
+                        vendorDto.setSubCategory(null);
+                    } else {
+                        String subCategories = csvRecord.get("Vendor Sub-Category");
+                        List<Long> subCategoryList = Arrays.stream(subCategories.split(",")).map(Long::valueOf).toList();
+                        vendorDto.setSubCategory(subCategoryList);
+                    }
+
+                    if (csvRecord.get("Email").equalsIgnoreCase("N/A")) {
+                        vendorDto.setEmail(null);
+                    } else {
+                        vendorDto.setEmail(csvRecord.get("Email"));
+                    }
+
+
+                    if (csvRecord.get("Phone Number").equalsIgnoreCase("N/A")) {
+                        vendorDto.setPhone(null);
+                    } else {
+                        vendorDto.setPhone(csvRecord.get("Phone Number"));
+                    }
+
+                    if (csvRecord.get("Password").equalsIgnoreCase("N/A")) {
+                        vendorDto.setPassword(null);
+                    } else {
+                        vendorDto.setPassword(csvRecord.get("Password"));
+                    }
+
+
+                    if (csvRecord.get("Vendor Type").equalsIgnoreCase("N/A")) {
+                        vendorDto.setVendorType(null);
+                    } else {
+                        String vendorType = csvRecord.get("Vendor Type");
+                        if (vendorType != null) {
+                            String[] vendorTypeIdAndName = vendorType.split(",");
+                            if (vendorTypeIdAndName.length > 1) {
+                                Long vendorTypeId = Long.valueOf(vendorTypeIdAndName[0]);
+                                String vendorTypeName = vendorTypeIdAndName[1];
+                                VendorType vendorType2 = new VendorType(vendorTypeId, vendorTypeName);
+                                vendorDto.setVendorType(vendorType2);
+                            } else {
+                                Long vendorTypeId = Long.valueOf(vendorTypeIdAndName[0]);
+                                VendorType vendorType2 = new VendorType(vendorTypeId, null);
+                                vendorDto.setVendorType(vendorType2);
+                            }
+                        }
+
+                    }
+
+                    // Save the vendor
+                    createVendor(vendorDto);
+                }
+            } catch (Exception e) {
+                throw new Exception("Error processing CSV file: " + e.getMessage());
+            }
+        }else{
+            throw new FileNotFoundException();
+        }
     }
 
     @Override

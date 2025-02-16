@@ -19,6 +19,7 @@ public class PurchaseOrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(precision = 38,scale = 4)
     private BigDecimal itemQty;
 
     @ManyToOne
@@ -27,10 +28,19 @@ public class PurchaseOrderDetail {
     private String itemName;
 
 //    private Long warehouseId;
+    @Column(precision = 38,scale = 4)
     private BigDecimal deliveryCharge;
+
+    @Column(precision = 38,scale = 4)
     private BigDecimal vatAmount;
+
+    @Column(precision = 38,scale = 4)
     private BigDecimal vatPercent;
+
+    @Column(precision = 38,scale = 4)
     private BigDecimal subTotal;
+
+    @Column(precision = 38,scale = 4)
     private BigDecimal totalPrice;
     
     @ManyToOne
