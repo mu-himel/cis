@@ -15,6 +15,7 @@ import com.aes.erp.inventory.service.CategoryService;
 import com.aes.erp.inventory.service.OrganizationService;
 import com.aes.erp.network.NetworkService;
 import com.aes.erp.user_management.entity.User;
+import com.aes.erp.user_management.service.UserRepository;
 import com.aes.erp.user_management.service.UserService;
 import com.aes.erp.vendor.dto.*;
 
@@ -30,6 +31,7 @@ import com.aes.erp.vendor.repository.*;
 import com.aes.erp.vendor.service.DocumentHolderServices.DocumentHolderService;
 import com.aes.erp.vendor.utils.EmailSenderUtil;
 import com.aes.erp.vendor.utils.GenericModelMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -55,14 +57,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.hibernate.tool.schema.SchemaToolingLogging.LOGGER;
 
+@Slf4j
 @Service
 public class VendorServiceImpl implements VendorService {
     private final EmailSenderUtil emailSenderUtil;
 
-
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private VendorRepository vendorRepository;
     @Autowired
@@ -256,11 +262,37 @@ public class VendorServiceImpl implements VendorService {
 
                     }
 
-                    // Save the vendor
-                    createVendor(vendorDto);
+
+                    if (vendorDto.getEmail() != null) {
+                        final String EMAIL_PATTERN = "[a-zA-Z0-9.]*[@][a-zA-Z]+\\.(com|net|org)";
+                        Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
+                        Matcher matcher = emailPattern.matcher(vendorDto.getEmail());
+                        Optional<User> existUserChecking = userRepository.findByEmailAddress(vendorDto.getEmail());
+
+
+                        if (!matcher.matches()){
+                            log.warn("This email is invalid: {}", vendorDto.getEmail());
+                        } else if (existUserChecking.isPresent()) {
+                            log.warn("Email already exist: {}", vendorDto.getEmail());
+                        }else {
+                            System.out.println(vendorDto.getEmail());
+                            createVendor(vendorDto); // Only create vendor if email is valid
+                        }
+
+
+                        /*if (matcher.matches()) {
+                            System.out.println(vendorDto.getEmail());
+                            createVendor(vendorDto); // Only create vendor if email is valid
+                        } else if (existUserChecking.isPresent()) {
+                            log.warn("Email already exist: {}", vendorDto.getEmail());
+                        } else {
+                            log.warn("This email is invalid: {}", vendorDto.getEmail());
+                        }*/
+                    }
+
                 }
             } catch (Exception e) {
-                throw new Exception("Error processing CSV file: " + e.getMessage());
+                throw new RuntimeException("Error processing CSV file: " + e.getMessage());
             }
         }else{
             throw new FileNotFoundException();
