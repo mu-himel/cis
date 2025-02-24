@@ -21,7 +21,7 @@ import java.util.Optional;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(value = {"currentYearBudget","budgetId","requestedBy","entity"})
+@JsonIgnoreProperties(value = {"currentYearBudget", "budgetId", "requestedBy", "entity", "newBrands"})
 public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
 
     private Long id;
