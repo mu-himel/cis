@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Data
 @Table(name = "category_attributes")
 @EqualsAndHashCode(exclude = {"category"})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CategoryAttribute {
 
     @Id
