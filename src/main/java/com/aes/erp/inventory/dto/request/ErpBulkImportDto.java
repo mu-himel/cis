@@ -11,4 +11,5 @@ public class ErpBulkImportDto extends BulkDeleteDto{
     private Long warehouseStoreId;
     private Long parentCategoryId;
     private Boolean isForCps;
+    private Boolean isSync;
 }

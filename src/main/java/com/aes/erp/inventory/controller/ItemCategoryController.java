@@ -207,8 +207,8 @@ public class ItemCategoryController {
         @RequestAttribute String token,
         @RequestAttribute Organization organization,
         @RequestBody ErpBulkImportDto erpImportDto){
-        categoryService.bulkImport(token,organization, erpImportDto.getUserId(), erpImportDto.getWarehouseId(),
-        erpImportDto.getWarehouseStoreId(),erpImportDto.getParentCategoryId(),erpImportDto.getId());
+        categoryService.bulkImport(token, organization, erpImportDto.getUserId(), erpImportDto.getWarehouseId(),
+                erpImportDto.getWarehouseStoreId(), erpImportDto.getParentCategoryId(), erpImportDto.getId(), erpImportDto.getIsSync());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

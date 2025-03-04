@@ -537,14 +537,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void bulkImport(String token, Organization org, String userId, Long warehouseId, Long storeId,
-    Long parentCategoryId, List<Long> ids) {
+                           Long parentCategoryId, List<Long> ids, Boolean isSync) {
         List<CategoryRequestDto> categoryList = new ArrayList<>();
-        for(Long catId : ids){
+        for (Long catId : ids) {
             Optional<ItemCategory> itemCatOps = categoryRepository.findById(catId);
-            if(itemCatOps.isPresent()){
+            if (itemCatOps.isPresent()) {
                 ItemCategory itemCategory = itemCatOps.get();
                 CategoryRequestDto catReqDto = new CategoryRequestDto();
-                catReqDto.setAttributes(itemCategory.getAttributes().stream().map(ica->{
+                catReqDto.setAttributes(itemCategory.getAttributes().stream().map(ica -> {
                     CategoryAttribute ca = new CategoryAttribute();
                     ca.setAttributeType(ica.getAttributeType());
                     ca.setAttributeValue(ica.getAttributeValue());
@@ -554,16 +554,21 @@ public class CategoryServiceImpl implements CategoryService {
                 catReqDto.setIsForCps(false);
                 catReqDto.setCode(itemCategory.getCode());
                 catReqDto.setName(itemCategory.getName());
-                if(parentCategoryId==null){
+                if (isSync != null) {
+                    catReqDto.setIsSync(isSync);
+                } else {
+                    catReqDto.setIsSync(false);
+                }
+                if (parentCategoryId == null) {
                     catReqDto.setParentCategory(null);
-                }else{
+                } else {
                     catReqDto.setParentCategory(new ItemCategory(parentCategoryId));
                 }
                 catReqDto.setVat(itemCategory.getVat());
                 catReqDto.setWarehouse(new ReferenceObjectDto(warehouseId));
                 catReqDto.setWarehouseStore(new ReferenceObjectDto(storeId));
-                if(itemCategory.getSubcategoryBrands().size()>0){
-                    catReqDto.setBrands(itemCategory.getSubcategoryBrands().stream().map(sb->{
+                if (itemCategory.getSubcategoryBrands().size() > 0) {
+                    catReqDto.setBrands(itemCategory.getSubcategoryBrands().stream().map(sb -> {
                         return sb.getBrand().getName();
                     }).toList());
                 }
