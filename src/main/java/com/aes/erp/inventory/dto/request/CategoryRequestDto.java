@@ -47,6 +47,7 @@ public class CategoryRequestDto implements EntityConvertable<ItemCategory> {
     private BigDecimal vat;
 
     private Boolean isForCps;
+    private Boolean isSync;
 
     private Organization organization = null;
 
