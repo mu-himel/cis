@@ -1,6 +1,7 @@
 package com.aes.erp.inventory.controller;
 
 
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.ErpBulkImportDto;
 import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
@@ -98,12 +99,14 @@ public class ItemCategoryController {
 //    }
 
     @GetMapping("/main-categories")
-    public ResponseEntity<?> getMainCategoryList(@RequestParam("storeTypeId") Optional<Long> storeTypeId,
+    public ResponseEntity<?> getMainCategoryList(
+                                                 @RequestAttribute ClaimResponseDto loggedInUser,
+                                                 @RequestParam("storeTypeId") Optional<Long> storeTypeId,
                                                  @RequestParam("name") Optional<String> name,
                                                  @RequestParam("code") Optional<String> code
                                                  ){
         return new ResponseEntity<>(
-                categoryService.getItemCategoryListForStoreType(storeTypeId,name,code),
+                categoryService.getItemCategoryListForStoreType( loggedInUser,storeTypeId,name,code),
                 HttpStatus.OK
         );
     }
@@ -123,12 +126,13 @@ public class ItemCategoryController {
 
     @GetMapping("/list")
     public ResponseEntity<?> getCategoryList(
+            @RequestAttribute ClaimResponseDto loggedInUser,
             @RequestParam("categoryId")  Optional<Long> categoryId,
             @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
-                                             @RequestParam("name")  Optional<String> name,
-                                                @RequestParam("code") Optional<String> code){
+            @RequestParam("name")  Optional<String> name,
+            @RequestParam("code") Optional<String> code ){
         return new ResponseEntity<>(
-                categoryService.getSubCategoryListFilteredByStoreTypeAndParentCategory(storeTypeId,categoryId,name,code),
+                categoryService.getSubCategoryListFilteredByStoreTypeAndParentCategory(storeTypeId,categoryId,name,code, loggedInUser),
                 HttpStatus.OK
         );
     }

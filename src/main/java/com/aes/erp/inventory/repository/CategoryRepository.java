@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, CategoryQuery {
@@ -25,13 +25,21 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
 @Query(value = findAllByItemCategoryWithSubCategoryCount,
             countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     Page<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("storeTypeId") Long storeTypeId,@Param("name") String name,@Param("code") String code, Pageable pageable);
+            @Param("storeTypeId") Long storeTypeId,
+            @Param("name") String name,
+            @Param("code") String code,
+            @Param("vendorCategoryIds") Set<Long> vendorCategoryIds,
+            Pageable pageable);
 
 
     @Query(value = findAllByItemCategoryWithSubCategoryCount,
             countQuery = countQueryForFindAllByItemCategoryWithSubCategoryCount)
     List<ItemCategoryWithSubCategoryCountExt> findAllByItemCategoryWithSubCategoryCount(
-            @Param("storeTypeId") Long storeTypeId, @Param("name") String name, @Param("code") String code);
+            @Param("storeTypeId") Long storeTypeId,
+            @Param("name") String name,
+            @Param("code") String code,
+            @Param("vendorCategoryIds") Set<Long> vendorCategoryIds
+            );
 
     @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory,
             countQuery = countQueryForSubCategoryFilteredByStoreTypeAndParentCategory,
@@ -42,12 +50,14 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
             @Param("name") String name, @Param("code") String code,
             Pageable pageable);
 
-    @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategory, nativeQuery = true)
+    @Query(value = findAllBySubCategoryFilteredByStoreTypeAndParentCategoryWithVendor, nativeQuery = true)
     List<SubCategoryWithParentCategoryAndStoreTypeExt> findAllBySubCategoryFilteredByStoreTypeAndParentCategory(
             @Param("store_type_id") Long store_type_id,
             @Param("parent_category") Long parent_category,
             @Param("name") String name,
-            @Param("code") String code
+            @Param("code") String code,
+            @Param("vendorId") Integer vendorId
+
             );
 
         @Query(value = findAllBySubCategoryFilteredByParentCategory,

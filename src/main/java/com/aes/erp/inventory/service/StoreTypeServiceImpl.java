@@ -77,7 +77,7 @@ public class StoreTypeServiceImpl implements StoreTypeService{
         if(storeTypeOptional.isPresent()){
             StoreType storeType = storeTypeOptional.get();
 
-            List<?> categories = categoryService.getItemCategoryListForStoreType(
+            List<?> categories = categoryService.getItemCategoryListForStoreType(null,
                     Optional.of(storeType.getId()), 
                     Optional.empty(), 
                     Optional.empty());
