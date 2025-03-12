@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
@@ -51,11 +52,12 @@ public interface CategoryService {
     List<?> getSubCategoryListFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId,
                                                                    Optional<Long> parentCategoryId,
                                                                    Optional<String> name,
-                                                                   Optional<String> code);
+                                                                   Optional<String> code,
+                                                                   ClaimResponseDto loggedInUser);
 
     Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
                               Optional<Long> id, Optional<String> name, Optional<String> code);
-    List<?> getItemCategoryListForStoreType(Optional<Long> id, Optional<String> name, Optional<String> code);
+    List<?> getItemCategoryListForStoreType(ClaimResponseDto loggedInUser, Optional<Long> id, Optional<String> name, Optional<String> code);
 
     Page<?> getItemCategories( Optional<Integer> page, Optional<Integer> size,
                                Optional<String> name, Optional<String> code,

@@ -1,5 +1,6 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.request.BulkCategoryRequestDto;
@@ -16,10 +17,11 @@ import com.aes.erp.inventory.entity.SubCategoryBrand;
 import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.repository.*;
 import com.aes.erp.network.NetworkService;
+import com.aes.erp.vendor.entity.Vendor;
+import com.aes.erp.vendor.repository.VendorRepository;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final GenericModelMapper genericModelMapper;
     private final SubcategoryBrandRepository subcategoryBrandRepository;
+    private final VendorRepository vendorRepository;
     @Autowired
     private CategoryAttributeRepository categoryAttributeRepository;
 
@@ -63,10 +66,11 @@ public class CategoryServiceImpl implements CategoryService {
 //    @Value("${scm.apiEndpoint}")
 //    private String scmApiEndpoint;
 
-    public CategoryServiceImpl(BrandRepository brandRepository, GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository) {
+    public CategoryServiceImpl(BrandRepository brandRepository, GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository, VendorRepository vendorRepository) {
         this.brandRepository = brandRepository;
         this.genericModelMapper = genericModelMapper;
         this.subcategoryBrandRepository = subcategoryBrandRepository;
+        this.vendorRepository = vendorRepository;
     }
 
     public void addBrandToSubCategory(CategoryRequestDto dto, ItemCategory category) {
@@ -346,10 +350,19 @@ public class CategoryServiceImpl implements CategoryService {
     public List<?> getSubCategoryListFilteredByStoreTypeAndParentCategory(Optional<Long> storeTypeId,
                                                                           Optional<Long> parentCategoryId,
                                                                           Optional<String> name,
-                                                                          Optional<String> code) {
+                                                                          Optional<String> code,
+                                                                          ClaimResponseDto loggedInUser ) {
+        Integer vendorId = null;
+        if(loggedInUser!=null){
+            if(loggedInUser.getUserInfoDto().get("vendorId")!=null &&
+                    !loggedInUser.getUserInfoDto().get("vendorId").equals("")){
+                vendorId = (Integer) loggedInUser.getUserInfoDto().get("vendorId");
+            }
+        }
+
         return categoryRepository.findAllBySubCategoryFilteredByStoreTypeAndParentCategory(storeTypeId.orElse(null),
                 parentCategoryId.orElse(null),
-                name.orElse(null), code.orElse(null));
+                name.orElse(null), code.orElse(null), vendorId);
     }
 
     @Override
@@ -362,13 +375,30 @@ public class CategoryServiceImpl implements CategoryService {
             return categoryRepository.findAllByItemCategoryWithSubCategoryCount(
                     store_type_id.orElse(null),
                     name.orElse(null), code.orElse(null),
+                    null,
                     pageable);
     }
 
     @Override
-    public List<?> getItemCategoryListForStoreType(Optional<Long> id, Optional<String> name, Optional<String> code) {
-        return categoryRepository.findAllByItemCategoryWithSubCategoryCount(id.orElse(null),
-                name.orElse(null),code.orElse(null));
+    public List<?> getItemCategoryListForStoreType(ClaimResponseDto loggedInUser, Optional<Long> id, Optional<String> name, Optional<String> code) {
+        Set<Long> vendorCategoryIds = null;
+        if(loggedInUser!=null){
+            if(loggedInUser.getUserInfoDto().get("vendorId")!=null &&
+                    !loggedInUser.getUserInfoDto().get("vendorId").equals("")){
+                Optional<VendorRepository.VendorDetail> opVendor = vendorRepository.findVendorById(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
+               if(opVendor.isPresent()){
+                   vendorCategoryIds= opVendor.get().getCategories()!=null?
+                           Arrays.stream(opVendor.get().getCategories().split(","))
+                                   .map(Long:: parseLong).collect(Collectors.toSet()) :null;
+               }
+            }
+        }
+
+        return categoryRepository.findAllByItemCategoryWithSubCategoryCount(
+                id.orElse(null),
+                name.orElse(null),
+                code.orElse(null),
+                vendorCategoryIds);
     }
 
     
