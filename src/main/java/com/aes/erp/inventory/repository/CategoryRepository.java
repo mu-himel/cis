@@ -160,6 +160,7 @@ public interface CategoryRepository extends JpaRepository<ItemCategory, Long>, C
                     (:categoryId IS NOT NULL AND sic.code LIKE CONCAT(:prefix,'%'))
                 OR
                     (:categoryId IS NULL AND SUBSTR(sic.code,1,1)=:prefix)
+                     AND sic.parent_category_id  IS NULL
                 )
                 ORDER BY sic.name ASC
             """,nativeQuery = true)
