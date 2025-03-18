@@ -3,34 +3,20 @@ package com.aes.erp.inventory.service;
 import com.aes.erp.authentication.dto.ClaimResponseDto;
 import com.aes.erp.common.ReferenceObjectDto;
 import com.aes.erp.exception.AesException;
-import com.aes.erp.inventory.dto.request.BulkCategoryRequestDto;
-import com.aes.erp.inventory.dto.request.CategoryRequestDto;
-import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
-import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
-import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
+import com.aes.erp.inventory.dto.request.*;
 import com.aes.erp.inventory.dto.response.SubCategory;
-import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.Organization;
-import com.aes.erp.inventory.entity.Brand;
-import com.aes.erp.inventory.entity.CategoryAttribute;
-import com.aes.erp.inventory.entity.SubCategoryBrand;
+import com.aes.erp.inventory.entity.*;
 import com.aes.erp.inventory.enums.CategoryStatus;
 import com.aes.erp.inventory.repository.*;
 import com.aes.erp.network.NetworkService;
-import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.repository.VendorRepository;
 import com.aes.erp.vendor.utils.GenericModelMapper;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -41,38 +27,28 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
     private static final Integer PAGE_SIZE = 10;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    private final BrandRepository brandRepository;
-    @Autowired
-    private StoreTypeRepository storeTypeRepository;
 
-    @Autowired
-    private CategoryBudgetRepository categoryBudgetRepository;
+    private final CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
+
+    private final StoreTypeRepository storeTypeRepository;
+
+
+    private final CategoryBudgetRepository categoryBudgetRepository;
 
     private final GenericModelMapper genericModelMapper;
     private final SubcategoryBrandRepository subcategoryBrandRepository;
     private final VendorRepository vendorRepository;
-    @Autowired
+
     private CategoryAttributeRepository categoryAttributeRepository;
 
-    @Autowired
-    private NetworkService networkService;
-
-//    @Value("${scm.apiEndpoint}")
-//    private String scmApiEndpoint;
-
-    public CategoryServiceImpl(BrandRepository brandRepository, GenericModelMapper genericModelMapper, SubcategoryBrandRepository subcategoryBrandRepository, VendorRepository vendorRepository) {
-        this.brandRepository = brandRepository;
-        this.genericModelMapper = genericModelMapper;
-        this.subcategoryBrandRepository = subcategoryBrandRepository;
-        this.vendorRepository = vendorRepository;
-    }
-
+    private final NetworkService networkService;
+    
     public void addBrandToSubCategory(CategoryRequestDto dto, ItemCategory category) {
         if (dto.getBrands() != null) {
             Set<SubCategoryBrand> subCategoryBrands = new HashSet<>();
