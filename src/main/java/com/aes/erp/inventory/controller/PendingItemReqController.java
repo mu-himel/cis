@@ -1,26 +1,15 @@
 package com.aes.erp.inventory.controller;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.aes.erp.inventory.dto.request.*;
+import com.aes.erp.inventory.service.PendingItemRequestService;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.aes.erp.inventory.dto.request.BulkDeleteDto;
-import com.aes.erp.inventory.dto.request.PendingAttributeDto;
-import com.aes.erp.inventory.dto.request.PendingBrandDto;
-import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
-import com.aes.erp.inventory.service.PendingItemRequestService;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/pending-item-requests")
@@ -33,6 +22,14 @@ public class PendingItemReqController {
     public ResponseEntity<?> createPendingItemRequest(@RequestBody PendingItemRequestDto pendingItemRequestDto){
         return new ResponseEntity<>(pendingItemRequestService.createPendingItemRequest(pendingItemRequestDto),
                 HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePendingItem(@ApiParam(value = "Item Id",example = "1", required = true)
+                                               @PathVariable Long id,
+                                               @RequestBody ItemRequestDto itemRequestDto){
+        pendingItemRequestService.updatePendingItem(id, itemRequestDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")

@@ -1,15 +1,14 @@
 package com.aes.erp.inventory.service;
 
+import com.aes.erp.inventory.controller.PendingItemReqController.PendingAttributesDto;
+import com.aes.erp.inventory.dto.request.ItemRequestDto;
+import com.aes.erp.inventory.dto.request.PendingBrandDto;
+import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
+import org.springframework.data.domain.Page;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-
-import com.aes.erp.inventory.controller.PendingItemReqController.PendingAttributesDto;
-import com.aes.erp.inventory.dto.request.PendingAttributeDto;
-import com.aes.erp.inventory.dto.request.PendingBrandDto;
-import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
 
 public interface PendingItemRequestService {
     Map<String, Object> createPendingItemRequest(PendingItemRequestDto pRequestDto);
@@ -26,4 +25,5 @@ public interface PendingItemRequestService {
     void deletePendingAttributes(List<Long> id);
     void deletePendingItemRequest(Long id);
     void rejectPendingItem(Long id);
+    void updatePendingItem(Long id, ItemRequestDto itemRequestDto);
 }

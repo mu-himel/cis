@@ -1,69 +1,47 @@
 package com.aes.erp.inventory.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.controller.PendingItemReqController.PendingAttributesDto;
-import com.aes.erp.inventory.dto.request.MergePendingCategoryPostDto;
+import com.aes.erp.inventory.dto.request.ItemRequestDto;
 import com.aes.erp.inventory.dto.request.MergePendingItemsPostDto;
-import com.aes.erp.inventory.dto.request.PendingAttributeDto;
 import com.aes.erp.inventory.dto.request.PendingBrandDto;
 import com.aes.erp.inventory.dto.request.PendingItemRequestDto;
-import com.aes.erp.inventory.entity.Brand;
-import com.aes.erp.inventory.entity.CategoryAttribute;
-import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.Organization;
-import com.aes.erp.inventory.entity.PendingAttribute;
-import com.aes.erp.inventory.entity.PendingBrand;
-import com.aes.erp.inventory.entity.PendingItemRequest;
-import com.aes.erp.inventory.enums.CategoryStatus;
+import com.aes.erp.inventory.entity.*;
 import com.aes.erp.inventory.repository.BrandRepository;
 import com.aes.erp.inventory.repository.PendingAttributeRepository;
 import com.aes.erp.inventory.repository.PendingBrandRepository;
 import com.aes.erp.inventory.repository.PendingItemRequestRepository;
 import com.aes.erp.network.NetworkService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
-public class PendingItemRequestServiceImpl implements PendingItemRequestService{
+public class PendingItemRequestServiceImpl implements PendingItemRequestService {
 
     private static final Integer PAGE_SIZE = 10;
 
-    @Autowired
-    private PendingItemRequestRepository pendingItemRequestRepository;
+    private final PendingItemRequestRepository pendingItemRequestRepository;
 
-    @Autowired
-    private BrandRepository brandRepository;
+    private final BrandRepository brandRepository;
 
-    @Autowired
-    private PendingBrandRepository pendingBrandRepository;
+    private final PendingBrandRepository pendingBrandRepository;
 
-    @Autowired
-    private PendingAttributeRepository pendingAttributeRepository;
+    private final PendingAttributeRepository pendingAttributeRepository;
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired
-    private ItemService itemService;
+    private final ItemService itemService;
 
-    @Autowired
-    private NetworkService networkService;
+    private final NetworkService networkService;
 
 //    @Value("${scm.apiEndpoint}")
 //    private String scmApiEndpoint;
@@ -104,24 +82,24 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
     private String getNextItemCode() {
         Optional<Long> pirOp = pendingItemRequestRepository.findMaxOrderById();
-        if(pirOp.isPresent()){
+        if (pirOp.isPresent()) {
             Long pir = pirOp.get();
             Long newProductId = pir + 1;
-            return String.format("%05d",newProductId);
+            return String.format("%05d", newProductId);
         }
-        return String.format("%05d",1);
+        return String.format("%05d", 1);
     }
 
     @Override
     public Optional<?> getDetail(Long id) {
-        return pendingItemRequestRepository.findById(id,PendingItemRequest.class);
+        return pendingItemRequestRepository.findById(id, PendingItemRequest.class);
     }
 
     @Override
     public Page<?> getPage(Optional<Long> categoryId, Optional<Long> subCategoryId, Optional<Integer> page, Optional<Integer> size) {
         Pageable pageable = PageRequest.of(page.orElse(0), size.orElse(PAGE_SIZE));
         return pendingItemRequestRepository.findAllPendingItemRequests(categoryId.orElse(null)
-                , subCategoryId.orElse(null) ,pageable);
+                , subCategoryId.orElse(null), pageable);
     }
 
     @Override
@@ -134,30 +112,28 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     public void createPendingBrand(PendingBrandDto pendingBrandDto) {
         PendingBrand pendingBrand = pendingBrandDto.getEntity();
         List<PendingBrand> pendingBrands = pendingBrandRepository.findAllByBrandName(pendingBrand.getBrandName());
-        if(pendingBrands.size()>0){
+        if (pendingBrands.size() > 0) {
             throw new AesException("Brand Request Already Pending");
         }
         pendingBrandRepository.save(pendingBrand);
     }
 
-    
 
     @Override
     @Transactional
     public void deletePendingBrand(Long id) {
         Optional<PendingBrand> pendingBrandOp = pendingBrandRepository.findById(id);
-        if(pendingBrandOp.isPresent()){
+        if (pendingBrandOp.isPresent()) {
             PendingBrand pendingBrand = pendingBrandOp.get();
             pendingBrandRepository.delete(pendingBrand);
         }
     }
 
-    
 
     @Override
     @Transactional
     public void deletePendingBrands(List<Long> id) {
-        if(id.isEmpty()){
+        if (id.isEmpty()) {
             throw new AesException("Sorry! delete not possible list is empty");
         }
         pendingBrandRepository.deleteAllById(id);
@@ -167,11 +143,11 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     @Override
     @Transactional
     public void deletePendingAttributes(List<Long> ids) {
-        if(ids.isEmpty()){
+        if (ids.isEmpty()) {
             throw new AesException("Sorry! delete not possible list is empty");
         }
         pendingAttributeRepository.deleteAllById(ids);
-        
+
     }
 
     @Override
@@ -189,28 +165,28 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     @Transactional
     public void createPendingAttribute(PendingAttributesDto pendingAttributesDto) {
         List<PendingAttribute> pendingAttributes = new ArrayList<>();
-        pendingAttributesDto.pendingAttributes().stream().forEach(pendingAttributeDto->{
+        pendingAttributesDto.pendingAttributes().stream().forEach(pendingAttributeDto -> {
             PendingAttribute pendingAttribute = pendingAttributeDto.getEntity();
             Optional<PendingAttribute> pendingAttrOp = pendingAttributeRepository
-                .findAllBySubCategoryIdAndAttributeTypeAndAttributeValue(pendingAttribute.getSubCategory().getId(),
-            pendingAttribute.getAttributeType(),pendingAttribute.getAttributeValue());
-            if(pendingAttrOp.isEmpty()){
+                    .findAllBySubCategoryIdAndAttributeTypeAndAttributeValue(pendingAttribute.getSubCategory().getId(),
+                            pendingAttribute.getAttributeType(), pendingAttribute.getAttributeValue());
+            if (pendingAttrOp.isEmpty()) {
 
                 Optional<CategoryAttribute> catAttrOp = categoryService.getCategoryAttributeValueBySubCatAndAttributeType(pendingAttribute.getSubCategory().getId(),
-                pendingAttribute.getAttributeType());
-                if(catAttrOp.isPresent()){
-                    if(catAttrOp.get().getAttributeValue().toLowerCase().contains(pendingAttribute.getAttributeValue().toLowerCase())){
+                        pendingAttribute.getAttributeType());
+                if (catAttrOp.isPresent()) {
+                    if (catAttrOp.get().getAttributeValue().toLowerCase().contains(pendingAttribute.getAttributeValue().toLowerCase())) {
                         throw new AesException("Sorry! Attribute already exist");
                     }
                 }
 
                 pendingAttributes.add(pendingAttribute);
-            }else{
+            } else {
                 throw new AesException("Sorry! Attribute already exist as pending");
             }
-            
+
         });
-        
+
         pendingAttributeRepository.saveAll(pendingAttributes);
     }
 
@@ -218,19 +194,19 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
     @Transactional
     public void deletePendingAttribute(Long id) {
         Optional<PendingAttribute> pendAttrOptional = pendingAttributeRepository.findById(id);
-        if(pendAttrOptional.isPresent()){
+        if (pendAttrOptional.isPresent()) {
 
             PendingAttribute pendingAttribute = pendAttrOptional.get();
             pendingAttributeRepository.delete(pendingAttribute);
         }
-        
+
     }
 
 
     @Override
     @Transactional
     public void rejectPendingItem(Long id) {
-        PendingItemRequest getPendingItem = pendingItemRequestRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Content not exist"));
+        PendingItemRequest getPendingItem = pendingItemRequestRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Content not exist"));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(networkService.getKeycloakAccessToken(getPendingItem.getOrganization()));
@@ -258,8 +234,62 @@ public class PendingItemRequestServiceImpl implements PendingItemRequestService{
 
     }
 
-    
+    @Override
+    @Transactional
+    public void updatePendingItem(Long id, ItemRequestDto itemRequestDto) {
+        Optional<PendingItemRequest> opPendingItemRequest = pendingItemRequestRepository.findById(id);
+        if (opPendingItemRequest.isEmpty()) {
+            throw new AesException("Pending item not found");
+        }
 
-    
-    
+        PendingItemRequest pendingItemRequest = opPendingItemRequest.get();
+
+
+        if (itemRequestDto.getItemUnit() != null) {
+            pendingItemRequest.setItemUnit(itemRequestDto.getItemUnit());
+        }
+
+        if (itemRequestDto.getBrand() != null) {
+            Optional<Brand> optionalBrand = brandRepository.findById(itemRequestDto.getBrand().getId());
+            optionalBrand.ifPresent(brand -> {
+                pendingItemRequest.setBrand(brand);
+            });
+        }
+
+        if (itemRequestDto.getAttributes() != null && itemRequestDto.getAttributes().size() > 0) {
+            pendingItemRequest.setAttributes(itemRequestDto.getAttributes().stream().map(itemAttribute -> {
+                PendingItemAttribute pendingItemAttribute = new PendingItemAttribute();
+                pendingItemAttribute.setPendingItemRequest(pendingItemRequest);
+                pendingItemAttribute.setId(itemAttribute.getId());
+                pendingItemAttribute.setAttributeType(itemAttribute.getAttributeType());
+                pendingItemAttribute.setAttributeValue(itemAttribute.getAttributeValue());
+                pendingItemAttribute.setAttributeUnit(itemAttribute.getAttributeUnit());
+                pendingItemAttribute.setPendingItemRequest(pendingItemRequest);
+                return pendingItemAttribute;
+            }).collect(Collectors.toList()));
+
+        }
+
+        pendingItemRequest.setItemAttributeName(generateItemAttributeName(itemRequestDto.getAttributes()));
+
+        pendingItemRequestRepository.save(pendingItemRequest);
+
+    }
+
+    private String generateItemAttributeName(List<ItemAttribute> attributes) {
+        StringBuilder sb = new StringBuilder();
+
+        attributes.stream().forEach(itemAttribute -> {
+            String attrType = itemAttribute.getAttributeType().trim();
+            String attrValue = itemAttribute.getAttributeValue().trim();
+            String attrUnit = itemAttribute.getAttributeUnit().trim();
+            if (!attrType.isEmpty() && !attrValue.isEmpty() && !attrUnit.isEmpty()) {
+                sb.append(attrType + " " + attrValue + " " + attrUnit);
+                sb.append(" - ");
+            }
+        });
+
+        return (sb.isEmpty()) ? "" : sb.toString().substring(0, sb.length() - 3);
+    }
+
 }
