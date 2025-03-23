@@ -106,6 +106,7 @@ public interface TenderQuery {
                 AND (:endDate IS NULL OR t.creation_date <= :endDate)  
                 AND (COALESCE(:subCategoryIds) IS NULL OR ic.id IN (:subCategoryIds))
                 AND (t.deadline < :currentDateTime)
+                AND (:tenderNo IS NULL OR t.rfq_no LIKE %:tenderNo% )
                 GROUP BY t.id, t.tender_status, t.tender_type, ic.id, tc.id, t.creation_date""";
 
     String tenderProjectionCountQuery = " SELECT count(*) FROM (" + tenderProjectionQuery + " ) as t ";

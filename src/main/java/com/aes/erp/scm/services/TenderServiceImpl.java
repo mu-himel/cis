@@ -6,16 +6,14 @@ import com.aes.erp.exception.AesException;
 import com.aes.erp.inventory.dto.response.SubCategory;
 import com.aes.erp.inventory.entity.CategoryAttribute;
 import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.Organization;
-import com.aes.erp.inventory.entity.PendingItemAttribute;
 import com.aes.erp.inventory.service.CategoryServiceImpl;
 import com.aes.erp.inventory.service.OrganizationService;
+import com.aes.erp.scm.Entities.*;
+import com.aes.erp.scm.Query.TenderQuerySpecification;
 import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.TenderCreateDto;
 import com.aes.erp.scm.dto.TenderItemCreateDto;
 import com.aes.erp.scm.dto.TenderResponseDto;
-import com.aes.erp.scm.Entities.*;
-import com.aes.erp.scm.Query.TenderQuerySpecification;
 import com.aes.erp.scm.repositories.DeliveryDetailsRepository;
 import com.aes.erp.scm.repositories.TenderItemRepository;
 import com.aes.erp.scm.repositories.TenderParticipatorRepository;
@@ -24,7 +22,6 @@ import com.aes.erp.vendor.entity.Vendor;
 import com.aes.erp.vendor.enums.VendorDocumentVerificationStatus;
 import com.aes.erp.vendor.service.VendorService;
 import com.aes.erp.vendor.utils.GenericModelMapper;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,11 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -302,9 +297,17 @@ public class TenderServiceImpl implements TenderService{
 
 
     @Override
-    public Page<?> getClosedTenderProjection(ClaimResponseDto loggedInUser, Optional<String> searchFilter,
-            Optional<Integer> page, Optional<Integer> size, Optional<TenderType> tenderType,Optional<Long> organizationId, Optional<Long> categoryId, Optional<String> startDate,
-            Optional<String> endDate) {
+    public Page<?> getClosedTenderProjection(
+            ClaimResponseDto loggedInUser,
+            Optional<String> searchFilter,
+            Optional<Integer> page,
+            Optional<Integer> size,
+            Optional<TenderType> tenderType,
+            Optional<Long> organizationId,
+            Optional<Long> categoryId,
+            Optional<String> tenderNo,
+            Optional<String> startDate,
+            Optional<String> endDate    ) {
         Sort sort = Sort.by(Sort.Direction.DESC,"id");
         Pageable pageable = PageRequest.of(page.orElse(0),size.orElse(10),sort);
 
@@ -328,11 +331,20 @@ public class TenderServiceImpl implements TenderService{
             toDate = Instant.parse(endDate.get()+"T10:15:30.00Z").toEpochMilli();
             System.out.println(toDate);
         }
+
+
         return tenderRepository.findAllClosedTenderProjection(
                 vendorId,
                 searchFilter.orElse(""),
-                subCatIds, tenderType,organizationId,categoryId, fromDate,
-                toDate, Instant.now().toEpochMilli(),pageable);
+                subCatIds,
+                tenderType,
+                organizationId,
+                categoryId,
+                 tenderNo,
+                fromDate,
+                toDate,
+                Instant.now().toEpochMilli(),
+                pageable);
     }
 
     @Override

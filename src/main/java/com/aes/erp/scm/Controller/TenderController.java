@@ -1,11 +1,9 @@
 package com.aes.erp.scm.Controller;
 
+import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.scm.Entities.TenderType;
 import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.TenderCreateDto;
-import com.aes.erp.authentication.dto.ClaimResponseDto;
-import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.Organization;
-import com.aes.erp.scm.Entities.TenderType;
 import com.aes.erp.scm.services.TenderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,9 +78,10 @@ public class TenderController {
             @RequestParam("page") Optional<Integer> page,
             @RequestParam("size") Optional<Integer> size,
             @RequestParam("tenderType") Optional<TenderType> tenderType,
+            @RequestParam("tenderNo") Optional<String> tenderNo,
             @RequestParam("organizationId") Optional<Long> organizationId,
             @RequestParam("categoryId") Optional<Long> categoryId){
-        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType,organizationId,categoryId, fromDate, toDate),
+        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType,organizationId,categoryId, tenderNo, fromDate, toDate),
                 HttpStatus.OK);
     }
 
