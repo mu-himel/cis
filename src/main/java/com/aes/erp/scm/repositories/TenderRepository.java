@@ -3,8 +3,6 @@ package com.aes.erp.scm.repositories;
 import com.aes.erp.scm.Entities.Tender;
 import com.aes.erp.scm.Entities.TenderStatus;
 import com.aes.erp.scm.Entities.TenderType;
-import com.aes.erp.vendor.entity.RFQ_Negotiation.NegotiationPartyType;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -50,6 +48,7 @@ public interface TenderRepository extends JpaRepository<Tender, Long>, TenderQue
                                                   @Param("tenderType") Optional<TenderType> tenderType,
                                                   @Param("organizationId") Optional<Long> organizationId,
                                                   @Param("categoryId") Optional<Long> categoryId,
+                                                  @Param("tenderNo") String tenderNo,
                                                   @Param("startDate") Long startDate,
                                                   @Param("endDate") Long endDate,
                                                   @Param("currentDateTime") Long currentDateTime,

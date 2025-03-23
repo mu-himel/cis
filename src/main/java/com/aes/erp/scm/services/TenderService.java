@@ -1,15 +1,12 @@
 package com.aes.erp.scm.services;
 
+import com.aes.erp.authentication.dto.ClaimResponseDto;
+import com.aes.erp.scm.Entities.Tender;
+import com.aes.erp.scm.Entities.TenderType;
 import com.aes.erp.scm.dto.NoteDto;
 import com.aes.erp.scm.dto.TenderCreateDto;
 import com.aes.erp.scm.dto.TenderResponseDto;
-import com.aes.erp.authentication.dto.ClaimResponseDto;
-import com.aes.erp.inventory.entity.ItemCategory;
-import com.aes.erp.inventory.entity.Organization;
-import com.aes.erp.scm.Entities.Tender;
-import com.aes.erp.scm.Entities.TenderType;
 import org.springframework.data.domain.Page;
-import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,9 +34,10 @@ public interface TenderService {
     );
 
     Page<?> getClosedTenderProjection(
-            ClaimResponseDto loggedInUser,
-            Optional<String> searchFilter, Optional<Integer> page,
-            Optional<Integer> size, Optional<TenderType> tenderType, Optional<Long> organizationId, Optional<Long> categoryId,
+            ClaimResponseDto loggedInUser, Optional<String> searchFilter,
+            Optional<Integer> page, Optional<Integer> size,
+            Optional<TenderType> tenderType, Optional<Long> organizationId,
+            Optional<Long> categoryId, Optional<String> tenderNo,
             Optional<String> fromDate, Optional<String> toDate
     );
 
