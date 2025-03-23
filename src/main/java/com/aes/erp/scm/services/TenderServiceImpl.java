@@ -340,7 +340,7 @@ public class TenderServiceImpl implements TenderService{
                 tenderType,
                 organizationId,
                 categoryId,
-                 tenderNo,
+                tenderNo.orElse(null),
                 fromDate,
                 toDate,
                 Instant.now().toEpochMilli(),

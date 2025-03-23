@@ -81,7 +81,10 @@ public class TenderController {
             @RequestParam("tenderNo") Optional<String> tenderNo,
             @RequestParam("organizationId") Optional<Long> organizationId,
             @RequestParam("categoryId") Optional<Long> categoryId){
-        return new ResponseEntity<>(tenderService.getClosedTenderProjection(loggedInUser, searchFilter, page, size, tenderType,organizationId,categoryId, tenderNo, fromDate, toDate),
+        return new ResponseEntity<>(tenderService.getClosedTenderProjection(
+                loggedInUser, searchFilter, page, size,
+                tenderType, organizationId, categoryId,
+                tenderNo, fromDate, toDate),
                 HttpStatus.OK);
     }
 
