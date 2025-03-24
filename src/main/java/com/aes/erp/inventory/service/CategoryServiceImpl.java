@@ -356,17 +356,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<?> getItemCategoryListForStoreType(ClaimResponseDto loggedInUser, Optional<Long> id, Optional<String> name, Optional<String> code) {
+    public List<?> getItemCategoryListForStoreType(Optional<ClaimResponseDto> optionalLoggedInUser, Optional<Long> id, Optional<String> name, Optional<String> code) {
         Set<Long> vendorCategoryIds = null;
-        if(loggedInUser!=null){
-            if(loggedInUser.getUserInfoDto().get("vendorId")!=null &&
-                    !loggedInUser.getUserInfoDto().get("vendorId").equals("")){
-                Optional<VendorRepository.VendorDetail> opVendor = vendorRepository.findVendorById(Long.valueOf((Integer)loggedInUser.getUserInfoDto().get("vendorId")));
-               if(opVendor.isPresent()){
-                   vendorCategoryIds= opVendor.get().getCategories()!=null?
-                           Arrays.stream(opVendor.get().getCategories().split(","))
-                                   .map(Long:: parseLong).collect(Collectors.toSet()) :null;
-               }
+        if (optionalLoggedInUser.isPresent()) {
+            ClaimResponseDto loggedInUser = optionalLoggedInUser.get();
+            if (loggedInUser.getUserInfoDto()!= null &&
+                    loggedInUser.getUserInfoDto().get("vendorId") != null &&
+                    !loggedInUser.getUserInfoDto().get("vendorId").equals("")) {
+                Optional<VendorRepository.VendorDetail> opVendor = vendorRepository.findVendorById(Long.valueOf((Integer) loggedInUser.getUserInfoDto().get("vendorId")));
+                if (opVendor.isPresent()) {
+                    vendorCategoryIds = opVendor.get().getCategories() != null ?
+                            Arrays.stream(opVendor.get().getCategories().split(","))
+                                    .map(Long::parseLong).collect(Collectors.toSet()) : null;
+                }
             }
         }
 
