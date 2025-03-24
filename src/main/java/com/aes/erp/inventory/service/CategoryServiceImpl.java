@@ -12,6 +12,7 @@ import com.aes.erp.network.NetworkService;
 import com.aes.erp.vendor.repository.VendorRepository;
 import com.aes.erp.vendor.utils.GenericModelMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -327,11 +328,14 @@ public class CategoryServiceImpl implements CategoryService {
                                                                           Optional<Long> parentCategoryId,
                                                                           Optional<String> name,
                                                                           Optional<String> code,
-                                                                          ClaimResponseDto loggedInUser ) {
+                                                                          Optional<ClaimResponseDto> optionalLoggedInUser ) {
         Integer vendorId = null;
-        if(loggedInUser!=null){
-            if(loggedInUser.getUserInfoDto().get("vendorId")!=null &&
-                    !loggedInUser.getUserInfoDto().get("vendorId").equals("")){
+        if (optionalLoggedInUser.isPresent()) {
+            log.info("Fetching Vendor ID from loggedIn User.");
+            ClaimResponseDto loggedInUser = optionalLoggedInUser.get();
+            if (loggedInUser.getUserInfoDto() != null &&
+                    loggedInUser.getUserInfoDto().get("vendorId") != null &&
+                    !loggedInUser.getUserInfoDto().get("vendorId").equals("")) {
                 vendorId = (Integer) loggedInUser.getUserInfoDto().get("vendorId");
             }
         }
@@ -359,12 +363,14 @@ public class CategoryServiceImpl implements CategoryService {
     public List<?> getItemCategoryListForStoreType(Optional<ClaimResponseDto> optionalLoggedInUser, Optional<Long> id, Optional<String> name, Optional<String> code) {
         Set<Long> vendorCategoryIds = null;
         if (optionalLoggedInUser.isPresent()) {
+            log.info("Fetching Vendor ID from loggedIn User.");
             ClaimResponseDto loggedInUser = optionalLoggedInUser.get();
             if (loggedInUser.getUserInfoDto()!= null &&
                     loggedInUser.getUserInfoDto().get("vendorId") != null &&
                     !loggedInUser.getUserInfoDto().get("vendorId").equals("")) {
                 Optional<VendorRepository.VendorDetail> opVendor = vendorRepository.findVendorById(Long.valueOf((Integer) loggedInUser.getUserInfoDto().get("vendorId")));
                 if (opVendor.isPresent()) {
+                    log.info("Fetching Vendor assigned categories.");
                     vendorCategoryIds = opVendor.get().getCategories() != null ?
                             Arrays.stream(opVendor.get().getCategories().split(","))
                                     .map(Long::parseLong).collect(Collectors.toSet()) : null;

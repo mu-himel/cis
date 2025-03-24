@@ -124,7 +124,7 @@ public class ItemCategoryController {
 
     @GetMapping("/list")
     public ResponseEntity<?> getCategoryList(
-            @RequestAttribute ClaimResponseDto loggedInUser,
+            @RequestAttribute Optional<ClaimResponseDto> loggedInUser,
             @RequestParam("categoryId")  Optional<Long> categoryId,
             @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
             @RequestParam("name")  Optional<String> name,

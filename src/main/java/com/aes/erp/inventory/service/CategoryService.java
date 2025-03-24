@@ -53,7 +53,7 @@ public interface CategoryService {
                                                                    Optional<Long> parentCategoryId,
                                                                    Optional<String> name,
                                                                    Optional<String> code,
-                                                                   ClaimResponseDto loggedInUser);
+                                                                   Optional<ClaimResponseDto> loggedInUser);
 
     Page<?> getItemCategoriesForStoreType(Optional<Integer> page, Optional<Integer> size,
                               Optional<Long> id, Optional<String> name, Optional<String> code);
