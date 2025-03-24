@@ -6,25 +6,23 @@ import com.aes.erp.inventory.dto.request.CategoryRequestDto;
 import com.aes.erp.inventory.dto.request.ErpBulkImportDto;
 import com.aes.erp.inventory.dto.request.ImportCategoryScmIdUpdateDto;
 import com.aes.erp.inventory.dto.request.MergePendingCategoryDto;
-import com.aes.erp.inventory.dto.request.MergePendingItemsDto;
 import com.aes.erp.inventory.entity.ItemCategory;
 import com.aes.erp.inventory.entity.Organization;
 import com.aes.erp.inventory.service.CategoryService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
@@ -100,7 +98,7 @@ public class ItemCategoryController {
 
     @GetMapping("/main-categories")
     public ResponseEntity<?> getMainCategoryList(
-                                                 @RequestAttribute ClaimResponseDto loggedInUser,
+                                                 @RequestAttribute Optional<ClaimResponseDto> loggedInUser,
                                                  @RequestParam("storeTypeId") Optional<Long> storeTypeId,
                                                  @RequestParam("name") Optional<String> name,
                                                  @RequestParam("code") Optional<String> code
@@ -126,7 +124,7 @@ public class ItemCategoryController {
 
     @GetMapping("/list")
     public ResponseEntity<?> getCategoryList(
-            @RequestAttribute ClaimResponseDto loggedInUser,
+            @RequestAttribute Optional<ClaimResponseDto> loggedInUser,
             @RequestParam("categoryId")  Optional<Long> categoryId,
             @RequestParam("storeTypeId")  Optional<Long> storeTypeId,
             @RequestParam("name")  Optional<String> name,
